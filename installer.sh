@@ -27,6 +27,7 @@ ln -s ${BASEDIR}/emacs_d/ ~/.emacs.d
 # git remote add upstream https://github.com/sorin-ionescu/prezto.git
 # git remote -v
 # git fetch upstream
+# cd "${ZDOTDIR:-$HOME}"/dotfiles
 
 # NB to remove submodules, see the following gist: https://gist.github.com/simonmoulds/3d6d07f0703bfe5a9ccc6744668b9187
 
@@ -47,6 +48,12 @@ ln -s ~/.zprezto/runcoms/zprofile ~/.zprofile
 ln -s ~/.zprezto/runcoms/zshenv ~/.zshenv
 
 # tmux
+
+# git submodule add https://github.com/tmux-plugins/tpm "${ZDOTDIR:-$HOME}"/dotfiles/tmux/plugins
+# cd "${ZDOTDIR:-$HOME}"/dotfiles/tmux/plugins
+# git submodule update --init --recursive
+# cd "${ZDOTDIR:-$HOME}"/dotfiles
+
 ln -s ${BASEDIR}/tmux/ ~/.tmux
 ln -s ${BASEDIR}/tmux_conf ~/.tmux.conf
 
