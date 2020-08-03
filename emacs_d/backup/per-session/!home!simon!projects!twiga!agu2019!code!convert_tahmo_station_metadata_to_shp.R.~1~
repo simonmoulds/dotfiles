@@ -1,6 +1,0 @@
-library(rgdal)
-library(sf)
-
-x = read.csv('../data-raw/TAHMO/tahmo_stn_metadata.csv')
-
-pt = st_as_sf(x, coords=c("X","Y"))

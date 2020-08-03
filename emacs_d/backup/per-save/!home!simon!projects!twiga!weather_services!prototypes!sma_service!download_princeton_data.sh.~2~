@@ -1,8 +1,0 @@
-#!/bin/bash
-
-for var in [ prcp tas tmin tmax ]
-do
-    echo $var
-done
-
-    

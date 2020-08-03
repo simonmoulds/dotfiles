@@ -1,2 +1,0 @@
-rewrite netcdf2PCRobjectClone to avoid using netCDF4.date2index, which
-   seems to be crashing

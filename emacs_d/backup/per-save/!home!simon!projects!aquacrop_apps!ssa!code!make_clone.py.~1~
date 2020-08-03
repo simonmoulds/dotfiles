@@ -1,6 +1,0 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
-import xarray as xr
-
-xds = xr.open_dataset('../data-raw/soil/theta_sat_cosby_ssa_layer1_0pt25degree.tif')

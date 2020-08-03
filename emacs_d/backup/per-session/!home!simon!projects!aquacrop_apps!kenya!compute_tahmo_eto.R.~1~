@@ -1,6 +1,0 @@
-## Author : Simon Moulds
-## Date   : July 2020
-
-library(water)
-
-x = read.csv("tahmo_weather_data.csv")

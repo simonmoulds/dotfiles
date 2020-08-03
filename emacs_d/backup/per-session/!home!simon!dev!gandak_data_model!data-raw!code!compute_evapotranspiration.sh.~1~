@@ -1,9 +1,0 @@
-#!/bin/bash
-
-wd=$HOME/projects/gandak_systems_model
-
-# # radiation
-# e2o_radiation.py -S 1 -E 366 -D $wd/data/hydrosheds_gandak_5m.map -O $wd/data/output_rad -T 60 -f PCRaster
-
-# evapotranspiration
-e2o_calculateEvaporation.py -I $wd/data/e2o_calculateEvaporation_gandak.ini

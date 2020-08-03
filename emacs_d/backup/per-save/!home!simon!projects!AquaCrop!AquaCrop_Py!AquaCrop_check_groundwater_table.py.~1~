@@ -1,6 +1,0 @@
-# TODO: header info
-
-class checkGroundwaterTable(object):
-
-    def __init__(self, checkGroundwaterTable_variable):
-        self.var = checkGroundwaterTable_variable

@@ -1,5 +1,0 @@
-library(ncdf4)
-
-nc = nc_open("maxRootDepth.nc")
-
-zr = ncvar_get(nc, "maxRootDepth")

@@ -1,9 +1,0 @@
-#!/bin/bash
-
-r.in.gdal \
-    -a \
-    input="hwsd.tif" \
-    output=hwsd \
-    --overwrite
-
-g.region raster=hwsd

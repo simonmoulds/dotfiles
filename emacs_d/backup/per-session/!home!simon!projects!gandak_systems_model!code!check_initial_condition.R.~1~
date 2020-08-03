@@ -1,4 +1,0 @@
-library(raster)
-
-hini = raster("h_ini.nc", varname="h")
-dem = raster("gw_data.nc", varname="DEM")

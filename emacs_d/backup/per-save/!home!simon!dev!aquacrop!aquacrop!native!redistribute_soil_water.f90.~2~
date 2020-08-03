@@ -1,3 +1,0 @@
-module redistribute_soil_moisture
-  use types
-  implicit none

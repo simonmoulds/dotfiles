@@ -1,8 +1,0 @@
-## Author : Simon Moulds
-## Date   : 10/04/2019
-
-library(raster)
-library(magrittr)
-
-r = raster("poopomask5.nc")
-pts = as(r, "SpatialPoints") %>% as.data.frame

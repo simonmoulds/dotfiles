@@ -1,7 +1,0 @@
-## Author : Simon Moulds
-## Date   : July 2020
-
-library(rgdal)
-library(raster)
-
-lu_maps = list.files("../data", pattern="^(ESACCI|C3S)-(.*)_poopo.tif$")

@@ -1,9 +1,0 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
-import xarray as xr
-import numpy as np
-
-prec_fn = "daily_precipitation_cru_era-interim_2000_to_2010_cropped.nc4"
-refet_fn = "daily_referencePotET_cru_era-interim_2000_to_2010_cropped.nc4"
-temp_fn = "daily_temperature_cru_era-interim_2000_to_2010_cropped.nc4"

@@ -1,6 +1,0 @@
-# TODO: header info
-
-class rotation(object):
-
-    def __init__(self, landcoverType_variable):
-        

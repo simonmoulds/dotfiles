@@ -1,7 +1,0 @@
-library(raster)
-
-## read initial head and DEM
-hini = raster("h_ini.nc", varname="h")
-dem = raster("gw_data.nc", varname="DEM")
-gwlevel = dem - hini
-plot(gwlevel)

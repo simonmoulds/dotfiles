@@ -1,6 +1,0 @@
-#' Class PriceData
-#'
-#' An S4 class to represent price data
-#'
-#' @slot
-#' 

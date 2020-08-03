@@ -1,5 +1,0 @@
-#!/bin/bash
-
-aqdir=/home/simon/projects/AquaCrop/AquaCrop_Py
-projdir=/home/simon/projects/AquaCrop/Gandak_FAO56
-$aqdir/deterministic_runner.py 

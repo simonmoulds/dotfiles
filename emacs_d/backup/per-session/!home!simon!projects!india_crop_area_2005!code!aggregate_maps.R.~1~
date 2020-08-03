@@ -1,7 +1,0 @@
-## Author : Simon Moulds
-## Date   : July 2019
-
-library(raster)
-
-seasonal_map_path = "../data/output_2005/seasonal_maps"
-kharif_maps = list.files(seasonal_map_path, pattern="INDIA_(RAIN|IRRI)_(.*)_KHARIF_2005.tif")

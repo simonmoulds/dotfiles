@@ -1,8 +1,0 @@
-
-irrigation_schedule = function(n_crop, schedule, depth) {
-    x = list(
-        schedule = schedule,
-        depth = depth
-    )
-    structure(x, class="irrigation_schedule")
-}

@@ -1,5 +1,0 @@
-#!/bin/bash
-
-matlabdir='/home/simon/projects/AquaCrop/AquaCrop_tests/aquacrop_matlab_test_data'
-pythondir='/home/simon/projects/AquaCrop/AquaCrop_tests/aquacrop_matlab_test_data'
-

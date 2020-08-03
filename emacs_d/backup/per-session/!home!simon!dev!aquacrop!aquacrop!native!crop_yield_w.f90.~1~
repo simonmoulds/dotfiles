@@ -1,8 +1,0 @@
-module crop_yield_w
-  use types
-  use crop_yield, only: update_crop_yield
-  implicit none
-
-contains
-
-  subroutine update_biomass_accum_w( &

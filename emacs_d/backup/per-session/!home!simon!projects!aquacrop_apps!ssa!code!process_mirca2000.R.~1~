@@ -1,7 +1,0 @@
-## Author : Simon Moulds
-## Date   : August 2019
-
-library(raster)
-
-rainfed_calendar_path = "/data/MIRCA2000/cropping_calendar_rainfed.txt"
-x = readLines(rainfed_calendar_path)

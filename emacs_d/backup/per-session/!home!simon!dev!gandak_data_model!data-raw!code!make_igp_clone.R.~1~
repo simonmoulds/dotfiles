@@ -1,7 +1,0 @@
-## Author : Simon Moulds
-## Date   : Nov 2018
-
-library(raster)
-library(ncdf4)
-
-r = raster("/data/PRINCETON_IGP/prcp_daily_2015-2015_igp.nc", layer=1)

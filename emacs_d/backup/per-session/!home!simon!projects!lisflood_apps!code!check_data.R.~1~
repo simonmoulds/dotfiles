@@ -1,6 +1,0 @@
-## Author : Simon Moulds
-## Date   : Apr 2020
-
-library(raster)
-
-r = raster("../data/lisflood_channel_geometry/drt_channel_africa_0.250000Deg.tif")

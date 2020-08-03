@@ -1,5 +1,0 @@
-import xarray
-import metpy
-
-d2m = xarray.open_dataset('data/era5_reanalysis_2m_dewpoint_temperature_india_201901.nc')
-sp = xarray.open_dataset('data/era5_reanalysis_surface_pressure_india_201901.nc')

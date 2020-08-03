@@ -1,7 +1,0 @@
-## Author : Simon Moulds
-## Date   : June 2020
-
-library(ncdf4)
-library(tidync)
-
-x = hyper_tibble("test/netcdf/hm_output_daily_total_CC.nc")

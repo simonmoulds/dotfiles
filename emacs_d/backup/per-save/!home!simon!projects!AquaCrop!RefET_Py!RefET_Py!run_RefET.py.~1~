@@ -1,8 +1,0 @@
-
-class run_AquaCrop(DeterministicRunner):
-    def __init__(self, configuration, modelTime, initialState = None):
-        DynamicModel.__init__(self)
-        self.modelTime = modelTime
-        self.model = AquaCrop(configuration, modelTime, initialState)
-        self.model.initial()
-        self.reporting = Reporting(configuration, self.model, modelTime)

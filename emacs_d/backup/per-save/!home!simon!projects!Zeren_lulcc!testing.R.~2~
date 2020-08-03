@@ -1,9 +1,0 @@
-devtools::load_all("../r_lulcc/lulcc")
-
-ef_001 = raster("Peru_mountain_1000_R1.tif")
-ef_002 = raster("Peru_pop_adm3_mount_R1.tif")
-ef_003 = raster("Peru_rivers_mount_MTBF_R1.tif")
-
-ef_set = stack(ef_001,ef_002,ef_003)
-
-x = ExpVarRasterList(unstack(ef_set), pattern="ef")

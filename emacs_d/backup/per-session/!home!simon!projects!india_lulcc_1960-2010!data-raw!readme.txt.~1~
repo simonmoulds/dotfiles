@@ -1,1 +1,0 @@
-This directory contains the raw data required to run the analysis. We are not permitted to distribute two of the datasets (Richards and Flint, Bioclim) and have instead provided two scripts (download_bioclim.sh and download_richards_flint.sh) which contain wget commands to download the datasets.

@@ -1,7 +1,0 @@
-location{primary, type:svn}[jules.x] = https://code.metoffice.gov.uk/svn/jules/main
-browser.loc-tmpl[jules.x] = https://code.metoffice.gov.uk/trac/{1}/intertrac/source:/{2}{3}
-browser.comp-pat[jules.x] = (?msx-i:\A // [^/]+ /svn/ ([^/]+) /*(.*) \z)
-
-location{primary, type:svn}[jules_doc.x] = https://code.metoffice.gov.uk/svn/jules/doc
-browser.loc-tmpl[jules_doc.x] = https://code.metoffice.gov.uk/trac/{1}/intertrac/source:/{2}{3}
-browser.comp-pat[jules_doc.x] = (?msx-i:\A // [^/]+ /svn/ ([^/]+) /*(.*) \z)

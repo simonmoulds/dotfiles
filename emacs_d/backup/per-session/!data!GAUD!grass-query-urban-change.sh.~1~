@@ -1,6 +1,0 @@
-#!/bin/bash
-
-datadir=/data/
-
-v.in.ogr \
-    input=/

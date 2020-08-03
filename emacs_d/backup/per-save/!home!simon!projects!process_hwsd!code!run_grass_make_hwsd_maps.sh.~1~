@@ -1,6 +1,0 @@
-#!/bin/bash
-
-wd=$HOME/projects/process_hwsd/code
-chmod u+x grass_make_hwsd_maps.sh
-export GRASS_BATCH_JOB=$wd/grass_make_hwsd_maps.sh
-grass76 /home/sm510/grassdata/latlong/hwsd

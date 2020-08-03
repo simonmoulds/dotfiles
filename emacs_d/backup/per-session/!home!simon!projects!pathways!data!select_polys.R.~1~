@@ -1,5 +1,0 @@
-
-library(rgdal)
-
-shp = readOGR("gha_admbndp2_1m_gaul", layer="GHA_admbndp2_1m_GAUL")
-shp = shp[shp$ADM2_NAME %in% c("Accra","Kumasi","Tamale"),]

@@ -1,6 +1,0 @@
-module irrigation_w
-  use types
-  use irrigation, only: irrigation
-  implicit none
-
-contains

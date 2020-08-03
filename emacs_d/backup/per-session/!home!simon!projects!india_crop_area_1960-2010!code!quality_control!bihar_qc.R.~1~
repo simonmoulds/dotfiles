@@ -1,7 +1,0 @@
-## Author : Simon Moulds
-## Date   : Apr 2018
-
-## Quality control for Bihar
-
-## Barley
-xx[["irr_barley"]] %<>% irr_frac_interp(xx[["apy_barley"]], 45:46, 44)

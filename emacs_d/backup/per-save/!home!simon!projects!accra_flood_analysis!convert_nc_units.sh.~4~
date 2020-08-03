@@ -1,9 +1,0 @@
-#!/bin/bash
-
-for mon in {01..12}
-do
-    basenm=era5_reanalysis_ghana_2015${mon}
-    cdo -b I32 aexpr,"tp=tp*1000" "${basenm}".nc tmp.nc
-    cdo setattribute,tp@units=mm tmp.nc "${basenm}".nc "${basenm}"_mm.nc
-done
-

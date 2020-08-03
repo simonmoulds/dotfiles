@@ -1,7 +1,0 @@
-#!/bin/bash
-
-g.region \
-    e=86.5 w=83 n=28 s=25 \
-    res=0:05 \
-    save=gandak_0.083333Deg \
-    --overwrite
