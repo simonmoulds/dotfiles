@@ -25,12 +25,14 @@ ln -s ${BASEDIR}/emacs_d/ ~/.emacs.d
 # > git remote -v
 # > git fetch upstream
 
+# > git clone --recursive https://github.com/simonmoulds/prezto.git "${ZDOTDIR:-$HOME}"/dotfiles/zprezto
+
 for f in zshrc zlogin zlogout zprofile zshenv zpreztorc
 do    
     cp -rf ${BASEDIR}/${f} ${BASEDIR}/zprezto/runcoms
 done
 
-cp -rf ${BASEDIR}/zprezto ~/.zprezto
+cp -rf ${BASEDIR}/prezto ~/.zprezto
 
 ln -s ~/.zprezto/runcoms/zpreztorc ~/.zpreztorc
 ln -s ~/.zprezto/runcoms/zshrc ~/.zshrc
