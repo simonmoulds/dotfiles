@@ -29,7 +29,7 @@ ln -s ${BASEDIR}/emacs_d/ ~/.emacs.d
 
 for f in zshrc zlogin zlogout zprofile zshenv zpreztorc
 do    
-    cp -rf ${BASEDIR}/${f} ${BASEDIR}/zprezto/runcoms
+    cp -rf ${BASEDIR}/${f} ${BASEDIR}/prezto/runcoms
 done
 
 cp -rf ${BASEDIR}/prezto ~/.zprezto
