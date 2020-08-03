@@ -1,0 +1,215 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+# ######################################################### #
+# ######################################################### #
+# Installing the Google Earth Engine Python API:
+
+# Follow these instructions to install Google Earth Engine
+# Python API using Anaconda:
+
+# https://developers.google.com/earth-engine/python_install-conda)
+
+# To summarise:
+
+# > conda create --name ee
+# > conda activate ee
+# > conda install -c conda-forge earthengine-api
+
+# To authenticate:
+# > earthengine authenticate  
+#
+# ######################################################### #
+# ######################################################### #
+
+import os
+import time
+import ee
+
+# Initialize the Earth Engine module.
+ee.Initialize()
+
+# Define region:
+# # Test region:
+# region = ee.Geometry.Rectangle(78.5, 27.5, 78.75, 27.75);
+
+# India region:
+# xmin, ymin, xmax, ymax = 68., 6., 98., 38.
+xmin, ymin, xmax, ymax = 68., 6., 98., 38.
+xmin -= 1
+ymin -= 1
+xmax += 1
+ymax += 1
+region = ee.Geometry.Rectangle(xmin, ymin, xmax, ymax)
+res = 1./120
+ncol = int((xmax-xmin) / res)
+nrow = int((ymax-ymin) / res)
+
+dataset = \
+    ee.ImageCollection('MODIS/006/MOD13Q1')\
+      .filter(ee.Filter.date('2001-01-01', '2020-01-01'))# \
+      # .filterBounds(region)\
+      # .map(lambda image: image.clip(region))
+ndvi = dataset.select('NDVI');
+
+# ######################################################### #
+# Compute max kharif/rabi values in each year               #
+# ######################################################### #
+
+ndvi_kharif_list = ee.List([])
+ndvi_rabi_list = ee.List([])
+for i in range(2001, 2019):
+    # Filter current year kharif/rabi seasons
+    kharif_start = str(i) + '-06-01'
+    kharif_end = str(i) + '-09-30'
+    ndvi_kharif = ndvi.filter(
+        ee.Filter.date(kharif_start, kharif_end)
+    )
+    rabi_start = str(i)+ '-10-01'
+    rabi_end = str(i+1) + '-04-01'
+    ndvi_rabi = ndvi.filter(
+        ee.Filter.date(rabi_start, rabi_end)
+    )
+    # Compute maximum NDVI
+    ndvi_kharif_max = ndvi_kharif.reduce(ee.Reducer.max())
+    ndvi_rabi_max = ndvi_rabi.reduce(ee.Reducer.max())
+    # Add images to list
+    ndvi_kharif_list = ndvi_kharif_list.add(ndvi_kharif_max)
+    ndvi_rabi_list = ndvi_rabi_list.add(ndvi_rabi_max)
+
+# ######################################################### #
+# Compute the long term mean maximum value for each season  #
+# ######################################################### #
+
+ndvi_kharif_lt_mean_max = \
+    ee.ImageCollection(ndvi_kharif_list)\
+      .reduce(ee.Reducer.mean())
+
+ndvi_rabi_lt_mean_max = \
+    ee.ImageCollection(ndvi_rabi_list)\
+      .reduce(ee.Reducer.mean())
+
+# ######################################################### #
+# Calculate the anomaly for each year                       #
+# ######################################################### #
+ndvi_kharif_anomaly_list = ee.List([]);
+ndvi_rabi_anomaly_list = ee.List([]);
+for i in range(18):
+
+    # Retrieve maximum map
+    ndvi_kharif_max = ndvi_kharif_list.get(i)
+    ndvi_rabi_max = ndvi_rabi_list.get(i)
+    
+    # Calculate anomaly by subtracting from the long-term mean
+    ndvi_kharif_anomaly = \
+        ndvi_kharif_lt_mean_max\
+        .subtract(ndvi_kharif_max)
+    ndvi_rabi_anomaly = \
+        ndvi_rabi_lt_mean_max\
+        .subtract(ndvi_rabi_max)
+    
+    # Add anomaly maps to lists
+    ndvi_kharif_anomaly_list = \
+        ndvi_kharif_anomaly_list\
+        .add(ee.Image(ndvi_kharif_anomaly))
+    
+    ndvi_rabi_anomaly_list = \
+        ndvi_rabi_anomaly_list\
+        .add(ee.Image(ndvi_rabi_anomaly))
+
+# ######################################################### #
+# Export to Google Drive                                    #
+# ######################################################### #
+
+# Delete any existing files
+os.system('rclone delete remote:earthengine')
+
+# For testing:
+# years = [year for year in range(2001,2002)]
+years = [year for year in range(2001,2018)]
+tasks = []
+for index, year in enumerate(years):
+    # kharif_img = ee.Image(ndvi_kharif_anomaly_list.get(index))
+    # native_scale = kharif_img.projection().nominalScale()
+    task = ee.batch.Export.image.toDrive(
+        image = ee.Image(ndvi_kharif_anomaly_list.get(index)),
+        description = 'modis_max_kharif_anomaly_' + str(year),
+        # dimensions = str(ncol) + 'x' + str(nrow),
+        scale = 500,
+        # crs = ee.Image(ndvi_kharif_anomaly_list.get(index)).projection(),
+        region = region.getInfo()['coordinates'],
+        maxPixels = 2e9,
+        fileFormat = 'GeoTIFF',
+        folder='earthengine'
+    )
+    task.start()
+    tasks.append(task)
+
+    # rabi_img = ee.Image(ndvi_rabi_anomaly_list.get(index))
+    # native_scale = rabi_img.projection().nominalScale()
+    task = ee.batch.Export.image.toDrive(
+        image = ee.Image(ndvi_rabi_anomaly_list.get(index)),
+        description = 'modis_max_rabi_anomaly_' + str(year),
+        # dimensions = str(ncol) + 'x' + str(nrow),
+        scale = 500,
+        # crs = ee.Image(ndvi_rabi_anomaly_list.get(index)).projection(),
+        region = region.getInfo()['coordinates'],
+        maxPixels = 2e9,
+        fileFormat = 'GeoTIFF',
+        folder='earthengine'
+    )
+    task.start()
+    tasks.append(task)
+
+# ######################################################### #
+# Download to local computer using rclone                   #
+# ######################################################### #
+
+def get_status(tasks):
+    """Retrieve GEE task status."""
+    return [task.status() for task in tasks]
+
+def all_tasks_completed(tasks):
+    """Check whether tasks are completed."""
+    status = get_status(tasks)
+    return all([((st['state'] == 'COMPLETED') | (st['state'] == 'FAILED')) for st in status])
+
+# This polls Earth Engine to see if all tasks are complete,
+# and prevents the script from advancing until they are
+while not all_tasks_completed(tasks):
+    time.sleep(10)
+
+status = get_status(tasks)
+for i, value in enumerate(status):
+    state = status[i]['state']
+    id = status[i]['id']
+    description = status[i]['description']
+    if state == 'COMPLETED':
+
+        fn = description + '.tif'
+        newfn = description + '_resamp.tif'
+        
+        rclone_cmd = \
+            'rclone copy remote:earthengine/' \
+            + description + '.tif' \
+            + ' ../data'
+        os.system(rclone_cmd)
+
+        # Resample using GDAL
+        # N.B. I tried to do this using the export parameters in Earth Engine,
+        # but I couldn't manage to get it sufficiently accurate
+        ds = gdal.Open(os.path.join('../data', fn))
+        ds = gdal.Warp(
+            os.path.join('../data', newfn),
+            os.path.join('../data', fn),
+            outputBounds=[xmin, ymin, xmax, ymax],
+            xRes=res,
+            yRes=res,
+            dstSRS='EPSG:4326',
+            resampleAlg='bilinear'
+        )
+        ds = None
+        
+    else:
+        print('Task ' + id + '[' + description + ']' + ' failed')
+

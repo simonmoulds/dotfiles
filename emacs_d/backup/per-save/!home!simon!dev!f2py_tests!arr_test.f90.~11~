@@ -1,0 +1,54 @@
+module multtests
+
+  integer, parameter :: int32 = 4
+  integer, parameter :: int64 = 8
+  integer, parameter :: real32 = 4
+  integer, parameter :: real64 = 8
+
+contains
+
+  subroutine MULT0(a,nrow,ncol)
+
+    integer(int32), intent(in) :: nrow, ncol
+    real(real64), dimension(nrow,ncol), intent(inout) :: a
+
+    do i=1,nrow
+       do j=1,ncol
+          a(i,j) = a(i,j) * 3.14
+       end do
+    end do
+
+  end subroutine MULT0
+
+  subroutine MULT1(a,nrow,ncol)
+
+    integer(int32), intent(in) :: nrow, ncol
+    real(real64), dimension(nrow,ncol), intent(inout) :: a
+
+    do i=1,nrow
+       do j=1,ncol
+          a(i,j) = a(i,j) * 3.14
+       end do
+    end do
+
+  end subroutine MULT1
+
+end module multtests
+
+
+  !       SUBROUTINE FIB(A,N)
+! C
+! C     CALCULATE FIRST N FIBONACCI NUMBERS
+! C
+!       INTEGER N
+!       REAL*8 A(N)
+!       DO I=1,N
+!          IF (I.EQ.1) THEN
+!             A(I) = 0.0D0
+!          ELSEIF (I.EQ.2) THEN
+!             A(I) = 1.0D0
+!          ELSE 
+!             A(I) = A(I-1) + A(I-2)
+!          ENDIF
+!       ENDDO
+!       END

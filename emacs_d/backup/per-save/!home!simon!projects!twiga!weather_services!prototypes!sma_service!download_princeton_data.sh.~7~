@@ -1,0 +1,12 @@
+#!/bin/bash
+
+for var in prcp tas tmin tmax
+do
+    for year in 2014 2015 2016
+    do
+        fn="${var}"_daily_"${year}".nc
+        wget http://hydrology.princeton.edu/data/pgf/v3/0.25deg/daily/$fn
+    done    
+done
+
+    

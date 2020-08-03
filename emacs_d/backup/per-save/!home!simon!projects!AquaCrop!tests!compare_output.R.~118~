@@ -1,0 +1,243 @@
+## Author : Simon Moulds
+## Date   : July 2018
+
+library(tidyverse)
+library(magrittr)
+library(ncdf4)
+
+aosdir = "/home/simon/projects/AquaCrop/tests/aquacrop_matlab_test_data/"
+aqpydir = "/home/simon/projects/AquaCrop/tests/aquacrop_python_test_data/"
+
+## ======================================
+## Test 1: Ch7, Tunis Wheat, Ex1
+## ======================================
+
+## Wheat production in Tunis, Tunisia
+
+## Test 1a: Local soil
+## ###################
+
+## yield
+years = 1979:2001
+yield_comparison = data.frame(year=years,aos_v0=NA,aos_v5=NA,aqpy=NA)
+for (year in years) {
+    aos_v0_fn = file.path(
+        aosdir,
+        "Output_Ch7_Tunis_Wheat_Ex1a",
+        paste0("Exercise_7_1_LocalSoil_", year, "_FinalOutput_orig.txt"))
+    aos_v0 = read.table(aos_v0_fn, header=TRUE)
+    aos_v0_yield = aos_v0$Yield[1]             
+
+    aos_v5_fn = file.path(
+        aosdir,
+        "Output_Ch7_Tunis_Wheat_Ex1a",
+        paste0("Ch7_Tunis_Wheat_Ex1a_", year, "_FinalOutput.txt"))
+    aos_v5 = read.table(aos_v5_fn, header=TRUE)
+    aos_v5_yield = aos_v5$Yield[1]
+
+    aqpy_fn = file.path(
+        aqpydir,
+        paste0("Output_Ch7_Tunis_Wheat_Ex1a_", year),
+        "netcdf",
+        "Y_dailyTot_output.nc")
+
+    nc = nc_open(aqpy_fn)
+    nm = attributes(nc$var)$names[1]
+    var = ncvar_get(nc, nm)[1,1,]
+    nc_close(nc)
+    aqpy_yield = round(max(var), digits=2)
+
+    row = which(yield_comparison$year %in% year)
+    yield_comparison$aos_v0[row] = aos_v0_yield
+    yield_comparison$aos_v5[row] = aos_v5_yield
+    yield_comparison$aqpy[row] = aqpy_yield
+}
+
+x = yield_comparison$aos_v5
+y = yield_comparison$aqpy
+rmse = sqrt(mean((y-x)^2)) %>% round(digits=3)
+rsq = lm(y ~ x) %>% summary %>% `[[`("r.squared") %>% round(digits=3)
+p =
+    data.frame(time=years, x=x, y=y) %>%
+    ggplot(aes(x,y)) +
+    geom_point() +
+    coord_fixed() +
+    xlab(bquote('AquaCrop-OS ('*tonne~ha^-1*')')) +
+    ylab(bquote('AquaCrop-Py ('*tonne~ha^-1*')')) +
+    geom_abline(slope=1, intercept=c(0,0)) +
+    scale_x_continuous(breaks=seq(0,10,2), limits=c(0,10)) +
+    scale_y_continuous(breaks=seq(0,10,2), limits=c(0,10)) ## +
+    ## annotate("text",x=0.25,y=9.75,label="hello")
+p
+
+## Notes:
+## years 1987,1988 are out by quite large margins - need to
+## investigate this further
+
+## Test 1b: Sandy Loam
+## ###################
+
+## yield
+years = 1979:2001
+yield_comparison = data.frame(year=years,aos_v0=NA,aos_v5=NA,aqpy=NA)
+for (year in years) {
+    aos_v0_fn = file.path(
+        aosdir,
+        "Output_Ch7_Tunis_Wheat_Ex1b",
+        paste0("Exercise_7_1_SandyLoam_", year, "_FinalOutput_orig.txt"))
+    aos_v0 = read.table(aos_v0_fn, header=TRUE)
+    aos_v0_yield = aos_v0$Yield[1]             
+
+    aos_v5_fn = file.path(
+        aosdir,
+        "Output_Ch7_Tunis_Wheat_Ex1b",
+        paste0("Ch7_Tunis_Wheat_Ex1b_", year, "_FinalOutput.txt"))
+    if (file.exists(aos_v5_fn)) {
+        aos_v5 = read.table(aos_v5_fn, header=TRUE)
+        aos_v5_yield = aos_v5$Yield[1]
+    } else {
+        aos_v5_yield = NA
+    }    
+
+    aqpy_fn = file.path(
+        aqpydir,
+        paste0("Output_Ch7_Tunis_Wheat_Ex1b_", year),
+        "netcdf",
+        "Y_dailyTot_output.nc")
+
+    nc = nc_open(aqpy_fn)
+    nm = attributes(nc$var)$names[1]
+    var = ncvar_get(nc, nm)[1,1,]
+    nc_close(nc)
+    aqpy_yield = round(max(var), digits=2)
+
+    row = which(yield_comparison$year %in% year)
+    yield_comparison$aos_v0[row] = aos_v0_yield
+    yield_comparison$aos_v5[row] = aos_v5_yield
+    yield_comparison$aqpy[row] = aqpy_yield
+}
+
+## x = yield_comparison$aos_v5
+## y = yield_comparison$aqpy
+## rmse = sqrt(mean((y-x)^2)) %>% round(digits=3)
+## rsq = lm(y ~ x) %>% summary %>% `[[`("r.squared") %>% round(digits=3)
+## p =
+##     data.frame(time=years, x=x, y=y) %>%
+##     ggplot(aes(x,y)) +
+##     geom_point() +
+##     coord_fixed() +
+##     xlab(bquote('AquaCrop-OS ('*tonne~ha^-1*')')) +
+##     ylab(bquote('AquaCrop-Py ('*tonne~ha^-1*')')) +
+##     geom_abline(slope=1, intercept=c(0,0)) +
+##     scale_x_continuous(breaks=seq(0,10,2), limits=c(0,10)) +
+##     scale_y_continuous(breaks=seq(0,10,2), limits=c(0,10)) ## +
+##     ## annotate("text",x=0.25,y=9.75,label="hello")
+## p
+
+
+
+
+
+
+
+
+
+## #########
+## NOT USED:
+## #########
+
+## ## ======================================
+## ## Test 1: default data supplied with model
+## ## ======================================
+
+## aos_v5_fn = file.path(aosdir,
+##                       "Output",
+##                       "Sample_WaterContents.txt")
+
+## soil_profile = read.table(file.path(aosdir,"Input", "SoilProfile.txt"), skip=2) %>% setNames(c("Compartment","Thickness","Layer"))
+## ncomp = max(soil_profile$Compartment)
+## zmid = cumsum(soil_profile$Thickness) - soil_profile$Thickness / 2
+## colnms = c("Year","Month","Day","SimDay","Season",paste0("X", as.character(zmid), "m"))
+
+## ## aos_v0 = read.table(aos_v0_fn, header=TRUE, sep="\t", skip=ncomp) %>% setNames(colnms) %>% `[`(,1:(ncomp+5)) %>% unite("Date", Year, Month, Day, sep="-") %>% mutate(Date=as.Date(Date, format="%Y-%m-%d"))
+## aos_v5 = read.table(aos_v5_fn, header=TRUE, sep="\t") %>% `[`(,1:(ncomp+5)) %>% unite("Date", Year, Month, Day, sep="-") %>% mutate(Date=as.Date(Date, format="%Y-%m-%d"))
+
+## ## ix = match(aos_v0$Date, aos_v5$Date)
+## ## aos_v5 = aos_v5[ix,]
+
+## ## AquaCrop_Py
+## aqpy_fn = file.path(aqpydir,
+##                     "Output",
+##                     "netcdf",
+##                     "th_dailyTot_output.nc")
+
+## nc = nc_open(aqpy_fn)
+## nm = attributes(nc$var)$names[1]
+## var = ncvar_get(nc, nm)[1,1,1,]
+## nc_close(nc)
+
+## t = aos_v5[["Date"]]
+## plot(t[1:365], aos_v5[["X0.05m"]][1:365], col="blue")
+## ## lines(t, aos_v0[["X0.05m"]], col="magenta")
+## lines(t[1:365], var[1:365], col="green")
+
+## ## irrigation
+## aos_v5_fn = file.path(aosdir,
+##                       "Output_Ch7_Tunis_Wheat_Ex1",
+##                       "Ch7_Tunis_Wheat_Ex1_WaterFluxes.txt")
+## aos_v5 = read.table(aos_v5_fn, header=TRUE, sep="\t") %>% unite("Date", Year, Month, Day, sep="-") %>% mutate(Date=as.Date(Date, format="%Y-%m-%d"))
+
+## aos_v5_irr = aos_v5[["Irr"]]
+
+## aqpy_fn = file.path(aqpydir,
+##                     "Output_Ch7_Tunis_Wheat_Ex1",
+##                     "netcdf",
+##                     "Irr_dailyTot_output.nc")
+
+## nc = nc_open(aqpy_fn)
+## nm = attributes(nc$var)$names[1]
+## var = ncvar_get(nc, nm)[1,1,]#ix]
+## nc_close(nc)
+
+## ## water contents
+## aos_v0_fn = file.path(aosdir,
+##                       "Output_Ch7_Tunis_Wheat_Ex1",
+##                       "Exercise_7_1_LocalSoil_2001_WaterContents_orig.txt")
+## aos_v5_fn = file.path(aosdir,
+##                       "Output_Ch7_Tunis_Wheat_Ex1",
+##                       "Ch7_Tunis_Wheat_Ex1_WaterContents.txt")
+
+## soil_profile = read.table(file.path(aosdir,"Input_Ch7_Tunis_Wheat_Ex1", "SoilProfile.txt"), skip=2) %>% setNames(c("Compartment","Thickness","Layer"))
+## ncomp = max(soil_profile$Compartment)
+## zmid = cumsum(soil_profile$Thickness) - soil_profile$Thickness / 2
+## colnms = c("Year","Month","Day","SimDay","Season",paste0("X", as.character(zmid), "m"))
+
+## aos_v0 = read.table(aos_v0_fn, header=TRUE, sep="\t", skip=ncomp) %>% setNames(colnms) %>% `[`(,1:(ncomp+5)) %>% unite("Date", Year, Month, Day, sep="-") %>% mutate(Date=as.Date(Date, format="%Y-%m-%d"))
+## aos_v5 = read.table(aos_v5_fn, header=TRUE, sep="\t") %>% `[`(,1:(ncomp+5)) %>% unite("Date", Year, Month, Day, sep="-") %>% mutate(Date=as.Date(Date, format="%Y-%m-%d"))
+
+## ix = match(aos_v0$Date, aos_v5$Date)
+## ## aos_v5 = aos_v5[ix,]
+## aos_v0_th1 = aos_v0[["X0.05m"]]
+## aos_v5_th1 = aos_v5[["X0.05m"]]
+
+## ## AquaCrop_Py
+## aqpy_fn = file.path(aqpydir,
+##                     "Output_Ch7_Tunis_Wheat_Ex1",
+##                     "netcdf",
+##                     "th_dailyTot_output.nc")
+
+## nc = nc_open(aqpy_fn)
+## nm = attributes(nc$var)$names[1]
+## var = ncvar_get(nc, nm)[1,1,1,]#ix]
+## nc_close(nc)
+
+## aos_v5_th1[1:100]
+## round(var[1:100], digits=4)
+
+## aos_v5_irr = aos_v5
+
+## t = aos_v5[["Date"]]
+## plot(t, aos_v5_th1, col="blue")
+## ## lines(t, aos_v0_th1, col="magenta")
+## lines(t, var, col="green")
+## ## stop()

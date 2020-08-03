@@ -1,0 +1,97 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import numpy as np
+import pandas as pd
+import netCDF4
+import calendar
+import datetime
+import os
+
+# set working directory
+wd = '/home/simon/dev/gandak_wb_data_model/data-raw'
+os.chdir(wd)
+
+# extract raw data
+os.system('mkdir data/cwatm_input')
+os.system('unzip -o data/cwatm_input.zip -d data/cwatm_input')
+
+# directory to write output
+outd = '/home/simon/dev/gandak_wb_data_model/data'
+
+# =============
+# root fraction
+# =============
+
+zlayer = np.array([0.3,2.])
+zlayermid = np.array([0.15,1.3])
+nlayer = zlayer.size
+
+# forest
+# ######
+
+rf1 = netCDF4.Dataset('data/cwatm_input/landcover/forest/rootFraction1.nc')
+lat = rf1.variables['lat'][:][::-1]
+lon = rf1.variables['lon'][:]
+rf1_data = rf1.variables['rootFraction1'][:]
+rf1_data = np.flipud(rf1_data)
+rf1.close()
+
+rf2 = netCDF4.Dataset('data/cwatm_input/landcover/forest/rootFraction2.nc')
+rf2_data = rf2.variables['rootFraction2'][:]
+rf2_data = np.flipud(rf2_data)
+rf2.close()
+
+rf = np.stack([rf1_data, rf2_data])
+rf[np.isnan(rf)] = np.float32(1e+20)
+
+nlon = lon.size
+nlat = lat.size
+# lat = lat[::-1]
+
+d = netCDF4.Dataset(outd + '/' + 'forest_rootFraction.nc','w')
+d.createDimension('lon',nlon)
+d.createDimension('lat',nlat)
+d.createDimension('depth',nlayer)
+
+lono = d.createVariable('lon',np.float32,('lon'),zlib=True,least_significant_digit=16)
+lono.units = 'degrees_east'
+lono.standard_name = 'longitude'
+lono.long_name = 'longitude'
+lono[:]=lon
+
+lato = d.createVariable('lat',np.float32,('lat'),zlib=True,least_significant_digit=16)
+lato.units = 'degrees_north'
+lato.standard_name = 'latitude'
+lato.long_name = 'longitude'
+lato[:]=lat
+
+dpth = d.createVariable('depth',np.float32,('depth'),zlib=True,least_significant_digit=16)
+dpth.units = 'm'
+dpth.standard_name = 'depth'
+dpth.long_name = 'depth'
+dpth[:]=zlayermid
+
+# create container variable for CRS: lon/lat
+# WGS84 datum
+crso = d.createVariable('crs','i4')
+crso.long_name = 'Lon/Lat Coords in WGS84'
+crso.grid_mapping_name='latitude_longitude'
+crso.longitude_of_prime_meridian = 0.0
+crso.semi_major_axis = 6378137.0
+crso.inverse_flattening = 298.257223563
+
+root = d.createVariable('root_fraction',np.float32,('depth','lat','lon'),zlib=True,least_significant_digit=16,fill_value=np.float32(1e+20))
+root.units = '1'
+root.standard_name = 'root_fraction'
+root.long_name = 'root fraction in each soil layer'
+root[:] = rf
+
+d.Conventions='CF-1.6'
+d.close()
+
+# sd1 = netCDF4.Dataset('data/cwatm_input/landsurface/soil/storageDepth1.nc')
+# sd1_data = sd1.variables['firstStorDepth'][:]
+
+# sd2 = netCDF4.Dataset('data/cwatm_input/landsurface/soil/storageDepth2.nc')
+# sd2_data = sd2.variables['secondStorDepth'][:]

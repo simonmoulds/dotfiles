@@ -1,0 +1,214 @@
+## Author : Simon Moulds
+## Date   : March 2019
+
+## only do this once
+devtools::install_github("simonmoulds/r_lulcc2/lulcc")
+library(lulcc)
+library(RColorBrewer)  ## required for plotting
+
+## observed maps
+And0 = raster('LU2001x.tif')
+And8 = raster('LU2009x.tif')
+And15 = raster('LU2016x.tif')
+
+## observed maps
+obs = DiscreteLulcRasterStack(
+    x=stack(And0,And8,And15),
+    categories=c(1,2,3,4),
+    labels=c("Forest","Shrub","Grass","Others"),
+    t=c(0,8,15))
+
+## show object
+obs
+
+## cross tabulate change between two time points
+crossTabulate(obs, times=c(0,15))
+
+## explanatory variables
+ef_001  <- raster("ef_001.tif")    #HGT
+ef_002  <- raster("ef_002.tif")    #distance to river
+ef_003  <- raster("ef_003.tif")    #distance to road
+ef_004  <- raster("ef_004.tif")    #population
+ef_004 <- resample(ef_004, obs)
+
+ef_001[is.na(ef_001)] = 0
+ef_004[is.na(ef_004)] = 0
+
+ix = data.frame(var=c("ef_001","ef_002","ef_003","ef_004"),
+                yr=c(0,0,0,0),
+                dynamic=c(F,F,F,F))
+ef <- ExpVarRasterStack(
+    stack(ef_001,ef_002,ef_003,ef_004),
+    index=ix)
+ef
+
+## resample ef (not necessary in this example)
+ef <- resample(ef, obs)
+
+## fit statistical models
+part <- partition(x=obs, size=0.5, spatial=TRUE, t=0)
+
+train.data <- getPredictiveModelInputData(
+    lu=obs,
+    ef=ef,
+    cells=part[["train"]],
+    t=0)
+test.data <- getPredictiveModelInputData(
+    lu=obs,
+    ef=ef,
+    cells=part[["test"]],
+    t=0)
+
+forest.form = as.formula("Forest ~ ef_001+ef_002+ef_003+ef_004")
+forest.glm = glm(forest.form, family=binomial, data=train.data)
+
+shrub.form = as.formula("Shrub ~ ef_001+ef_002+ef_003+ef_004")
+shrub.glm = glm(shrub.form, family=binomial, data=train.data)
+
+grass.form = as.formula("Grass ~ ef_001+ef_002+ef_003+ef_004")
+grass.glm = glm(grass.form, family=binomial, data=train.data)
+
+other.form = as.formula("Others ~ ef_001+ef_002+ef_003+ef_004")
+other.glm = glm(other.form, family=binomial, data=train.data)
+
+glm.mods <- PredictiveModelList(
+    models=list(forest.glm, shrub.glm, grass.glm, other.glm),
+    categories=obs@categories,
+    labels=obs@labels)
+
+glm.pred <- PredictionList(models=glm.mods, newdata=test.data)
+glm.perf <- PerformanceList(pred=glm.pred, measure="rch")
+
+## create suitability maps
+all.data <- as.data.frame(x=ef, cells=part[['all']])
+probmaps <- predict(object=glm.mods, newdata=all.data, data.frame=TRUE)
+points <- rasterToPoints(obs[[1]], spatial=TRUE)
+probmaps <- SpatialPointsDataFrame(points, probmaps)
+r <- rasterize(x=probmaps, y=obs[[1]], field=names(probmaps), fun=max, na.rm=TRUE)
+plot(r)
+
+## obtain demand scenario
+dmd <- approxExtrapDemand(lu=obs, tout=0:15)
+
+## create CLUE-S model object
+clues.model <- CluesModel(observed.lulc=obs, 
+                          explanatory.variables=ef,
+                          predictive.models=glm.mods,
+                          time=0:15,
+                          demand=dmd,
+                          history=NULL,
+                          mask=NULL,
+                          neighbourhood=NULL,
+                          transition.rules=matrix(data=1, nrow=4, ncol=4),
+                          neighbourhood.rules=NULL,
+                          elasticity=c(0.2,0.2,0.2,0.2),
+                          iteration.factor=0.00001,
+                          max.iteration=5000,
+                          max.difference=5,
+                          ave.difference=5)
+clues.result <- allocate(clues.model)
+
+## create Ordered model (Fuchs et al)
+ordered.model <- OrderedModel(observed.lulc=obs, 
+                              explanatory.variables=ef, 
+                              predictive.models=glm.mods, 
+                              time=0:15, 
+                              demand=dmd,                              
+                              transition.rules=matrix(data=1, nrow=4, ncol=4),                              
+                              order=c(2,1,3,4)) 
+ordered.result <- allocate(ordered.model, stochastic=TRUE)
+
+## evaluate model result
+
+## ordered
+ordered.tabs <- ThreeMapComparison(x=obs[[1]],
+                                   x1=obs[[3]],
+                                   y1=ordered.result[[15]],
+                                   factors=2^(1:8), 
+                                   categories=obs@categories,
+                                   labels=obs@labels) 
+
+ordered.agr  <- AgreementBudget(x=ordered.tabs) 
+ordered.fom  <- FigureOfMerit(x=ordered.tabs) 
+
+plot(ordered.agr, from=1, to=2) 
+plot(ordered.fom, from=1, to=2) 
+
+## CLUE-S
+clues.tabs <- ThreeMapComparison(x=obs[[1]],
+                                 x1=obs[[3]],
+                                 y1=clues.result[[16]],
+                                 factors=2^(1:8),
+                                 categories=obs@categories,
+                                 labels=obs@labels)
+
+## plot three dimensional tables in different ways (figures not shown in paper)
+plot(clues.tabs)
+plot(clues.tabs, category=1, factors=2^(1:8)[c(1,3,5,7)])
+
+## calculate agreement budget and plot
+
+## CLUE-S
+clues.agr <- AgreementBudget(x=clues.tabs)
+p1 <- plot(clues.agr,
+           from=1,
+           to=2,
+           par.strip.text=list(cex=0.6),
+           par.settings=list(strip.background=list(col="lightgrey")),
+           xlab=list(cex=0.6),
+           ylab=list(cex=0.6),
+           ylim=c(0,0.08),
+           scales=list(y=list(at=c(seq(from=0,to=0.08,by=0.02)), cex=0.6, tck=0.6), x=list(cex=0.6, tck=0.6)),
+           key=list(cex=0.6))
+p1
+
+## ordered
+p2 <- plot(ordered.agr,
+           from=1,
+           to=2,
+           par.strip.text=list(cex=0.6),
+           par.settings=list(strip.background=list(col="lightgrey")),
+           xlab=list(cex=0.6),
+           ylab=list(cex=0.6),
+           ylim=c(0,0.08),
+           scales=list(y=list(at=c(seq(from=0,to=0.08,by=0.02)), cex=0.6, tck=0.6), x=list(cex=0.6, tck=0.6)),
+           key=list(cex=0.6))
+## p2
+
+## figure 7
+agr.p <- c("CLUE-S"=p1, Ordered=p2, layout=c(1,2))
+agr.p
+
+## trellis.device(device="pdf", width=4.72, height=5.72, file="f07_agreement.pdf")
+## print(agr.p)
+## dev.off()
+
+## CLUE-S
+clues.fom <- FigureOfMerit(x=clues.tabs)
+p1 <- plot(clues.fom,
+           from=1,
+           to=2,
+           par.strip.text=list(cex=0.6),
+           par.settings=list(strip.background=list(col="lightgrey")),
+           xlab=list(cex=0.6),
+           ylab=list(cex=0.6),
+           ylim=c(0,1),
+           scales=list(y=list(at=(seq(from=0,to=1,by=0.2)), cex=0.6), x=list(cex=0.6)),
+           key=NULL)
+p1
+
+## Ordered
+p2 <- plot(ordered.fom,
+           from=1,
+           to=2,
+           par.strip.text=list(cex=0.6),
+           par.settings=list(strip.background=list(col="lightgrey")),
+           xlab=list(cex=0.6),
+           ylab=list(cex=0.6),
+           ylim=c(0,1),
+           scales=list(y=list(at=(seq(from=0,to=1,by=0.2)), cex=0.6), x=list(cex=0.6)),
+           key=NULL)
+p2
+
+fom.p <- c("CLUE-S"=p1, Ordered=p2, layout=c(1,2))
+fom.p

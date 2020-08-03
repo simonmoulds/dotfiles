@@ -1,0 +1,43 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import os
+import numpy as np
+import rasterio
+import netCDF4 as nc
+
+from hydro_model_builder.ncConverter import np2netCDF
+from hydro_model_builder import VirtualOS as vos
+
+import variable_list as variable_list
+from utils import *
+
+class GroundwaterLevel(object):
+    def __init__(self, GroundwaterLevel_variable):
+        self.var = GroundwaterLevel_variable
+        self.var.GroundwaterLevelOutputFile = vos.getFullPath(
+            self.var._configuration.groundwaterLevelOptions['outputFile'],
+            self.var._configuration.globalOptions['outputDir'])
+        self.bbox = vos.get_clone_map_extent(self.var._configuration.cloneMap)
+
+    def initial(self):
+        pass
+
+    def dynamic(self):
+        gwlevel_filename = get_data_smart(
+            'gandak_data_model',
+            '../data/initial_groundwater_level.tif',
+            as_string = False)
+        gwlevel = read_gdal_raster_image(
+            gwlevel_filename,
+            self.bbox,
+            0)
+        netcdf = np2netCDF(
+            self.var._configuration,
+            self.var.dimensions,
+            variable_list)        
+        netcdf.create_netCDF(self.var.GroundwaterLevelOutputFile, 'level')
+        netcdf.data2NetCDF(
+            self.var.GroundwaterLevelOutputFile,
+            'level',
+            gwlevel)

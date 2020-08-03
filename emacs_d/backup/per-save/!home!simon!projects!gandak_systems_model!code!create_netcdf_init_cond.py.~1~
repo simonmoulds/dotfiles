@@ -1,0 +1,40 @@
+# initial values
+# ==============
+
+dataset = Dataset('initial_conditions_test.nc', 'w')
+dataset.description = 'AquaCrop initial value file'
+dataset.history = 'Created ' + time.ctime(time.time())
+
+# dataset dimensions
+lat = dataset.createDimension('lat', nlat)
+lon = dataset.createDimension('lon', nlon)
+# rotation = dataset.createDimension('rotation', nrotation)
+crop = dataset.createDimension('crop', ncrop)
+compartment = dataset.createDimension('compartment', ncompartment)
+
+# dataset variables
+latitudes = dataset.createVariable('latitude', np.float64, ('lat',))
+latitudes.units = "degrees_north"
+latitudes[:] = lat_vals
+
+longitudes = dataset.createVariable('longitude', np.float64, ('lon',))
+longitudes.units = "degrees_east"
+longitudes[:] = lon_vals
+
+# rotations = dataset.createVariable('rotation', np.int32, ('rotation',))
+# rotations[:] = np.arange(0,nrotation,1)
+crops = dataset.createVariable('crop', np.int32, ('crop',))
+crops[:] = np.arange(0,ncrop,1)
+
+compartments = dataset.createVariable('compartment', np.int32, ('compartment',))
+compartments[:] = np.arange(0,ncompartment,1) 
+
+# initial soil water content
+soilwatercontent = dataset.createVariable('th', np.float64, ('compartment','crop','lat','lon'))
+soilwatercontent[:] = 0.31
+
+# initial depth of water held in bunds
+bundwater = dataset.createVariable('BundWater', np.float64, ('crop','lat','lon'))
+bundwater[:] = 0.
+
+dataset.close()

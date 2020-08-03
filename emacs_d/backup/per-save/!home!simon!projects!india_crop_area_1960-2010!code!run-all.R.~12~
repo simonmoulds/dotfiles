@@ -1,0 +1,124 @@
+## Author  : Simon Moulds
+## Date    : Aug 2015 - Jul 2016
+## Licence : GPL v3
+
+## Run all scripts for generating historical land use/land cover maps:
+## run from  base directory (i.e. /path/to/India_LULCC_1956-2010)
+
+rm(list=ls())
+
+## Load required packages (all available on CRAN)
+library(zoo)
+library(maptools)    
+library(rgdal)      
+library(raster)
+library(gdalUtils)
+
+## Raw land use/land cover data from Indiastat and ICRISAT has been
+## processed and added to the R package 'indagridat'. This package also
+## contains the modified GADM district boundaries used in the analysis. 
+
+## load data package and required datasets
+devtools::load_all("pkg/r_indagridat/indagridat")
+
+data(indiastat1960)
+data(icrisat1960)
+district1960 <- readOGR(dsn=system.file("shapes",
+                                        package="indagridat"),
+                        layer="g1960_2_India")
+
+## paths to directories to hold intermediate results
+spatial_path    <- "data/intermediate/spatial_input_data"
+nonspatial_path <- "dataintermediate/nonspatial_input_data"
+
+## ## remove files currently in directories: use with caution!
+## for (dir in c(spatial_path, nonspatial_path)) {
+##     fs <- list.files(dir, full.names=TRUE)
+##     if (length(fs) > 0) {
+##         unlink(fs, recursive=TRUE)
+##     }
+## }
+
+## ## ======================================
+## ## 1. process spatial data
+## ## ======================================
+
+## source(file.path("code", "helpers", "process_spatial_data.R"))
+
+## ======================================
+## 2. process minor irrigation and agricultural census data
+## ======================================
+
+agcensus_path <- "data-raw/agcensus"
+source("code/helpers/process_agcensus_data.R")
+
+agcensus_fv <- readRDS(file.path(agcensus_path,
+                                 "agcensus_statewise_veg_frac.rds"))
+
+agcensus    <- readRDS(file.path(agcensus_path,
+                                 "agcensus_statewise_agri_data.rds"))
+
+state.lut <- readRDS(file.path("code",
+                               "helpers",
+                               "states_LUT.rds"))
+
+micensus_path <- "data-raw/micensus"
+source("code/helpers/process_micensus_data.R")
+
+## micensus_energ <-
+##     readRDS(file.path(micensus_path,
+##                       "micensus_statewise_energy_source.rds"))
+
+## ======================================
+## 3. run data quality assurance scripts
+## ======================================
+
+r <- raster(file.path(spatial_path, "template_aea.tif"))
+cell.area  <- prod(res(r)) / 1000 / 1000
+
+## Prepare demand files
+source(file.path("code", "helpers", "data-quality", "functions.R"))
+
+source(file.path("code", "helpers", "data-quality", "andhra_pradesh.R")) 
+source(file.path("code", "helpers", "data-quality", "bihar.R")) 
+source(file.path("code", "helpers", "data-quality", "chhattisgarh.R")) 
+source(file.path("code", "helpers", "data-quality", "delhi.R")) 
+source(file.path("code", "helpers", "data-quality", "gujarat.R"))  
+source(file.path("code", "helpers", "data-quality", "haryana.R")) 
+source(file.path("code", "helpers", "data-quality", "himachal_pradesh.R")) 
+## source(file.path("code", "helpers", "data-quality", "jammu_and_kashmir.R")) 
+source(file.path("code", "helpers", "data-quality", "jharkhand.R")) 
+source(file.path("code", "helpers", "data-quality", "karnataka.R")) 
+source(file.path("code", "helpers", "data-quality", "kerala.R")) 
+source(file.path("code", "helpers", "data-quality", "madhya_pradesh.R")) 
+source(file.path("code", "helpers", "data-quality", "maharashtra.R")) 
+source(file.path("code", "helpers", "data-quality", "orissa.R")) 
+source(file.path("code", "helpers", "data-quality", "punjab.R")) 
+source(file.path("code", "helpers", "data-quality", "rajasthan.R")) 
+source(file.path("code", "helpers", "data-quality", "tamil_nadu.R"))
+source(file.path("code", "helpers", "data-quality", "uttarakhand.R")) 
+source(file.path("code", "helpers", "data-quality", "uttar_pradesh.R"))
+source(file.path("code", "helpers", "data-quality", "west_bengal.R"))
+
+## ## The following states were left out of the analysis because of poor data:
+## ## source(file.path("code", "helpers", "data-quality", "andaman_and_nicobar.R")) 
+## ## source(file.path("code", "helpers", "data-quality", "arunachal_pradesh.R")) 
+## ## source(file.path("code", "helpers", "data-quality", "assam.R"))
+## ## source(file.path("code", "helpers", "data-quality", "chandigarh.R"))
+## ## source(file.path("code", "helpers", "data-quality", "dadra_and_nagar_haveli.R")) 
+## ## source(file.path("code", "helpers", "data-quality", "daman_and_diu.R")) 
+## ## source(file.path("code", "helpers", "data-quality", "goa.R")) 
+## ## source(file.path("code", "helpers", "data-quality", "lakshadweep.R")) 
+## ## source(file.path("code", "helpers", "data-quality", "puducherry.R")) 
+## ## source(file.path("code", "helpers", "data-quality", "manipur.R")) 
+## ## source(file.path("code", "helpers", "data-quality", "meghalaya.R"))  
+## ## source(file.path("code", "helpers", "data-quality", "mizoram.R")) 
+## ## source(file.path("code", "helpers", "data-quality", "nagaland.R")) 
+## ## source(file.path("code", "helpers", "data-quality", "sikkim.R")) 
+## ## source(file.path("code", "helpers", "data-quality", "tripura.R")) 
+
+## ======================================
+## run spatial disaggregation script
+## ======================================
+
+## source(file.path("code", "helpers", "allocation.R"))

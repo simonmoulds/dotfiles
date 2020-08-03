@@ -1,0 +1,12 @@
+## Author : Simon Moulds
+## Date   : March 2020
+
+library(raster)
+
+datadir = "/data/MERIT_Hydro/glb_05min"
+fs = list.files(datadir, pattern="*.ctl$", full.names=TRUE)
+for (i in 1:length(fs)) {
+    fn = fs[i]
+    ncfn = gsub("ctl$","nc", fn)
+    tiffn = gsub("ctl$","tif", fn)
+## river length

@@ -1,0 +1,104 @@
+## Author : Simon Moulds
+## Date   : July 2018
+
+## Script to run the Simile system dynamics model
+
+library(Simile)
+use.simile.at("/usr/lib/simile-6.9")
+
+## load Simile model
+model.handle = load.model("/home/simon/Simile/models/gandak_model_v2.so")
+objs = list.objects(model.handle)
+for (obj in objs) {
+    print(c(obj, get.model.property(model.handle, obj, "Dims")))
+}
+
+## create model instance, and load file parameters
+instance.handle = create.model(model.handle)
+set.model.step(instance.handle, 1, 1)
+param.file = "/home/simon/Simile/models/gandak_model_v2.spf"
+consult.parameter.metafile(instance.handle, param.file)
+reset.model(instance.handle, -2)
+get.model.time(instance.handle)
+ts = 0:1000
+
+## ====================
+## set fixed parameters
+## ====================
+
+## canal distribution factor
+param.handle <- create.param.array(instance.handle, "/canal_network/distribution_factor")
+set.model.parameter(param.handle, 0.1)
+
+## baseflow index
+param.handle <- create.param.array(instance.handle, "/baseflow_index")
+set.model.parameter(param.handle, 0.7)
+
+## current account initial value
+param.handle <- create.param.array(instance.handle, "/farm_income/current_account_initial")
+set.model.parameter(param.handle, 10000)
+
+## savings account initial value
+param.handle <- create.param.array(instance.handle, "/farm_income/savings_account_initial")
+set.model.parameter(param.handle, 0)
+
+reset.model(instance.handle, -1)
+
+## ==========================
+## Pre-allocate output arrays
+## ==========================
+
+groundwater_depth = rep(0, length(ts))
+recharge = rep(0, length(ts))
+abstraction = rep(0, length(ts))
+prec = rep(0, length(ts))
+## etref = rep(0, length(ts))
+## current_account = rep(0, length(ts))
+## tubewell_nos = rep(0, length(ts))
+## crop_income = rep(0, length(ts))
+## annual_income = rep(0, length(ts))
+## crop_yield = vector(mode="list", length(ts))
+## market_rate = vector(mode="list", length(ts))
+savings_account = rep(0, length(ts))
+## distributed_supply = rep(0, length(ts))
+## reqd_tubewell_supply = rep(0, length(ts))
+## max_tubewell_growth = rep(0, length(ts))
+## act_tubewell_growth = rep(0, length(ts))
+## potential_investment = rep(0, length(ts))
+
+## TODO
+prec_data = readRDS("data/prec_ts.rds")
+prec.handle <- create.param.array(instance.handle, "/Prec")
+
+
+get.model.property(model.handle, "/crops/crop_area", "Dims")
+crop_area.handle <- create.param.array(instance.handle, "/crops/crop_area")
+
+for (count in ts) {
+
+    ## set dynamic parameters
+    set.model.parameter(prec.handle, prec_data[count+1])
+    set.model.parameter(crop_area.handle, array(c(2,2),c(2,1)))
+
+    ## execute model
+    execute.model(instance.handle, count+1, "Euler", count)
+
+    ## retrieve output (TODO: put this in a function)
+    groundwater_depth[count] = get.value.list(instance.handle, "/aquifer/groundwater_depth")
+    recharge[count+1] = get.value.list(instance.handle, "/aquifer/recharge")
+    abstraction[count+1] = get.value.list(instance.handle, "/aquifer/abstraction")    
+    prec[count+1] = get.value.list(instance.handle, "/Prec")
+    ## etref[count+1] = get.value.list(instance.handle, "/ETref")
+    ## current_account[count+1] = get.value.list(instance.handle, "/farm_income/current_account")
+    savings_account[count+1] = get.value.list(instance.handle, "/farm_income/savings_account")
+    ## distributed_supply[count+1] = get.value.list(instance.handle, "/canal_network/distributed_supply")
+    ## tubewell_nos[count+1] = get.value.list(instance.handle, "/tubewell/tubewell_nos")
+    ## ## reqd_tubewell_supply[count+1] = get.value.list(instance.handle, "/tubewell/required_tubewell_supply")
+    ## max_tubewell_growth[count+1] = get.value.list(instance.handle, "/tubewell/maximum_tubewell_growth")
+    ## act_tubewell_growth[count+1] = get.value.list(instance.handle, "/tubewell/actual_tubewell_growth")
+    ## potential_investment[count+1] = get.value.list(instance.handle, "/farm_income/potential_investment")
+    ## ## crop_income[count+1] = get.value.list(instance.handle, "/farm_income/annual_income")
+    ## ## annual_income[count+1] = get.value.list(instance.handle, "/farm_income/annual_income")
+    ## ## market_rate[[count+1]] = get.value.list(instance.handle, "/crops/market_rate")
+    ## ## crop_yield[[count+1]] = get.value.list(instance.handle, "/crops/crop_yield/Ya")
+}

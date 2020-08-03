@@ -1,0 +1,118 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{xcolor}
+\usepackage{natbib}
+\usepackage{url}
+\renewcommand{\refname}{Literature cited:}
+\bibliographystyle{apalike}
+% \setlength {\ topmargin }{-2cm}
+% \setlength {\ oddsidemargin }{0cm}
+% \setlength {\ textheight }{24cm}
+% \setlength {\ textwidth }{16cm}
+% \usepackage{graphicx}
+% \usepackage{listings}
+% \usepackage{sectsty}
+% \usepackage{helvet}
+% \allsectionsfont {\ sffamily}
+
+\begin{document}
+\title {Author response to reviewer comments on manuscript ``A spatio-temporal land use/land cover reconstruction for India (1960-2010)'' by Simon Moulds \textit{et al.}}
+\author{Simon Moulds}
+\maketitle
+
+\noindent We are grateful to the two referees and the Editor for their thoughtful comments on the manuscript and land use/land cover dataset. Here, we address each reviewer comment in \textcolor{blue}{blue} and, where appropriate, detail changes in the revised manuscript in \textcolor{magenta}{magenta}.\\
+
+\noindent \textbf{Response to Referee \#1:}
+
+\begin{enumerate}
+
+\item This submission describes a dataset containing reconstructed land cover maps of India from 1960 to 2010. The maps were produced using a land change model, meaning that all maps are based on statistical simulations. These data fill the time-series gap of already available land use/cover maps for the years 1985, 1995 and 2005, which were produced using remote sensing data. The methods appear to be simple and straightforward. The approach and tools are well described in previous scientific literature. Nonetheless, there are some aspects regarding the temporal dynamics of the model that are unclear. For instance, has the model considered temporal changes in the travel time, road network and population density? If not, why? I would expect that these variables strongly determine the probability of land changes.\\
+
+  \noindent \textcolor{blue}{No, unfortunately we cannot account for temporal changes in the covariates due to lack of data. To some extent these changes are implicitly considered in the rate of land change between districts; however, of course we acknowledge that there is likely to be variation in the temporal dynamics of these variables between pixels within a district. To make this clear, we have added the following sentence to the end of section \emph{Biophysical and socio-economic predictor variables}}:
+
+  \textcolor{magenta}{\textit{These predictor variables were treated as static in time due to a lack of corresponding datasets for historical time points.}}
+
+  \noindent \textcolor{blue}{In addition, we have highlighted the shortcoming in the \emph{Usage notes} section by adding the following sentence to the second paragraph:}
+
+  \textcolor{magenta}{\textit{Users of the dataset should be aware that in the present analysis the explanatory factors of population density, accessibility and distance to roads have been treated as static in time due to the lack of historical, spatially explicit data showing the evolution of these variables during the study period.}}
+
+\item Another aspect that is not clear is the temporal dynamics of the land change rates. Has the model used the same rate of changes for every year? It would be important to account for varying rates of changes during the analyzed periods. Due to socio-economic factors, some years may experience more changes than others.
+  
+  \textcolor{blue}{Temporal variability in the rate of change is implicitly accounted for in the inventory data used to drive the allocation model (HILDA). Since the inventory data is at the district-level, differences in the rate of change in space are taken into account (296 district units were considered). The inventory dataset provides the quantity of each land cover type for each year in the study period (1960-2010), so temporal differences in the rate of change from one year to the next are considered. To clarify this point we have added the following sentence to the second paragraph of the Land change modelling procedure section:}
+
+  \textcolor{magenta}{\textit{This approach means that variability in the rate of land change between districts is implicitly taken into account, while the annual temporal resolution of the inventory data ensures that the temporal dynamics of land change in each district is properly represented.}}\\
+
+\item The model was calibrated using the 2005 map, while the 1985 and 1995 maps were used for validation. Overall, the quality assessment of the final product is not fully convincing. If I understood correctly, the spatial distribution of the land changes were only validated for the year 2005. While for 1985 and 1995, only the total land cover areas were compared with the simulations.
+
+  \textcolor{blue}{The validation of the dataset is limited by the availability of secondary data sources with which to compare our dataset, particularly for historical time points. The technical validation is divided into three parts. First, we assess the ability of the statistical models to predict the occurrence of the respective land cover classes in the testing partition of the 2005 map (30\% of the available data points). Secondly, we compare the time series of land change at the national level in order to check the outcome of the quality control procedures and to compare the quantity of each land cover class from the inventory data with that from the remote sensing product.\\}
+    
+\textcolor{blue}{The spatial distribution of land change was evaluated for 1985, because this represents the earliest time point for which an alternative source of spatially explicit land cover data is available. The 2005 map is treated as the initial condition in the analysis so it would not make sense to validate the dataset at this point in time. We perform the pattern validation (i.e. the validation of the spatial distribution of land change) using the method put forward by Pontius \textit{et al} (2011). This approach considers the initial condition (in our case the 2005 map from Roy \textit{et al} (2015)) and the simulated and reference maps for a subsequent time point (1985). The reference map is the 1985 map from Roy \textit{et al} (2015). Figure 6 shows the outcome of this analysis. Considering these three maps simultaneously allows us to identify cells which do not change at all during the intervening years. Briefly, Figure 6 shows the number of pixels (expressed as a fraction of the study area) corresponding to four possible outcomes (persistence simulated as change, change simulated as change to the wrong category, etc.). The figure does not show correctly simulated persistence (in other words, pixels which do not change during 1985-2005 according to the reference maps), because this represents the vast majority of cells. We perform this analysis at successively coarser resolutions in order to account for ``minor'' and ``major'' disagreement between the simulated and reference maps. For a full description of the validation methodology, see Pontius \textit{et al} (2011).\\}
+
+\textcolor{blue}{We realise that some confusion about the validation process may have arisen because we failed to explain what we meant by “pattern validation”. In addition, we did not clearly attribute Pontius \textit{et al} (2011) as the source of the validation method. Therefore we have rewritten the beginning of the second paragraph of the \emph{Land use change modelling} subsection as follows:}
+
+  \textcolor{magenta}{\textit{The spatial distribution of land change was validated for 1985; the earliest time point for which a reference land cover map was available. The validation was performed using the method developed by [33], in which a simulated land cover map for time 2 is compared with reference maps for time 2 and time 1. In the present study, the simulated map for 1985 was compared with reference maps for 1985 and 2005, which were taken from the remote sensing dataset described previously [15].}}
+
+\item Furthermore, there seems to be a large discrepancy between the overall values obtained from the inventory and the remote sensing data. The sources for these discrepancies were not explained. Instead, it seems that these differences were fixed by applying a calibration factor in the district-level inventories.
+
+  \textcolor{blue}{The reviewer is correct to note the discrepancies between the inventory data and the remote sensing data. These arise for a variety of reasons. On the one hand, there are likely to be systematic errors in the inventory data due to under- or overreporting of certain land cover categories. On the other hand there are potentially errors in the remote sensing product (for example, a tendency to misinterpret barren land as cropland or vice versa). It is important to the methodology that the area of each land cover in 2005 is the same in the non-spatial demand scenario (i.e. the inventory data) and the initial condition (the 2005 map from remote sensing). To achieve this we use a simple calibration factor; an approach which is also adopted by Tian \textit{et al} (2014). We have further clarified this approach in the sixth paragraph of the \emph{Data preparation} subsection, which now reads:}
+
+  \textcolor{magenta}{\textit{The final processing step was to calibrate the district-level time series data with land use/land cover quantities from the 2005 land use/land cover map, following the approach of [2]. This was necessary because the spatial allocation procedure requires the total area of each land cover type at the initial time point to be the same in the initial condition map (i.e. the 2005 map from [15]) and the non-spatial demand scenario (i.e. the time series dataset derived from the inventory data). Discrepancies between the respective values may arise for a number of reasons, including inaccurate reporting of certain land cover types in the inventory data or misclassification of pixels in the remote sensing dataset. In each district unit a calibration factor was determined for each land use category by dividing the quantity from the 2005 land use/land cover map with the corresponding quantity from the inventory data. The time series of each category was then multiplied by the calibration factor to ensure the area of each land cover type between the 2005 land cover map and the inventory data in each district corresponded. Differences between the district area and the sum of the various land use/land cover types at each time point were resolved by visually identifying the land uses responsible for the discrepancy and adjusting the respective areas accordingly.}}
+
+\item Another problem is that the land cover maps of 1985 and 1995 were not validated in previous studies, and therefore it is not possible to verify their accuracy.
+
+  \textcolor{blue}{The lack of validation of the 1985 dataset is indeed a problem which affects the validation. However, the remote sensing dataset of Roy \textit{et al} (2015) is the only dataset which provides historical land cover data for India. We have adapted the subsection \emph{Observed land use/land cover data} to provide a more complete description of the accuracy assessment conducted by Roy et al. (2015). It now reads:}
+
+  \textcolor{magenta}{\textit{Observed land use/land cover information was obtained from [15]; a dataset providing maps at 100m $\times$ 100m resolution for 1985, 1995 and 2005 derived from multi-temporal satellite data from Landsat, IRS 1C-LISS III and Resourcesat1 instruments. According to the accuracy assessment conducted by [15], which utilised 12,606 ground truth points, the 2005 map had an overall mapping accuracy of 94.46\% and a Kappa coefficient of 0.9445. While the accuracy of the 1985 and 1995 map was not quantified due to the lack of ground truth data for these time points, [15] argue that the accuracy is likely to be similar to that of the 2005 map.}}
+
+\item The authors argue that the dataset may be used to gain insight into human-environment interactions and to develop policy concerning sustainable agricultural development, urban expansion and the protection of ecosystem services. I believe these new insights are more likely to be achieved through a rigorous analysis of the drivers and dynamics. The simulated maps may be an outcome of this process. However, at least at this point, it is not clear how these data could be used for further addressing these questions. 
+
+  \textcolor{blue}{On reflection, we agree with the reviewer that it is more likely that the maps would be an outcome of, rather than an input to, attempts to better understand human-environment interactions. We have removed this claim in the revised manuscript. However, we believe that the maps could be used to inform policies in the areas mentioned, particularly when used in combination with impact assessment models. We have rewritten this passage in \emph{Usage Notes} as follows:}
+
+  \textcolor{magenta}{\textit{It is envisaged that the dataset will be used in a variety of contexts across disciplines. For example, it may be used in combination with impact assessment models to quantify the environmental impacts of land use change. Such analyses may inform policies designed to support sustainable agricultural development, urban expansion and the protection of ecosystem services.}}
+
+\item The methods and data processing seem to be described sufficiently to be reproduced. The information to reuse the dataset, or integrate it with other data is provided in a simple way. In general this information seems sufficient, but I could not find the labels/style file for the rasters. It is important that the nomenclature, classes and labels are consistent with other global dataset. Please clarify this point. 
+
+  \textcolor{blue}{We apologise for the lack of a style file – this was an oversight on our part. We have updated the GeoTIFF files to include a ‘GDALRasterAttributeTable’, which provides machine-readable category labels for the pixel values. We have additionally provided a README in the data directory. The categories are listed in Table 2 under the column ‘HILDA modelling’, and shown in Figure 2.}
+  % \textcolor{magenta}{\textit{TODO}}
+
+\item I have checked the data files deposited by the authors. Although they seem complete, I could not find a label/style file for the rasters. That is, since the rasters are in .tif format, I could not identify which land cover class is represented by each number.
+  
+  \textcolor{blue}{See response to previous comment.}
+
+\item The data repository is sufficient, but lacks online visualization tools or assessment of individual maps.
+
+\end{enumerate}
+  
+\noindent \textbf{Response to Referee \#2:}
+
+\begin{enumerate}
+\item How feasible is it to use the same calibration factors to create the LU/LC of recent years (after 2010)? Because the urbanization was more rigours after 2010. 
+  
+  \textcolor{blue}{As mentioned in our response to reviewer \#1, a shortcoming of the dataset is that it does not account for temporal variability in the socio-economic covariates (population density, accessibility, distance to roads). This is due to the lack of such datasets for more than one point in time. We would point out that the dataset provides maps between 1960-2010 only, and hence is unaffected by the increase in the rate of urbanization post-2010. Nevertheless, the general point stands and, as mentioned in our response to reviewer \#1, we have added the following sentence to the Usage notes section:}
+  
+  \textcolor{magenta}{\textit{Users of the dataset should be aware that in the present analysis the explanatory factors of population density, accessibility and distance to roads have been treated as static in time due to the lack of historical, spatially explicit data showing the evolution of these variables during the study period.}}
+
+\item Need little more clarification and validation of picking Indiastat data
+
+  \textcolor{blue}{The Indiastat dataset was selected because it was the only such dataset which provided district level land use/land cover inventory data. Ultimately, the source of the data is the official data compiled by the Directorate of Economics and Statistics. We have extended the description of the dataset in the subsection \emph{Land use and land cover inventory data}, which now reads:}
+
+  \textcolor{magenta}{\textit{The amount of land change in each district and at each time point during the study period was derived from district-level land use/land cover inventory data. In India, data about land use/land cover are collected at the village level on an annual basis and aggregated to district and state administrative levels. The compilation of the village level data is coordinated by the Directorate of Economics and Statistics of India's Ministry of Agriculture. Data for the entire study period, except the period 1993--1997 which for unknown reasons was not available, was purchased from Indiastat (\url{https://www.indiastat.com/}), a commercial organisation which distributes socio-economic data about India. An additional source of district-level survey data for 19 States and Union Territories for the period 1966 to 2009 was obtained from the Icrisat Village Dynamics in South Asia (VDSA) project (\url{http://vdsa.icrisat.ac.in/}). This data originates from the same ultimate source as the Indiastat data but, as part of the VDSA project, has already undergone some data quality assurance and, moreover, includes data for the period 1993--1997.}}
+
+\item Need little more insights about using HILDA for prediction
+
+  \textcolor{blue}{The HILDA model is well described in the literature (see Fuchs et al. (2013, 2015), for example), and has been used previously to reconstruct historical land use change in Europe. It is our opinion that the model is described sufficiently in our manuscript and in the literature to justify its use in the present analysis. If the reviewer had any specific queries or criticisms of the model we would of course be happy to address these in a revised manuscript.}\\
+
+\end{enumerate}
+
+\noindent \textbf{Literature cited:}\\
+
+\noindent Fuchs, R., Herold, M., Verburg, P. H. \& Clevers, J. G. P. W. A high-resolution and harmonized model approach for reconstructing and analysing historic land changes in Europe. \emph{Biogeosciences} \textbf{10}, 1543–1559 (2013).\\
+
+\noindent Fuchs, R., Herold, M., Verburg, P. H., Clevers, J. G. P. W. \& Eberle. J. Gross changes in reconstructions of historic land cover/use for Europe between 1900 and 2010. \emph{Glob. Change Biol.} \textbf{21}, 299–313 (2015).\\
+
+\noindent Pontius, R. G., Peethambaram, S. \& Castella, J. C. Comparison of three maps at multiple resolutions: a case study of land change simulation in Cho Don District, Vietnam. \emph{Ann. Assoc. Am. Geogr.} \textbf{101}, 45–62 (2011).\\
+
+\noindent Roy, P. et al. Development of decadal (1985–1995–2005) land use and land cover database for India. \emph{Remote Sens.} \textbf{7}, 2401–2430 (2015).\\
+
+\noindent Tian, H., Banger, K., Bo, T. \& Dadhwal, V. K. History of land use in India during 1880–2010: Large-scale land transformations reconstructed from satellite data and historical archives. \emph{Glob. Planet. Change} \textbf{121}, 78–88 (2014).\\
+
+\end{document}

@@ -1,0 +1,204 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+# AquaCrop crop growth model
+
+import os
+import shutil
+import sys
+import math
+import gc
+import numpy as np
+
+def water_stress(p_lo, p_up, fshape_w, et0, ETadj, tEarlySen, adjust_senescence_threshold, beta, TAW, Dr):
+
+    dims = et0.shape
+    nr, nlat, nlon = dims[0], dims[1], dims[2]
+    
+    # Adjust stress thresholds for Et0 on current day (don't do this for
+    # pollination water stress coefficient)
+    cond1 = (ETadj == 1)
+    for stress in range(3):
+        p_up[stress,:][cond1] = (p_up[stress,:] + (0.04 * (5 - et0)) * (np.log10(10 - 9 * p_up[stress,:])))[cond1]
+        p_lo[stress,:][cond1] = (p_lo[stress,:] + (0.04 * (5 - et0)) * (np.log10(10 - 9 * p_lo[stress,:])))[cond1]
+
+    # Adjust senescence threshold if early senescence triggered
+    if adjust_senescence_threshold:
+        cond2 = (tEarlySen > 0)
+        p_up[2,:][cond2] = (p_up[2,:] * (1. - (beta / 100)))[cond2]
+
+    # Limit adjusted values
+    p_up = np.clip(p_up, 0, 1)
+    p_lo = np.clip(p_lo, 0, 1)
+
+    # Calculate relative depletion
+    Drel = np.zeros((4, nr, nlat, nlon))
+    # No water stress
+    cond1 = (Dr <= (p_up * TAW))
+    Drel[cond1] = 0
+
+    # Partial water stress
+    cond2 = (Dr >  (p_up * TAW)) & (Dr < (p_lo * TAW)) & np.logical_not(cond1)
+    x1 = p_lo - np.divide(Dr, TAW, out=np.zeros_like(Drel), where=TAW!=0)
+    x2 = p_lo - p_up
+    Drel[cond2] = (1 - np.divide(x1, x2, out=np.zeros_like(Drel), where=x2!=0))[cond2]
+
+    # Full water stress
+    cond3 = (Dr >= (p_lo * TAW)) & np.logical_not(cond1 | cond2)
+    Drel[cond3] = 1         
+
+    # Calculate root zone stress coefficients
+    idx = np.arange(0,3)
+    x1 = np.exp(Drel[idx,:] * fshape_w[idx,:]) - 1
+    x2 = np.exp(fshape_w[idx,:]) - 1
+    Ks = (1 - np.divide(x1, x2, out=np.zeros_like(x2), where=x2!=0))
+
+    # Water stress coefficients (leaf expansion, stomatal closure,
+    # senescence, pollination failure)
+    Ksw_Exp = np.copy(Ks[0,:])
+    Ksw_Sto = np.copy(Ks[1,:])
+    Ksw_Sen = np.copy(Ks[2,:])
+    Ksw_Pol = 1 - Drel[3,:]
+
+    # Mean water stress coefficient for stomatal closure
+    Ksw_StoLin = 1 - Drel[1,:]
+    return Ksw_Exp, Ksw_Sto, Ksw_Sen, Ksw_Pol, Ksw_StoLin
+
+def root_development(growing_season, calendar_type, DAP, DelayedCDs, DelayedGDDs, GDD, GDDcum, Zmin, Zmax, PctZmin, Emergence, MaxRooting, fshape_r, fshape_ex, TrRatio, Germination):
+
+    dims = growing_season.shape
+    nr, nlat, nlon = dims[0], dims[1], dims[2]
+    
+    # Adjust time for any delayed development
+    if calendar_type == 1:
+        tAdj = (DAP - DelayedCDs)
+    elif calendar_type == 2:
+        tAdj = (GDDcum - DelayedGDDs)
+
+    # Calculate root expansion
+    Zini = Zmin * (PctZmin / 100)
+    t0 = np.round(Emergence / 2)
+    tmax = MaxRooting
+    if calendar_type == 1:
+        tOld = (tAdj - 1)
+    elif calendar_type == 2:
+        tOld = (tAdj - GDD)
+
+    tAdj[np.logical_not(growing_season)] = 0
+    tOld[np.logical_not(growing_season)] = 0
+
+    # Potential root depth on previous day
+    # ####################################
+
+    ZrOld = np.zeros((nr, nlat, nlon))
+    cond2 = (growing_season & (tOld >= tmax))
+    ZrOld[cond2] = Zmax[cond2]
+    cond3 = (growing_season & np.logical_not(cond2) & (tOld <= t0))
+    ZrOld[cond3] = Zini[cond3]
+    cond4 = (growing_season & (np.logical_not(cond2 | cond3)))
+    X_divd = tOld - t0
+    X_divs = tmax - t0
+    X = np.divide(X_divd, X_divs, out=np.zeros_like(t0), where=X_divs!=0)
+    ZrOld_exp = np.divide(1, fshape_r, out=np.zeros_like(fshape_r), where=cond4)
+    ZrOld_pow = np.power(X, ZrOld_exp, out=np.zeros_like(ZrOld), where=cond4)
+    ZrOld[cond4] = (Zini + (Zmax - Zini) * ZrOld_pow)[cond4]        
+    cond5 = (growing_season & (ZrOld < Zmin))
+    ZrOld[cond5] = Zmin[cond5]
+
+    # Potential root depth on current day
+    # ###################################
+
+    # TODO: write function potential_root_depth(growing_season, tAdj, tmax, Zmin, Zmax, t0, fshape_r):
+    Zr = np.zeros((nr, nlat, nlon))
+    cond6 = (growing_season & (tAdj >= tmax))
+    Zr[cond6] = Zmax[cond6]
+    cond7 = (growing_season & np.logical_not(cond6) & (tAdj <= t0))
+    Zr[cond7] = Zini[cond7]
+    cond8 = (growing_season & (np.logical_not(cond6 | cond7)))
+    X_divd = tAdj - t0
+    X_divs = tmax - t0
+    X = np.divide(X_divd, X_divs, out=np.zeros_like(t0), where=X_divs!=0)
+    Zr_exp = np.divide(1, fshape_r, out=np.zeros_like(fshape_r), where=cond8)
+    Zr_pow = np.power(X, Zr_exp, out=np.zeros_like(Zr), where=cond8)
+    Zr[cond8] = (Zini + (Zmax - Zini) * Zr_pow)[cond8]
+    cond9 = (growing_season & (Zr < Zmin))
+    Zr[cond9] = Zmin[cond9]
+
+    # Determine rate of change, adjust for any stomatal water stress
+    # ##############################################################
+
+    dZr = Zr - ZrOld
+    cond10 = (growing_season & (TrRatio < 0.9999))
+    cond101 = (cond10 & (fshape_ex >= 0))        
+    dZr[cond101] = (dZr * TrRatio)[cond101]
+    cond102 = (cond10 & np.logical_not(cond101))
+    fAdj_divd = (np.exp(TrRatio * fshape_ex) - 1)
+    fAdj_divs = (np.exp(fshape_ex) - 1)
+    fAdj = np.divide(fAdj_divd, fAdj_divs, out=np.zeros_like(Zr), where=fAdj_divs!=0)
+    dZr[cond102] = (dZr * fAdj)[cond102]
+
+    # Adjust root expansion for failure to germinate (roots cannot expand
+    # if crop has not germinated)
+    dZr[np.logical_not(Germination)] = 0
+    return dZr, Zr
+
+def water_content_affecting_germination(th, th_fc, th_wp, dz, dzsum, zGerm):
+
+    dims = th_fc.shape
+    nc, nr, nlat, nlon = dims[0], dims[1], dims[2], dims[3]
+    
+    zgerm = np.copy(zGerm)
+
+    # Here we force zGerm to have a maximum value equal to the depth of the
+    # deepest soil compartment
+    zgerm[zgerm > np.sum(dz, axis=0)] = np.sum(dz, axis=0)
+
+    # Add rotation, lat, lon dimensions to dz and dzsum
+    dz = dz[:,None,None,None] * np.ones((nr, nlat, nlon))
+    dzsum = dzsum[:,None,None,None] * np.ones((nr, nlat, nlon))
+    
+    # Find compartments covered by top soil layer affecting germination
+    comp_sto = (np.round(dzsum * 1000) <= np.round(zgerm * 1000))  # round to nearest mm
+
+    # Calculate water content in top soil layer
+    arr_zeros = np.zeros((nc, nr, nlat, nlon))
+    Wr_comp   = np.copy(arr_zeros)
+    WrFC_comp = np.copy(arr_zeros)
+    WrWP_comp = np.copy(arr_zeros)
+
+    # Determine fraction of compartment covered by top soil layer
+    factor = 1. - np.round(((dzsum - zgerm) / dz), 3)
+    # factor = np.clip(factor, 0, 1) * growing_season * comp_sto
+    factor = np.clip(factor, 0, 1) * comp_sto
+
+    # Increment water storages (mm)
+    Wr_comp = np.round((factor * 1000 * th * dz))
+    Wr_comp = np.clip(Wr_comp, 0, None)
+    Wr = np.sum(Wr_comp, axis=0)
+
+    WrFC_comp = np.round((factor * 1000 * th_fc * dz))
+    WrFC = np.sum(WrFC_comp, axis=0)
+
+    WrWP_comp = np.round((factor * 1000 * th_wp * dz))
+    WrWP = np.sum(WrWP_comp, axis=0)
+
+    # Calculate proportional water content
+    WrTAW = WrFC - WrWP
+    WcProp = 1 - np.divide((WrFC - Wr), WrTAW, out=np.zeros_like(WrTAW), where=WrTAW!=0)
+    return WcProp
+
+def growing_degree_day(Tmax, Tmin, Tbase, Tupp, method):
+
+    if method == 1:
+        Tmean = ((Tmax + Tmin) / 2)
+        Tmean = np.clip(Tmean, Tbase, Tupp)
+    elif method == 2:
+        Tmax = np.clip(Tmax, Tbase, Tupp)
+        Tmin = np.clip(Tmin, Tbase, Tupp)
+        Tmean = ((Tmax + Tmin) / 2)
+    elif method == 3:
+        Tmax = np.clip(Tmax, Tbase, Tupp)
+        Tmin = np.clip(Tmin, None, Tupp)
+        Tmean = np.clip(Tmean, Tbase, None)
+    GDD = (Tmean - Tbase)
+    return GDD

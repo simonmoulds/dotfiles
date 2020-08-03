@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# radiation
+e2o_radiation.py -S 1 -E 366 -D $wd/data/hydrosheds_gandak_5m.map -O $wd/data/output_rad -T 60 -f PCRaster

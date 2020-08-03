@@ -1,0 +1,332 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import os
+import numpy as np
+import netCDF4 as nc
+import datetime as datetime
+import calendar as calendar
+
+from hm.reporting import Reporting
+
+from .io.LandCoverParameters import AquaCropParameters
+from .io.CarbonDioxide import CarbonDioxide
+from .io.InitialCondition import InitialCondition
+from .io import variable_list_crop
+
+from .io.CarbonDioxide import refconc
+
+import aquacrop_fc
+
+
+class LandCover(object):
+    def __init__(self, model):
+        self.model = model
+        self.config = model.config
+        self.time = model.time
+        self.domain = model.domain
+        self.weather = model.weather_module
+        self.groundwater = model.groundwater_module
+    def initial(self):
+        pass
+    def dynamic(self):
+        pass
+
+
+class Cropland(LandCover):
+    def __init__(self, model):
+        super(Cropland, self).__init__(model)
+        self.carbon_dioxide_module = CarbonDioxide(self)
+        self.lc_parameters_module = AquaCropParameters(self)        
+        self.initial_condition_module = InitialCondition(self)
+
+    def initial(self):
+        self.carbon_dioxide_module.initial()
+        self.lc_parameters_module.initial()
+        self.initial_condition_module.initial()
+        state_vars = [
+            'GDDcum', 'FluxOut', 'IrrCum', 'IrrNetCum'
+        ]        
+        int_surf_vars = [
+            'WTinSoil', 'GrowthStage', 'DelayedCDs', 'Germination',
+            'PrematSenes', 'CropDead', 'YieldForm', 'PreAdj',
+            'CropMature', 'AgeDays', 'AgeDays_NS', 'AerDays',
+            'DaySubmerged', 'PreAdj'            
+        ]
+        flt_surf_vars = [
+            'GDD', 'GDDcum', 'PreIrr', 'IrrNet', 'DeepPerc',
+            'Runoff', 'Infl', 'thRZ_Act', 'thRZ_Sat', 'thRZ_Fc',
+            'thRZ_Wp', 'thRZ_Dry', 'thRZ_Aer', 'TAW', 'Dr', 'Wr',
+            'Irr', 'IrrCum', 'IrrNetCum', 'CrTot', 'DelayedGDDs',
+            'rCor', 'Zroot', 'Ksw_Exp', 'Ksw_Sto', 'Ksw_Sen',
+            'Ksw_Pol', 'Ksw_StoLin', 'tEarlySen', 'CC', 'CCadj',
+            'CC_NS', 'CCadj_NS', 'CCxAct', 'CCxAct_NS', 'CCxW',
+            'CCxW_NS', 'CCxEarlySen', 'CCprev', 'CC0adj', 'Epot',
+            'EvapZ', 'Wstage2', 'Wsurf', 'Wevap_Act', 'Wevap_Sat',
+            'Wevap_Fc', 'Wevap_Wp', 'Wevap_Dry', 'EsAct', 'Ksa_Aer',
+            'TrPot0', 'TrPot_NS', 'TrAct', 'TrAct0', 'Tpot', 'TrRatio',
+            'ETpot', 'GwIn', 'HI', 'HIt', 'PctLagPhase', 'B', 'B_NS',
+            'Fpre', 'Fpost', 'fpost_dwn', 'fpost_upp', 'Kst_Bio',
+            'Kst_PolH', 'Kst_PolC', 'Fpol', 'sCor1', 'sCor2',
+            'HIadj', 'Y'
+        ]
+        int_subsurf_vars = ['AerDaysComp']
+        flt_subsurf_vars = ['FluxOut']
+        initialize_to_one_vars = [
+            'rCor', 'TrRatio', 'Fpre', 'Fpost', 'fpost_dwn',
+            'fpost_upp'
+        ]        
+        int_vars = int_surf_vars + int_subsurf_vars
+        flt_vars = flt_surf_vars + flt_subsurf_vars
+        all_vars = int_vars + flt_vars        
+        for varname in all_vars:
+            if varname in int_surf_vars + int_subsurf_vars:
+                datatype = np.int32
+            else:
+                datatype = np.float64
+
+            if varname in int_subsurf_vars + flt_subsurf_vars:
+                dims = (self.nFarm, self.nCrop, self.nComp, self.domain.nxy)
+            else:
+                dims = (self.nFarm, self.nCrop, self.domain.nxy)
+
+            if varname in initialize_to_one_vars:
+                init_val = 1
+            else:
+                init_val = 0
+                
+            vars(self)[varname] = np.require(
+                np.full(dims, init_val, dtype=datatype),
+                requirements=['A','O','W','F']
+            )                
+            
+        self.reporting_module = Reporting(
+            self, variable_list_crop, 'CROP_PARAMETERS'
+        )
+        self.reporting_module.initial()
+
+    def dynamic(self):
+        
+        self.carbon_dioxide_module.dynamic(method='pad')
+        self.lc_parameters_module.dynamic()
+        layer_ix = self.layerIndex + 1
+        EvapTimeSteps = 20
+        aquacrop_fc.aquacrop_w.update_aquacrop_w(
+            self.GDD.T, 
+            self.GDDcum.T, 
+            self.GDDmethod, 
+            self.model.tmax.values, 
+            self.model.tmin.values,
+            self.Tbase.T,
+            self.Tupp.T,
+            self.GrowthStage.T,
+            self.Canopy10Pct.T,
+            self.MaxCanopy.T,
+            self.Senescence.T,
+            self.DAP.T,
+            self.DelayedCDs.T,
+            self.DelayedGDDs.T,
+            self.th.T,
+            np.asfortranarray(self.th_fc_adj.T),
+            self.WTinSoil.T,
+            self.th_sat.T,
+            self.th_fc.T,
+            int(self.groundwater.WaterTable),
+            int(self.groundwater.DynamicWaterTable),
+            self.groundwater.zGW,
+            self.dz,
+            layer_ix,
+            self.PreIrr.T,
+            self.IrrMethod.T,
+            self.Zroot.T,
+            self.Zmin.T,
+            self.NetIrrSMT.T,
+            self.th_wilt.T,
+            self.dz_sum,
+            self.DeepPerc.T,
+            np.asfortranarray(self.FluxOut.T),
+            self.k_sat.T,
+            self.tau.T,
+            self.Runoff.T,
+            self.Infl.T,
+            self.model.prec.values,
+            self.DaySubmerged.T,
+            self.Bunds.T,
+            self.zBund.T,
+            np.int32(self.CN).T,
+            int(self.adjustCurveNumber),
+            self.zCN.T,
+            self.CNbot.T,
+            self.CNtop.T,
+            self.thRZ_Act.T, 
+            self.thRZ_Sat.T, 
+            self.thRZ_Fc.T, 
+            self.thRZ_Wp.T, 
+            self.thRZ_Dry.T, 
+            self.thRZ_Aer.T, 
+            self.TAW.T, 
+            self.Dr.T, 
+            self.th_dry.T, 
+            self.Aer.T,
+            self.Irr.T,      
+            self.IrrCum.T,   
+            self.IrrNetCum.T,
+            self.SMT1.T,
+            self.SMT2.T,
+            self.SMT3.T,
+            self.SMT4.T,
+            self.IrrScheduled.T,  # TODO
+            self.AppEff.T,
+            self.model.etref.values,
+            self.MaxIrr.T,
+            self.IrrInterval.T,            
+            self.SurfaceStorage.T,
+            self.CrTot.T,
+            self.aCR.T,
+            self.bCR.T,
+            self.fshape_cr.T,
+            self.dz_layer,
+            self.Germination.T,
+            self.zGerm.T,
+            self.GermThr.T,
+            self.rCor.T, 
+            self.Zmax.T, 
+            self.PctZmin.T, 
+            self.Emergence.T, 
+            self.MaxRooting.T, 
+            self.fshape_r.T, 
+            self.fshape_ex.T, 
+            self.SxBot.T,
+            self.SxTop.T,
+            self.TrRatio.T,
+            self.zRes.T,
+            self.CC.T,
+            self.CCprev.T,
+            self.CCadj.T,
+            self.CC_NS.T,
+            self.CCadj_NS.T,
+            self.CCxW.T,
+            self.CCxAct.T,
+            self.CCxW_NS.T,
+            self.CCxAct_NS.T,
+            self.CC0adj.T,
+            self.CCxEarlySen.T,
+            self.tEarlySen.T,
+            self.PrematSenes.T,  # not required when all modules use Fortran
+            self.CropDead.T,
+            self.CC0.T,
+            self.CCx.T,
+            self.CGC.T,
+            self.CDC.T,
+            self.Maturity.T,
+            self.CanopyDevEnd.T,
+            self.ETadj.T,
+            self.p_up1.T,
+            self.p_up2.T,
+            self.p_up3.T,
+            self.p_up4.T,
+            self.p_lo1.T,
+            self.p_lo2.T,
+            self.p_lo3.T,
+            self.p_lo4.T,
+            self.fshape_w1.T,
+            self.fshape_w2.T,
+            self.fshape_w3.T,
+            self.fshape_w4.T,
+            self.EsAct.T,
+            self.Epot.T,
+            self.WetSurf.T,
+            self.Wsurf.T,
+            self.Wstage2.T,
+            self.EvapZ.T,
+            self.EvapZmin.T,
+            self.EvapZmax.T,
+            self.REW.T,
+            self.Kex.T,
+            self.fwcc.T,
+            self.fevap.T,
+            self.fWrelExp.T,
+            self.Mulches.T,
+            self.fMulch.T,
+            self.MulchPctGS.T,
+            self.MulchPctOS.T,
+            self.model.time.timestep,
+            EvapTimeSteps,
+            self.TrPot0.T, 
+            self.TrPot_NS.T, 
+            self.TrAct.T,
+            self.TrAct0.T, 
+            self.Tpot.T, 
+            self.AerDays.T, 
+            np.asfortranarray(self.AerDaysComp.T), 
+            self.AgeDays.T,
+            self.AgeDays_NS.T,
+            self.DaySubmerged.T,
+            self.IrrNet.T, 
+            self.MaxCanopyCD.T, 
+            self.Kcb.T, 
+            self.a_Tr.T,
+            self.fage.T, 
+            self.LagAer.T, 
+            self.CurrentConc.T, 
+            refconc,
+            self.ETpot.T,
+            self.GwIn.T,
+            self.HI.T, 
+            self.PctLagPhase.T,
+            self.YieldForm.T,
+            self.CCmin.T, 
+            self.HIini.T, 
+            self.HI0.T, 
+            self.HIGC.T, 
+            self.HIstart.T, 
+            self.HIstartCD.T, 
+            self.tLinSwitch.T, 
+            self.dHILinear.T, 
+            self.CropType.T,
+            self.BioTempStress.T,
+            self.GDD_up.T,
+            self.GDD_lo.T,
+            self.PolHeatStress.T,
+            self.Tmax_up.T,
+            self.Tmax_lo.T,
+            self.fshape_b.T,
+            self.PolColdStress.T,
+            self.Tmin_up.T,
+            self.Tmin_lo.T,
+            self.B.T,
+            self.B_NS.T,
+            self.YldFormCD.T,
+            self.WP.T,
+            self.WPy.T,
+            self.fCO2.T,
+            self.Determinant.T,
+            self.HIadj.T,
+            self.PreAdj.T,
+            self.Fpre.T, 
+            self.Fpol.T, 
+            self.Fpost.T, 
+            self.fpost_dwn.T, 
+            self.fpost_upp.T, 
+            self.sCor1.T, 
+            self.sCor2.T,
+            self.dHI0.T, 
+            self.dHI_pre.T, 
+            self.CanopyDevEndCD.T, 
+            self.HIendCD.T, 
+            self.FloweringCD.T, 
+            self.a_HI.T, 
+            self.b_HI.T, 
+            self.exc.T,
+            self.Y.T,
+            self.CropMature.T,
+            int(self.CalendarType),
+            self.GrowingSeasonDayOne.T,
+            self.GrowingSeasonIndex.T,
+            self.nFarm,
+            self.nCrop,
+            self.nComp,
+            self.nLayer,
+            self.domain.nxy            
+        )                
+        self.reporting_module.dynamic()

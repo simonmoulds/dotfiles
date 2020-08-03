@@ -1,0 +1,10 @@
+#' Class PriceData
+#'
+#' An S4 class to represent price data
+#'
+#' @slot nitrogen numeric
+#' @slot phosphorous numeric
+#' @slot potassium numeric
+#' @slot diesel numeric
+#' @slot crop data.frame
+#' 

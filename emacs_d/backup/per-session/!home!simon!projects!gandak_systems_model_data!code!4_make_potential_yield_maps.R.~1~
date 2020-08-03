@@ -1,0 +1,6 @@
+## Author : Simon Moulds
+
+library(raster)
+
+suffix = "res02_crav6190"
+crops = c("rice","whea","sugc")

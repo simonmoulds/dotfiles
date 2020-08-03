@@ -1,0 +1,120 @@
+[FILE_PATHS]
+PathIn = /home/simon/dev/hydro_model_builder/examples/WFDEI/input
+PathOut = /home/simon/dev/hydro_model_builder/examples/WFDEI/output
+
+[MODEL_GRID]
+cloneMap = ${FILE_PATHS:PathIn}/Gandak30min.clone.map
+landmask = ${FILE_PATHS:PathIn}/Gandak30min.landmask.map
+
+[CLOCK]
+startTime = 1982-05-01
+endTime = 1983-10-30
+
+[NETCDF_ATTRIBUTES]
+institution = Centre for Water Systems, University of Exeter
+title       = RefET model output
+description = WFDEI example (by Simon Moulds) 
+netcdf_y_orientation_follow_cf_convention = True
+formatNetCDF = NETCDF4
+zlib = True
+
+[WEATHER]
+temperatureNC = Tair_daily_WFDEI/Tair_daily_WFDEI_{year:0>4}{month:0>2}.nc
+temperatureVarName = Tair
+temperatureTimeDimName = timestp
+
+subDailyTemperatureNC = Tair_WFDEI/Tair_WFDEI_{year:0>4}{month:0>2}.nc
+subDailyTemperatureVarName = Tair
+subDailyTemperatureTimeDimName = timestp
+
+downwellingLongwaveRadiationNC = LWdown_daily_WFDEI/LWdown_daily_WFDEI_{year:0>4}{month:0>2}.nc
+downwellingLongwaveRadiationVarName = LWdown
+downwellingLongwaveRadiationTimeDimName = timestp
+
+surfaceAtmosphericPressureNC = PSurf_daily_WFDEI/PSurf_daily_WFDEI_{year:0>4}{month:0>2}.nc
+surfaceAtmosphericPressureVarName = PSurf
+surfaceAtmosphericPressureTimeDimName = timestp
+
+nearSurfaceSpecificHumidityNC = Qair_daily_WFDEI/Qair_daily_WFDEI_{year:0>4}{month:0>2}.nc
+nearSurfaceSpecificHumidityVarName = Qair
+nearSurfaceSpecificHumidityTimeDimName = timestp
+
+downwellingShortwaveRadiationNC = SWdown_daily_WFDEI/SWdown_daily_WFDEI_{year:0>4}{month:0>2}.nc
+downwellingShortwaveRadiationVarName = SWdown
+downwellingShortwaveRadiationTimeDimName = timestp
+
+nearSurfaceWindSpeedNC = Wind_daily_WFDEI/Wind_daily_WFDEI_{year:0>4}{month:0>2}.nc
+nearSurfaceWindSpeedVarName = Wind
+nearSurfaceWindSpeedTimeDimName = timestp
+
+[REPORTING]
+outDailyTotNC = ETref,tmin,tmax,tmean
+
+# [globalOptions]
+
+# # Set the input directory map in an absolute path
+# inputDir = /home/simon/dev/etref/examples/WFDEI/input
+
+# # Set the output directory in an absolute path
+# outputDir = /home/simon/dev/etref/examples/WFDEI/output
+
+# # Map of clone (must be provided in PCRaster maps)
+# # - Spatial resolution and coverage are based on this map:
+# cloneMap = Gandak30min.clone.map
+
+# # The area/landmask of interest:
+# landmask = Gandak30min.landmask.map
+
+# # NetCDF attributes for output files:
+# institution = Centre for Water Systems, University of Exeter
+# title       = RefET model output
+# description = WFDEI example (by Simon Moulds) 
+
+# # Start/end time (YYYY-MM-DD)
+# startTime = 2000-01-01
+# endTime = 2000-01-31
+
+# # Method (one or more of PenmanMonteith, PriestleyTaylor, Hargreaves; comma-delimited if required)
+# method = PenmanMonteith
+# # method = PenmanMonteith,PriestleyTaylor,Hargreaves
+
+# [meteoOptions]
+
+# # TODO: meteoDataSource = WFDEI (with method in Configuration to define relevant variables)
+
+# compute_daily_min_max_temperature_from_subdaily_data = True
+
+# temperatureNC = Tair_daily_WFDEI/Tair_daily_WFDEI_{year:0>4}{month:0>2}.nc
+# temperatureVarName = Tair
+# temperatureTimeDimName = timestp
+
+# subDailyTemperatureNC = Tair_WFDEI/Tair_WFDEI_{year:0>4}{month:0>2}.nc
+# subDailyTemperatureVarName = Tair
+# subDailyTemperatureTimeDimName = timestp
+
+# downwellingLongwaveRadiationNC = LWdown_daily_WFDEI/LWdown_daily_WFDEI_{year:0>4}{month:0>2}.nc
+# downwellingLongwaveRadiationVarName = LWdown
+# downwellingLongwaveRadiationTimeDimName = timestp
+
+# surfaceAtmosphericPressureNC = PSurf_daily_WFDEI/PSurf_daily_WFDEI_{year:0>4}{month:0>2}.nc
+# surfaceAtmosphericPressureVarName = PSurf
+# surfaceAtmosphericPressureTimeDimName = timestp
+
+# nearSurfaceSpecificHumidityNC = Qair_daily_WFDEI/Qair_daily_WFDEI_{year:0>4}{month:0>2}.nc
+# nearSurfaceSpecificHumidityVarName = Qair
+# nearSurfaceSpecificHumidityTimeDimName = timestp
+
+# downwellingShortwaveRadiationNC = SWdown_daily_WFDEI/SWdown_daily_WFDEI_{year:0>4}{month:0>2}.nc
+# downwellingShortwaveRadiationVarName = SWdown
+# downwellingShortwaveRadiationTimeDimName = timestp
+
+# nearSurfaceWindSpeedNC = Wind_daily_WFDEI/Wind_daily_WFDEI_{year:0>4}{month:0>2}.nc
+# nearSurfaceWindSpeedVarName = Wind
+# nearSurfaceWindSpeedTimeDimName = timestp
+
+# [reportingOptions]
+# outDailyTotNC = ETref,tmin,tmax,tmean
+# # Should we follow the netCDF Climate and Forecast Conventions?
+# netcdf_y_orientation_follow_cf_convention = True
+# formatNetCDF = NETCDF4
+# zlib = True

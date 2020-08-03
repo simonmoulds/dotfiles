@@ -1,0 +1,37 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#
+# AquaCrop
+#
+import os
+import numpy as np
+import pcraster as pcr
+import virtualOS as vos
+import netCDF4 as nc
+import datetime as datetime
+import calendar as calendar
+
+class IrrigationParameters(object):
+
+    def __init__(self, iniItems, landmask):
+        object.__init__(self)
+
+        self.cloneMap = iniItems.cloneMap
+        self.tmpDir   = iniItems.tmpDir
+        self.inputDir = iniItems.globalOptions['inputDir']
+        self.landmask = landmask
+
+        attr = vos.getMapAttributesALL(self.cloneMap)
+        self.nLat = int(attr['rows'])
+        self.nLon = int(attr['cols'])
+
+        self.irrMgmtParameterFileNC = iniItems.irrMgmtOptions['irrMgmtParameterNC']
+
+    def read_irrigation_mgmt_parameters(self):
+        """Function to read field management input parameters"""
+        
+        fieldMgmtParams = ['Mulches','MulchPctGS','MulchPctOS','fMulch','Bunds','zBund','BundWater']
+        for var in fieldMgmtParams:
+            vars(self)[var] = vos.netcdf2PCRobjCloneWithoutTime(self.irrMgmtParameterFileNC,\
+                                                                var,\
+                                                                cloneMapFileName=self.cloneMap)            

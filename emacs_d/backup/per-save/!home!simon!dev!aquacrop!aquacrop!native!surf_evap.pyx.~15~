@@ -1,0 +1,8 @@
+
+cdef extern from "c_surf_evap.h":
+    void c_surf_evap(double* es_pot, double* es_act, double* surface_storage, double* rew, double* w_surf, double* w_stage_two, double* evap_z, double* evap_z_min, int n_farm, int n_crop, int n_cell)
+
+def f(double[:,:,:] es_pot, double[:,:,:] es_act, double[:,:,:] surface_storage, double[:,:,:] rew, double[:,:,:] w_surf, double[:,:,:] w_stage_two, double[:,:,:] evap_z, double[:,:,:] evap_z_min, int n_farm, int n_crop, int n_cell):
+
+    c_surf_evap(es_pot, es_act, surface_storage, rew, w_surf, w_stage_two, evap_z, evap_z_min, n_farm, n_crop, n_cell)
+    

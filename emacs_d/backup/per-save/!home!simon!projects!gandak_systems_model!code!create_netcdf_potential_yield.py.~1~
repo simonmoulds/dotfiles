@@ -1,0 +1,56 @@
+# Potential yield data
+# ====================
+
+import datetime
+import time
+
+# Assume time varying
+
+d = read_csv('JoK_input_data/sult_pol_av_crop_yield_sultanpur.txt', delimiter="\s+", header=None, skiprows=[0,1], names=['Year','Rice','Wheat'])
+
+years = d['Year'].values
+rice_yield = d['Rice'].values
+wheat_yield = d['Wheat'].values
+# f = interpolate.interp1d(years, data, kind="linear")
+# newyears = np.arange(years.min(), years.max() + 1)
+# newdata = f(newyears)
+
+dataset = Dataset('potential_crop_yield_test.nc', 'w')
+dataset.description = 'Annual potential crop yield file'
+dataset.history = 'Created ' + time.ctime(time.time())
+
+lat = dataset.createDimension('lat', nlat)
+lon = dataset.createDimension('lon', nlon)
+crop = dataset.createDimension('crop', ncrop)
+time = dataset.createDimension('time', None)
+
+latitudes = dataset.createVariable('latitude', np.float64, ('lat',))
+latitudes.units = "degrees_north"
+latitudes[:] = lat_vals
+
+longitudes = dataset.createVariable('longitude', np.float64, ('lon',))
+longitudes.units = "degrees_east"
+longitudes[:] = lon_vals
+
+crops = dataset.createVariable('crop', np.int32, ('crop',))
+crops[:] = np.arange(0,ncrop,1)
+
+times = dataset.createVariable('time', np.int32, ('time',))
+times.units = "days since 1901-01-01 00:00:00"
+times.calendar = "standard"
+
+dates = []
+for i in range(len(years)):
+    dates.append(datetime.datetime(years[i],1,1))
+
+times[:] = date2num(dates, units=times.units, calendar=times.calendar)
+
+yx = dataset.createVariable('Yx', np.float64, ('time','crop','lat','lon'))
+yx.setncattr('standard_name', 'Yx')
+yx.setncattr('long_name', 'Potetial crop yield')
+yx.setncattr('units', '1e-1 kg.m-2')
+yx.setncattr('_FillValue', np.float64(1e+20))
+yx.setncattr('missing_value', np.float64(1e+20))
+yx[:] = rice_yield[:,None,None,None] * np.ones((ncrop,nlat,nlon))[None,:,:,:]
+
+dataset.close()

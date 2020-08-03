@@ -1,0 +1,65 @@
+## Author : Simon Moulds
+## Date   : August 2019
+
+library(ncdf4)
+library(raster)
+library(rasterVis)
+
+datadir="../data"
+region=raster(file.path(datadir, "ghana_landmask_0pt25degree.tif"))
+nlat=nrow(region)
+nlon=ncol(region)
+
+nc = nc_open(file.path(datadir, "netcdf", "Y_cropland_yearMax_output.nc"))
+yield = ncvar_get(nc, "crop_yield") # nlon, nlat, time
+latitude = ncvar_get(nc, "lat")
+longitude = ncvar_get(nc, "lon")
+time = ncvar_get(nc, "time")
+rlist = vector(mode="list", length=length(time))
+for (i in 1:length(time)) {
+    r = raster(region)
+    r[] = t(yield[,,i])
+    rlist[[i]] = r
+}
+nc_close(nc)
+
+years = 1980:2010
+tot = rep(NA, length(years))
+for (i in 1:length(years)) {
+    tot[i] = sum(getValues(rlist[[i]]), na.rm=T)
+}
+
+## plot years 1984, 2004
+library(rastervis)
+library(viridis)
+st = stack(rlist[c(5,25)])
+min_val = floor(min(cellStats(st, "min")))
+max_val = ceiling(max(cellStats(st, "max")))
+nlev = 100
+my_breaks = seq(min_val, max_val, length.out=nlev+1)
+
+r = levelplot(st,
+              at=my_breaks,
+              margin=FALSE,
+              xlab=NULL,
+              ylab=NULL,
+              xlim=c(-4,2),
+              ylim=c(4,12),
+              par.settings=list(axis.line=list(lwd=1), strip.background=list(col="transparent"), strip.border=list(col="transparent")),
+              par.strip.text=list(cex=0.6),
+              names.attr=c("1984","2004"),
+              col.regions=rev(terrain.colors(nlev)), #terrain.colors,#colorRampPalette(brewer.pal(n=9, "YlGn"))(1000),
+              layout=c(2,1),
+              scales=list(draw=TRUE, cex=0.6),
+              colorkey=list(
+                  space="bottom",
+                  width=0.75,
+                  at=seq(min_val,max_val,length.out=nlev),
+                  labels=list(
+                      at=seq(0,12,4),
+                      labels=seq(0,12,4),
+                      cex=0.6
+                  ),
+                  tck=0.5
+              ))
+r

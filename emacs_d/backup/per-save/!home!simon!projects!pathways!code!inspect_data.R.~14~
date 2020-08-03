@@ -1,0 +1,37 @@
+## Author : Simon Moulds
+## Date   : June 2019
+
+library(foreign)
+
+datadir = "/home/simon/projects/pathways/data/g7spss"
+
+## aggregates
+## ##########
+
+## aggregates per region?
+x = read.spss(file.path(datadir, "aggregates", "aggregates", "povgh_2017.sav"), to.data.frame=TRUE)
+
+x = read.spss(file.path(datadir, "aggregates", "aggregates", "00_GHA_BASICINFO.sav"), to.data.frame=TRUE)
+
+x = read.spss(file.path(datadir, "aggregates", "aggregates", "01_GHA_EXPFOOD.sav"), to.data.frame=TRUE)
+
+x = read.spss(file.path(datadir, "aggregates", "aggregates", "03_GHA_EXPCLTH.sav"), to.data.frame=TRUE)
+
+## and so on...
+
+## community
+## #########
+
+x = read.spss(file.path(datadir, "community", "community", "g7comSEC5-CROPS.sav"), to.data.frame=TRUE)
+
+## Part A
+## ######
+
+## some potentially interesting sections:
+
+## Section 7D (Housing, utilities and amenities)
+## (manual pages 73-74
+
+## this seems to be the main dataset
+x = read.spss(file.path(datadir, "PartAB", "PartA", "g7sec7.sav"), to.data.frame=TRUE)
+write.csv(x, file.path(datadir, "partA_g7sec7.csv"), row.names=FALSE)

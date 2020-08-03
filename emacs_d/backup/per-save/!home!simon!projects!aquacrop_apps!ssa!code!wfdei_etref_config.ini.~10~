@@ -1,0 +1,102 @@
+[FILE_PATHS]
+PathIn = /home/simon/projects/aquacrop_apps/ssa/data
+PathOut = /home/simon/projects/aquacrop_apps/ssa/data
+
+[MODEL_GRID]
+cloneMap = ${FILE_PATHS:PathIn}/africa_clone_0pt25degree.tif
+landmask = ${FILE_PATHS:PathIn}/africa_landmask_0pt25degree.tif
+
+[CLOCK]
+startTime = 2000-01-01
+endTime = 2000-01-31
+
+[NETCDF_ATTRIBUTES]
+institution = Department of Civil and Environmental Engineering, Imperial College London
+title       = etref model output
+description = 
+netcdf_y_orientation_follow_cf_convention = True
+formatNetCDF = NETCDF4
+zlib = True
+
+[ET_METHOD]
+method = PenmanMonteith
+
+[WEATHER]
+compute_daily_min_max_temperature_from_subdaily_data = True
+compute_daily_mean_temperature_from_subdaily_data = False
+
+meanDailyTemperatureNC = ${FILE_PATHS:PathIn}/Tair_daily_WFDEI/Tair_daily_WFDEI_{year:0>4}{month:0>2}.nc
+meanDailyTemperatureVarName = Tair
+meanDailyTemperatureTimeDimName = timestp
+meanDailyTemperatureOffset = 0.0
+meanDailyTemperatureFactor = 1.0
+
+minDailyTemperatureNC = None
+minDailyTemperatureVarName = None
+minDailyTemperatureTimeDimName = None
+minDailyTemperatureOffset = 0.0
+minDailyTemperatureFactor = 1.0
+
+maxDailyTemperatureNC = None
+maxDailyTemperatureVarName = None
+maxDailyTemperatureTimeDimName = None
+maxDailyTemperatureOffset = 0.0
+maxDailyTemperatureFactor = 1.0
+
+subDailyTemperatureNC = ${FILE_PATHS:PathIn}/Tair_WFDEI/Tair_WFDEI_{year:0>4}{month:0>2}.nc
+subDailyTemperatureVarName = Tair
+subDailyTemperatureTimeDimName = timestp
+subDailyTemperatureOffset = 0.0
+subDailyTemperatureFactor = 1.0
+
+downwellingLongwaveRadiationNC = ${FILE_PATHS:PathIn}/LWdown_daily_WFDEI/LWdown_daily_WFDEI_{year:0>4}{month:0>2}.nc
+downwellingLongwaveRadiationVarName = LWdown
+downwellingLongwaveRadiationTimeDimName = timestp
+downwellingLongwaveRadiationOffset = 0.0
+downwellingLongwaveRadiationFactor = 1.0
+
+surfaceAtmosphericPressureNC = ${FILE_PATHS:PathIn}/PSurf_daily_WFDEI/PSurf_daily_WFDEI_{year:0>4}{month:0>2}.nc
+surfaceAtmosphericPressureVarName = PSurf
+surfaceAtmosphericPressureTimeDimName = timestp
+surfaceAtmosphericPressureOffset = 0.0
+surfaceAtmosphericPressureFactor = 1.0
+
+specificHumidityNC = ${FILE_PATHS:PathIn}/Qair_daily_WFDEI/Qair_daily_WFDEI_{year:0>4}{month:0>2}.nc
+specificHumidityVarName = Qair
+specificHumidityTimeDimName = timestp
+specificHumidityOffset = 0.0
+specificHumidityFactor = 1.0
+
+maxRelativeHumidityNC = None
+maxRelativeHumidityVarName = None
+maxRelativeHumidityTimeDimName = None
+maxRelativeHumidityOffset = 0.0
+maxRelativeHumidityFactor = 1.0
+
+minRelativeHumidityNC = None
+minRelativeHumidityVarName = None
+minRelativeHumidityTimeDimName = None
+minRelativeHumidityOffset = 0.0
+minRelativeHumidityFactor = 1.0
+
+meanRelativeHumidityNC = None
+meanRelativeHumidityVarName = None
+meanRelativeHumidityTimeDimName = None
+meanRelativeHumidityOffset = 0.0
+meanRelativeHumidityFactor = 1.0
+
+downwellingShortwaveRadiationNC = ${FILE_PATHS:PathIn}/SWdown_daily_WFDEI/SWdown_daily_WFDEI_{year:0>4}{month:0>2}.nc
+downwellingShortwaveRadiationVarName = SWdown
+downwellingShortwaveRadiationTimeDimName = timestp
+downwellingShortwaveRadiationOffset = 0.0
+downwellingShortwaveRadiationFactor = 1.0
+
+windSpeedNC = ${FILE_PATHS:PathIn}/Wind_daily_WFDEI/Wind_daily_WFDEI_{year:0>4}{month:0>2}.nc
+windSpeedVarName = Wind
+windSpeedTimeDimName = timestp
+windSpeedOffset = 0.0
+windSpeedFactor = 1.0
+
+[REPORTING]
+outDailyTotal = ETref
+

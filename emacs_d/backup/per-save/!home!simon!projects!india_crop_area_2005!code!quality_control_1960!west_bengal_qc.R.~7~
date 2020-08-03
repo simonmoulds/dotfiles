@@ -1,0 +1,19 @@
+## Author : Simon Moulds
+## Date   : Apr 2018
+
+## Quality control for West Bengal
+
+## Barley
+## ######
+
+xx[["apy_barley"]] %<>% locf_interp(59:63)
+
+## Chickpea
+## ########
+
+xx[["apy_chickpea"]] %<>% locf_interp(61:63)
+
+## Cotton
+## ######
+
+xx[["apy_cotton"]] %<>% locf_interp(60:63)

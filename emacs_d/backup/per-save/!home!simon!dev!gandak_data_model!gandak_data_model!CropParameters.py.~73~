@@ -1,0 +1,151 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import os
+import numpy as np
+import rasterio
+import csv
+import pkgutil
+
+from hydro_model_builder.ncConverter import np2netCDF
+from hydro_model_builder import VirtualOS as vos
+
+import variable_list as variable_list
+from utils import *
+
+class CropParameters(object):
+    def __init__(self, CropParameters_variable):
+        self.var = CropParameters_variable
+        self.var.CropParameterOutputFile = vos.getFullPath(
+            self.var._configuration.cropParameterOptions['outputFile'],
+            self.var._configuration.globalOptions['outputDir'])
+        self.bbox = vos.get_clone_map_extent(self.var._configuration.cloneMap)
+        
+    def initial(self):
+        arr_zeros = np.zeros((self.var.nCrop, self.var.nLat, self.var.nLon))
+        self.var.planting_day = arr_zeros.copy()
+        self.var.harvest_day = arr_zeros.copy()
+        self.var.L_ini = arr_zeros.copy()
+        self.var.L_dev = arr_zeros.copy()
+        self.var.L_mid = arr_zeros.copy()
+        self.var.L_late = arr_zeros.copy() 
+        self.var.Kc_ini = arr_zeros.copy()
+        self.var.Kc_mid = arr_zeros.copy()
+        self.var.Kc_end = arr_zeros.copy()
+        self.var.Z_max = arr_zeros.copy()
+        self.var.p_std = arr_zeros.copy()
+
+    def read_gcwm_crop_data(self):
+        gcwm_data_filename = get_data_smart(
+            'gandak_data_model',
+            '../data/gcwm_crop_data.csv',
+            as_string=False)
+        
+        with open(gcwm_data_filename, 'rt') as f:
+            reader = csv.reader(f, delimiter=',',)
+            next(reader, None)
+            crop_data = {}
+            for row in reader:
+                if row[0] not in crop_data:
+                    key = row[0].upper()
+                    crop_data[key] = {}
+                    crop_data[key]['L_ini'] = float(row[1])
+                    crop_data[key]['L_dev'] = float(row[2])
+                    crop_data[key]['L_mid'] = float(row[3])
+                    crop_data[key]['L_late'] = float(row[4])
+                    crop_data[key]['Kc_ini'] = float(row[5])
+                    crop_data[key]['Kc_mid'] = float(row[6])
+                    crop_data[key]['Kc_end'] = float(row[7])
+                    crop_data[key]['rd_irr'] = float(row[8])
+                    crop_data[key]['rd_rain'] = float(row[9])
+                    crop_data[key]['p_std'] = float(row[10])
+                    
+        return crop_data
+
+    def read_crop_planting_and_harvest_day(self):
+        
+        # Retrieve planting and harvest date from raster images
+        map_path = '/home/simon/projects/india_crop_area_2005/data/output_2005/growing_season_maps'
+        start_day = np.array([1,32,60,91,121,152,182,213,244,274,305,335])
+        end_day = np.array([31,59,90,120,151,181,212,243,273,304,334,365])
+        harvest_day = []
+        planting_day = []
+        for index, name in enumerate(self.var.CropTypes):
+            # names of files containing planting and harvest dates of
+            # crop under consideration
+            x = os.path.join(map_path, 'INDIA_' + name.upper() + '_2005_SOWING.tif')
+            y = os.path.join(map_path, 'INDIA_' + name.upper() + '_2005_HARVESTING.tif')
+            if os.path.isfile(x) and os.path.isfile(y):
+                xarr = read_gdal_raster_image(x, self.bbox, 0)
+                yarr = read_gdal_raster_image(y, self.bbox, 0)                
+                pd = np.zeros_like(xarr)
+                hd = np.zeros_like(xarr)
+                for i in range(xarr.shape[0]):
+                    for j in range(xarr.shape[1]):
+                        if xarr[i,j] > 0:
+                            pd_ix = int(xarr[i,j]) - 1
+                            hd_ix = int(yarr[i,j]) - 1
+                            pd[i,j] = start_day[pd_ix]
+                            hd[i,j] = end_day[hd_ix]
+                        else:
+                            pd[i,j] = xarr[i,j]
+                            hd[i,j] = yarr[i,j]
+
+                planting_day.append(pd)
+                harvest_day.append(hd)
+
+        # arrays with dimensions (crop,lat,lon)
+        self.var.planting_day = np.stack(planting_day, axis=0)
+        self.var.harvest_day = np.stack(harvest_day, axis=0)
+
+    def read_parameters(self):
+        crop_data = self.read_gcwm_crop_data()        
+        for index,crop in enumerate(self.var.CropTypes):
+            key = lookup_crop_id(crop, 'GCWM')            
+            self.var.L_ini[index,...] = (crop_data[key]['L_ini'])
+            self.var.L_dev[index,...] = (crop_data[key]['L_dev'])
+            self.var.L_mid[index,...] = (crop_data[key]['L_mid'])
+            self.var.L_late[index,...] = (crop_data[key]['L_late'])
+            self.var.Kc_ini[index,...] = (crop_data[key]['Kc_ini'])
+            self.var.Kc_mid[index,...] = (crop_data[key]['Kc_mid'])
+            self.var.Kc_end[index,...] = (crop_data[key]['Kc_end'])
+            if crop.startswith('irr'):
+                self.var.Z_max[index,...] = (crop_data[key]['rd_irr'])
+            elif crop.startswith('rain'):
+                self.var.Z_max[index,...] = (crop_data[key]['rd_rain'])
+            self.var.p_std[index,...] = (crop_data[key]['p_std'])
+
+        self.var.Z_min = self.var.Z_max  # TEMPORARY
+        self.var.Ky = np.full((self.var.nCrop, self.var.nLat, self.var.nLon), 1)
+        
+    def dynamic(self):
+        self.read_crop_planting_and_harvest_day()
+        self.read_parameters()
+        
+        crop_parameters = {
+            'planting_day' : self.var.planting_day,
+            'harvest_day' : self.var.harvest_day,
+            'L_ini' : self.var.L_ini,
+            'L_dev' : self.var.L_dev,
+            'L_mid' : self.var.L_mid,
+            'L_late' : self.var.L_late,
+            'Kc_ini' : self.var.Kc_ini,
+            'Kc_mid' : self.var.Kc_mid,
+            'Kc_end' : self.var.Kc_end,
+            'Z_min' : self.var.Z_min,
+            'Z_max' : self.var.Z_max,
+            'p_std' : self.var.p_std,
+            'Ky' : self.var.Ky}
+
+        crop_parameter_names = ['planting_day','harvest_day','L_ini','L_dev','L_mid','L_late','Kc_ini','Kc_mid','Kc_end','Z_min','Z_max','p_std','Ky']
+        netcdf = np2netCDF(
+            self.var._configuration,
+            self.var.dimensions,
+            variable_list)
+        netcdf.create_netCDF(self.var.CropParameterOutputFile, crop_parameter_names)
+        for param in crop_parameter_names:        
+            netcdf.data2NetCDF(self.var.CropParameterOutputFile, param, vars(self.var)[param])
+        
+        # netcdf.create_netCDF(self.var.CropParameterOutputFile, crop_parameters.keys())
+        # for key, value in crop_parameters.iteritems():        
+        #     netcdf.data2NetCDF(self.var.CropParameterOutputFile, key, value)

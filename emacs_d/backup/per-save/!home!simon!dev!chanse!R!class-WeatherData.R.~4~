@@ -1,0 +1,24 @@
+setOldClass("xts")
+
+
+#' Class WeatherData
+#'
+#' An S4 class to represent weather data
+#'
+#' @slot prec xts. Daily precipitation (mm).
+#' @slot etref xts. Daily reference evapotranspiration (mm).
+#'
+#' @export
+#' @exportClass WeatherData
+#' @rdname WeatherData-class
+setClass("WeatherData",
+         slots = c(
+             prec = "xts",
+             etref = "xts"
+         ),
+         validity = function(object) {
+             return(TRUE)
+         }
+         )
+
+         

@@ -1,0 +1,10 @@
+## Author : Simon Moulds
+## Date   : Nov 2018
+
+library(raster)
+
+wd = "/home/simon/projects/gandak_systems_model_data"
+r = raster("../data/channel_network_IDs.asc")
+r[r > 0] = 1
+
+writeRaster(r, "../data/canal_access.tif", overwrite=TRUE, format="GTiff")

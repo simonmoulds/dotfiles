@@ -1,0 +1,38 @@
+import netCDF4 as nc
+import numpy as np
+import datetime
+
+# d = nc.Dataset('input/Tair_WFDEI/Tair_WFDEI_200001.nc')
+# start_index = nc.date2index(datetime.datetime(2000,1,1),d.variables['time'])
+# end_index = nc.date2index(datetime.datetime(2000,1,2,0,0,0),d.variables['time'])
+# idx = np.arange(start_index,end_index)
+# arr = d.variables['Tair'][idx,:]
+
+d = nc.Dataset('input/Tair_daily_WFDEI/Tair_daily_WFDEI_200001.nc')
+tname = "timestp"
+
+nctime = d.variables[tname][:]
+t_unit = d.variables[tname].units 
+
+try :
+    t_cal = d.variables[tname].calendar
+except AttributeError :
+    t_cal = u"gregorian" # or standard
+
+datevar = []
+datevar.append(nc.num2date(nctime, units=t_unit, calendar=t_cal))
+
+# def _dateparse(timestr):
+#     """parse a string of the form time-units since yyyy-mm-dd hh:mm:ss 
+#     return a tuple (units, datetimeinstance)
+#     """
+#     timestr_split = timestr.split()
+#     units = timestr_split[0].lower()
+#     # if units not in _units:
+#     #    raise ValueError,"units must be one of 'seconds', 'minutes', 'hours' or 'days' (or singular version of these), got '%s'" % units
+#     if timestr_split[1].lower() != 'since':
+#         raise ValueError,"no 'since' in unit_string"
+#     # parse the date string
+#     n = timestr.find('since')+6
+#     # year,month,day,hour,minute,second,utc_offset = _parse_date(timestr[n:])
+#     return units, utc_offset #, datetime(year, month, day, hour, minute, second)

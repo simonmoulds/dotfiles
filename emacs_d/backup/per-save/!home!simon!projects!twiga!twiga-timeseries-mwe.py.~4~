@@ -1,0 +1,112 @@
+import requests
+import pandas as pd
+import numpy as np
+
+API_USER = ".\\twiga_hl"
+API_PASSWORD = "321321Demo!"
+
+# Example: get soil moisture data
+requestBody = {
+    "Readers": [
+        {
+            "DataSourceCode": "Tahmo.Stations.Data.Distribution",
+            "Settings": {
+                "LocationCodes": [
+                    'TA00429'
+                ],
+                "VariableCodes": [
+                    'Soil.Moisture','P'
+                ],
+                "StartDate": '20191001000000',
+                "EndDate": '20191002000000',
+                "StructureType": "TimeSeries"
+            }
+        }
+    ]
+}
+response = requests.post(
+    'http://twiga-api.hydronet.com/api/timeseries/get',
+    json=requestBody,
+    auth=requests.auth.HTTPBasicAuth(API_USER, API_PASSWORD),
+    verify=False
+)
+
+responseJSON = response.json()
+print(responseJSON)
+
+# get a list of locations/codes
+requestBody = {
+    "DataSourceCodes": [
+        "Tahmo.Stations.Data.Distribution"
+    ],
+    # "StartDate": '20100101000000',
+    "EndDate": '20160101000000',
+}
+response = requests.post(
+    'http://twiga-api.hydronet.com/api/entity/locations/get',
+    json=requestBody,
+    auth=requests.auth.HTTPBasicAuth(API_USER, API_PASSWORD),
+    verify=False
+)
+
+responseJSON = response.json()
+
+locations = responseJSON['Locations']
+
+stn_codes = []
+for id in locations.keys():
+    stn_codes.append(locations[id]['Code'])
+    
+# get a list of variables
+requestBody = {
+    "DataSourceCodes": [
+        "Tahmo.Stations.Data.Distribution"
+    ],
+}
+
+response = requests.post(
+    'http://twiga-api.hydronet.com/api/entity/variables/get',
+    json=requestBody,
+    auth=requests.auth.HTTPBasicAuth(API_USER, API_PASSWORD),
+    verify=False
+)
+
+responseJSON = response.json()
+
+variables = responseJSON['Variables']
+
+var_codes = []
+for id in variables.keys():
+    var_codes.append(variables[id]['Code'])
+
+# formulate a request
+requestBody = {
+    "Readers": [
+        {
+            "DataSourceCode": "Tahmo.Stations.Data.Distribution",
+            "Settings": {
+                "LocationCodes": [
+                    'TA00429'
+                ],
+                # "VariableCodes": [
+                #     'Soil.Moisture','P'
+                # ],
+                "VariableCodes": [
+                    'P','TMP'
+                ],                
+                "StartDate": '20191001000000',
+                "EndDate": '20191002000000',
+                "StructureType": "TimeSeries"
+            }
+        }
+    ]
+}
+
+response = requests.post(
+    'http://twiga-api.hydronet.com/api/timeseries/get',
+    json=requestBody,
+    auth=requests.auth.HTTPBasicAuth(API_USER, API_PASSWORD),
+    verify=False
+)
+    
+responseJSON = response.json()

@@ -1,0 +1,33 @@
+#' Create hydrological_parameters object.
+#'
+#' @param n_farm Integer scalar. The number of farms in the simulation.
+#' @param field_capacity
+#' @param wilting_point
+#' @param specific_yield
+#' @param runoff_coefficient
+#' @param evaporation_coefficient
+#' @param canal_volume
+#' @param canal_leakage_rate
+#'
+#' @return hydrological_parameters
+#' 
+hydrological_parameters = function(n_farm,
+                                   field_capacity,
+                                   wilting_point,
+                                   specific_yield,
+                                   runoff_coefficient,
+                                   evaporation_coefficient,
+                                   canal_volume,
+                                   canal_leakage_rate) {
+    
+    x = list(
+        field_capacity = _expand_parameter(n_farm, field_capacity),
+        wilting_point = _expand_parameter(n_farm, wilting_point),
+        specific_yield = _expand_parameter(n_farm, specific_yield),
+        runoff_coefficient = _expand_parameter(n_farm, runoff_coefficient),
+        evaporation_coefficient = _expand_parameter(n_farm, evaporation_coefficient),
+        canal_volume = _expand_parameter(n_farm, canal_volume),
+        canal_leakage_rate = _expand_parameter(n_farm, canal_leakage_rate)
+    )
+    structure(x, class="hydrological_parameters")
+}

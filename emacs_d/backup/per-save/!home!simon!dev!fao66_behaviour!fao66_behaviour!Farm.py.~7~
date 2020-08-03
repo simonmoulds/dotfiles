@@ -1,0 +1,53 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import os
+import numpy as np
+from hydro_model_builder import VirtualOS as vos
+from aquacrop.Messages import *
+
+from FarmParameters import FarmParameters
+from Income import Income
+from Expenditure import Expenditure
+from Investment import Investment
+from Accounting import Accounting
+from TubewellCapacity import TubewellCapacity
+from CanalAccess import CanalAccess
+# from IrrigationSupply import IrrigationSupply
+
+import logging
+logger = logging.getLogger(__name__)
+
+class Farm(object):
+
+    def __init__(self, Farm_variable):
+        self.var = Farm_variable
+        self.parameters_module = FarmParameters(Farm_variable)
+        self.income_module = Income(Farm_variable)
+        self.expenditure_module = Expenditure(Farm_variable)
+        self.investment_module = Investment(Farm_variable)
+        self.accounting_module = Accounting(Farm_variable)
+        self.tubewell_capacity_module = TubewellCapacity(Farm_variable)
+        self.canal_access_module = CanalAccess(Farm_variable)
+        # self.irrigation_supply_module = IrrigationSupply(Farm_variable)
+        
+    def initial(self):
+        self.parameters_module.initial()
+        self.income_module.initial()
+        self.expenditure_module.initial()
+        self.investment_module.initial()
+        self.accounting_module.initial()
+        self.tubewell_capacity_module.initial()
+        self.canal_access_module.initial()
+        # self.irrigation_supply_module.initial()
+
+    def dynamic(self):
+        self.parameters_module.dynamic()
+        self.income_module.dynamic()
+        self.expenditure_module.dynamic()
+        self.investment_module.dynamic()
+        self.accounting_module.dynamic()
+        self.tubewell_capacity_module.dynamic()
+        self.canal_access_module.dynamic()
+        # self.irrigation_supply_module.dynamic()
+    

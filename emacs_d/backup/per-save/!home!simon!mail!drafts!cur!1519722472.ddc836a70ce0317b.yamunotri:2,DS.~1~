@@ -1,0 +1,51 @@
+From: Simon Moulds <s.moulds@exeter.ac.uk>
+To: "O'Keeffe, Jimmy M" <jimmy.okeeffe@imperial.ac.uk>
+Subject: Re: parameters and plots
+References: <AM5PR0601MB23564118DC022A568B84513BD4C00@AM5PR0601MB2356.eurprd06.prod.outlook.com>
+User-agent: mu4e 1.0-alpha2; emacs 24.5.1
+In-reply-to: <AM5PR0601MB23564118DC022A568B84513BD4C00@AM5PR0601MB2356.eurprd06.prod.outlook.com>
+
+<#part type="application/zip" filename="~/projects/igp_livelihood_model/chanse/wrr_paper.zip" disposition=attachment>
+<#/part>
+Hi Jimmy,
+
+Most recent version of the code attached. Parameter values are in code/config/<district>_params.R
+
+Yes, sure. Which plots does inflation impact - farmer livelihood?
+
+Cheers,
+Simon
+
+O'Keeffe, Jimmy M writes:
+
+> Hi Simon.
+>
+>
+> I'm waiting for some feedback from Wouter and Ana, but in the meantime I'm tying up some loose ends in the paper.
+>
+>
+> One of those is double checking that all of the parameters in table 2 are correct. I'm fairly sure you've already sent this to me but just in case it was a different version used, would you mind sending me the code with the driving data etc used in the most recent plot outputs?
+>
+>
+> Also, it would be good to update the inflation corrected plot, and produce an additional groundwater plot which shows the impact of climate change only which will be added to the supplementary information.
+>
+>
+> Happy to go through any of this over the phone if you like.
+>
+>
+> Cheers
+>
+> Jimmy
+>
+>
+>
+> ————————————
+> Dr Jimmy O'Keeffe
+> Research Associate
+>
+> Department of Civil and Environmental Engineering
+> Imperial College London
+> London SW7 2AZ
+> @jimmy_okeeffe
+> https://www.imperial.ac.uk/people/jimmy.okeeffe
+

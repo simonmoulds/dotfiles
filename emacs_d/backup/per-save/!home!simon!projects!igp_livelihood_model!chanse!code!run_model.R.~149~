@@ -1,0 +1,411 @@
+## Author : Simon Moulds & Jimmy O'Keeffe
+## Date   : July 2017
+
+library(Rcpp)
+library(magrittr)
+
+## ======================================
+## climate data
+## ======================================
+
+climate_data = read.table(file.path("data","input","all_data_irr2.txt"), header=TRUE)
+rainfall_data = read.table(file.path("data","input","sult_precip_1971_2013.txt"), header=TRUE)
+prec = rainfall_data[["precip"]]
+reference_ET = climate_data[["ETo_mm"]]
+
+## ======================================
+## time data
+## ======================================
+
+tm = as.POSIXlt(rainfall_data[["date"]]) # safe to use this in future runs as well?
+day = tm[["yday"]] + 1
+month = tm[["mon"]] + 1
+year = tm[["year"]] + 1900
+
+## ======================================
+## Price data
+## ======================================
+
+price_data = read.table(file.path("data","input","all.variables_yield_interp_fert_cons.txt"), header = TRUE)
+price_data_year = price_data[["year"]] %>% as.POSIXlt %>% `[[`("year") %>% `+`(1900)
+
+index1 = match(sort(unique(year)), price_data_year) ## this index removes years outside the model period
+index2 = match(year, price_data_year[index1])       ## this index maps annual values to daily
+
+rice_price_per_t = price_data[["rice_p_per_t"]][index1][index2]
+wheat_price_per_t = price_data[["wheat_p_per_t"]][index1][index2]
+
+fert_n_t_ha = price_data[["fert_n_t_ha"]][index1][index2]
+fert_p_t_ha = price_data[["fert_p_t_ha"]][index1][index2]
+fert_k_t_ha = price_data[["fert_k_t_ha"]][index1][index2]
+
+fert_n_price_per_kg = price_data[["fert_n_p_per_kg"]][index1][index2]
+fert_p_price_per_kg = price_data[["fert_p_p_per_kg"]][index1][index2]
+fert_k_price_per_kg = price_data[["fert_k_p_per_kg"]][index1][index2]
+
+## make fertiliser price/application rate a daily time series
+fertiliser_price = matrix(data=c(fert_n_price_per_kg, fert_p_price_per_kg, fert_k_price_per_kg), ncol=3) # DATA INPUT
+fertiliser_app_rate = matrix(data=c(fert_n_t_ha, fert_p_t_ha, fert_k_t_ha), ncol=3)                      # DATA INPUT
+
+## TODO: remove this
+fertiliser_app_rate[,1] = 120
+fertiliser_app_rate[,2] = 26
+fertiliser_app_rate[,3] = 48
+
+diesel_price_data = read.table(file.path("data","input","diesel_prices_long.txt"), header = TRUE)
+diesel_price_data_year = diesel_price_data[["year"]] %>% as.POSIXlt
+index = diesel_price_data_year %in% tm
+diesel_price = diesel_price_data[["dp"]][index]
+
+well_cost_data = read.table(file.path("data","input","well_cost_long.txt"), header = TRUE)
+well_cost_data_year = well_cost_data[["year"]] %>% as.POSIXlt
+index = well_cost_data_year %in% tm
+well_cost = well_cost_data[["well_cost"]][index]
+
+## ======================================
+## yield data
+## ======================================
+
+yield_data = read.table(file.path("data","input","ln_crop_yield_sultanpur.txt"), h=T)
+yield_data_year = yield_data[["Year"]]
+index = yield_data_year %in% year
+wheat_yield = yield_data[["wheat_th"]][index]
+rice_yield = yield_data[["rice_th"]][index]
+
+## ======================================
+## crop data
+## ======================================
+
+## 1. crop coefficient
+
+Kc = rep(0, length(day))
+
+Kc1w = 0.80 ## crop factor wheat stage 1 (all taken from Choudhury et al 2013)
+Kc2w = 1.12 ## crop factor wheat stage 2
+Kc3w = 1.25 ## crop factor wheat stage 3
+Kc4w = 0.46 ## crop factor wheat stage 4
+
+Kc1r = 0.61 ## crop factor rice stage 1 (again, all taken from Choudhury et al 2013)
+Kc2r = 0.8  ## crop factor rice stage 2
+Kc3r = 1.23 ## crop factor rice stage 3
+Kc4r = 0.74 ## crop factor rice stage 4
+
+Kc[day >=1 & day <= 16] = Kc2w
+Kc[day >=17 & day <= 47] = Kc3w
+Kc[day >=48 & day <= 106] = Kc4w 
+Kc[day >=320 & day <= 350] = Kc1w
+Kc[day >=351 & day <= 366] = Kc2w
+  
+Kc[day >=148 & day <= 185] = Kc1r
+Kc[day >=186 & day <= 223] = Kc2r
+Kc[day >=224 & day <= 261] = Kc3r 
+Kc[day >=262 & day <= 296] = Kc4r
+
+## 2. ET depletion factor
+
+et_depletion_factor = rep(0, length(day))
+
+et_depletion_factor_wheat = 0.55 ## ET depletion factor wheat, from FAO56
+et_depletion_factor_rice = 0.20  ## ET depletion factor rice, from FAO56
+
+et_depletion_factor[day >= 1 & day <= 106] = et_depletion_factor_wheat
+et_depletion_factor[day >= 320 & day <= 366] = et_depletion_factor_wheat
+et_depletion_factor[day >= 148 & day <= 296] = et_depletion_factor_rice
+
+## 3. rooting depth
+
+rooting_depth_wheat = 1.25  ## rooting depth wheat, from FAO56
+rooting_depth_rice = 0.65   ## rooting depth rice, from FAO56
+rooting_depth_fallow = 0.01 ## rooting depth fallow
+
+rooting_depth = rep(rooting_depth_fallow, length(day))
+
+rooting_depth[day >= 1 & day <= 106] = rooting_depth_wheat
+rooting_depth[day >= 320 & day <= 366] = rooting_depth_wheat
+rooting_depth[day >= 148 & day <= 296] = rooting_depth_rice
+
+## ## take a look
+## plot(Kc[306:(365 + 305)], type="l")
+## plot(et_depletion_factor[306:(365 + 305)], type="l")
+## plot(rooting_depth[306:(365 + 305)], type="l")
+
+## ======================================
+## Parameters
+## ======================================
+
+## region characteristics
+farm_area = 10000  ##10000 m^2 in ha  
+region_area = 20 * farm_area
+surface_elev_masl = 103   ## Actual elevation above sea level
+
+## farmer parameters
+saving_lower = 50
+saving_upper = 50
+savings_reduction = 0.8 ## Amount savings are reduced per year when farmers income is zero 
+saving_percentage = 0.1 ## Percentage of income retained as savings
+
+## hydrological parameters
+Sy = 0.3
+surface_elev = (surface_elev_masl * region_area) * Sy
+H_init = (surface_elev_masl - 7) * region_area * Sy 
+evaporation_loss_coef = 0.8
+root_zone_depletion_init = 0
+field_capacity = 0.3
+wilting_point = 0.12
+runoff_coef = 0.95
+return_flow_coef = 0.5
+canal_volume = 1 * 5 * 4000
+canal_leakage_coef = 0.4
+
+## crop parameters
+wheat_yield_coeff = 1.8 ## factor to change crop max yield by as values used are averages from Gov stats TODO - add to code
+rice_yield_coeff = 1.7  ## factor to change crop max yield by as values used are averages from Gov stats TODO - add to code
+Ks_max = 1
+Ks_min = 0
+Ky_wheat = 0.6
+Ky_rice = 1.3
+
+## irrigation parameters
+harvest_day = 305
+wheat_months = c(11,12,1,2,3,4)         # PARAMETER
+rice_months = c(5,6,7,8,9,10)           # PARAMETER
+irrigation_eff = 0.4                    # PARAMETER
+fuel_eff = 2.00  ## Pump efficiency multiplier 100=1.0 90=1.11 80=1.25 70=1.43 50=2.0 30=3.33 
+wheat_min = 0.11 # PARAMETER (min irrigation depth - wheat)
+wheat_max = 0.15 # PARAMETER (max irrigation depth - wheat)
+rice_min = 0.15  # PARAMETER
+rice_max = 0.20  # PARAMETER
+well_depth1 = (surface_elev_masl - 20) * region_area * Sy # PARAMETER
+well_depth2 = (surface_elev_masl - 40) * region_area * Sy # PARAMETER
+well_depth3 = (surface_elev_masl - 80) * region_area * Sy # PARAMETER
+well_depth = c(well_depth1, well_depth2, well_depth3)     # PARAMETER
+max_well_depth = min(well_depth)                          # PARAMETER
+
+## irrigation scheduling
+wheat_irr_schedule_mu = c(3,46,319)     # PARAMETER
+wheat_irr_schedule_sd = c(3,3,3)        # PARAMETER
+
+wheat_can_irr_schedule_mu = c(3,46)     # PARAMETER
+wheat_can_irr_schedule_sd = c(1,1)      # PARAMETER
+
+rice_irr_schedule_mu = c(148,168,208,218,268,288) # PARAMETER
+rice_irr_schedule_sd = c(3,3,3,3,3,3)             # PARAMETER
+
+rice_can_irr_schedule_mu = c(148,168,208,268,288) # PARAMETER
+rice_can_irr_schedule_sd = c(1,1,1,1,1)           # PARAMETER
+
+## ======================================
+## run model
+## ======================================
+
+n_year   = length(unique(year)) ## TODO: change this
+n_day    = length(day)
+n_crop   = 2
+n_wheat_irr = length(wheat_irr_schedule_mu)
+n_rice_irr = length(rice_irr_schedule_sd)
+n_farmer = 10                           
+n_runs = 5                              
+
+sourceCpp("code/model.cpp")
+
+for (k in 1:n_runs) {
+    
+    wheat_irr_schedule =
+        rnorm(n = n_wheat_irr * n_farmer, mean=wheat_irr_schedule_mu, sd=wheat_irr_schedule_sd) %>%
+        round %>%
+        `[<-`(. < 1, 1) %>%
+        matrix(nrow=n_wheat_irr, ncol=n_farmer)
+
+    rice_irr_schedule =
+        rnorm(n = n_rice_irr * n_farmer, mean=rice_irr_schedule_mu, sd=rice_irr_schedule_sd) %>%
+        round %>%
+        `[<-`(. < 1, 1) %>%
+        matrix(nrow=n_rice_irr, ncol=n_farmer)
+
+    n_wheat_can_irr = length(wheat_can_irr_schedule_mu)
+    n_rice_can_irr = length(rice_can_irr_schedule_mu)
+
+    wheat_can_irr_schedule =
+        rnorm(n = n_wheat_can_irr * n_farmer, mean=wheat_can_irr_schedule_mu, sd=wheat_can_irr_schedule_sd) %>%
+        round %>%
+        `[<-`(. < 1, 1) %>%
+        matrix(nrow=n_wheat_can_irr, ncol=n_farmer)
+
+    rice_can_irr_schedule =
+        rnorm(n = n_rice_can_irr * n_farmer, mean=rice_can_irr_schedule_mu, sd=rice_can_irr_schedule_sd) %>%
+        round %>%
+        `[<-`(. < 1, 1) %>%
+        matrix(nrow=n_rice_can_irr, ncol=n_farmer)
+
+    ## this function changes the irrigation schedule if an irrigation is
+    ## scheduled a short period (say 1 or 2 days) after canal water is
+    ## available. This is based on the assumption that if a farmer is due
+    ## to irrigation on Tuesday (for example), but in fact canal water is
+    ## available on the Monday, he will irrigated a day early in order to
+    ## make use of canal water (need to check what JoK thinks of this
+    ## approach)
+    for (i in 1:nrow(wheat_irr_schedule)) {
+        for (j in 1:ncol(wheat_irr_schedule)) {
+            v = wheat_irr_schedule[i,j]
+            diff = v - wheat_can_irr_schedule[,j]
+            ix = diff > 0 & diff < 1
+            if (any(ix)) {
+                v = wheat_can_irr_schedule[ix,j]
+            }
+            wheat_irr_schedule[i,j] = v
+        }
+    }
+
+    init_farmer_category = sample(1:1, size=n_farmer, replace=TRUE)
+    farmer_canal_access = sample(x=0:1, size=n_farmer, replace=TRUE, prob=c(0.9,0.1)) %>% as.logical # NB 'prob' will vary across districts
+    ## farmer_canal_access = rep(0, n_farmer);
+
+    x = model(prec, reference_ET, day, year, month, Kc, et_depletion_factor, rooting_depth, diesel_price, rice_price_per_t, wheat_price_per_t, rice_yield, wheat_yield, rice_yield_coeff, wheat_yield_coeff, wheat_irr_schedule, wheat_can_irr_schedule, rice_irr_schedule, rice_can_irr_schedule, wheat_months, rice_months, wheat_min, wheat_max, rice_min, rice_max, Ky_wheat, Ky_rice, fertiliser_price, fertiliser_app_rate, farmer_canal_access, init_farmer_category, well_depth, max_well_depth, well_cost, H_init, Sy, root_zone_depletion_init, harvest_day, n_year, n_day, n_crop, n_farmer, region_area, farm_area, surface_elev, return_flow_coef, irrigation_eff, canal_volume, canal_leakage_coef, field_capacity, wilting_point, runoff_coef, Ks_max, Ks_min, evaporation_loss_coef, fuel_eff, saving_percentage, saving_lower, saving_upper)
+
+    ## change the format of the output to comply with JoK original
+    ## data analysis scripts
+    farmer_output = array(data=NA, dim=c(n_year, n_farmer, 6)) 
+    farmer_output[,,1] = x[["farmer_category"]]
+    farmer_output[,,2] = x[["farmer_livelihood"]] ## currently do not save income
+    farmer_output[,,3] = x[["farmer_saving"]]
+    ## farmer_output[,,4] = ?????
+    farmer_output[,,5] = x[["farmer_wheat_yield"]]
+    farmer_output[,,6] = x[["farmer_rice_yield"]]
+    save(farmer_output, file=file.path("data","output",paste0("farmer_run_", k, ".RData")))
+
+    gw_output = array(data=NA, dim=c(n_day, n_farmer, 6))
+    gw_output[,,1] = x[["farmer_actual_ET"]]
+    gw_output[,,2] = x[["farmer_gw_head"]]
+    gw_output[,,3] = x[["farmer_root_zone_depletion"]]
+    ## gw_output[,,4] = ?????
+    ## gw_output[,,5] = ?????
+    gw_output[,,6] = x[["farmer_abstraction"]]
+    save(gw_output, file=file.path("data","output",paste0("gw_run_", k, ".RData")))
+
+}
+
+## ======================================
+## plot
+## ======================================
+
+yield_comp_data = read.table(file.path("data","input","av_crop_yield_sultanpur.txt"), h=T)  
+date = tm
+
+for (i in 1:n_runs){
+    
+    # farmer
+    filein <- file.path("data", "output", paste0("farmer_run_",i,".RData"))
+    farmer.in <- get(load(filein))
+    
+    if(i == 1){
+        cat <- array(NA,dim=c(n_year,n_farmer,n_runs))
+        income <- array(NA,dim=c(n_year,n_farmer,n_runs))
+        savings <- array(NA,dim=c(n_year,n_farmer,n_runs))
+        yieldW <- array(NA,dim=c(n_year,n_farmer,n_runs))
+        yieldR <- array(NA,dim=c(n_year,n_farmer,n_runs))
+    }
+    
+    cat[,,i] <- farmer.in[,,1]
+    income[,,i] <- farmer.in[,,2]
+    savings[,,i] <- farmer.in[,,3]
+    yieldW[,,i] <- farmer.in[,,5]
+    yieldR[,,i] <- farmer.in[,,6]
+    
+    # groundwater
+    filein <- file.path("data", "output", paste0("gw_run_",i,".RData"))
+    gw.in <- get(load(filein))
+    if(i == 1){
+        gw <- array(NA,dim=c(n_day, n_farmer, n_runs))
+    }
+    gw[,,i] <- (gw.in[,,2] / region_area) / Sy    
+}
+  
+gw_mean <- apply(gw[,1,], 1, mean)  ## mean of Gw for plotting
+gw_min  <- apply(gw[,1,], 1, min)   ## min of Gw for plotting
+gw_max  <- apply(gw[,1,], 1, max)   ## max of Gw for plotting
+gw_med  <- apply(gw[,1,], 1, median)   ## max of Gw for plotting
+
+income_mean <- apply(income[,n_farmer,], 1, mean) 
+income_max  <- apply(income[,n_farmer,], 1, max) 
+income_min  <- apply(income[,n_farmer,], 1, min) 
+income_med  <- apply(income[,n_farmer,], 1, median) 
+
+yieldW_mean <- apply(yieldW[,n_farmer,], 1, mean) 
+yieldW_max <- apply(yieldW[,n_farmer,], 1, max) 
+yieldW_min <- apply(yieldW[,n_farmer,], 1, min)
+yieldW_med <- apply(yieldW[,n_farmer,], 1, median)
+
+yieldR_mean <- apply(yieldR[,n_farmer,], 1, mean) 
+yieldR_max <- apply(yieldR[,n_farmer,], 1, max) 
+yieldR_min <- apply(yieldR[,n_farmer,], 1, min)
+yieldR_med <- apply(yieldR[,n_farmer,], 1, median)
+  
+par(mfrow=c(3,2))
+
+## Category
+ylim <- range(cat,na.rm=T)
+for (i in 1:n_runs){
+    plot(cat[,n_farmer,i],col=i,x=unique(year), ylim=ylim,type="l", main="Farmer Category", xlab="Year", ylab="Category")
+    par(new=T)  
+}
+par(new=F)
+  
+## Income
+ylim <- range(0,70000)
+for (i in 1:n_runs){
+    plot(income[,n_farmer,i],col=i, x=unique(year),ylim=ylim,type="l", main="Farmer Income", xlab="Year", ylab="Income (INR)")
+    par(new=T)  
+}
+par(new=F)
+  
+## Mean Income
+#par(new=F)
+#ylim <- range(income,na.rm=T)
+#plot(income_mean,col=i, x=unique(year),ylim=ylim,type="l",  main="Mean farmer income (INR)", xlab="Year", ylab="mASL");par(new=T) 
+#par(new=F)
+    
+## Savings
+ylim <- range(savings,na.rm=T)
+for (i in 1:n_runs){
+    plot(savings[,n_farmer,i],col=i, x=unique(year),ylim=ylim,type="l",  main="Farmer Savings", xlab="Year", ylab="Savings (INR)")
+    par(new=T)  
+}
+par(new=F)
+
+## par(new=F)
+## ## GW
+## #par(mfrow=c(1,1))
+ylim <- range(gw,na.rm=T)
+for (i in 1:n_runs){
+    plot(gw[,n_farmer,i],col=i, x=tm,ylim=ylim,type="l",  main="Groundwater Level (Metres above sea level)", xlab="Year", ylab="mASL");par(new=T)  
+    ## plot(gw[1:365,n_farmer,3],col=i, ylim=ylim,type="l",  main="Groundwater Level (Metres above sea level)", xlab="Year", ylab="mASL");par(new=T)  
+}
+par(new=F)
+  
+## ## GW mean
+## ylim <- range(gw,na.rm=T)
+## plot(gw_med,col="red", x=date,ylim=ylim,type="l",  main="Groundwater Level (Metres above sea level)", xlab="Year", ylab="mASL");par(new=T) 
+## plot(gw_min,col="blue", x=date,ylim=ylim,type="l",  main="Groundwater Level (Metres above sea level)", xlab="Year", ylab="mASL");par(new=T) 
+## plot(gw_max,col="blue", x=date,ylim=ylim,type="l",  main="Groundwater Level (Metres above sea level)", xlab="Year", ylab="mASL");par(new=T) 
+## #plot(gw_med_comp[,1],col="green", x=date,ylim=ylim,type="l", main="Groundwater Level (Metres above sea level)", xlab="Year", ylab="mASL")
+## par(new=F)
+  
+## YieldW
+#ylim <- range(yieldW,na.rm=T)
+ylim <- range(0.5,4)
+for (i in 1:n_runs){
+    plot(yieldW[,n_farmer,i],col=i,x=unique(year), ylim=ylim,type="l",  main="Crop Yield (Wheat t/ha)", xlab="Year", ylab="t/ha")
+    par(new=T)  
+}
+plot(yield_comp_data$wheat_th, x=unique(year), ylim=ylim, xlab="Year", ylab="t/ha", type="l", lty=4, lwd="2")
+par(new=F)
+  
+## YieldR
+ylim <- range(0,4)
+#ylim <- range(yieldR,na.rm=T)
+for (i in 1:n_runs){
+    plot(yieldR[,n_farmer,i],col=i,x=unique(year), ylim=ylim,type="l",  main="Crop Yield (Rice t/ha)", xlab="Year", ylab="t/ha")
+    par(new=T)
+}
+plot(yield_comp_data$rice_th, x=unique(year), ylim=ylim, xlab="Year", ylab="t/ha", type="l", lty=4, lwd="2")
+par(new=F)

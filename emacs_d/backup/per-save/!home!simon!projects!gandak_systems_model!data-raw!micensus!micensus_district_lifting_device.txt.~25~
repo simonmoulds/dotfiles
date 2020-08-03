@@ -1,0 +1,61 @@
+1. District wise dugwells according to lifting device
+https://data.gov.in/sites/default/files/datafile/Statedgwltab1.9.csv
+micensus_1993-94_districtwise_dugwell_liftingdevice.csv
+https://data.gov.in/sites/default/files/datafile/dgwlState1.9.csv
+micensus_2000-01_districtwise_dugwell_liftingdevice.csv
+https://data.gov.in/sites/default/files/datafile/dstr112.csv
+micensus_2006-07_districtwise_dugwell_liftingdevice.csv
+
+2. District wise shallow tubewells according to lifting device
+https://data.gov.in/sites/default/files/datafile/Districtshtbwl2.9.csv
+micensus_1993-94_districtwise_shallowtubewell_liftingdevice.csv
+https://data.gov.in/sites/default/files/datafile/shltbstate2.9.csv
+micensus_2000-01_districtwise_shallowtubewell_liftingdevice.csv
+https://data.gov.in/sites/default/files/datafile/dstr212.csv
+micensus_2006-07_districtwise_shallowtubewell_liftingdevice.csv
+
+3. District wise deep tubewells according to lifting device
+https://data.gov.in/sites/default/files/datafile/Statedptbwltab3.8.csv
+micensus_1993-94_districtwise_deeptubewell_liftingdevice.csv
+https://data.gov.in/sites/default/files/datafile/dptbwlstate3.8.csv
+micensus_2000-01_districtwise_deeptubewell_liftingdevice.csv
+https://data.gov.in/sites/default/files/datafile/dstr312.csv
+micensus_2006-07_districtwise_deeptubewell_liftingdevice.csv
+
+4. District wise dugwells according to horsepower of lifting device
+https://data.gov.in/sites/default/files/datafile/Statedgwltab1.10.csv
+micensus_1993-94_districtwise_dugwell_liftingdevicehp.csv
+https://data.gov.in/sites/default/files/datafile/dgwlState1.10.csv
+micensus_2000-01_districtwise_dugwell_liftingdevicehp.csv
+https://data.gov.in/sites/default/files/datafile/dstr114.csv
+micensus_2006-07_districtwise_dugwell_liftingdevicehp.csv
+
+5. District wise shallow tubewells according to horsepower of lifting device
+https://data.gov.in/sites/default/files/datafile/Districtshtbwl2.10.csv
+micensus_1993-94_districtwise_deeptubewell_liftingdevicehp.csv
+https://data.gov.in/sites/default/files/datafile/dptbwlstate3.9.csv
+micensus_2000-01_districtwise_deeptubewell_liftingdevicehp.csv
+https://data.gov.in/sites/default/files/datafile/dstr214.csv
+micensus_2006-07_districtwise_deeptubewell_liftingdevicehp.csv
+
+6. District wise deep tubewells according to horsepower of lifting device
+https://data.gov.in/sites/default/files/datafile/Statedptbwltab3.9.csv
+micensus_1993-94_districtwise_deeptubewell_liftingdevicehp.csv
+https://data.gov.in/sites/default/files/datafile/dptbwlstate3.9_1.csv
+micensus_2000-01_districtwise_deeptubewell_liftingdevicehp.csv
+https://data.gov.in/sites/default/files/datafile/dstr314.csv
+micensus_2006-07_districtwise_deeptubewell_liftingdevicehp.csv
+
+7. District wise dugwells according to source of energy (NB 2006-07 only; energy source contained in lifting device files for other years)
+https://data.gov.in/sites/default/files/datafile/dstr113.csv
+micensus_2006-07_districtwise_dugwell_energysrc.csv
+
+8. District wise shallow tubewells according to source of energy 
+https://data.gov.in/sites/default/files/datafile/dstr213.csv
+micensus_2006-07_districtwise_shallowtubewell_energysrc.csv
+
+9. District wise dugwells according to source of energy 
+https://data.gov.in/sites/default/files/datafile/dstr313.csv
+micensus_2006-07_districtwise_deeptubewell_energysrc.csv
+
+

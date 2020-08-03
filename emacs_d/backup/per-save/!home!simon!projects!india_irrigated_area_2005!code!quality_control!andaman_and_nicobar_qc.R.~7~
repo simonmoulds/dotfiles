@@ -1,0 +1,92 @@
+## Author : Simon Moulds
+## Date   : January 2018
+
+## Quality control for Andaman and Nicobar Island
+
+## Crops not grown: ...
+
+## banana
+## ######
+
+xx[["apy_banana-whole_year"]] = xx[["mapspam_atot_banana"]][6]
+xx[["irr_banana-whole_year"]] = xx[["mapspam_xirr_banana"]][6]
+
+## cassava
+## #######
+
+xx[["apy_banana-whole_year"]] = xx[["mapspam_atot_banana"]][6]
+xx[["irr_banana-whole_year"]] = xx[["mapspam_xirr_banana"]][6]
+
+## coconut
+## #######
+
+xx[["apy_coconut-whole_year"]] = xx[["mapspam_atot_coconut"]][6]
+xx[["irr_coconut-whole_year"]] = xx[["mapspam_xirr_coconut"]][6]
+
+## groundnut
+## #########
+
+xx[["apy_groundnut-rabi"]][11] = 0
+
+## maize
+## #####
+
+xx[["apy_maize-rabi"]][11] = 0
+
+## other pulses
+## ############
+
+xx[["apy_other_pulses-kharif"]] = 0
+xx[["apy_other_pulses-rabi"]] = 0
+
+## pigeonpea
+## #########
+
+xx[["apy_pigeonpea-rabi"]][11] = 0
+
+## potato
+## ######
+
+xx[["apy_sweet_potato-whole_year"]] %<>% locf_interp(c(3:5,8:11))
+xx[["apy_sweet_potato-rabi"]][11] = 0
+
+## rest of crops
+## #############
+
+xx[["apy_rest_of_crops-whole_year"]] %<>% locf_interp(8:11)
+xx[["apy_rest_of_crops-rabi"]][11] = 0
+
+## rice
+## ####
+
+xx[["apy_rice-winter"]] %<>% locf_interp(8:11)
+
+## sugarcane
+## #########
+
+xx[["apy_sugarcane-whole_year"]] %<>% linear_interp(8:10)
+
+## tropical fruit
+## ##############
+
+xx[["apy_tropical_fruit-whole_year"]] = xx[["mapspam_atot_tropical_fruit"]][6]
+xx[["irr_tropical_fruit-whole_year"]] = xx[["mapspam_xirr_tropical_fruit"]][6]
+
+## vegetables
+## ##########
+
+xx[["apy_vegetables-kharif"]] = xx[["mapspam_atot_vegetables"]][6]
+xx[["irr_vegetables-kharif"]] = xx[["mapspam_xirr_vegetables"]][6]
+
+
+
+
+
+
+
+
+
+
+
+
+

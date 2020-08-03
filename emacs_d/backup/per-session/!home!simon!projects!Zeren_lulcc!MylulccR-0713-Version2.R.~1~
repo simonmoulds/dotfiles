@@ -1,0 +1,75 @@
+library(lulcc)
+
+setwd("C:/Users/Carter/Documents/literature review/lulcc_Andes")
+landuse2009 <- ("landuse12.tif")
+r <- raster(landuse2009)
+plot(r, main='RasterLayer from file')
+
+lu <- DiscreteLulcRasterStack (x=r,categories=c(1,2),labels=c("Intervened","Forest"),t=c(0))
+plot(lu)
+
+ef_002  <- ("ef_002_1.tif")    #slope
+ef_003  <- ("ef_003.tif")    #Urban
+ef_004  <- ("ef_004.tif")    #Rural
+ef_009  <- ("ef_009.tif")    #Road4
+ef_012  <- ("ef_012.tif")    #River3
+
+
+ix <- data.frame(var=c("ef_002","ef_003","ef_004","ef_009","ef_012"),
+                     yr=c(0,0,0,0,0),
+                     dynamic=c(F,F,F,F,F))
+ef <- ExpVarRasterStack(x=stack(ef_002,ef_003,ef_004,ef_009,ef_012), index=ix)
+
+part <- partition(x=lu, size=0.5, spatial=TRUE,t=0)
+
+train.data <- getPredictiveModelInputData(lu=lu, ef=ef, cells=part[["train"]],t=0)
+
+intervene.form <- as.formula("Intervened ~ ef_002+ef_003+ef_004+ef_009+ef_012")
+intervene.glm <- glm(intervene.form, family=binomial, data=train.data)
+
+forest.form <- ("Forest ~ ef_002")
+forest.glm <- glm(forest.form, family=binomial, data=train.data)
+
+glm.models <- PredictiveModelList(models=list(intervene.glm, forest.glm),
+                                  categories = lu@categories,
+                                  labels = lu@labels)
+
+test.data <- getPredictiveModelInputData(lu=lu, ef=ef, cells=part[["test"]],t=0)
+
+
+glm.pred <- PredictionList(models=glm.models, newdata=test.data)
+
+glm.perf <- PerformanceList(pred=glm.pred, measure="rch")
+
+p <- plot(list(glm=glm.perf))
+print(p)
+
+dmd <- matrix(c(2266208,6554684,2741900,6078992,2945769,5875123,3149637,5671255),nrow=4,ncol=2,byrow = TRUE)
+
+w <- matrix(data=1, nrow=3, ncol=3)
+nb <- NeighbRasterStack(x=lu[[1]], weights=w, categories=c(1,2))
+
+ordered.model <- OrderedModel(observed.lulc = lu,
+                              explanatory.variables = ef,
+                              predictive.models = glm.models,
+                              time=0:3,
+                              demand=dmd,
+                              transition.rules = matrix(data = 1, nrow = 3, ncol = 2),
+                              order=c(1,2))
+
+ordered.model <- allocate(ordered.model, stochastic=TRUE)
+
+op<-slot(ordered.model, "output")
+
+lu_0<-op$landuse12
+lu_1<-op$layer.1
+lu_2<-op$layer.2
+lu_3<-op$layer
+plot(lu_0, main='landuse2009')
+plot(lu_1, main='landuse2029(-)')
+plot(lu_2, main='landuse2029')
+plot(lu_3, main='landuse2029(+)')
+###########################################
+writeRaster(lu_1, 'landuse2029_1.tif')
+writeRaster(lu_2, 'landuse2029_2.tif')
+writeRaster(lu_3, 'landuse2029_3.tif')

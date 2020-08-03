@@ -1,0 +1,15 @@
+#!/bin/bash
+
+aosdir='/home/simon/projects/AquaCrop/AquaCrop_Py'
+testdir='/home/simon/projects/AquaCrop/tests/aquacrop_python_test_data'
+declare -a arr=("aos_ch7_tunis_wheat_ex1")
+
+for elem in "${arr[@]}"
+do
+    for year in {1979..2001}
+    do
+        config_fn="${testdir}"/Config/"${elem}"_"${year}"_config.ini
+        runner_fn="${aosdir}"/deterministic_runner.py
+        $runner_fn $config_fn aquacrop
+    done
+done

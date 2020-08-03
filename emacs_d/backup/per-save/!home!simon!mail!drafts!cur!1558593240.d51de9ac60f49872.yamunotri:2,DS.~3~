@@ -1,0 +1,141 @@
+References: <B5855A94-EE7C-4DB7-9883-A7D0FB7049D8@ufz.de> <87d0kaahe6.fsf@yamunotri.localdomain> <7F88A955-5391-4A0F-8A3F-463C12D097FC@ufz.de> <87blzuag9m.fsf@yamunotri.localdomain> <04A1E51C-15BD-498C-BFA7-23A18124C115@ufz.de>
+User-agent: mu4e 1.0-alpha2; emacs 24.5.1
+From: Simon Moulds <simon.moulds@imperial.ac.uk>
+To: Jan Friesen <jan.friesen@ufz.de>
+Subject: Re: [TWIGA] D4.1 observation variable discussion
+In-reply-to: <04A1E51C-15BD-498C-BFA7-23A18124C115@ufz.de>
+Fcc: /home/simon/mail/ic/Sent Items/cur/1558593642.1c695ce1b6f69976.yamunotri:2,S
+Date: Thu, 23 May 2019 07:40:42 +0100
+Message-ID: <8736l5ad1x.fsf@yamunotri.localdomain>
+
+Hi Jan,
+
+Would you mind if we changed this to the first time you suggested (Tuesday @ 10am)? Sorry - my son was yesterday given a hospital appointment at the exact time of our meeting. Nothing serious, but I should attend.
+
+My Skype ID is simonmoulds.
+
+Thanks,
+Simon
+
+Jan Friesen writes:
+
+> Great. My skype ID is yajcod - either send me a contact request some of these days or send me your skype ID.
+>
+> Cheers,
+> Jan
+>
+>> Am 22.05.2019 um 13:19 schrieb Simon Moulds <simon.moulds@imperial.ac.uk>:
+>> 
+>> OK, that's fine - I'll have a think about it.
+>> 
+>> Tuesday @ 2pm (1pm UK time) works well for me, so we'll talk then.
+>> 
+>> Thanks,
+>> Simon
+>> 
+>> Jan Friesen writes:
+>> 
+>>> Hi Simon:
+>>> At first thought canopy cover is not as easy, as it requires a view from above - that is definitely possible with UAVs but may be challenging with regard to a picture taken on the ground, e.g. at breast height. Anyway - that’s why we’re talking...
+>>> 
+>>> My suggestions are:
+>>> 
+>>> Tuesday, 28.5.2019, 10am (German time, UTC+2 | CEST)
+>>> Tuesday, 28.5.2019, 2pm (German time, UTC+2 | CEST)
+>>> Wednesday, 29.5.2019, 10am (German time, UTC+2 | CEST)
+>>> Wednesday, 29.5.2019, 2pm (German time, UTC+2 | CEST)
+>>> 
+>>> Just pick one.
+>>> 
+>>> Cheers,
+>>> Jan
+>>> 
+>>> 
+>>>> Am 22.05.2019 um 12:54 schrieb Simon Moulds <simon.moulds@imperial.ac.uk>:
+>>>> 
+>>>> Hi Jan,
+>>>> 
+>>>> Yes, I think we will use AquaCrop (or at least an implementation of it which I've helped to develop). The main variable which I think may be captured by smartphones is canopy cover, which in AquaCrop is used instead of leaf area index. According to the model documentation, canopy cover is "the fraction of the soil surface covered by green canopy cover." (see http://www.fao.org/3/a-br246e.pdf for more information - canopy cover is discussed on pages 7-10). Also note it's not too late to change the model if this really won't work for your activities!
+>>>> 
+>>>> A Skype call would be useful. I'm available on Tuesday and Wednesday next week - what would be best for you?
+>>>> 
+>>>> Thanks,
+>>>> Simon
+>>>> 
+>>>> Jan Friesen writes:
+>>>> 
+>>>>> Hi Simon:
+>>>>> 
+>>>>> From the discussion I read that you have identified the crop model to be used. From my side we could organize a skype to identify which variables would be most useful to have, i.e. thinking about smartphione apps or questionaires for farmers.
+>>>>> 
+>>>>> I think for now it would be fine if the two of us talk - are you available in the next two weeks or are you traveling? I am, in general, available next week Mon-Wed as well as the following week.
+>>>>> 
+>>>>> Cheers,
+>>>>> Jan
+>>>>> 
+>>>>> 
+>>>>> ---------------------------------------------------------------
+>>>>> Dr. Jan Friesen
+>>>>> Department Catchment Hydrology
+>>>>> 
+>>>>> Helmholtz-Zentrum für Umweltforschung GmbH - UFZ
+>>>>> Helmholtz Centre for Environmental Research GmbH - UFZ
+>>>>> Permoserstraße 15, 04318 Leipzig, Germany
+>>>>> Phone +49 341 235 1082
+>>>>> jan.friesen@ufz.de, www.ufz.de
+>>>>> http://www.ufz.de/index.php?en=17611
+>>>>> 
+>>>>> Sitz der Gesellschaft/Registered Office: Leipzig
+>>>>> Registergericht/Registration Office: Amtsgericht Leipzig
+>>>>> Handelsregister Nr./Trade Register Nr.: B 4703
+>>>>> Vorsitzender des Aufsichtsrats/Chairman of the Supervisory Board: MinDirig Wilfried Kraus
+>>>>> Wissenschaftlicher Geschäftsführer/Scientific Managing Director:
+>>>>> Prof. Dr. Dr. h.c. Georg Teutsch
+>>>>> Administrative Geschäftsführerin/Administrative Managing Director:
+>>>>> Dr. Sabine König
+>>>>> ---------------------------------------------------------------
+>>>> 
+>>> 
+>>> ---------------------------------------------------------------
+>>> Dr. Jan Friesen
+>>> Department Catchment Hydrology
+>>> 
+>>> Helmholtz-Zentrum für Umweltforschung GmbH - UFZ
+>>> Helmholtz Centre for Environmental Research GmbH - UFZ
+>>> Permoserstraße 15, 04318 Leipzig, Germany
+>>> Phone +49 341 235 1082
+>>> jan.friesen@ufz.de, www.ufz.de
+>>> http://www.ufz.de/index.php?en=17611
+>>> 
+>>> Sitz der Gesellschaft/Registered Office: Leipzig
+>>> Registergericht/Registration Office: Amtsgericht Leipzig
+>>> Handelsregister Nr./Trade Register Nr.: B 4703
+>>> Vorsitzender des Aufsichtsrats/Chairman of the Supervisory Board: MinDirig Wilfried Kraus
+>>> Wissenschaftlicher Geschäftsführer/Scientific Managing Director:
+>>> Prof. Dr. Dr. h.c. Georg Teutsch
+>>> Administrative Geschäftsführerin/Administrative Managing Director:
+>>> Dr. Sabine König
+>>> ---------------------------------------------------------------
+>> 
+>
+> ---------------------------------------------------------------
+> Dr. Jan Friesen
+> Department Catchment Hydrology
+>
+> Helmholtz-Zentrum für Umweltforschung GmbH - UFZ
+> Helmholtz Centre for Environmental Research GmbH - UFZ
+> Permoserstraße 15, 04318 Leipzig, Germany
+> Phone +49 341 235 1082
+> jan.friesen@ufz.de, www.ufz.de
+> http://www.ufz.de/index.php?en=17611
+>
+> Sitz der Gesellschaft/Registered Office: Leipzig
+> Registergericht/Registration Office: Amtsgericht Leipzig
+> Handelsregister Nr./Trade Register Nr.: B 4703
+> Vorsitzender des Aufsichtsrats/Chairman of the Supervisory Board: MinDirig Wilfried Kraus
+> Wissenschaftlicher Geschäftsführer/Scientific Managing Director:
+> Prof. Dr. Dr. h.c. Georg Teutsch
+> Administrative Geschäftsführerin/Administrative Managing Director:
+> Dr. Sabine König
+> ---------------------------------------------------------------
+

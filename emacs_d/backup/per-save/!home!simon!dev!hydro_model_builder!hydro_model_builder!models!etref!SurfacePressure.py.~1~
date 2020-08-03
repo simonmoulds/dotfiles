@@ -1,0 +1,40 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import os
+import string
+import numpy as np
+import file_handling
+import Messages
+
+class SurfacePressure(object):
+    def __init__(self, SurfacePressure_variable):
+        self.var = SurfacePressure_variable
+
+    def initial(self):
+        self.set_surface_pressure_input_filenames()
+        
+    def set_surface_pressure_input_filenames(self):
+        keys = ['surfaceAtmosphericPressureNC',
+                'surfaceAtmosphericPressureVarName',
+                'surfaceAtmosphericPressureTimeDimName']
+        vals = [self.var._configuration.WEATHER[key] for key in keys]        
+        self.var.surfacePressureFileNC = vals[0]
+        self.var.surfacePressureVarName = vals[1]
+        self.var.surfacePressureTimeDimName = vals[2]
+        
+    def read_surface_pressure_data(self):
+        day, month, year = (self.var._modelTime.currTime.day,
+                            self.var._modelTime.currTime.month,
+                            self.var._modelTime.currTime.year)
+        self.var.surface_pressure = file_handling.netcdf_to_array(
+            self.var.surfacePressureFileNC.format(day=day, month=month, year=year),
+            self.var.surfacePressureVarName,
+            str(self.var._modelTime.fulldate),
+            useDoy = None,
+            cloneMapFileName = self.var.cloneMapFileName,
+            # cloneMapAttributes = self.var.cloneMapAttributes,
+            LatitudeLongitude = True)[self.var.landmask]
+
+    def dynamic(self):
+        self.read_surface_pressure_data()

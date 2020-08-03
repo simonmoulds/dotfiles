@@ -1,0 +1,873 @@
+## Author : Simon Moulds
+## Date   : April 2018
+
+## Script to aggregate GAUL units to 1950 boundaries
+
+library(rgdal)
+library(maptools)
+
+setwd("/home/simon/projects/r_indagridat/indagridat/data-raw")
+
+## 1. subset global dataset to India
+gaul.india.district <- readOGR(dsn="data/india_adm2_1990/data", layer="g1990_2_India")
+## gaul.india.state <- readOGR(dsn=mod.path, layer="IND_adm1")
+
+## ======================================
+## District
+## ======================================
+
+gaul.data <- gaul.india.district@data
+ids       <- gaul.data$ADM2_CODE
+nms       <- as.character(gaul.data$ADM2_NAME)
+state_nms <- as.character(gaul.data$ADM1_NAME)
+
+get_ix = function(x, y) {
+    # treat ids and state_nms as global vars
+    n = length(x)
+    ix = rep(NA, n)
+    for (i in 1:n) {
+        ix[i] = which(ids == x[i] & state_nms == y)
+    }
+    ix
+}
+
+## Bracketed district names, such as "(Vizianagaram)", mean
+## the district did not exist in 1950
+
+## Andaman and Nicobar Islands
+## ###########################
+
+## Andaman and Nicobar Islands
+ix      <- match(c(17545,17546), ids)
+ids[ix] <- ids[ix[1]]
+nms[ix] <- "Andaman and Nicobar" 
+
+## Andhra Pradesh
+## ##############
+
+## East Godavari, Khammam, Warangal
+ix      <- get_ix(c(17551,17555,17568), "Andhra Pradesh")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- "East_Godavari.Khammam.Warangal"
+
+## Gunter, Kurnool, Nellore, (Prakasam)
+ix      <- get_ix(c(17552,17557,17561,17563), "Andhra Pradesh")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- "Gunter.Kurnool.Nellore"
+
+## Hyderabad, Mahbubnagar, Medak, (Rangareddi)
+ix      <- get_ix(c(17553,17558,17559,17564), "Andhra Pradesh")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- "Hyderabad.Mahbubnagar.Medak"
+
+## Srikakulam, Vishakhapatnam, (Vizianagaram)
+ix      <- get_ix(c(17565,17566,17567), "Andhra Pradesh")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- "Srikakulam.Vishakhapatnam"
+
+## Assam
+## #####
+
+## Cachar, (Hailakandi), (Karimganj)
+ix      <- get_ix(c(17577,70088,17585), "Assam")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- nms[ix[1]]
+
+## Darrang, (Sonitpur)
+ix      <- get_ix(c(40,59), "Assam")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- nms[ix[1]]
+
+## Goalpara, (Bongaigaon), (Dhuburi), (Kokrajhar)
+ix      <- get_ix(c(17581,70086,17579,70090), "Assam")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- nms[ix[1]]
+
+## Kamrup, (Barpeta), (Nalbari)
+ix      <- get_ix(c(17583,17576,17590), "Assam")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- nms[ix[1]]
+
+## Lakhimpur, (Dhemaji), (Dibrugarh), (Tinsukia)
+ix      <- get_ix(c(54,41,17580,70093), "Assam")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- nms[ix[1]]
+
+## Nowgong, (Marigaon)
+ix      <- get_ix(c(17589,70092), "Assam")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- nms[ix[1]]
+
+## Sibsagar, (Golaghat), (Jorhat)
+ix      <- get_ix(c(17592,17582,70089), "Assam")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- nms[ix[1]]
+
+## United Mikir and North Cachar Hills, (Karbi Anglong)
+ix      <- get_ix(c(17591,17584), "Assam")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- "United Mikir and North Cachar Hills"
+
+## Mizoram
+## #######
+
+## NB Mizoram formerly a district of Assam called Mizo Hills
+
+## Mizo Hills (Aizawl), (Chhimtuipui), (Lawngtlai)
+ix      <- get_ix(c(466,646,70201), "Mizoram")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- "Mizo Hills"
+
+## Meghalaya
+## #########
+
+## NB Meghalaya formerly two districts of Assam (Garo Hills,
+## United Khasi and Jaintia Hills)
+
+## Garo Hills, (East Garo Hills),  (West Garo Hills)
+ix      <- get_ix(c(17793,72669), "Meghalaya")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- "Garo Hills"
+
+## Khasi and Jaintia Hills, (East Khasi Hills),
+## (Jaintia Hills), (West Khasi Hills)
+ix      <- get_ix(c(72667,17795,17797), "Meghalaya")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- "Khasi and Jaintia Hills"
+
+## Bihar
+## #####
+
+## Champaran (Pashchim Champaran, Purba Chamaparan)
+ix      <- get_ix(c(17618,17620), "Bihar")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- "Champaran"
+
+## Darbhanga, (Madhubani), (Samistipur)
+ix      <- get_ix(c(17598,17611,17626), "Bihar")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- nms[ix[1]]
+
+## Muzaffarpur (Sitamarhi), (Vaishali)
+ix      <- get_ix(c(17613,72604,17632), "Bihar")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- nms[ix[1]]
+
+## Ranchi, (Gumla), (Lohardaga)
+ix = get_ix(c(17622,72584,17610), "Bihar")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- nms[ix[1]]
+
+## Singhbhum (Pashchim Singhbhum), (Purba Singhbhum)
+ix = get_ix(c(72586,70153), "Bihar")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- "Singhbhum"
+
+## Saran, (Gopalganj), (Siwan)
+ix      <- get_ix(c(17628,17604,17631), "Bihar")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- nms[ix[1]]
+
+## Saharsa, Munger, (Begusarai), (Khagaria), (Madhepura)
+ix      <- get_ix(c(730,651,17595,17609,17612), "Bihar")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- "Saharsa.Munger"
+
+## Purnea, (Araria), (Katihar), (Kishanganj)
+ix      <- get_ix(c(17621,70094,17608,70100), "Bihar")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- nms[ix[1]]
+
+## Patna, (Nalanda)
+ix      <- get_ix(c(17619,17615), "Bihar")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- nms[ix[1]]
+
+## Gaya, (Aurangabad), (Jehanabad), (Nawada)
+ix      <- get_ix(c(17601,17594,17607,17616), "Bihar")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- nms[ix[1]]
+
+## Shahabad, (Bhojpur), (Rohtas)
+ix      <- get_ix(c(644,697), "Bihar")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- "Shahabad"
+
+## Hazaribagh, (Giridh), (Dhanbad)
+ix      <- get_ix(c(650,647,70141), "Bihar")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- "Hazaribag.Dhanbad"
+
+## Santal Parganas, (Dumka), (Deoghar), (Godda), (Sahibganj)
+ix      <- get_ix(c(72583,17600,17603,731), "Bihar")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- "Santal Parganas"
+
+## Dadra and Nagar Haveli
+## ######################
+
+ix      <- get_ix(c(70119), "Dadra and Nagar Haveli")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- nms[ix[1]]
+
+## Delhi
+## #####
+
+ix      <- get_ix(c(17633), "Delhi")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- nms[ix[1]]
+
+## Goa, Daman and Diu
+## ##################
+
+## Goa
+ix      <- get_ix(c(70122,70123), "Goa")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- "Goa"
+
+## Daman
+ix      <- get_ix(c(70120), "Daman and Diu")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- nms[ix[1]]
+
+## Diu (Junagadh)
+ix      <- get_ix(c(70121), "Daman and Diu")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- "Diu"
+
+## Gujarat
+## #######
+
+## Amreli, Bhavnagar, Rajkot
+ix      <- get_ix(c(17636,17639,17647), "Gujarat") 
+ids[ix] <- ids[ix[1]]
+nms[ix] <- "Amreli.Bhavnagar.Rajkot"
+
+## Mehsana, (Gandhinagar), (Patan)
+ix      <- get_ix(c(17645,17640,70129), "Gujarat")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- nms[ix[1]]
+
+## Surat, (Valsad)
+ix      <- get_ix(c(17649,72608), "Gujarat")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- nms[ix[1]]
+
+## Himachal Pradesh
+## ################
+
+## Hamirpur, Kangra, (Una), (Kullu)
+ix      <- get_ix(c(17668,17669,17677,17671), "Himachal Pradesh")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- "Hosiarpur.Kangra"
+
+## Mahasu, Simla, Sirmaur
+ix      <- get_ix(c(17676,17674,17675), "Himachal Pradesh")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- "Mahasu.Simla.Sirmaur"
+
+## ======================================
+## Jammu and Kashmir
+## ======================================
+
+ix = get_ix(c(199,200,202,203,205,206,207,210,211,212,213,214,219,220), "Jammu & Kashmir")
+ids[ix] <- ids[ix[1]]
+nms <- "JammuAndKashmir"
+
+## ======================================
+## Kerala
+## ======================================
+
+## Cannanore
+ix <- get_ix(c(17698,17701,17703,17704,17705,17708,17710), "Kerala")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- "Cannanore.Kozhikode.Palghat.Thrichur"
+
+## Ernakulam, Kottayam, (Idukki)
+ix      <- get_ix(c(17699,17702,17700), "Kerala")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- "Ernakulam.Kottayam"
+
+## Alleppey, Quilon, (Pattanamtitta)
+ix      <- get_ix(c(70298,17707,17706), "Kerala")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- "Alleppey.Quilon"
+
+## ======================================
+## Laccadive, Minicoy and Amindivi Islands
+## ======================================
+
+## Lakshadweep
+ix      <- match(c(70167), ids)
+ids[ix] <- ids[ix[1]]
+nms[ix] <- "Laccadive, Minicoy and Amindivi Islands"
+
+## ======================================
+## Madhya Pradesh
+## ======================================
+
+## Gwalior, Datia
+ix      <- get_ix(c(17727,17721), "Madhya Pradesh")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- "Gwalior.Datia"
+
+## Rewa, Satna
+ix      <- get_ix(c(17743,17745), "Madhya Pradesh")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- "Rewa.Satna"
+
+## Sehore, (Bhopal)
+ix      <- get_ix(c(17746,17716), "Madhya Pradesh")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- nms[ix[1]]
+
+## ======================================
+## Chhattispur
+## ======================================
+
+## NB Chhattispur formerly a part of Madhya Pradesh
+
+## Bilaspur, Durg, (Raj Nandgaon)
+ix      <- get_ix(c(72582,17724,70112,70117), "Madhya Pradesh")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- "Bilaspur.Durg"
+
+## Raigarh, (Jashpur)
+ix      <- get_ix(c(70297,649), "Madhya Pradesh")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- nms[ix[1]]
+
+## ======================================
+## Maharashtra
+## ======================================
+
+## Ahmednagar, Bid
+ix      <- get_ix(c(70178,70179), "Maharashtra")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- "Ahmednagar.Bid"
+
+## Aurangabad, Parbhani, (Hingoli), (Jalna)
+ix      <- get_ix(c(17786,232,70182), "Maharashtra")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- "Aurangabad.Parbhani"
+
+## Chanda, (Garhchirolo)
+ix      <- get_ix(c(17763,17765), "Maharashtra")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- nms[ix[1]]
+
+## Osmanabad, (Latur)
+ix      <- get_ix(c(17774,17770), "Maharashtra")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- nms[ix[1]]
+
+## Ratnagiri, (Sindhudurg)
+ix      <- get_ix(c(17778,17779), "Maharashtra")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- nms[ix[1]]
+
+## ======================================
+## Manipur
+## ======================================
+
+## Manipur
+ix      <- get_ix(c(70188:70190,70192:70195,72625), "Manipur")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- "Manipur"
+
+## ======================================
+## Mysore (later Karnataka)
+## ======================================
+
+## Bellary, Chitradurga, Shimoga
+ix      <- get_ix(c(72609,72610,72611), "Karnataka")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- "Bellary.Chitradurga.Shimoga"
+
+## Bangalore
+ix      <- get_ix(c(70158,70159), "Karnataka")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- "Bangalore"
+
+## ======================================
+## Nagaland (formerly Naga Hills-Tuensang Area)
+## ======================================
+
+## Kohima, Mokokchung, Tuensang
+ix      <- get_ix(c(17802:17807,72593), "Nagaland")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- "Kohima.Mokokchung.Tuensang"
+
+## ======================================
+## North East Frontier Agency
+## ======================================
+
+## Tirap, (Changlang)
+ix <- get_ix(c(30,18), "Arunachal Pradesh")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- nms[ix[1]]
+
+## Lohit, (Dibang Valley)
+ix <- get_ix(c(23,19), "Arunachal Pradesh")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- nms[ix[1]]
+
+## Siang, Subansiri
+ix <- get_ix(c(21,31,34,26,32,28), "Arunachal Pradesh")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- "Siang.Subansiri"
+
+## Kameng
+ix <- get_ix(c(20,33,29), "Arunachal Pradesh")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- "Kameng"
+
+## ======================================
+## Orissa
+## ======================================
+
+## Kalahandi, Koraput,
+ix <- get_ix(c(72658,72659), "Orissa")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- "Kalahandi.Koraput"
+
+## ======================================
+## Pondicherry
+## ======================================
+
+## Puducherry
+## Karaikal
+## Mahe
+## Yanam
+
+## ======================================
+## Punjab
+## ======================================
+
+ix = get_ix(c(17821,17825,17828,17829,17830,17833,72646,72647,72649,72663,72666,457), "Punjab")
+ids[ix] = ids[ix[1]]
+nms[ix] = "Punjab"
+
+## ======================================
+## Haryana
+## ======================================
+
+## Hissar, Mahendragarh, (Bhiwani), (Sirsa)
+ix      <- get_ix(c(72590,17662,17655,17664), "Haryana")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- "Hisar.Mahendragarh"
+
+## Gurgaon, (Faridabad), (Rewari)
+ix      <- get_ix(c(17657,70131,70137), "Haryana")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- nms[ix[1]]
+
+## Rohtak, (Sonepat)
+ix      <- get_ix(c(72600,17665), "Haryana")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- nms[ix[1]]
+
+## Karnal, (Kaithal), (Kurukshetra)
+ix      <- get_ix(c(17660,70134,17661,70136), "Haryana")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- nms[ix[1]]
+
+## Ambala, (Panchkala), (Yamuna Nagar)
+ix      <- get_ix(c(72650,70138), "Haryana")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- nms[ix[1]]
+
+## ======================================
+## Rajasthan
+## ======================================
+
+## Ajmer, Jaipur, Sawai Madhopur, Tonk
+ix      <- get_ix(c(17834,72636,72630,17859), "Rajasthan")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- "Ajmer.Jaipur.Sawai_Madhopur.Tonk"
+
+## ======================================
+## Sikkim
+## ======================================
+
+## East, North, South, West
+ix      <- get_ix(c(17861:17864), "Sikkim")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- "Sikkim"
+
+## ======================================
+## Tamil Nadu
+## ======================================
+
+## Coimbatore
+ix      <- get_ix(c(17867,17875), "Tamil Nadu")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- nms[ix[1]]
+
+## Madurai
+ix      <- get_ix(c(72631,17877), "Tamil Nadu")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- nms[ix[1]]
+ 
+## Ramanathapuram
+ix      <- get_ix(c(17878,17882,17869), "Tamil Nadu")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- nms[ix[1]]
+
+## Salem
+ix      <- get_ix(c(72629,17868), "Tamil Nadu")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- nms[ix[1]]
+
+## Tirunelveli
+ix      <- get_ix(c(17884,17866), "Tamil Nadu")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- "Tirunelveli"
+
+## Tiruchchirapelli, Thanjavur
+ix      <- get_ix(c(72638,72632,17876), "Tamil Nadu")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- "Tiruchchirappalli.Thanjavur"
+
+## ======================================
+## Tripura
+## ======================================
+
+## North, South, West, Dhalai
+ix      <- get_ix(c(72642,72644,17887), "Tripura")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- "Tripura"
+
+## ======================================
+## Uttar Pradesh
+## ======================================
+
+## Meerut, (Ghaziabad)
+ix <- get_ix(c(154440,17911), "Uttar Pradesh")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- nms[ix[1]]
+
+## Aligarh, Mathura
+ix      <- get_ix(c(72613,72612), "Uttar Pradesh")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- "Aligarh.Mathura"
+
+## Agra, Mainpuri, (Firozabad)
+ix <- get_ix(c(17888,17924,70264), "Uttar Pradesh")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- "Agra.Mainpuri"
+
+## Kanpur, (Kanpur Dehat)
+ix <- get_ix(c(17920,70269), "Uttar Pradesh")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- nms[ix[1]]
+
+## Mirzapur, (Sonbhadra)
+ix <- get_ix(c(17927,70279), "Uttar Pradesh")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- nms[ix[1]]
+
+## Azamgarh, (Mau)
+ix <- get_ix(c(17892,70274), "Uttar Pradesh")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- nms[ix[1]]
+
+## Gorakhpur, (Maharajganj)
+ix <- get_ix(c(17914,70272), "Uttar Pradesh")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- nms[ix[1]]
+
+## Basti, (Siddharth Nagar)
+ix <- get_ix(c(72584,70278), "Uttar Pradesh")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- nms[ix[1]]
+
+## ======================================
+## Uttarakhand (formerly part of Uttar Pradesh)
+## ======================================
+
+## Chamoli, (Rudra Prayag)
+ix      <- get_ix(c(636,70286), "Uttarakhand")
+ids[ix] <- ids[ix[1]]
+nms[ix] <- nms[ix[1]]
+
+## Almora, (Bageshwar), (Champawat)
+ix1 <- get_ix(c(72605), "Uttar Pradesh")
+ix2 <- get_ix(c(70283), "Uttarakhand")
+ix <- c(ix1,ix2)
+ids[ix] <- ids[ix[1]]
+nms[ix] <- nms[ix[1]]
+
+## ======================================
+## West Bengal
+## ======================================
+
+## 24-Parganas
+ix <- get_ix(c(70293,70294), "West Bengal")
+ix      <- match(c(590,592), ids)
+ids[ix] <- ids[ix[1]]
+nms[ix] <- "24-Parganas"
+
+## ======================================
+## Create SpatialPolygonsDataFrame object
+## ======================================
+
+gaul.india.district.1956 <- unionSpatialPolygons(gaul.india.district, ids)
+poly.ids  <- (sapply(gaul.india.district.1956@polygons, FUN=function(x) x@ID))
+
+gaul.data$ID_2 <- ids
+
+## ## At this stage, while the vector database still has original
+## ## district names, it is convenient to write the lookup table
+## ## to aggregate districts:
+
+## states <- unique(dist.lut$State) 
+## data <- list()
+## for (i in 1:length(states)) {
+##     state <- states[i]
+##     dists <- sort(unique(dist.lut$NAME[dist.lut$State %in% state]))
+##     if (length(dists) > 0) {
+##         df <- data.frame(State=state, District=dists, ID_2=NA)
+        
+##         for (j in 1:length(dists)) {
+##             dist <- dists[j]
+##             ix <- gaul.data$NAME_2 %in% dists[j]
+##             if (any(ix)) {
+##                 adm2.code <- gaul.data$ID_2[ix]
+##                 adm2.name <- gaul.data$NAME_2[ix]
+##                 ## if (any(c("Aurangabad","Raigarh","Bilaspur","Junagadh","Hamirpur") %in% adm2.name)) adm2.code <- gaul.data$ID_2[(gaul.data$NAME_1 %in% state & ix)]
+##                 if ("Aurangabad" %in% adm2.name) {
+##                     if (state %in% c("Hyderabad","Maharashtra","Maharashtra and Gujarat")) {
+##                         adm2.code <- gaul.data$ID_2[(gaul.data$NAME_1 %in% "Maharashtra" & ix)]
+##                     } else {
+##                         adm2.code <- gaul.data$ID_2[(gaul.data$NAME_1 %in% "Bihar" & ix)]
+##                     }
+##                 }       
+
+##                 if ("Raigarh" %in% adm2.name) {
+##                     if (state %in% c("Bombay","Maharashtra","Maharashtra and Gujarat")) {
+##                         adm2.code <- gaul.data$ID_2[(gaul.data$NAME_1 %in% "Maharashtra" & ix)]
+##                     } else {
+##                         adm2.code <- gaul.data$ID_2[(gaul.data$NAME_1 %in% "Chhattisgarh" & ix)]
+##                     }
+##                 }
+                
+##                 if ("Bilaspur" %in% adm2.name) {
+##                     if (state %in% c("Madhya Pradesh","Chhattisgarh")) {
+##                         adm2.code <- gaul.data$ID_2[(gaul.data$NAME_1 %in% "Chhattisgarh" & ix)]
+##                     } else {
+##                         adm2.code <- gaul.data$ID_2[(gaul.data$NAME_1 %in% "Himachal Pradesh" & ix)]
+##                     }
+##                 }
+                        
+##                 if ("Junagadh" %in% adm2.name) adm2.code <- gaul.data$ID_2[(gaul.data$NAME_1 %in% state & ix)]
+##                 if ("Hamirpur" %in% adm2.name) adm2.code <- gaul.data$ID_2[(gaul.data$NAME_1 %in% state & ix)]
+
+                
+##                 if (length(adm2.code) > 1) {
+##                     print(adm2.code)
+##                 }
+##                 df$ID_2[j] <- adm2.code
+##             }
+##         }
+        
+##         n <- length(data)
+##         data[[n+1]] <- df
+##     }
+## }
+
+## data <- do.call(rbind, data)
+
+## ## Manually assign district code to the following districts:
+
+## ## Andaman and Nicobar
+## data$ID_2[data$District %in% "Andaman and Nicobar"] <- 1
+
+## ## Arunachal Pradesh
+## data$ID_2[data$District %in% "Anjaw"]               <- 20
+## data$ID_2[data$District %in% "Dibang Valley"]       <- 20
+
+## ## Assam
+## data$ID_2[data$District %in% "Baksa"]               <- 42
+## data$ID_2[data$District %in% "Balipara Frontier Tract"] <- NA
+## data$ID_2[data$District %in% "Chirang"]             <- 38
+## data$ID_2[data$District %in% "Garo Hills"]          <- 339  ## Meghalaya
+## data$ID_2[data$District %in% "Khasi and Jaintia Hills"] <- 340  ## as above
+## data$ID_2[data$District %in% "Lushai Hills"]        <- 346
+## data$ID_2[data$District %in% "Naga Hills"]          <- 354
+## data$ID_2[data$District %in% "Sadiya Frontier Tract"] <- NA
+## data$ID_2[data$District %in% "Udalguri"]            <- 34
+## data$ID_2[data$District %in% "United Mikir Hills and North Cachar Hills"] <- 50
+
+## ## Bihar
+## data$ID_2[data$District %in% "Arwal"]               <- 63
+## data$ID_2[data$District %in% "Champaran"]           <- 77 
+## data$ID_2[data$District %in% "Manbhum"]             <- NA
+## data$ID_2[data$District %in% "Shahabad"]            <- 58
+## data$ID_2[data$District %in% "Singhbhum"]           <- 200
+
+## ## Bombay
+## data$ID_2[data$District %in% "Kanara"]              <- NA 
+## data$ID_2[data$District %in% "Satara North"]        <- 323
+## data$ID_2[data$District %in% "Satara South"]        <- 323
+## data$ID_2[data$District %in% "Mumbai Suburban"]     <- 307
+## data$ID_2[data$District %in% "Mumbai city"]         <- 307
+
+## ## Chhattisgarh
+## data$ID_2[data$District %in% "Balod"]               <- 93
+## data$ID_2[data$District %in% "Baloda Bazar"]        <- 105
+## data$ID_2[data$District %in% "Bemetara"]            <- 93
+## data$ID_2[data$District %in% "Gariaband"]           <- 92
+## data$ID_2[data$District %in% "Kondagaon"]           <- 92
+## data$ID_2[data$District %in% "Mungeli"]             <- 93
+## data$ID_2[data$District %in% "Narayanpur"]          <- 92
+## data$ID_2[data$District %in% "Sukma"]               <- 92
+## data$ID_2[data$District %in% "Surajpur"]            <- 107
+
+## ## Delhi, Goa
+## data$ID_2[data$District %in% "Goa"]                 <- 112
+
+## ## Gujarat
+## data$ID_2[data$District %in% "Gohilwad"]            <- NA
+## data$ID_2[data$District %in% "Holar"]               <- NA
+## data$ID_2[data$District %in% "Madhya Saurashtra"]   <- NA
+## data$ID_2[data$District %in% "Sorath"]              <- NA
+## data$ID_2[data$District %in% "Tapi"]                <- 134
+## data$ID_2[data$District %in% "Zalawad"]             <- NA
+
+## ## Haryana
+## data$ID_2[data$District %in% "Mewat"]               <- 143
+## data$ID_2[data$District %in% "Palwal"]              <- 143
+
+## ## Jammu and Kashmir
+## ## data$ID_2[data$District %in% "Bandipora"]           <- 172
+## ## data$ID_2[data$District %in% "Ganderbal"]           <- 182
+## ## data$ID_2[data$District %in% "Kishtwar"]            <- 183
+## ## data$ID_2[data$District %in% "Kulgam"]              <- 182 
+## ## data$ID_2[data$District %in% "Ramban"]              <- 183
+## ## data$ID_2[data$District %in% "Reasi"]               <- NA
+## ## data$ID_2[data$District %in% "Samba"]               <- 174
+## ## data$ID_2[data$District %in% "Shopian"]             <- 182
+## data$ID_2[data$District %in% "Bandipora"]           <- 170
+## data$ID_2[data$District %in% "Ganderbal"]           <- 170
+## data$ID_2[data$District %in% "Kishtwar"]            <- 170
+## data$ID_2[data$District %in% "Kulgam"]              <- 170 
+## data$ID_2[data$District %in% "Ramban"]              <- 170
+## data$ID_2[data$District %in% "Reasi"]               <- NA
+## data$ID_2[data$District %in% "Samba"]               <- 170
+## data$ID_2[data$District %in% "Shopian"]             <- 170
+
+## ## Jharkhand
+## data$ID_2[data$District %in% "Khunti"]              <- 202
+## data$ID_2[data$District %in% "Ramgarh"]             <- 185
+
+## ## Karnataka
+## data$ID_2[data$District %in% "Bangalore"]           <- 207
+## data$ID_2[data$District %in% "Chikballapur"]        <- 224
+## data$ID_2[data$District %in% "Ramanagara"]          <- 207
+## data$ID_2[data$District %in% "Yadgir"]              <- 220
+
+## ## Kerala, Lakshadweep
+## data$ID_2[data$District %in% "Lakshadweep"]         <- 247
+## data$ID_2[data$District %in% "Malabar"]             <- NA
+
+## ## Madhya Pradesh
+## data$ID_2[data$District %in% "Alirajpur"]           <- 270
+## data$ID_2[data$District %in% "Gird"]                <- NA
+## data$ID_2[data$District %in% "Madhya Pradesh"]      <- NA
+## data$ID_2[data$District %in% "Nimar"]               <- NA
+## data$ID_2[data$District %in% "Singrauli"]           <- 366
+
+## ## Madras
+## data$ID_2[data$District %in% "Chengalpattu"]        <- 456
+## data$ID_2[data$District %in% "North Arcot"]         <- 475
+## data$ID_2[data$District %in% "South Arcot"]         <- 452
+## data$ID_2[data$District %in% "Tanjore"]             <- 473
+
+## ## Maharashtra
+## data$ID_2[data$District %in% "Greater Bombay"]      <- 307
+
+## ## Maharashtra and Gujarat
+## data$ID_2[data$District %in% "Halar"]               <- NA
+
+## ## Manipur
+## data$ID_2[data$District %in% "Imphal"]              <- 330
+## data$ID_2[data$District %in% "Manipur"]             <- 330
+
+## ## Mizoram
+## data$ID_2[data$District %in% "Chhimtuipui"]         <- 346
+## data$ID_2[data$District %in% "Mizoram"]             <- 346
+
+## ## Nagaland
+## data$ID_2[data$District %in% "Kiphire"]             <- 354
+## data$ID_2[data$District %in% "Nagaland"]            <- 354
+## data$ID_2[data$District %in% "Peren"]               <- 354
+
+## ## Orissa
+## data$ID_2[data$District %in% "Phulbani"]            <- 367
+
+## ## Punjab
+## data$ID_2[data$District %in% "Barnala"]             <- 397
+## data$ID_2[data$District %in% "Fazilka"]             <- 400
+## data$ID_2[data$District %in% "Pathankot"]           <- 401
+## data$ID_2[data$District %in% "Ropar"]               <- 397
+## data$ID_2[data$District %in% "Sahibzada Ajit Singh Nagar"] <- 397
+## data$ID_2[data$District %in% "Tarn Taran"]          <- 396
+
+## ## Sikkim
+## data$ID_2[data$District %in% "Sikkim"]              <- 445
+
+## ## Tamil Nadu
+## data$ID_2[data$District %in% "Krishnagiri"]         <- 466
+## data$ID_2[data$District %in% "Tamil Nadu"]          <- NA
+## data$ID_2[data$District %in% "Trippur"]             <- 451
+## data$ID_2[data$District %in% "Tiruvarur"]           <- 473
+
+## ## Tripura
+## data$ID_2[data$District %in% "Tripura"]             <- 489
+
+## ## Uttar Pradesh, Uttarakhand
+## data$ID_2[data$District %in% "Amethi"]              <- 560
+## data$ID_2[data$District %in% "Garhwal"]             <- 570
+## data$ID_2[data$District %in% "Kasganj"]             <- 513
+
+## ## West Bengal
+## data$ID_2[data$District %in% "24 Parganas"]         <- 590
+## data$ID_2[data$District %in% "Dinajpur"]            <- 579
+## data$ID_2[data$District %in% "Midnapore"]           <- 581
+## data$ID_2[data$District %in% "West Dinajpur"]       <- 579
+
+## ## Now, assign aggregated names to vector database and write SpatialPolygons object:
+## gaul.data$NAME_2 <- nms
+
+## gaul.data <- gaul.data[!duplicated(ids),]
+## gaul.data <- gaul.data[match(as.numeric(poly.ids), gaul.data$ID_2),]
+## row.names(gaul.data) <- poly.ids 
+
+## gaul.data$NAME_1[gaul.data$NAME_1 %in% "Telangana"] <- "Andhra Pradesh"
+
+## gaul.india.district.1956 <- SpatialPolygonsDataFrame(gaul.india.district.1956, gaul.data)
+
+## writeOGR(gaul.india.district.1956, dsn=mod.path, layer="IND_adm2_1956", driver="ESRI Shapefile", overwrite_layer=TRUE)
+
+## ## write lookup table
+## stname <- rep(NA, nrow(data))
+## for (i in 1:length(stname)) {
+##     dist <- data$ID_2[i]
+##     st   <- gaul.data$NAME_1[gaul.data$ID_2 %in% dist]
+##     if (length(st) > 1) stop()
+##     if (length(st) < 1) st <- NA
+##     ## if (st %in% "Administrative unit not available") {
+##     ##     stcode <- gaul.data$ID_1[gaul.data$ID_2 %in% dist]
+##     ##     ## if (stcode == 70036) st <- "Arunachal Pradesh"
+##     ##     ## if (stcode %in% c(40408,40409,40422:40431)) st <- "Jammu and Kashmir"
+##     ## }
+    
+##     stname[i] <- st
+## }
+
+## data <- cbind(data, data.frame(NAME=nms[match(data$ID_2, ids)], STNAME=stname))
+## data$STNAME[data$STNAME %in% "Telangana"] <- "Andhra Pradesh"
+
+## writeWorksheetToFile(file.path(lut.path, "aggr_1950_LUT.xls"), data=data, sheet="Sheet 1", clearSheets=TRUE)
+## saveRDS(data, file.path(lut.path, "aggr_1950_LUT.rds"))

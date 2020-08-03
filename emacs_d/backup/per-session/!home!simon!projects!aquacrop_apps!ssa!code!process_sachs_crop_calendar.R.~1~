@@ -1,0 +1,20 @@
+## Author : Simon Moulds
+## Date   : August 2019
+
+library(raster)
+
+
+
+writeRaster(
+    start_map_jd,
+    "../data/maize_planting_julian_day_sachs2010.tif",
+    format="GTiff",
+    overwrite=TRUE
+)
+    
+writeRaster(
+    end_map_jd,
+    "../data/maize_harvest_julian_day_sachs2010.tif",
+    format="GTiff",
+    overwrite=TRUE
+)

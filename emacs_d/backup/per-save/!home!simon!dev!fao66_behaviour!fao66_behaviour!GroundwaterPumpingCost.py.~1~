@@ -1,0 +1,32 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+# AquaCrop crop growth model
+
+import numpy as np
+
+import logging
+logger = logging.getLogger(__name__)
+
+class GroundwaterPumpingCost(object):
+    """Class to represent the cost of abstracting groundwater"""
+
+    def __init__(self, IrrigationSupply_variable):
+        self.var = IrrigationSupply_variable
+
+    def initial(self):
+        pass
+
+    def reset_initial_conditions(self):
+        pass
+        
+    def groundwater_pumping_cost(self):
+        # self.var.GwPumpingVol
+        # self.var.zGW
+        # diesel price
+        # subsidies
+        # pump efficiency        
+        pass
+    
+    def dynamic(self):
+        pass

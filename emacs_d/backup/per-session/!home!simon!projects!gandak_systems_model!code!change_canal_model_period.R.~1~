@@ -1,0 +1,9 @@
+## Author : Simon Moulds
+## Date   : Sep 2018
+
+datadir = "data/GandakCanalModel"
+inflows = readLines(file.path(datadir, "Input", "inflows.dat"))
+sl = grep("^//", inflows)[3] + 1
+inflows = inflows[sl:length(inflows)]
+ts = seq(as.Date("1963-01-01"), as.Date("2017-07-06"), by="1 day")
+length(ts)

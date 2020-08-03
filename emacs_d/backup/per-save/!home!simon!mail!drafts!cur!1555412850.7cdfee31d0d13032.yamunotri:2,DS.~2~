@@ -1,0 +1,17 @@
+User-agent: mu4e 1.0-alpha2; emacs 24.5.1
+From: Simon Moulds <simon.moulds@imperial.ac.uk>
+To: 
+Subject: Running JULES in parallel
+
+Hi,
+
+I'm having some trouble running JULES in parallel on my machine. It's compiling fine, appears to write the dumpfile for the first time step, but then fails with an error "Program received signal SIGFPE: Floating-point exception - erroneous arithmetic operation."
+
+I've compiled HDF5/netCDF compiled with parallel i/o enabled using OpenMPI. I'm not sure whether it's required, but I've also enabled PnetCDF.
+
+Attached are the job.err and job.out files - please do let me know if you need anything else.
+
+I'm really grateful for your help.
+
+Simon
+

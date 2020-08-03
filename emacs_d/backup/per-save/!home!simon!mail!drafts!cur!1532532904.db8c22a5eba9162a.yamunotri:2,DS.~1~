@@ -1,0 +1,282 @@
+References: <LOXP12301MB1461C9E20A1E7F2CA1292D0285540@LOXP12301MB1461.GBRP123.PROD.OUTLOOK.COM> <LOXP12301MB14615BBAAF7DCEF21A928A1F85540@LOXP12301MB1461.GBRP123.PROD.OUTLOOK.COM> <LOXP12301MB1461D4B1813E82C3C7E6853E85540@LOXP12301MB1461.GBRP123.PROD.OUTLOOK.COM>
+User-agent: mu4e 1.0-alpha2; emacs 24.5.1
+From: Simon Moulds <s.moulds@exeter.ac.uk>
+To: "Scheidegger, Johanna M." <johsch@bgs.ac.uk>
+Cc: "O'Keeffe, Jimmy M" <jimmy.okeeffe@imperial.ac.uk>, "S.Moulds@exeter.ac.uk" <S.Moulds@exeter.ac.uk>, "Jackson, Christopher R." <crja@bgs.ac.uk>
+Subject: Re: FW: model coupling question
+In-reply-to: <LOXP12301MB1461D4B1813E82C3C7E6853E85540@LOXP12301MB1461.GBRP123.PROD.OUTLOOK.COM>
+
+Hi Johanna,
+
+Yes, I'm free all day
+Scheidegger, Johanna M. writes:
+
+> Hi all,
+>
+> Jimmy and I were having a few questions about the model coupling.
+>
+> Would you be around for a quick Skype tomorrow to clarify things?
+>
+> For example 10.30?
+>
+> Thanks,
+> Johanna
+>
+>
+> From: Scheidegger, Johanna M.
+> Sent: 25 July 2018 16:23
+> To: O'Keeffe, Jimmy M <jimmy.okeeffe@imperial.ac.uk>
+> Subject: RE: model coupling question
+>
+> Hi,
+>
+> Yes, I am free all day tomorrow. As far as I can see, Chris should be around from 10 to 2 and then from 3 onwards again.
+>
+> How about 10.30?
+>
+> Johanna
+>
+>
+>
+> From: O'Keeffe, Jimmy M [mailto:jimmy.okeeffe@imperial.ac.uk]
+> Sent: 25 July 2018 16:12
+> To: Scheidegger, Johanna M. <johsch@bgs.ac.uk<mailto:johsch@bgs.ac.uk>>
+> Subject: Re: model coupling question
+>
+>
+> Thanks Johanna.
+>
+>
+>
+> I'm not sure either. I think it's worth having a quick chat about this and including Simon too. Are you free tomorrow?
+>
+>
+>
+> Cheers
+>
+> Jimmy
+>
+> ________________________________
+> From: Scheidegger, Johanna M. <johsch@bgs.ac.uk<mailto:johsch@bgs.ac.uk>>
+> Sent: 25 July 2018 15:34:30
+> To: O'Keeffe, Jimmy M
+> Subject: RE: model coupling question
+>
+>
+> Hi Jimmy,
+>
+> Thanks,
+>
+>
+>
+> I converted the tiff file to an asci, but I think I need to specify the grid size. Default was  0.0027777777777778 degree, but I guess you have something rounder?
+>
+>
+>
+> We will need to think about the model domain, so we can get sensible boundaries for the groundwater model. One option would be to use Nachikets' Gandak basin  boundary, or another one would be to follow some rivers. However, the Gandak basin boundaries are a lot smaller than your extent.  Following some rivers on the other hand would include some areas that are not in your domain.
+>
+> I don't know, whether it would be easier to think about this now,  or whether we should get the models linked and running and then think about it.
+>
+>
+>
+>
+>
+> I've put some comments below.
+>
+> I agree, it might be useful to catch up soon.
+>
+>
+>
+> Johanna
+>
+>
+>
+>
+>
+>
+>
+> From: O'Keeffe, Jimmy M [mailto:jimmy.okeeffe@imperial.ac.uk]
+> Sent: 25 July 2018 14:37
+> To: Scheidegger, Johanna M. <johsch@bgs.ac.uk<mailto:johsch@bgs.ac.uk>>
+> Subject: Re: model coupling question
+>
+>
+>
+> Hi Johanna,
+>
+>
+>
+> I've attached a zipfile called input and a code file which has a version of the model, in case that will be useful at some point.
+>
+>
+>
+> The grid is taken from the tiff file - I'm not sure if that is of use to you. If not I'll get on to Simon to see if he has any suggestions.
+>
+>
+>
+> I've added some other responses below. Hope they help but if a phone call is needed let me know.
+>
+>
+>
+> Thanks
+>
+> Jimmy
+>
+>
+>
+> Could you please send me an asci grid of the model domain you are using for the CHANSE model?
+>
+> - See attachments
+>
+>
+>
+> Are you using a DEM for your model, and if so could you please send me this as well, so we use the same. Otherwise I'll use the SRTM DEM.
+>
+> - Don't think we are so I'm sure STRM will be fine
+>
+>
+>
+> And just to check, what exactly you would like from AMBHAS:
+>
+>         -hydraulic head [m] or water table depth below ground surface [m]?
+>
+>         -baseflow [m3/d]
+>
+> - The model requires depth to groundwater to check if the well of a particular farmer can reach water level and irrigate. We haven't used baseflow before, but yes, that would be useful for answering questions about E-flows.
+>
+>
+>
+> ==> I can provide you with the depth to groundwater in m
+>
+>
+>
+> Is there anything else you will need from the groundwater model?
+>
+> - Not at the moment I think
+>
+>
+>
+> Are you providing us with recharge in [m/d], or is it in a different unit?
+>
+> - It can be in m3/d
+>
+>
+>
+> ==> In m/d would be better if you can, otherwise I will modify the code
+>
+>
+>
+> I forgot to ask about groundwater abstraction, is this in m3/d?
+>
+> - Sort of yes, it's as a depth which is applied to the crop which is subtracted from the grounwater level in a bucket model, but that can be supplied in m3/d
+>
+> -> great, I presume this will be one file per timestep
+>
+>
+>
+> And will you provide me with one netcdf file that contains both recharge and pumping for one timestep, or will they be in separate files? And what is the filename?
+>
+> - We would have to create this file. At the moment it is a min and max value collected from field work and the model picks a random value from that range. This is also something that we might have to talk about
+>
+> -> In that case, it might be easier if we do one file for recharge and one file for pumping.
+>
+>
+>
+> Would you like the output from AMBHAS in one or two files?
+>
+> - Not sure. What would be on these files?
+>
+> -> I can write depth to groundwater in one file and baseflow in another file. Or I can write them both into one file.
+>
+> -> As I remember, Simon was saying in our last Skype that the data transfer is in netcdf format.
+>
+>
+>
+>
+>
+> ________________________________
+>
+> From: Scheidegger, Johanna M. <johsch@bgs.ac.uk<mailto:johsch@bgs.ac.uk>>
+> Sent: 25 July 2018 14:07
+> To: O'Keeffe, Jimmy M
+> Subject: RE: model coupling question
+>
+>
+>
+> Hi,
+>
+>
+>
+> I forgot to ask about groundwater abstraction, is this in m3/d?
+>
+>
+>
+> And will you provide me with one netcdf file that contains both recharge and pumping for one timestep, or will they be in separate files? And what is the filename?
+>
+>
+>
+> Would you like the output from AMBHAS in one or two files?
+>
+>
+>
+> Thanks!
+>
+> Johanna
+>
+> _____________________________________________
+> From: Scheidegger, Johanna M.
+> Sent: 25 July 2018 13:51
+> To: O'Keeffe, Jimmy M <jimmy.okeeffe@imperial.ac.uk<mailto:jimmy.okeeffe@imperial.ac.uk>>
+> Subject: model coupling question
+>
+>
+>
+>
+>
+> Hi Jimmy,
+>
+>
+>
+> Could you please send me an asci grid of the model domain you are using for the CHANSE model?
+>
+>
+>
+> Are you using a DEM for your model, and if so could you please send me this as well, so we use the same. Otherwise I'll use the SRTM DEM.
+>
+>
+>
+> And just to check, what exactly you would like from AMBHAS:
+>
+>         -hydraulic head [m] or water table depth below ground surface [m]?
+>
+>         -baseflow [m3/d]
+>
+>
+>
+> Is there anything else you will need from the groundwater model?
+>
+>
+>
+> Are you providing us with recharge in [m/d], or is it in a different unit?
+>
+>
+>
+> Thanks!
+>
+> Johanna
+>
+>
+>
+>   ________________________________
+>
+> This message (and any attachments) is for the recipient only. NERC is subject to the Freedom of Information Act 2000 and the contents of this email and any reply you make may be disclosed by NERC unless it is exempt from release under the Act. Any material supplied to NERC may be stored in an electronic records management system.
+>
+>   ________________________________
+>
+> ________________________________
+> This message (and any attachments) is for the recipient only. NERC is subject to the Freedom of Information Act 2000 and the contents of this email and any reply you make may be disclosed by NERC unless it is exempt from release under the Act. Any material supplied to NERC may be stored in an electronic records management system.
+> ________________________________
+> ________________________________
+> This message (and any attachments) is for the recipient only. NERC is subject to the Freedom of Information Act 2000 and the contents of this email and any reply you make may be disclosed by NERC unless it is exempt from release under the Act. Any material supplied to NERC may be stored in an electronic records management system.
+> ________________________________
+

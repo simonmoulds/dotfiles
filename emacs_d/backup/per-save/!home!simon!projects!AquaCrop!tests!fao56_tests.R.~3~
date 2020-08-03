@@ -1,0 +1,18 @@
+library(magrittr)
+library(zoo)
+library(xts)
+library(dplyr)
+library(ncdf4)
+
+fs = list.files(file.path(py_dir, "Output", "netcdf"), pattern="^.*\\.nc$", full.names=TRUE)
+
+data = vector(mode="list", length=length(fs))
+nms = rep(NA, length(fs))
+for (i in 1:length(fs)) {
+    nc = nc_open(fs[i])
+    nm = attributes(nc$var)$names[1]
+    var = ncvar_get(nc, nm)
+    data[[i]] = var
+    nc_close(nc)
+}
+pd = do.call(cbind, data)

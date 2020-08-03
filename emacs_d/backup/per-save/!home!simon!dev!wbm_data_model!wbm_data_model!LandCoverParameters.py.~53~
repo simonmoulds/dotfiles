@@ -1,0 +1,853 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import os
+import numpy as np
+import pandas as pd
+from hm import file_handling
+import netCDF4 as nc
+import datetime as datetime
+import shutil
+import csv
+
+# from .CropParameters import *
+# from .FarmParameters import *
+# from .PriceData import *
+from hm.OutputNetCDF import OutputNetCDF
+import variable_list
+
+class BaseClass(object):
+    def __init__(self, land_cover):
+        self.land_cover = land_cover
+
+class CoverFractionData(BaseClass):    
+    def __init__(self, land_cover):
+        super(CoverFractionData, self).__init__(land_cover)
+        self.bbox = file_handling.get_gdal_extent(self.land_cover.model.cloneMap, self.land_cover.model.cloneMapFileName)            
+    def initial(self):
+        pass
+
+    def dynamic(self):
+        lc_filename = str(
+            self.land_cover.configuration['landCoverFractionInputFile']
+        )
+        lc_output_filename = str(
+            self.land_cover.configuration['landCoverFractionOutputFile']
+        )
+        lc_output_variable_name = str(
+            self.land_cover.configuration['landCoverFractionOutputVariableName']
+        )
+        lc_frac = file_handling.read_GDAL(lc_filename, self.bbox).data[0,...]
+        netcdf = OutputNetCDF(
+            self.land_cover.model._configuration.NETCDF_ATTRIBUTES,
+            self.land_cover.dimensions,
+            variable_list)        
+        netcdf.create_netCDF(
+            lc_output_filename,
+            lc_output_variable_name
+        )            
+        netcdf.add_data_to_netcdf(
+            lc_output_filename,
+            lc_output_variable_name,
+            lc_frac,
+            timeStamp=datetime.datetime(
+                2009,1,1,0,0,0
+            ))
+
+class CropCoefficientData(BaseClass):
+    def __init__(self, land_cover):
+        super(CropCoefficientData, self).__init__(land_cover)
+
+    def initial(self):
+        pass
+
+    def dynamic(self):
+        shutil.copy(
+            str(self.land_cover.configuration['cropCoefficientInputFile']),
+            str(self.land_cover.configuration['landCoverTypePathOut'])
+        )
+
+class MinimumInterceptionCapacityData(BaseClass):
+    def __init__(self, land_cover):
+        super(MinimumInterceptionCapacityData, self).__init__(land_cover)
+
+    def initial(self):
+        pass
+
+    def dynamic(self):
+        pass    
+
+class InterceptionCapacityData(BaseClass):
+    def __init__(self, land_cover):
+        super(InterceptionCapacityData, self).__init__(land_cover)
+
+    def initial(self):
+        pass
+
+    def dynamic(self):
+        shutil.copy(
+            str(self.land_cover.configuration['interceptCapInputFile']),
+            str(self.land_cover.configuration['landCoverTypePathOut'])
+        )
+
+class RootFractionData(BaseClass):
+    def __init__(self, land_cover):
+        super(RootFractionData, self).__init__(land_cover)
+
+    def initial(self):
+        pass
+
+    def dynamic(self):
+        shutil.copy(
+            str(self.land_cover.configuration['rootFractionInputFile']),
+            str(self.land_cover.configuration['landCoverTypePathOut'])
+        )
+
+class MaxRootDepth(BaseClass):
+    def __init__(self, land_cover):
+        super(MaxRootDepth, self).__init__(land_cover)
+
+    def initial(self):
+        pass
+
+    def dynamic(self):
+        shutil.copy(
+            str(self.land_cover.configuration['maxRootDepthInputFile']),
+            str(self.land_cover.configuration['landCoverTypePathOut'])
+        )
+
+class VanGenuchtenParameters(BaseClass):
+    def __init__(self, land_cover):
+        super(VanGenuchtenParameters, self).__init__(land_cover)
+
+    def initial(self):
+        pass
+
+    def dynamic(self):
+        shutil.copy(
+            str(self.land_cover.configuration['alphaInputFile']),
+            str(self.land_cover.configuration['landCoverTypePathOut'])
+        )
+
+        shutil.copy(
+            str(self.land_cover.configuration['lambdaInputFile']),
+            str(self.land_cover.configuration['landCoverTypePathOut'])
+        )
+
+class TopoParameters(BaseClass):
+    def __init__(self, land_cover):
+        super(TopoParameters, self).__init__(land_cover)
+
+    def initial(self):
+        pass
+
+    def dynamic(self):
+        shutil.copy(
+            str(self.land_cover.configuration['relativeElevationInputFile']),
+            str(self.land_cover.configuration['landCoverTypePathOut'])
+        )
+        
+        shutil.copy(
+            str(self.land_cover.configuration['elevationStandardDeviationInputFile']),
+            str(self.land_cover.configuration['landCoverTypePathOut'])
+        )
+
+        # N.B. these are used for routing:
+        # # tanslope
+        # shutil.copy(
+        #     str(config_section['tanSlopeInputFile']),
+        #     str(self.land_cover.configuration['landCoverTypePathOut'])
+        # )
+
+        # # slope length
+        # shutil.copy(
+        #     str(config_section['slopeLengthInputFile']),
+        #     str(self.land_cover.configuration['landCoverTypePathOut'])
+        # )
+
+class SoilHydraulicParameters(BaseClass):
+
+    def __init__(self, land_cover):
+        super(SoilHydraulicParameters, self).__init__(land_cover)
+        self.land_cover.model.nLayer = 3  # TODO - put somewhere else
+        self.bbox = file_handling.get_gdal_extent(self.land_cover.model.cloneMap, self.land_cover.model.cloneMapFileName)
+        
+    def initial(self):
+        pass
+    
+    def read_soil_data(self, filename):
+        d = []
+        for layer in range(self.land_cover.model.nLayer):
+            fn = filename.format(layer=layer)
+            r = file_handling.read_GDAL(fn, self.bbox).data[0,...]
+            d.append(r)
+        d = np.stack(d, axis=0)
+        return d                        
+
+    def write_netcdf(self, filename, variable_name, data):
+        netcdf = OutputNetCDF(
+            self.land_cover.model._configuration.NETCDF_ATTRIBUTES,
+            self.land_cover.dimensions,
+            variable_list
+        )
+        netcdf.create_netCDF(
+            filename,
+            variable_name
+        )
+        netcdf.add_data_to_netcdf(
+            filename,
+            variable_name,
+            data
+        )
+    
+    def dynamic(self):
+        th_fc = self.read_soil_data(
+            self.land_cover.configuration['fieldCapacityInputFile']
+        )
+        self.write_netcdf(
+            str(self.land_cover.configuration['fieldCapacityOutputFile']),
+            str(self.land_cover.configuration['fieldCapacityOutputVariableName']),
+            th_fc
+        )
+
+        th_wp = self.read_soil_data(
+            self.land_cover.configuration['wiltingPointInputFile']
+        )
+        self.write_netcdf(
+            str(self.land_cover.configuration['wiltingPointOutputFile']),
+            str(self.land_cover.configuration['wiltingPointOutputVariableName']),
+            th_wp
+        )
+
+        th_sat = self.read_soil_data(
+            self.land_cover.configuration['saturatedWaterContentInputFile']
+        )
+        self.write_netcdf(
+            self.land_cover.configuration['saturatedWaterContentOutputFile'],
+            str(self.land_cover.configuration['saturatedWaterContentOutputVariableName']),
+            th_sat
+        )
+        
+        th_dry = self.read_soil_data(
+            self.land_cover.configuration['residualWaterContentInputFile']
+        )
+        self.write_netcdf(
+            str(self.land_cover.configuration['residualWaterContentOutputFile']),
+            str(self.land_cover.configuration['residualWaterContentOutputVariableName']),
+            th_dry
+        )
+        
+        ksat = self.read_soil_data(
+            self.land_cover.configuration['KsatInputFile']
+        )
+        self.write_netcdf(
+            str(self.land_cover.configuration['KsatOutputFile']),
+            str(self.land_cover.configuration['KsatOutputVariableName']),
+            ksat)
+
+class FarmParameters(BaseClass):
+    def __init__(self, land_cover):
+        super(FarmParameters, self).__init__(land_cover)
+        self.land_cover.nFarmSizeCategory = int(self.land_cover.configuration['nFarmSizeCategory'])
+        farm_per_category = str(self.land_cover.configuration['nFarmPerCategory'])
+        farm_per_category = [int(x) for x in farm_per_category.split(",")]
+        if (len(farm_per_category) == 1) and (self.land_cover.nFarmSizeCategory > 1):
+            farm_per_category = [farm_per_category[0] for i in range(self.land_cover.nFarmSizeCategory)]
+        self.land_cover.nFarmPerCategory = np.array(farm_per_category)
+        self.land_cover.nFarm = np.sum(self.land_cover.nFarmPerCategory)
+        # TODO: make this part of model object
+        self.bbox = file_handling.get_gdal_extent(
+            self.land_cover.model.cloneMap,
+            self.land_cover.model.cloneMapFileName
+        )
+            
+    def initial(self):
+        self.land_cover.farm_parameter_names = ['farm_category','farm_area','farm_category_area','tubewell_ownership','canal_access']
+
+    def dynamic(self):
+        netcdf = OutputNetCDF(
+            self.land_cover.model._configuration.NETCDF_ATTRIBUTES,
+            self.land_cover.dimensions,
+            variable_list
+        )
+        netcdf.create_netCDF(
+            str(self.land_cover.configuration['farmParametersOutputFile']),
+            self.land_cover.farm_parameter_names
+        )
+
+        # farm category
+        farm_category = np.arange(1, self.land_cover.nFarmSizeCategory + 1)
+        farm_category = np.repeat(
+            farm_category,
+            np.array(self.land_cover.nFarmPerCategory))
+        farm_category = (
+            farm_category[:,None,None]
+            * np.ones((self.land_cover.model.nLat, self.land_cover.model.nLon))
+        )        
+        netcdf.add_data_to_netcdf(
+            str(self.land_cover.configuration['farmParametersOutputFile']),
+            'farm_category',
+            farm_category
+        )
+        
+        # farm area
+        farm_area_list = []
+        for index,suffix in enumerate(['marg','small','semim','medium','large']):
+            fn = '../data/' + suffix + '_farm_area_1980.tif'
+            ar = file_handling.read_GDAL(fn, self.bbox).data[0,...]
+            farm_area_list.append(ar[None,:,:] * np.ones((self.land_cover.nFarmPerCategory[index]))[:,None,None])
+
+        farm_area = np.concatenate(farm_area_list, axis=0)
+        farm_area *= 10000      # Ha -> m2
+        netcdf.add_data_to_netcdf(
+            str(self.land_cover.configuration['farmParametersOutputFile']),
+            'farm_area',
+            farm_area
+        )
+
+        ## farm category area
+        farm_category_area = np.zeros((self.land_cover.nFarmSizeCategory, self.land_cover.model.nLat, self.land_cover.model.nLon))
+        for index,suffix in enumerate(['marg','small','semim','medium','large']):
+            fn = '../data/' + suffix + '_total_area_1980.tif'
+            ar = file_handling.read_GDAL(fn, self.bbox).data[0,...]
+            farm_category_area[index,:,:] = ar
+
+        netcdf.add_data_to_netcdf(
+            str(self.land_cover.configuration['farmParametersOutputFile']),
+            'farm_category_area',
+            farm_category_area
+        )
+
+        # initial tubewell ownership
+        tw_ownership_list = []
+        for index,suffix in enumerate(['marg','small','semim','medium','large']):
+            fn = '../data/' + suffix + '_tw_ownership_rate.tif'
+            ar = file_handling.read_GDAL(fn, self.bbox).data[0,...]
+            tw_ownership_list.append(ar[None,:,:] * np.ones((self.land_cover.nFarmPerCategory[index]))[:,None,None])
+        tw_ownership = np.concatenate(tw_ownership_list, axis=0)
+        # tw_ownership_binary = (
+        #     tw_ownership
+        #     > np.random.random((self.land_cover.nFarm, self.land_cover.model.nLat, self.land_cover.model.nLon))
+        # )        
+        netcdf.add_data_to_netcdf(
+            str(self.land_cover.configuration['farmParametersOutputFile']),
+            'tubewell_ownership',
+            tw_ownership
+            # tw_ownership_binary)
+            )
+
+        # canal access
+        canal_access_list = []
+        for index,suffix in enumerate(['marg','small','semim','medium','large']):
+            fn = '../data/' + suffix + '_canal_access_rate.tif'
+            ar = file_handling.read_GDAL(fn, self.bbox).data[0,...]
+            canal_access_list.append(ar[None,:,:] * np.ones((self.land_cover.nFarmPerCategory[index]))[:,None,None])
+        canal_access = np.concatenate(canal_access_list, axis=0)        
+        # canal_access_binary = canal_access > np.random.random((self.land_cover.nFarm, self.land_cover.model.nLat, self.land_cover.model.nLon))        
+        netcdf.add_data_to_netcdf(
+            str(self.land_cover.configuration['farmParametersOutputFile']),
+            'canal_access',
+            canal_access
+            # canal_access_binary)
+        )
+        
+data = [['IRR_RICE_KHARIF','RICE','RICE_IRRI','PADY_TP'],
+        ['RAIN_RICE_KHARIF','RICE','RICE_RAIN','PADY_TP'],
+        ['IRR_RICE_RABI','RICE','RICE_IRRI','PADY_TP'],
+        ['RAIN_RICE_RABI','RICE','RICE_RAIN','PADY_TP'],
+        ['IRR_WHEAT_RABI','WHEAT','WHEAT_IRRI','WHT_TP'],
+        ['RAIN_WHEAT_RABI','WHEAT','WHEAT_RAIN','WHT_TP'],
+        ['IRR_SUGARCANE_WHOLE_YEAR','SUGAR_CANE','SUGC_IRRI','SGUR_TP'],
+        ['RAIN_SUGARCANE_WHOLE_YEAR','SUGAR_CANE','SUGC_RAIN','SGUR_TP']]
+
+crop_names = pd.DataFrame(data,columns=['ID','GCWM','GAEZ','PRICE'])
+
+def lookup_crop_id(crop_ref, column):
+    row_ix = [i for i,s in enumerate(crop_names['ID']) if crop_ref.upper() in s]
+    if len(row_ix) == 1:
+        row_ix = row_ix[0]
+    return crop_names[column][row_ix]
+    
+class CropParameters(BaseClass):
+    def __init__(self, land_cover):
+        super(CropParameters, self).__init__(land_cover)        
+        self.land_cover.CropParametersOutputFile = str(self.land_cover.configuration['cropParametersOutputFile'])
+        self.bbox = file_handling.get_gdal_extent(
+            self.land_cover.model.cloneMap,
+            self.land_cover.model.cloneMapFileName
+        )
+        
+    def initial(self):
+        self.land_cover.crop_parameter_names = [
+            'PlantingDate','HarvestDate','L_ini','L_dev','L_mid',
+            'L_late','Kc_ini','Kc_mid','Kc_end','Zmin','Zmax',
+            'p_std','Ky']        
+        arr_zeros = np.zeros((self.land_cover.nCrop, self.land_cover.model.nLat, self.land_cover.model.nLon))
+        for param in self.land_cover.crop_parameter_names:
+            vars(self.land_cover)[param] = arr_zeros.copy()
+        
+    def read_gcwm_crop_data(self):
+        gcwm_data_filename = "../data/gcwm_crop_data.csv"  # TODO
+        with open(gcwm_data_filename, 'rt') as f:
+            reader = csv.reader(f, delimiter=',',)
+            next(reader, None)
+            crop_data = {}
+            for row in reader:
+                if row[0] not in crop_data:
+                    key = row[0].upper()
+                    crop_data[key] = {}
+                    crop_data[key]['L_ini'] = float(row[1])
+                    crop_data[key]['L_dev'] = float(row[2])
+                    crop_data[key]['L_mid'] = float(row[3])
+                    crop_data[key]['L_late'] = float(row[4])
+                    crop_data[key]['Kc_ini'] = float(row[5])
+                    crop_data[key]['Kc_mid'] = float(row[6])
+                    crop_data[key]['Kc_end'] = float(row[7])
+                    crop_data[key]['rd_irr'] = float(row[8])
+                    crop_data[key]['rd_rain'] = float(row[9])
+                    crop_data[key]['p_std'] = float(row[10])
+                    
+        return crop_data
+
+    def read_crop_planting_and_harvest_day(self):        
+        # Retrieve planting and harvest date from raster images
+        map_path = '/home/simon/projects/india_crop_area_2005/data/output_2005/growing_season_maps'
+        start_day = np.array([1,32,60,91,121,152,182,213,244,274,305,335])
+        end_day = np.array([31,59,90,120,151,181,212,243,273,304,334,365])
+        harvest_day = []
+        planting_day = []
+        for index, name in enumerate(self.land_cover.CropTypes):
+            # names of files containing planting and harvest dates of
+            # crop under consideration
+            x = os.path.join(map_path, 'INDIA_' + name.upper() + '_2005_SOWING.tif')
+            y = os.path.join(map_path, 'INDIA_' + name.upper() + '_2005_HARVESTING.tif')
+            if os.path.isfile(x) and os.path.isfile(y):
+                xarr = file_handling.read_GDAL(x, self.bbox).data[0,...]
+                yarr = file_handling.read_GDAL(y, self.bbox).data[0,...]  
+                pd = np.zeros_like(xarr)
+                hd = np.zeros_like(xarr)
+                for i in range(xarr.shape[0]):
+                    for j in range(xarr.shape[1]):
+                        if xarr[i,j] > 0:
+                            pd_ix = int(xarr[i,j]) - 1
+                            hd_ix = int(yarr[i,j]) - 1
+                            pd[i,j] = start_day[pd_ix]
+                            hd[i,j] = end_day[hd_ix]
+                        else:
+                            pd[i,j] = xarr[i,j]
+                            hd[i,j] = yarr[i,j]
+
+                planting_day.append(pd)
+                harvest_day.append(hd)
+
+        self.land_cover.PlantingDate = np.stack(planting_day, axis=0)
+        self.land_cover.HarvestDate = np.stack(harvest_day, axis=0)
+
+    def read_parameters(self):
+        crop_data = self.read_gcwm_crop_data()        
+        for index,crop in enumerate(self.land_cover.CropTypes):
+            key = lookup_crop_id(crop, 'GCWM')            
+            self.land_cover.L_ini[index,...] = (crop_data[key]['L_ini'])
+            self.land_cover.L_dev[index,...] = (crop_data[key]['L_dev'])
+            self.land_cover.L_mid[index,...] = (crop_data[key]['L_mid'])
+            self.land_cover.L_late[index,...] = (crop_data[key]['L_late'])
+            self.land_cover.Kc_ini[index,...] = (crop_data[key]['Kc_ini'])
+            self.land_cover.Kc_mid[index,...] = (crop_data[key]['Kc_mid'])
+            self.land_cover.Kc_end[index,...] = (crop_data[key]['Kc_end'])
+            if crop.startswith('irr'):
+                self.land_cover.Zmax[index,...] = (crop_data[key]['rd_irr'])
+            elif crop.startswith('rain'):
+                self.land_cover.Zmax[index,...] = (crop_data[key]['rd_rain'])
+            self.land_cover.p_std[index,...] = (crop_data[key]['p_std'])
+
+        # TEMPORARY            
+        self.land_cover.Zmin = self.land_cover.Zmax
+        self.land_cover.Ky = np.full((self.land_cover.nCrop, self.land_cover.model.nLat, self.land_cover.model.nLon), 1)
+        
+    def dynamic(self):
+        self.read_crop_planting_and_harvest_day()
+        self.read_parameters()
+        netcdf = OutputNetCDF(
+            self.land_cover.model._configuration.NETCDF_ATTRIBUTES,
+            self.land_cover.dimensions,
+            variable_list
+            )
+        netcdf.create_netCDF(
+            self.land_cover.CropParametersOutputFile,
+            self.land_cover.crop_parameter_names
+        )
+        for param in self.land_cover.crop_parameter_names:
+            netcdf.add_data_to_netcdf(
+                self.land_cover.CropParametersOutputFile,
+                param,
+                vars(self.land_cover)[param]
+            )
+
+class CropArea(object):
+    def __init__(self, land_cover):
+        self.land_cover = land_cover
+        crop_types = self.land_cover.configuration['cropTypes']
+        self.land_cover.CropTypes = [x.strip() for x in crop_types.split(',')]
+        self.land_cover.nCrop = len(self.land_cover.CropTypes)
+        self.land_cover.CropAreaInputDir = str(self.land_cover.configuration['cropAreaPathIn'])
+        self.land_cover.CropAreaOutputFile = str(self.land_cover.configuration['cropAreaOutputFile'])
+        self.bbox = file_handling.get_gdal_extent(
+            self.land_cover.model.cloneMap,
+            self.land_cover.model.cloneMapFileName
+        )
+            
+    def initial(self):
+        pass
+
+    def dynamic(self):
+        crop_area = []
+        for index,name in enumerate(self.land_cover.CropTypes):
+            arr = file_handling.read_GDAL(
+                os.path.join(self.land_cover.CropAreaInputDir,'INDIA_' + name.upper() + '_2005.tif'),
+                self.bbox
+            ).data[0,...]
+            crop_area.append(arr)
+            
+        self.land_cover.crop_area = np.stack(crop_area, axis=0)
+        self.land_cover.crop_area *= 10000.
+        netcdf = OutputNetCDF(
+            self.land_cover.model._configuration.NETCDF_ATTRIBUTES,
+            self.land_cover.dimensions,
+            variable_list
+            )        
+        netcdf.create_netCDF(
+            self.land_cover.CropAreaOutputFile,
+            'crop_area'
+        )
+        netcdf.add_data_to_netcdf(
+            self.land_cover.CropAreaOutputFile,
+            'crop_area',
+            self.land_cover.crop_area
+        )
+
+class PotentialYield(BaseClass):
+    def __init__(self, land_cover):
+        super(PotentialYield, self).__init__(land_cover)
+        self.bbox = file_handling.get_gdal_extent(self.land_cover.model.cloneMap, self.land_cover.model.cloneMapFileName)            
+        
+    def initial(self):
+        pass
+
+    def dynamic(self):        
+        potential_yield_maps = []
+        for crop in self.land_cover.CropTypes:
+            gaez_crop = lookup_crop_id(crop, 'GAEZ')
+            fn = '../data' + '/' + 'potential_yield_' + gaez_crop.lower() + '_mixed_input.tif'
+            arr = file_handling.read_GDAL(fn, self.bbox).data[0,...]
+            potential_yield_maps.append(arr)
+            
+        potential_yield = np.stack(potential_yield_maps, axis=0)
+        
+        netcdf = OutputNetCDF(
+            self.land_cover.model._configuration.NETCDF_ATTRIBUTES,
+            self.land_cover.dimensions,
+            variable_list
+        )        
+        netcdf.create_netCDF(
+            str(self.land_cover.configuration['potentialYieldOutputFile']),
+            'Yx'
+        )
+        netcdf.add_data_to_netcdf(
+            str(self.land_cover.configuration['potentialYieldOutputFile']),
+            'Yx',
+            potential_yield
+        )
+        
+class FieldManagementParameters(BaseClass):
+    def __init__(self, land_cover):
+        super(FieldManagementParameters, self).__init__(land_cover)
+        
+    def initial(self):
+        pass
+    
+    def dynamic(self):
+        pass
+
+class IrrigationParameters(BaseClass):
+    def __init__(self, land_cover):
+        super(IrrigationParameters, self).__init__(land_cover)
+        
+    def initial(self):
+        pass
+    
+    def dynamic(self):
+        pass
+
+class PriceData(BaseClass):
+    def __init__(self, land_cover):
+        super(PriceData, self).__init__(land_cover)
+
+    def initial(self):
+        pass
+
+    def get_crop_price_data(self, price_data):
+        pass
+
+    def read_price_data(self, filename):
+        price_data = pd.read_table(
+            filename,
+            sep='\t',
+            header=0,
+            index_col=False)
+        return price_data
+
+    def get_annual_time_series(self, price_data):
+        # annual time series
+        years = price_data['YEAR']
+        year = np.min(years)
+        end_year = np.max(years)
+        dates = []
+        while year < end_year + 1:
+            dates.append(datetime.datetime(year,1,1))
+            year += 1
+        return dates
+
+    def get_daily_time_series(self, price_data):
+        date_str = price_data['DATE']
+        dates = []
+        for date in price_data['DATE']:
+            year, month, day = date.split("-")
+            dates.append(datetime.datetime(int(year), int(month), int(day)))
+        return dates
+        
+    def write_crop_price_data(self):
+        price_data = self.read_price_data('../data/gandak_crop_price_data.txt')
+        dates = self.get_annual_time_series(price_data)
+        crop_price_data = []
+        for crop in self.land_cover.CropTypes:
+            price_crop = lookup_crop_id(crop, 'PRICE')
+            arr = np.array(price_data[price_crop], dtype=np.float64)
+            arr = arr[:,None,None] * np.ones((self.land_cover.model.nLat, self.land_cover.model.nLon))[None,:,:]
+            crop_price_data.append(arr)
+
+        crop_price = np.stack(crop_price_data, axis=1)
+        netcdf = OutputNetCDF(
+            self.land_cover.model._configuration.NETCDF_ATTRIBUTES,
+            self.land_cover.dimensions,
+            variable_list
+        )        
+        netcdf.create_netCDF(
+            str(self.land_cover.configuration['cropPriceOutputFile']),
+            'crop_price'
+        )
+        for index,date in enumerate(dates):
+            netcdf.add_data_to_netcdf(
+                str(self.land_cover.configuration['cropPriceOutputFile']),
+                'crop_price',
+                crop_price[index,...],
+                date
+            )
+
+    def write_fertiliser_price_data(self):
+        price_data = self.read_price_data('../data/gandak_fert_price_data.txt')
+        dates = self.get_annual_time_series(price_data)
+
+        nitrogen_price = np.array(price_data['N_TP'], dtype=np.float64)
+        phosphorus_price = np.array(price_data['P_TP'], dtype=np.float64)
+        potassium_price = np.array(price_data['K_TP'], dtype=np.float64)
+        
+        nitrogen_price = nitrogen_price[:,None,None] * np.ones((self.land_cover.model.nLat, self.land_cover.model.nLon))[None,:,:]
+        phosphorus_price = phosphorus_price[:,None,None] * np.ones((self.land_cover.model.nLat, self.land_cover.model.nLon))[None,:,:]
+        potassium_price = potassium_price[:,None,None] * np.ones((self.land_cover.model.nLat, self.land_cover.model.nLon))[None,:,:]
+
+        netcdf = OutputNetCDF(
+            self.land_cover.model._configuration.NETCDF_ATTRIBUTES,
+            self.land_cover.dimensions,
+            variable_list
+        )
+        netcdf.create_netCDF(
+            str(self.land_cover.configuration['fertiliserPriceOutputFile']),
+            ['nitrogen_price','phosphorus_price','potassium_price']
+        )
+        
+        for index,date in enumerate(dates):
+            netcdf.add_data_to_netcdf(
+                str(self.land_cover.configuration['fertiliserPriceOutputFile']),
+                'nitrogen_price',
+                nitrogen_price[index,...],
+                date,
+                index
+            )
+            netcdf.add_data_to_netcdf(
+                str(self.land_cover.configuration['fertiliserPriceOutputFile']),                
+                'phosphorus_price',
+                phosphorus_price[index,...],
+                date,
+                index
+            )
+            netcdf.add_data_to_netcdf(
+                str(self.land_cover.configuration['fertiliserPriceOutputFile']),
+                'potassium_price',
+                potassium_price[index,...],
+                date,
+                index
+            )
+
+    def write_diesel_price_data(self):
+        price_data = self.read_price_data('../data/gandak_diesel_price_data.txt')
+        dates = self.get_daily_time_series(price_data)
+        diesel_price = np.array(price_data['DIESEL_PRICE'], dtype=np.float64)
+        diesel_price = diesel_price[:,None,None] * np.ones((self.land_cover.model.nLat, self.land_cover.model.nLon))[None,:,:]
+        netcdf = OutputNetCDF(
+            self.land_cover.model._configuration.NETCDF_ATTRIBUTES,
+            self.land_cover.dimensions,
+            variable_list
+        )
+        netcdf.create_netCDF(
+            str(self.land_cover.configuration['dieselPriceOutputFile']),
+            'diesel_price'
+        )
+        for index,date in enumerate(dates):
+            netcdf.add_data_to_netcdf(
+                str(self.land_cover.configuration['dieselPriceOutputFile']),
+                'diesel_price',
+                diesel_price[index,...],
+                date
+            )
+        
+    def dynamic(self):
+        self.write_crop_price_data()
+        self.write_fertiliser_price_data()
+        self.write_diesel_price_data()
+        
+class SealedLandParameters(BaseClass):
+    def __init__(self, land_cover):
+        super(SealedLandParameters, self).__init__(land_cover)
+        self.topo_parameters_module = TopoParameters(land_cover)
+        self.cover_fraction_module = CoverFractionData(land_cover)
+        self.intercept_capacity_module = MinimumInterceptionCapacityData(land_cover)
+
+    def initial(self):
+        self.topo_parameters_module.initial()
+        self.cover_fraction_module.initial()
+        self.intercept_capacity_module.initial()
+
+    def dynamic(self):
+        self.topo_parameters_module.dynamic()
+        self.cover_fraction_module.dynamic()
+        self.intercept_capacity_module.dynamic()
+
+class WaterParameters(SealedLandParameters):
+    pass
+        
+class NaturalVegetationParameters(BaseClass):
+    def __init__(self, land_cover):
+        super(NaturalVegetationParameters, self).__init__(land_cover)
+        self.soil_hydraulic_parameters_module = SoilHydraulicParameters(land_cover)
+        self.topo_parameters_module = TopoParameters(land_cover)
+        self.cover_fraction_module = CoverFractionData(land_cover)
+        self.crop_coefficient_module = CropCoefficientData(land_cover)
+        self.intercept_capacity_module = InterceptionCapacityData(land_cover)
+        self.root_depth_module = MaxRootDepth(land_cover)
+        self.van_genuchten_module = VanGenuchtenParameters(land_cover)
+        self.root_fraction_module = RootFractionData(land_cover)
+
+    def initial(self):
+        self.soil_hydraulic_parameters_module.initial()
+        self.topo_parameters_module.initial()
+        self.cover_fraction_module.initial()
+        self.crop_coefficient_module.initial()
+        self.intercept_capacity_module.initial()
+        self.root_depth_module.initial()
+        self.van_genuchten_module.initial()
+        self.root_fraction_module.initial()
+
+    def dynamic(self):
+        self.soil_hydraulic_parameters_module.dynamic()
+        self.topo_parameters_module.dynamic()
+        self.cover_fraction_module.dynamic()
+        self.crop_coefficient_module.dynamic()
+        self.intercept_capacity_module.dynamic()
+        self.root_depth_module.dynamic()
+        self.van_genuchten_module.dynamic()
+        self.root_fraction_module.dynamic()
+        
+class ManagedLandParameters(BaseClass):
+    def __init__(self, land_cover):
+        super(ManagedLandParameters, self).__init__(land_cover)
+        self.soil_hydraulic_parameters_module = SoilHydraulicParameters(land_cover)
+        self.topo_parameters_module = TopoParameters(land_cover)
+        self.cover_fraction_module = CoverFractionData(land_cover)
+        self.crop_coefficient_module = CropCoefficientData(land_cover)
+        self.root_depth_module = MaxRootDepth(land_cover)
+        self.van_genuchten_module = VanGenuchtenParameters(land_cover)
+        self.root_fraction_module = RootFractionData(land_cover)
+        self.field_mgmt_parameters_module = FieldManagementParameters(land_cover)
+        self.irrigation_parameters_module = IrrigationParameters(land_cover)
+
+    def initial(self):
+        self.soil_hydraulic_parameters_module.initial()
+        self.topo_parameters_module.initial()
+        self.cover_fraction_module.initial()
+        self.crop_coefficient_module.initial()
+        self.root_depth_module.initial()
+        self.van_genuchten_module.initial()
+        self.root_fraction_module.initial()
+        self.field_mgmt_parameters_module.initial()
+        self.irrigation_parameters_module.initial()
+
+    def dynamic(self):
+        self.soil_hydraulic_parameters_module.dynamic()
+        self.topo_parameters_module.dynamic()
+        self.cover_fraction_module.dynamic()
+        self.crop_coefficient_module.dynamic()
+        self.root_depth_module.dynamic()
+        self.van_genuchten_module.dynamic()
+        self.root_fraction_module.dynamic()
+        self.field_mgmt_parameters_module.dynamic()
+        self.irrigation_parameters_module.dynamic()        
+    
+class ManagedLandWithFarmerBehaviourParameters(BaseClass):
+    def __init__(self, land_cover):
+        super(ManagedLandWithFarmerBehaviourParameters, self).__init__(land_cover)
+        self.soil_hydraulic_parameters_module = SoilHydraulicParameters(land_cover)
+        self.topo_parameters_module = TopoParameters(land_cover)
+        self.cover_fraction_module = CoverFractionData(land_cover)
+        self.farm_parameters_module = FarmParameters(land_cover)
+        self.crop_parameters_module = CropParameters(land_cover)
+        self.crop_area_module = CropArea(land_cover)
+        self.potential_yield_module = PotentialYield(land_cover)
+        self.price_module = PriceData(land_cover)
+        self.crop_coefficient_module = CropCoefficientData(land_cover)
+        self.root_depth_module = MaxRootDepth(land_cover)
+        self.van_genuchten_module = VanGenuchtenParameters(land_cover)
+        self.root_fraction_module = RootFractionData(land_cover)
+        self.field_mgmt_parameters_module = FieldManagementParameters(land_cover)
+        self.irrigation_parameters_module = IrrigationParameters(land_cover)
+
+    def initial(self):
+        self.soil_hydraulic_parameters_module.initial()
+        self.topo_parameters_module.initial()
+        self.cover_fraction_module.initial()
+        self.farm_parameters_module.initial()
+        self.crop_parameters_module.initial()
+        self.crop_area_module.initial()
+        self.potential_yield_module.initial()
+        self.price_module.initial()
+        self.crop_coefficient_module.initial()
+        self.root_depth_module.initial()
+        self.van_genuchten_module.initial()
+        self.root_fraction_module.initial()
+        self.field_mgmt_parameters_module.initial()
+        self.irrigation_parameters_module.initial()
+        
+    def dynamic(self):
+        self.soil_hydraulic_parameters_module.dynamic()
+        self.topo_parameters_module.dynamic()
+        self.cover_fraction_module.dynamic()
+        self.farm_parameters_module.dynamic()
+        self.crop_parameters_module.dynamic()
+        self.crop_area_module.dynamic()
+        self.potential_yield_module.dynamic()
+        self.price_module.dynamic()
+        self.crop_coefficient_module.dynamic()
+        self.root_depth_module.dynamic()
+        self.van_genuchten_module.dynamic()
+        self.root_fraction_module.dynamic()
+        self.field_mgmt_parameters_module.dynamic()
+        self.irrigation_parameters_module.dynamic()

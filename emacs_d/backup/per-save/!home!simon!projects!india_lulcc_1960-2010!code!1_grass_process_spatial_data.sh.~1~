@@ -1,0 +1,289 @@
+#!/bin/bash
+
+wd=$HOME/projects/india_lulcc_1960-2010
+
+# =======================================
+# land use
+# =======================================
+
+unzip -o data-raw/Decadal_LULC_India_1336.zip -d data
+
+# create location from land use map
+if [ ! -d "$HOME/grassdata/utm44n" ]
+then
+    grass -e -c data/Decadal_LULC_India_1336/data/LULC_2005.tif $HOME/grassdata/utm44n
+fi
+
+echo 'export GRASS_MESSAGE_FORMAT=plain
+r.mask -r
+for year in 1985 1995 2005
+do
+    r.in.gdal input=data/Decadal_LULC_India_1336/data/LULC_"${year}".tif output=lulc_"${year}" --overwrite
+done
+' > mygrassjob_pt1.sh
+
+chmod u+x mygrassjob_pt1.sh
+export GRASS_BATCH_JOB=$wd/mygrassjob_pt1.sh
+grass $HOME/grassdata/utm44n/PERMANENT
+unset GRASS_BATCH_JOB
+rm mygrassjob_pt1.sh
+
+# =======================================
+# elevation
+# =======================================
+
+ls data-raw/HydroSHEDS | grep -E '^n[0-9]{2}e[0-9]{3}_con_grid.zip$' > tmp
+while read line
+do
+    basen=$(echo $line | sed 's/\(.*\)_\(.*\)_\(.*\).zip/\1/')
+    unzip -o data-raw/HydroSHEDS/"${line}" -d data-raw/HydroSHEDS
+    gdal_translate data-raw/HydroSHEDS/"${basen}"_con/"${basen}"_con -of GTiff data-raw/HydroSHEDS/"${basen}"_con.tif    
+done < tmp
+
+gdalwarp data-raw/HydroSHEDS/*.tif data/hydrosheds_india_mosaic.tif
+
+# create location from land use map
+if [ ! -d "$HOME/grassdata/latlong" ]
+then
+    grass -e -c data/hydrosheds_india_mosaic.tif $HOME/grassdata/latlong
+fi
+
+echo 'export GRASS_MESSAGE_FORMAT=plain
+r.mask -r
+r.in.gdal input=data/hydrosheds_india_mosaic.tif output=hydrosheds --overwrite
+g.region rast=hydrosheds
+g.region n=38 s=6 e=68 w=98 
+g.region -p
+# r.slope.aspect elevation=hydrosheds slope=hydrosheds_slope aspect=hydrosheds_aspect --overwrite
+' > mygrassjob_pt2.sh
+
+chmod u+x mygrassjob_pt2.sh
+export GRASS_BATCH_JOB=$wd/mygrassjob_pt2.sh
+grass $HOME/grassdata/latlong/PERMANENT
+unset GRASS_BATCH_JOB
+rm mygrassjob_pt2.sh
+
+# # memory management (remove if memory is not an issue)
+# rm data/hydrosheds_india_mosaic.tif
+
+# =======================================
+# district boundary data
+# =======================================
+
+echo 'export GRASS_MESSAGE_FORMAT=plain
+r.mask -r
+v.in.ogr input=pkg/indagridat/inst/shapes/IND_adm2_1956.shp output=IND_adm2_1956 --overwrite
+' > mygrassjob_pt3.sh
+
+chmod u+x mygrassjob_pt3.sh
+export GRASS_BATCH_JOB=$wd/mygrassjob_pt3.sh
+grass $HOME/grassdata/latlong/PERMANENT
+unset GRASS_BATCH_JOB
+rm mygrassjob_pt3.sh
+
+# =======================================
+# road network
+# =======================================
+
+unzip -o data-raw/groads-v1-asia-shp.zip -d data
+
+echo 'export GRASS_MESSAGE_FORMAT=plain
+r.mask -r
+v.in.ogr input=data/groads-v1-asia-shp/gROADS-v1-asia.shp output=roads --overwrite
+' > mygrassjob_pt4.sh
+
+chmod u+x mygrassjob_pt4.sh
+export GRASS_BATCH_JOB=$wd/mygrassjob_pt4.sh
+grass $HOME/grassdata/latlong/PERMANENT
+unset GRASS_BATCH_JOB
+rm mygrassjob_pt4.sh
+
+# =======================================
+# population density (Worldpop)
+# =======================================
+
+unzip -o data-raw/138_popmap10.zip -d data
+
+echo 'export GRASS_MESSAGE_FORMAT=plain
+r.mask -r
+r.in.gdal input=data/popmap10.tif output=popmap10 --overwrite
+# r.in.gdal input=data/popmap10.tif output=popmap15 --overwrite
+' > mygrassjob_pt5.sh
+
+chmod u+x mygrassjob_pt5.sh
+export GRASS_BATCH_JOB=$wd/mygrassjob_pt5.sh
+grass $HOME/grassdata/latlong/PERMANENT
+unset GRASS_BATCH_JOB
+rm mygrassjob_pt5.sh
+
+# # memory management (remove if memory is not an issue)
+# rm data/popmap10.tif \
+#    data/popmap10.tfw \
+#    data/popmap10.tif.aux.xml \
+#    data/popmap10.tif.ovr
+
+# =======================================
+# accessibility
+# =======================================
+
+unzip -o data-raw/access_50k.zip -d data
+
+echo 'export GRASS_MESSAGE_FORMAT=plain
+r.mask -r
+r.in.gdal input=data/access_50k/acc_50k/w001001.adf output=access_50k --overwrite
+' > mygrassjob_pt7.sh
+
+chmod u+x mygrassjob_pt7.sh
+export GRASS_BATCH_JOB=$wd/mygrassjob_pt7.sh
+grass $HOME/grassdata/latlong/PERMANENT
+unset GRASS_BATCH_JOB
+rm mygrassjob_pt7.sh
+
+# =======================================
+# bioclim vars
+# =======================================
+
+unzip -o -j data-raw/wc2.0_30s_bio.zip wc2.0_bio_30s_01.tif -d data
+unzip -o -j data-raw/wc2.0_30s_bio.zip wc2.0_bio_30s_02.tif -d data
+unzip -o -j data-raw/wc2.0_30s_bio.zip wc2.0_bio_30s_03.tif -d data
+unzip -o -j data-raw/wc2.0_30s_bio.zip wc2.0_bio_30s_04.tif -d data
+unzip -o -j data-raw/wc2.0_30s_bio.zip wc2.0_bio_30s_05.tif -d data
+unzip -o -j data-raw/wc2.0_30s_bio.zip wc2.0_bio_30s_06.tif -d data
+unzip -o -j data-raw/wc2.0_30s_bio.zip wc2.0_bio_30s_07.tif -d data
+unzip -o -j data-raw/wc2.0_30s_bio.zip wc2.0_bio_30s_08.tif -d data
+unzip -o -j data-raw/wc2.0_30s_bio.zip wc2.0_bio_30s_09.tif -d data
+unzip -o -j data-raw/wc2.0_30s_bio.zip wc2.0_bio_30s_10.tif -d data
+unzip -o -j data-raw/wc2.0_30s_bio.zip wc2.0_bio_30s_11.tif -d data
+unzip -o -j data-raw/wc2.0_30s_bio.zip wc2.0_bio_30s_12.tif -d data
+
+echo 'export GRASS_MESSAGE_FORMAT=plain
+r.mask -r
+r.in.gdal input=data/wc2.0_bio_30s_01.tif output=bioclim_var1 --overwrite
+r.in.gdal input=data/wc2.0_bio_30s_02.tif output=bioclim_var2 --overwrite
+r.in.gdal input=data/wc2.0_bio_30s_03.tif output=bioclim_var3 --overwrite
+r.in.gdal input=data/wc2.0_bio_30s_04.tif output=bioclim_var4 --overwrite
+r.in.gdal input=data/wc2.0_bio_30s_05.tif output=bioclim_var5 --overwrite
+r.in.gdal input=data/wc2.0_bio_30s_06.tif output=bioclim_var6 --overwrite
+r.in.gdal input=data/wc2.0_bio_30s_07.tif output=bioclim_var7 --overwrite
+r.in.gdal input=data/wc2.0_bio_30s_08.tif output=bioclim_var8 --overwrite
+r.in.gdal input=data/wc2.0_bio_30s_09.tif output=bioclim_var9 --overwrite
+r.in.gdal input=data/wc2.0_bio_30s_10.tif output=bioclim_var10 --overwrite
+r.in.gdal input=data/wc2.0_bio_30s_11.tif output=bioclim_var11 --overwrite
+r.in.gdal input=data/wc2.0_bio_30s_12.tif output=bioclim_var12 --overwrite
+' > mygrassjob_pt8.sh
+
+chmod u+x mygrassjob_pt8.sh
+export GRASS_BATCH_JOB=$wd/mygrassjob_pt8.sh
+grass $HOME/grassdata/latlong/PERMANENT
+unset GRASS_BATCH_JOB
+rm mygrassjob_pt8.sh
+
+# # memory management (remove this statement if memory is not an issue)
+# rm data/wc2.0_bio_30s_01.tif \
+#    data/wc2.0_bio_30s_02.tif \
+#    data/wc2.0_bio_30s_03.tif \
+#    data/wc2.0_bio_30s_04.tif \
+#    data/wc2.0_bio_30s_05.tif \
+#    data/wc2.0_bio_30s_06.tif \
+#    data/wc2.0_bio_30s_07.tif \
+#    data/wc2.0_bio_30s_08.tif \
+#    data/wc2.0_bio_30s_09.tif \
+#    data/wc2.0_bio_30s_10.tif \
+#    data/wc2.0_bio_30s_11.tif \
+#    data/wc2.0_bio_30s_12.tif
+
+# =======================================
+# import data
+# =======================================
+
+# define projection
+
+# projection details from: http://www.nnrms.gov.in/greennnrms/download/NnrmsStandardsDoc.pdf
+
+gdalwarp -t_srs '+proj=lcc +lat_0=24 +lat_1=12.472955 +lat_235.172804 +lon_0=80 +x_0=4000000 +y_0=4000000 +ellps=WGS84 +units=m +no_defs' data/hydrosheds_india_mosaic.tif data/dummy.tif
+
+if [ ! -d "$HOME/grassdata/lcc" ]
+then
+    grass -e -c data/dummy.tif $HOME/grassdata/lcc
+fi
+rm data/dummy.tif
+
+if [ ! -d "data/district_maps" ]
+then
+    mkdir data/district_maps
+fi
+
+# region bounds are equivalent to latlong bounding box 38,6,68,98
+# (n,s,e,w). The '-a' flag aligns the region with the resolution rather
+# than the bounds.
+echo 'export GRASS_MESSAGE_FORMAT=plain
+r.mask -r
+
+# r.proj location=latlong mapset=PERMANENT input=hydrosheds -g
+
+g.region -a n=6009889.1933498 s=1877838.71226013 w=2346133.12435385 e=6204923.68097275 res=100 save=india_rgn --overwrite
+g.region -p
+
+v.proj location=latlong mapset=PERMANENT input=IND_adm2_1956 output=IND_adm2_1956 --overwrite
+
+v.proj location=latlong mapset=PERMANENT input=roads output=roads --overwrite
+r.proj location=utm44n mapset=PERMANENT input=lulc_1985 output=lulc_1985 method=nearest --overwrite
+r.proj location=utm44n mapset=PERMANENT input=lulc_1995 output=lulc_1995 method=nearest --overwrite
+r.proj location=utm44n mapset=PERMANENT input=lulc_2005 output=lulc_2005 method=nearest --overwrite
+r.proj location=latlong mapset=PERMANENT input=hydrosheds output=elevation method=bilinear --overwrite
+r.proj location=latlong mapset=PERMANENT input=popmap10 output=popdens method=bilinear --overwrite
+r.proj location=latlong mapset=PERMANENT input=access_50k output=access method=bilinear --overwrite
+r.proj location=latlong mapset=PERMANENT input=bioclim_var1 output=bio1 method=bilinear --overwrite
+r.proj location=latlong mapset=PERMANENT input=bioclim_var2 output=bio2 method=bilinear --overwrite
+r.proj location=latlong mapset=PERMANENT input=bioclim_var3 output=bio3 method=bilinear --overwrite
+r.proj location=latlong mapset=PERMANENT input=bioclim_var4 output=bio4 method=bilinear --overwrite
+r.proj location=latlong mapset=PERMANENT input=bioclim_var5 output=bio5 method=bilinear --overwrite
+r.proj location=latlong mapset=PERMANENT input=bioclim_var6 output=bio6 method=bilinear --overwrite
+r.proj location=latlong mapset=PERMANENT input=bioclim_var7 output=bio7 method=bilinear --overwrite
+r.proj location=latlong mapset=PERMANENT input=bioclim_var8 output=bio8 method=bilinear --overwrite
+r.proj location=latlong mapset=PERMANENT input=bioclim_var9 output=bio9 method=bilinear --overwrite
+r.proj location=latlong mapset=PERMANENT input=bioclim_var10 output=bio10 method=bilinear --overwrite
+r.proj location=latlong mapset=PERMANENT input=bioclim_var11 output=bio11 method=bilinear --overwrite
+r.proj location=latlong mapset=PERMANENT input=bioclim_var12 output=bio12 method=bilinear --overwrite
+
+## district maps
+## #############
+
+r.mask raster=lulc_2005 
+v.to.rast type=area input=IND_adm2_1956 output=IND_adm2_1956_rast use=attr attribute_column=ID_2 --overwrite
+r.mask -r
+
+r.mask raster=lulc_2005
+r.stats -n IND_adm2_1956_rast > tmp
+while read line
+do
+    g.region region=india_rgn
+    r.mapcalc "tmp = if(IND_adm2_1956_rast==${line},1,null())" --overwrite
+    g.region zoom=tmp
+    r.out.gdal input=tmp output=data/district_maps/dist_"${line}".tif type=Byte --overwrite
+done < tmp
+g.region region=india_rgn
+r.mask -r
+
+# distance to roads
+# #################
+
+g.region region=india_rgn
+v.to.rast input=roads output=roads_rast use=val value=1 --overwrite
+r.null map=roads_rast setnull=0
+r.grow.distance -m input=roads_rast distance=distance_to_road_m --overwrite
+r.mapcalc "dist2rd = distance_to_road_m / 1000" --overwrite
+g.remove -f type=raster name=distance_to_road_m
+
+# slope, aspect
+# #############
+
+r.slope.aspect elevation=elevation slope=slope aspect=aspect --overwrite
+' > mygrassjob_pt10.sh
+
+chmod u+x mygrassjob_pt10.sh
+export GRASS_BATCH_JOB=$wd/mygrassjob_pt10.sh
+grass $HOME/grassdata/lcc/PERMANENT
+unset GRASS_BATCH_JOB
+rm mygrassjob_pt10.sh tmp
+

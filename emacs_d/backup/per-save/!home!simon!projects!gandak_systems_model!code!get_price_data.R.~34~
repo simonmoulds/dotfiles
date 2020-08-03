@@ -1,0 +1,84 @@
+## Author : Simon Moulds
+## Date   : Oct 2018
+
+## Get price data from various sources, and create
+## time series with consistent format
+
+library(readxl)
+library(magrittr)
+library(tidyverse)
+
+bihar_dists = c("Champaran","Muzaffarpur","Saran")
+up_dists = c("Deoria","Gorakhpur")
+dists = c(bihar_dists, up_dists)
+
+## ==========================
+## Fertiliser price - ICRISAT
+## ==========================
+bihar_fert_price =
+    read_excel("data-raw/ICRISAT/Bihar/dt_fert_prices_a_web.xlsx", col_names=TRUE, na=c("-1"))
+
+up_fert_price =
+    read_excel("data-raw/ICRISAT/UttarPradesh/dt_fert_prices_a_web.xlsx", col_names=TRUE, na=c("-1"))
+
+combined_fert_price = rbind(bihar_fert_price, up_fert_price)
+
+combined_fert_price$ID = "Gandak"
+
+combined_fert_price %<>%
+    filter(DISTNAME %in% dists) %>%
+    group_by(ID,YEAR) %>%
+    summarise_at(vars(-STCODE,-STNAME,-DIST,-DISTNAME), funs(mean(., na.rm=TRUE)))
+
+## ====================
+## Crop price - ICRISAT
+## ====================
+
+bihar_crop_price =
+    read_excel("data-raw/ICRISAT/Bihar/dt_fhp_a_web.xlsx", col_names=TRUE, na=c("-1"))
+
+up_crop_price =
+    read_excel("data-raw/ICRISAT/UttarPradesh/dt_fhp_a_web.xlsx", col_names=TRUE, na=c("-1"))
+
+combined_crop_price = rbind(bihar_crop_price, up_crop_price)
+
+combined_crop_price$ID = "Gandak"
+
+combined_crop_price %<>%
+    filter(DISTNAME %in% dists) %>%
+    group_by(ID,YEAR) %>%
+    summarise_at(vars(-STCODE,-STNAME,-DIST,-DISTNAME), funs(mean(., na.rm=TRUE)))
+
+## ============
+## Diesel price
+## ============
+
+## library(wbstats)
+## new_cache = wbcache()
+## wbsearch("consumer price index")
+## cpi = wb(country="IND",indicator="FP.CPI.TOTL")
+## wbsearch("diesel")
+## diesel = wb(country="IND",indicator="EP.PMP.DESL.CD")
+diesel_price =
+    read.table("data/sult_base_diesel_prices_long.txt", header=TRUE, sep="\t") %>%
+    mutate_at(vars(year), funs(as.character)) %>%
+    dplyr::filter(grepl("^[0-9]{4}-01-01", year))
+
+diesel_price[["year"]] %<>% 
+    as.Date %>%
+    as.POSIXlt(format="%Y-%m-%d") %>%
+    format("%Y") %>%
+    as.numeric
+
+diesel_price %<>% setNames(c("YEAR","DIESEL_PRICE"))
+diesel_price$ID = "Gandak"
+
+## join data, fill in missing values using LOCF
+gandak_price_data =
+    left_join(combined_crop_price, combined_fert_price, by=c("ID","YEAR")) %>%
+    left_join(diesel_price, by=c("ID","YEAR")) %>%
+    ungroup %>%
+    mutate_at(vars(-ID, -YEAR), funs(zoo::na.locf(., na.rm=FALSE, rule=1))) %>%
+    mutate_at(vars(-ID, -YEAR), funs(zoo::na.locf(., fromLast=TRUE, na.rm=FALSE, rule=1)))
+
+

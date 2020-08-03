@@ -1,0 +1,21 @@
+#' Class WeatherData
+#'
+#' An S4 class to represent weather data
+#'
+#' @slot prec numeric. Daily precipitation (mm).
+#' @slot etref numeric. Daily reference evapotranspiration (mm).
+#' @slot ts POSIXt. Times corresponding to meteorological input data.
+#'
+#' @export
+#' @exportClass WeatherData
+#' @rdname WeatherData-class
+setClass("WeatherData",
+         slots = c(
+             prec = "numeric",
+             etref = "numeric",
+             ts = "POSIXt"
+         ),
+         validity = function(object) {
+             return(TRUE)
+         }
+         )     

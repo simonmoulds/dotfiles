@@ -1,0 +1,14 @@
+#!/bin/bash
+
+dotfiles=(".vimrc" ".zshrc" ".gitconfig")
+dir="${HOME}/dotfiles"
+for dotfile in "${dotfiles[@]}"
+do
+    ln -sf "${HOME}/${dotfile}" "${dir}"
+done
+
+zdotfiles=(".zlogin",".zlogout",".zpreztorc",".zprofile",".zshenv",".zshrc")
+for zdotfile in "${zdotfiles[@]}"
+do
+    ln -sf "${HOME}/${zdotfile}" "${HOME}"/.zprezto/runcoms
+done

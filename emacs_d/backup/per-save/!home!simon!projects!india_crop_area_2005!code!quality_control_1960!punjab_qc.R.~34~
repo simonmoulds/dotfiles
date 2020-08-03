@@ -1,0 +1,79 @@
+## Author : Simon Moulds
+## Date   : Apr 2018
+
+## Quality control for Punjab
+
+## Barley
+## ######
+
+xx[["irr_barley"]] %<>% locf_interp(62:63)
+xx[["apy_barley"]] %<>% irr_frac_interp(xx[["apy_barley"]], 61:63, 60)
+
+## Chickpea
+## ########
+
+xx[["irr_chickpea"]] %<>% irr_frac_interp(xx[["apy_chickpea"]], 44:50, 43)
+xx[["irr_chickpea"]] %<>% locf_interp(61:63)
+
+## Cotton
+## ######
+
+xx[["irr_cotton"]] %<>% locf_interp(62:63)
+xx[["apy_cotton"]] %<>% irr_frac_interp(xx[["apy_cotton"]], 61:63, 60)
+
+## Finger millet
+## #############
+
+xx[["apy_finger_millet"]] %<>% tot_frac_interp(xx[["irr_finger_millet"]], 29, 28)
+
+## Groundnut
+## #########
+
+xx[["irr_groundnut"]] %<>% irr_frac_interp(xx[["apy_groundnut"]], 44:48, 43)
+xx[["irr_groundnut"]] %<>% locf_interp(62:63)
+xx[["apy_groundnut"]] %<>% tot_frac_interp(xx[["irr_groundnut"]], 61:63, 60)
+
+## Maize
+## #####
+
+xx[["irr_maize"]] %<>% locf_interp(62:63)
+xx[["apy_maize"]] %<>% tot_frac_interp(xx[["irr_maize"]], 61:63, 60)
+
+## Pearl millet
+## ############
+
+xx[["irr_pearl_millet"]] %<>% locf_interp(62:63)
+xx[["apy_pearl_millet"]] %<>% tot_frac_interp(xx[["irr_pearl_millet"]], 61:63, 60)
+xx[["irr_pearl_millet"]] %<>% irr_frac_interp(xx[["apy_pearl_millet"]], 44:50, 43)
+
+## Pigeonpea
+## #########
+
+xx[["irr_pigeonpea"]] %<>% locf_interp(62:63)
+xx[["apy_pigeonpea"]] %<>% tot_frac_interp(xx[["irr_pigeonpea"]], 61:63, 60)
+xx[["irr_pigeonpea"]] %<>% irr_frac_interp(xx[["apy_pigeonpea"]], 44:50, 43)
+
+## Rapeseed
+## ########
+
+xx[["irr_rapeseed"]] %<>% locf_interp(62:63)
+xx[["apy_rapeseed"]] %<>% tot_frac_interp(xx[["irr_rapeseed"]], 61:63, 60)
+xx[["irr_rapeseed"]] %<>% irr_frac_interp(xx[["apy_rapeseed"]], 44:48, 43)
+
+## Rice
+## ####
+
+xx[["irr_rice-autumn"]][55:61] = xx[["irr_rice-winter"]][55:61]
+xx[["irr_rice-autumn"]] %<>% irr_frac_interp(xx[["apy_rice"]], 44:50, 43)
+xx[["irr_rice-autumn"]] %<>% irr_frac_interp(xx[["apy_rice"]], 56:57, 55)
+xx[["irr_rice-winter"]] = xx[["irr_rice-autumn"]]
+xx[["irr_rice-autumn"]] = 0
+xx[["apy_rice"]] %<>% irr_frac_interp(xx[["irr_rice-winter"]], 61, 60)
+
+## Sesamum
+## #######
+
+xx[["apy_sesamum"]] %<>% tot_frac_interp(xx[["irr_sesamum"]], 61, 60)
+xx[["irr_sesamum"]] %<>% irr_frac_interp(xx[["apy_sesamum"]], 44:48, 43)
+
+## 

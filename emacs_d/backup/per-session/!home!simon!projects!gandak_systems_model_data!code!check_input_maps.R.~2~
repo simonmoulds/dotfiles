@@ -1,0 +1,37 @@
+## Author : Simon Moulds
+## Date   : January 2020
+
+library(magrittr)
+library(raster)
+
+## ############
+## 1. area maps
+## ############
+
+clone = raster("../data/Gandak05min.clone.tif")
+landmask = raster("../data/Gandak05min.landmask.tif")
+
+plot(clone)
+plot(landmask)
+
+## ######################
+## 2. soil parameter maps
+## ######################
+
+area = raster("../data/modelMaskCellArea.tif")
+wcres0 = raster("../data/wcres_topsoil_gapfilled_5m.tif")
+wcres1 = raster("../data/wcres_subsoil_gapfilled_5m.tif")
+
+wcsat0 = raster("../data/wcsat_topsoil_gapfilled_5m.tif")
+wcsat1 = raster("../data/wcsat_subsoil_gapfilled_5m.tif")
+
+wcwp = raster("../data/wcpf4.2_topsoil_gapfilled_5m.tif")
+wcwp = raster("../data/wcpf4.2_subsoil_gapfilled_5m.tif")
+
+wcfc = raster("../data/wcpf2_topsoil_gapfilled_5m.tif")
+wcfc = raster("../data/wcpf2_subsoil_gapfilled_5m.tif")
+
+## #############
+## 3. gaez input
+## #############
+

@@ -1,0 +1,565 @@
+## Author : Simon Moulds
+## Date   : Oct 2019
+
+library(RSQLite)
+library(tidyverse)
+library(magrittr)
+library(raster)    
+library(ncdf4)
+
+## helper functions to convert AquaCrop-Python input files to
+## AquaCrop-OS input files
+
+get_config_option = function(config_fn, option) {
+    val = readLines(config_fn) %>%
+        `[`(grepl(paste0("^", option), .)) %>%
+        strsplit("=") %>%
+        `[[`(1) %>%
+        `[`(2) %>%
+        trimws
+    val
+}
+
+write_file_setup_input_file = function(clock_fn="Clock.txt", weather_fn="Weather.txt", co2_fn="MaunaLoaCO2.txt", crop_mix_fn="CropMix.txt", soil_fn="Soil.txt", field_mgmt_fn="FieldManagement.txt", init_wc_fn="InitialWaterContent.txt", water_table_fn="WaterTable.txt", prefix="output", file_path=".", file_name="FileSetup.txt") {
+    
+    x = c(
+        "%% ----------- Input filenames for AquaCropOS ----------- %%",
+        "%% Clock Filename %%",
+        clock_fn,
+        "%% Weather Data Filename %%",
+        weather_fn,
+        "%% C02 Concentration Time-Series Filename %%",
+        co2_fn,
+        "%% Crop Parameters Filename %%",
+        crop_mix_fn,
+        "%% Soil Parameters Filename %%",
+        soil_fn,
+        "%% Field Management Filename %%",
+        field_mgmt_fn,
+        "%% Initial Water Content Filename %%",
+        init_wc_fn,
+        "%% Groundwater Table Filename %%",
+        water_table_fn,
+        "%% Output Filename %%",
+        output_fn,
+        "%% Write daily outputs ('Y' or 'N') %%",
+        "Y"
+    )
+    
+    con = file(file.path(file_path, file_name))
+    writeLines(x, con)
+    close(con)
+}
+
+write_clock_input_file = function(start_time, end_time, time_step=1, evap_time_step=20, file_path=".", file_name="Clock.txt") {
+    x = c(
+        "%% ---------- Clock parameter inputs for AquaCrop ---------- %%",
+        "%% Simulation start time (yyyy-mm-dd) %%",
+        paste0("SimulationStartTime : ", start_time),
+        "%% Simulation end time (yyyy-mm-dd) %%",
+        paste0("SimulationEndTime : ", end_time),
+        "%% Simulate off-season ('N' or 'Y') %%",
+        "OffSeason : Y"
+    )
+    con = file(file.path(file_path, file_name))
+    writeLines(x, con)
+    close(con)
+}
+
+write_crop_mix_input_file = function(crop_type, crop_rotation_fn="CropRotation.txt", crop_fn="Crop.txt", irri_fn="IrrigationManagement.txt", file_path=".", file_name="CropMix.txt") {
+    
+    x = c(
+        "%% ---------- Crop mix options for AquaCropOS ---------- %%",
+        "%% Number of crop options %%",
+        "1",
+        "%% Specified planting calendar %%",
+        "N",
+        "%% Crop rotation filename %%",
+        crop_rotation_fn,
+        "%% Information about each crop type %%",
+        "%% CropType, CropFilename, IrrigationFilename %%",
+        paste(crop_type, crop_fn, irri_fn, sep=", ")
+    )
+    con = file(file.path(file_path, file_name))
+    writeLines(x, con)
+    close(con)
+
+}
+
+get_crop_param_from_nc = function(crop_nc, param, pts) {
+    nc = nc_open(crop_nc)
+    lat = ncvar_get(nc, "lat")
+    lon = ncvar_get(nc, "lon")
+    vars = names(nc$var)
+    if (param %in% vars) {
+        param_arr = ncvar_get(nc, param)
+    } else {
+        stop("nc does not contain param")
+    }
+    nc_close(nc)
+    lat_ix = which.min(abs(lat - pts$y))[1]
+    lon_ix = which.min(abs(lon - pts$x))[1]
+    param_val = param_arr[lon_ix, lat_ix]    
+    param_val
+}
+
+write_crop_param_input_file = function(crop_params, file_path=".", file_name="Crop.txt") {
+    x = c(
+        "%% ---------- Crop parameters for AquaCropOS ---------- %%",
+        "%% Crop Type ('1': Leafy vegetable, '2': Root/tuber, '3': Fruit/grain) %%",
+        paste0("CropType : ", crop_params[["CropType"]]),
+        "%% Calendar Type ('1': Calendar days, '2': Growing degree days) %%",
+        paste0("CalendarType : ", crop_params[["CalendarType"]]),
+        "%% Convert calendar to GDD mode if inputs are given in calendar days ('0': No; '1': Yes) %%",
+        paste0("SwitchGDD : ", crop_params[["SwitchGDD"]]),
+        "%% Planting Date (dd/mm) %%",
+        paste0("PlantingDate : ", crop_params[["PlantingDate"]]),
+        "%% Latest Harvest Date (dd/mm) %%",
+        paste0("HarvestDate : ", crop_params[["HarvestDate"]]),
+        "%% Growing degree/Calendar days from sowing to emergence/transplant recovery %%",
+        paste0("Emergence : ", crop_params[["Emergence"]]),
+        "%% Growing degree/Calendar days from sowing to maximum rooting %%",
+        paste0("MaxRooting : ", crop_params[["MaxRooting"]]),
+        "%% Growing degree/Calendar days from sowing to senescence %%",
+        paste0("Senescence : ", crop_params[["Senescence"]]),
+        "%% Growing degree/Calendar days from sowing to maturity %%",
+        paste0("Maturity : ", crop_params[["Maturity"]]),
+        "%% Growing degree/Calendar days from sowing to start of yield formation %%",
+        paste0("HIstart : ", crop_params[["HIstart"]]),
+        "%% Duration of flowering in growing degree/calendar days (-999 for non-fruit/grain crops) %%",
+        paste0("Flowering : ", crop_params[["Flowering"]]),
+        "%% Duration of yield formation in growing degree/calendar days %%",
+        paste0("YldForm : ", crop_params[["YldForm"]]),
+        "%% Growing degree day calculation method %%",
+        paste0("GDDmethod : ", crop_params[["GDDmethod"]]),
+        "%% Base temperature (degC) below which growth does not progress %%",
+        paste0("Tbase : ", crop_params[["Tbase"]]),
+        "%% Upper temperature (degC) above which crop development no longer increases %%",
+        paste0("Tupp : ", crop_params[["Tupp"]]),
+        "%% Pollination affected by heat stress (0: No; 1: Yes) %%",
+        paste0("PolHeatStress : ", crop_params[["PolHeatStress"]]),
+        "%% Maximum air temperature (degC) above which pollination begins to fail %%",
+        paste0("Tmax_up : ", crop_params[["Tmax_up"]]),
+        "%% Maximum air temperature (degC) at which pollination completely fails %%",
+        paste0("Tmax_lo : ", crop_params[["Tmax_lo"]]),
+        "%% Pollination affected by cold stress (0: No; 1: Yes) %%",
+        paste0("PolColdStress : ", crop_params[["PolColdStress"]]),
+        "%% Minimum air temperature (degC) below which pollination begins to fail %%",
+        paste0("Tmin_up : ", crop_params[["Tmin_up"]]),
+        "%% Minimum air temperature (degC) at which pollination completely fails %%",
+        paste0("Tmin_lo : ", crop_params[["Tmin_lo"]]),
+        "%% Biomass production affected by temperature stress (0: No; 1: Yes) %%",
+        paste0("BioTempStress : ", crop_params[["BioTempStress"]]),
+        "%% Minimum growing degree days (degC/day) required for full biomass production %%",
+        paste0("GDD_up : ", crop_params[["GDD_up"]]),
+        "%% Growing degree days (degC/day) at which no biomass production occurs %%",
+        paste0("GDD_lo : ", crop_params[["GDD_lo"]]),
+        "%% Shape factor describing the reduction in biomass production for insufficient growing degree days %%",
+        paste0("fshape_b : ", crop_params[["fshape_b"]]),
+        "%% Initial percentage of minimum effective rooting depth %%",
+        paste0("PctZmin : ", crop_params[["PctZmin"]]),
+        "%% Minimum effective rooting depth (m) %%",
+        paste0("Zmin : ", crop_params[["Zmin"]]),
+        "%% Maximum rooting depth (m) %%",
+        paste0("Zmax : ", crop_params[["Zmax"]]),
+        "%% Shape factor describing root expansion %%",
+        paste0("fshape_r : ", crop_params[["fshape_r"]]),
+        "%% Shape factor describing the effects of water stress on root expansion %%",
+        paste0("fshape_ex : ", crop_params[["fshape_ex"]]),
+        "%% Maximum root water extraction at top of the root zone (m3/m3/day) %%",
+        paste0("SxTopQ : ", crop_params[["SxTopQ"]]),
+        "%% Maximum root water extraction at the bottom of the root zone (m3/m3/day) %%",
+        paste0("SxBotQ : ", crop_params[["SxBotQ"]]),
+        "%% Exponent parameter for adjustment of Kcx once senescence is triggered %%",
+        paste0("a_Tr: ", crop_params[["a_Tr"]]),
+        "%% Soil surface area (cm2) covered by an individual seedling at 90% emergence %%",
+        paste0("SeedSize : ", crop_params[["SeedSize"]]),
+        "%% Number of plants per hectare %%",
+        paste0("PlantPop : ", crop_params[["PlantPop"]]),
+        "%% Minimum canopy size below which yield formation cannot occur %%",
+        paste0("CCmin : ", crop_params[["CCmin"]]),
+        "%% Maximum canopy cover (fraction of soil cover) %%",
+        paste0("CCx : ", crop_params[["CCx"]]),
+        "%% Canopy decline coefficient (fraction per GDD) %%",
+        paste0("CDC : ", crop_params[["CDC"]]),
+        "%% Canopy growth coefficient (fraction per GDD) %%",
+        paste0("CGC : ", crop_params[["CGC"]]),
+        "%% Crop coefficient when canopy growth is complete but prior to senescence %%",
+        paste0("Kcb : ", crop_params[["Kcb"]]),
+        "%% Decline of crop coefficient due to ageing (%/day) %%",
+        paste0("fage : ", crop_params[["fage"]]),
+        "%% Water productivity normalized for ET0 and C02 (g/m2) %%",
+        paste0("WP : ", crop_params[["WP"]]),
+        "%% Adjustment of water productivity in yield formation stage (% of WP) %%",
+        paste0("WPy : ", crop_params[["WPy"]]),
+        "%% Crop co2 sink strength coefficient %%",
+        paste0("fsink : ", crop_params[["fsink"]]),
+        "%% WP co2 adjustment parameter given by Steduto et al. 2007 %%",
+        paste0("bsted : ", crop_params[["bsted"]]),
+        "%% WP co2 adjustment parameter given by FACE experiments %%",
+        paste0("bface : ", crop_params[["bface"]]),
+        "%% Reference harvest index %%",
+        paste0("HI0 : ", crop_params[["HI0"]]),
+        "%% Initial harvest index %%",
+        paste0("HIini : ", crop_params[["HIini"]]),
+        "%% Possible increase of harvest index due to water stress before flowering (%) %%",
+        paste0("dHI_pre : ", crop_params[["dHI_pre"]]),
+        "%% Coefficient describing positive impact on harvest index of restricted vegetative growth during yield formation %%",
+        paste0("a_HI : ", crop_params[["a_HI"]]),
+        "%% Coefficient describing negative impact on harvest index of stomatal closure during yield formation %%",
+        paste0("b_HI : ", crop_params[["b_HI"]]),       
+        "%% Maximum allowable increase of harvest index above reference %%",
+        paste0("dHI0 : ", crop_params[["dHI0"]]),
+        "%% Crop Determinancy ('0': Indeterminant, '1': Determinant) %%",
+        paste0("Determinant : ", crop_params[["Determinant"]]),
+        "%% Excess of potential fruits %%",
+        paste0("exc : ", crop_params[["exc"]]),
+        "%% Percentage of total flowering at which peak flowering occurs %%",
+        paste0("MaxFlowPct : ", crop_params[["MaxFlowPct"]]),
+        "%% Upper soil water depletion threshold for water stress effects on affect canopy expansion %%",
+        paste0("p_up1 : ", crop_params[["p_up1"]]),
+        "%% Upper soil water depletion threshold for water stress effects on canopy stomatal control %%",
+        paste0("p_up2 : ", crop_params[["p_up2"]]),
+        "%% Upper soil water depletion threshold for water stress effects on canopy senescence %%",
+        paste0("p_up3 : ", crop_params[["p_up3"]]),
+        "%% Upper soil water depletion threshold for water stress effects on canopy pollination %%",
+        paste0("p_up4 : ", crop_params[["p_up4"]]),
+        "%% Lower soil water depletion threshold for water stress effects on canopy expansion %%",
+        paste0("p_lo1 : ", crop_params[["p_lo1"]]),
+        "%% Lower soil water depletion threshold for water stress effects on canopy stomatal control %%",
+        paste0("p_lo2 : ", crop_params[["p_lo2"]]),
+        "%% Lower soil water depletion threshold for water stress effects on canopy senescence %%",
+        paste0("p_lo3 : ", crop_params[["p_lo3"]]),
+        "%% Lower soil water depletion threshold for water stress effects on canopy pollination %%",
+        paste0("p_lo4 : ", crop_params[["p_lo4"]]),
+        "%% Shape factor describing water stress effects on canopy expansion %%",
+        paste0("fshape_w1 : ", crop_params[["fshape_w1"]]),
+        "%% Shape factor describing water stress effects on stomatal control %%",
+        paste0("fshape_w2 : ", crop_params[["fshape_w2"]]),
+        "%% Shape factor describing water stress effects on canopy senescence %%",
+        paste0("fshape_w3 : ", crop_params[["fshape_w3"]]),
+        "%% Shape factor describing water stress effects on pollination %%",
+        paste0("fshape_w4 : ", crop_params[["fshape_w4"]]),
+        "%% Adjustment to water stress thresholds depending on daily ET0 (0: 'No', 1: 'Yes') %%",
+        paste0("ETadj : ", crop_params[["ETadj"]]),
+        "%% Vol (%) below saturation at which stress begins to occur due to deficient aeration %%",
+        paste0("Aer : ", crop_params[["Aer"]]),
+        "%% Number of days lag before aeration stress affects crop growth %%",
+        paste0("LagAer : ", crop_params[["LagAer"]]),
+        "%% Reduction (%) to p_lo3 when early canopy senescence is triggered %%",
+        paste0("beta : ", crop_params[["beta"]]),
+        "%% Proportion of total water storage needed for crop to germinate %%",
+        paste0("GermThr : ", crop_params[["GermThr"]])
+    )
+    con = file(file.path(file_path, file_name))
+    writeLines(x, con)
+    close(con)    
+}
+
+write_field_mgmt_params_file = function(field_mgmt_params, file_path=".", file_name="FieldManagement.txt") {
+    x = c(
+        "%% ---------- Field management inputs for AquaCropOS ---------- %%",
+        "%% Soil surface covered by mulches (0: No; 1: Yes) %%",
+        paste0("Mulches : ", field_mgmt_params[["Mulches"]]),
+        "%% Area of soil surface covered by mulches during growing season (%) %%",
+        paste0("MulchPctGS : ", field_mgmt_params[["MulchPctGS"]]),
+        "%% Area of soil surface covered by mulches outside growing season (%) %%",
+        paste0("MulchPctOS : ", field_mgmt_params[["MulchPctOS"]]),
+        "%% Soil evaporation adjustment factor due to effect of mulches %%",
+        paste0("fMulch : ", field_mgmt_params[["fMulch"]]),
+        "%% Surface bunds present (0: No; 1: Yes) %%",
+        paste0("Bunds : ", field_mgmt_params[["Bunds"]]),
+        "%% Bund height (m) %%",
+        paste0("zBund : ", field_mgmt_params[["zBund"]]),
+        "%% Initial water height in surface bunds (mm) %%",
+        paste0("BundWater : ", field_mgmt_params[["BundWater"]])
+    )
+    con = file(file.path(file_path, file_name))
+    writeLines(x, con)
+    close(con)
+}    
+
+write_irri_params_file = function(irr_params, irr_schedule_fn="IrrigationSchedule.txt", file_path=".", file_name="IrrigationManagement.txt") {
+    x = c(
+        "%% ---------- Irrigation management parameters for AquaCropOS ---------- %%",
+        "%% Irrigation time-series filename %%",
+        irr_schedule_fn,
+        "%% Irrigation method (0: Rainfed; 1: Soil moisture based; 2: Fixed interval; 3: Specified time series; 4: Net calculation) %%",
+        paste0("IrrMethod : ", irr_params[["IrrMethod"]]),
+        "%% Irrigation interval in days (only used if IrrMethod = 2) %%",
+        paste0("IrrInterval : ", irr_params[["IrrInterval"]]),
+        "%% Soil moisture target in FAO56 growth stage one (% of total PAW below which irrigation is triggered) %%",
+        paste0("SMT1 : ", irr_params[["SMT1"]]),
+        "%% Soil moisture target in FAO56 growth stage two (% of total PAW below which irrigation is triggered) %%",
+        paste0("SMT2 : ", irr_params[["SMT2"]]),
+        "%% Soil moisture target in FAO56 growth stage three (% of total PAW below which irrigation is triggered) %%",
+        paste0("SMT3 : ", irr_params[["SMT3"]]),
+        "%% Soil moisture target in FAO56 growth stage four (% of total PAW below which irrigation is triggered) %%",
+        paste0("SMT4 : ", irr_params[["SMT4"]]),
+        "%% Maximum irrigation depth (mm) %%",
+        paste0("MaxIrr : ", irr_params[["MaxIrr"]]),
+        "%% Irrigation application efficiency (%) %%",
+        paste0("AppEff : ", irr_params[["AppEff"]]),
+        "%% Net irrigation threshold moisture level (% of total PAW that will be maintained) %%",
+        paste0("NetIrrSMT : ", irr_params[["NetIrrSMT"]]),
+        "%% Percentage of soil surface wetted by irrigation %%",
+        paste0("WetSurf : ", irr_params[["WetSurf"]])
+    )
+    con = file(file.path(file_path, file_name))
+    writeLines(x, con)
+    close(con)
+}    
+
+get_time_dim_from_nc = function(ncfile) {
+    nc = nc_open(ncfile)
+    time_vals = ncvar_get(nc, "time")
+    time_unit = strsplit(nc$dim$time$units, split="since")[[1]][1] %>%
+        trimws %>% tolower
+    time_origin = strsplit(nc$dim$time$units, split="since")[[1]][2] %>%
+        trimws %>%
+        as.POSIXct
+    time = convertDateNcdf2R(
+        time.source=time_vals,
+        units=time_unit,
+        origin=time_origin
+    )
+    nc_close(nc)
+    time
+}
+
+get_longitude_dim = function(nc) {
+    if ("lon" %in% names(nc$dim)) {
+        lon = ncvar_get(nc, "lon")
+    } else if ("longitude" %in% names(nc$dim)) {
+        lon = ncvar_get(nc, "longitude")
+    } else {
+        stop("longitude dimension not found")
+    }
+    lon
+}
+
+get_latitude_dim = function(nc) {
+    if ("lat" %in% names(nc$dim)) {
+        lat = ncvar_get(nc, "lat")
+    } else if ("latitude" %in% names(nc$dim)) {
+        lat = ncvar_get(nc, "latitude")
+    } else {
+        stop("latitude dimension not found")
+    }
+    lat
+}
+
+get_time_varying_var_from_nc = function(ncfile, param, pts) {    
+    nc = nc_open(ncfile)
+    lon = get_longitude_dim(nc)
+    lat = get_latitude_dim(nc)
+    ## time_vals = ncvar_get(nc, "time")
+    ## time_unit = strsplit(nc$dim$time$units, split="since")[[1]][1] %>%
+    ##     trimws
+    ## time_origin = strsplit(nc$dim$time$units, split="since")[[1]][2] %>%
+    ##     trimws %>%
+    ##     as.POSIXct
+    ## time = convertDateNcdf2R(
+    ##     time.source=time_vals,
+    ##     units=time_unit,
+    ##     origin=time_origin
+    ## )
+    vars = names(nc$var)
+    if (param %in% vars) {
+        param_arr = ncvar_get(nc, param)
+    } else {
+        stop("nc does not contain param")
+    }
+    nc_close(nc)
+    lat_ix = which.min(abs(lat - pts$y))[1]
+    lon_ix = which.min(abs(lon - pts$x))[1]
+    param_val = param_arr[lon_ix, lat_ix, ]    
+    param_val
+}
+
+write_co2_file = function(co2_data,  file_path=".", file_name="CarbonDioxide.txt") {
+    x = c(
+        "%% ---------- CO2 concentration at Mauna Loa for AquaCrop ---------- %%",
+        "%% Year      CO2 conc (ppm) %%"
+    )
+    for (i in 1:nrow(co2_data)) {
+        yr = co2_data[i,1]
+        val = formatC(co2_data[i,2], digits=2, flag="0", format="f")
+        ln = paste0(yr, "    ", val)
+        x = append(x, ln)
+    }
+    con = file(file.path(file_path, file_name))
+    writeLines(x, con)
+    close(con)    
+}
+
+get_soil_param_from_nc = function(soil_nc, param, pts) {
+    nc = nc_open(soil_nc)
+    lat = ncvar_get(nc, "lat")
+    lon = ncvar_get(nc, "lon")
+    vars = names(nc$var)
+    if (param %in% vars) {
+        param_arr = ncvar_get(nc, param)
+    } else {
+        stop("nc does not contain param")
+    }
+    nc_close(nc)
+    lat_ix = which.min(abs(lat - pts$y))[1]
+    lon_ix = which.min(abs(lon - pts$x))[1]
+    param_val = param_arr[lon_ix, lat_ix, ]    
+    param_val
+}
+
+write_soil_hydrualic_input = function(dz_layer, th_sat, th_fc, th_wp, k_sat, file_path=".", file_name="SoilHydrology.txt") {
+    x = c(
+        "%% ---------- Soil hydraulic properties for AquaCropOS ---------- %%",
+        "%% LayerNo  LayerThickness(m)  thS(m3/m3)    thFC(m3/m3)  thWP(m3/m3)   Ksat(mm/day) %%"
+    )
+    dz_layer = formatC(dz_layer, digits=2, format="f")
+    th_sat = formatC(th_sat, digits=2, format="f")
+    th_fc = formatC(th_fc, digits=2, format="f")
+    th_wp = formatC(th_wp, digits=2, format="f")
+    k_sat = formatC(k_sat, digits=2, format="f")
+    for (i in 1:length(dz_layer)) {        
+        ln = paste0(c(i, dz_layer[i], th_sat[i], th_fc[i], th_wp[i], k_sat[i]), collapse="\t")
+        x = append(x, ln)
+    }
+    con = file(file.path(file_path, file_name))
+    writeLines(x, con)
+    close(con)    
+}
+
+write_soil_profile_input = function(dz_comp, layer_index, file_path=".", file_name="SoilProfile.txt") {
+    x = c(
+        "%% ---------- Soil profile discretisation for AquaCropOS ---------- %%",
+        "%% CompartmentNo	Thickness(m)	LayerNo %%"
+    )
+    for (i in 1:length(dz_comp)) {
+        ln = paste0(c(i, dz_comp[i], layer_index[i]), collapse="\t")
+        x = append(x, ln)
+    }
+    con = file(file.path(file_path, file_name))
+    writeLines(x, con)
+    close(con)    
+}
+
+write_init_water_content_input = function(type, interp_method, num_points, depths, vals, file_path=".", file_name="InitialWaterContent.txt") {    
+    x = c(
+        "%% ---------- Initial soil water content for AquaCrop ---------- %%",
+        "%% Type of value ('Prop' (i.e. WP/FC/SAT), 'Num' (i.e. XXX m3/m3), 'Pct' (i.e. % TAW)) %%",
+        type, 
+        "%% Interpolate data points ('Depth' or 'Layer') %%",
+        interp_method,
+        "%% Number of input points (NOTE: Must be at least one point per soil layer) %%",
+        num_points,
+        "%% Input data points (Depth (m)   Value) %%"
+    )
+
+    for (i in 1:length(depths)) {
+        depth = formatC(depths[i], digits=2, flag="0", format="f")
+        val = formatC(vals[i], digits=2, flag="0", format="f")
+        ln = paste0(depth, "\t", val)
+        x = append(x, ln)
+    }
+    con = file(file.path(file_path, file_name))
+    writeLines(x, con)
+    close(con)    
+}
+
+write_soil_parameter_input = function(soil_params, soil_profile_fn="SoilProfile.txt", soil_texture_fn="SoilTexture.txt", soil_hydrology_fn="SoilHydrology.txt", file_path=".", file_name="Soil.txt") {
+    x = c(
+        "%% ---------- Soil parameter inputs for AquaCropOS ---------- %%",
+        "%% Soil profile filename %%",
+        soil_profile_fn,
+        "%% Soil textural properties filename %%",
+        soil_texture_fn,
+        "%% Soil hydraulic properties filename %%",
+        soil_hydrology_fn,
+        "%% Calculate soil hydraulic properties (0: No, 1: Yes) %%",
+        paste0("CalcSHP : ", soil_params[["CalcSHP"]]),
+        "%% Total thickness of soil profile (m) %%",
+        paste0("zSoil : ", soil_params[["zSoil"]]),
+        "%% Total number of compartments %%",
+        paste0("nComp : ", soil_params[["nComp"]]),
+        "%% Total number of layers %%",
+        paste0("nLayer : ", soil_params[["nLayer"]]),
+        "%% Thickness of soil surface skin evaporation layer (m) %%",
+        paste0("EvapZsurf : ", soil_params[["EvapZsurf"]]),
+        "%% Minimum thickness of full soil surface evaporation layer (m) %%",
+        paste0("EvapZmin : ", soil_params[["EvapZmin"]]),
+        "%% Maximum thickness of full soil surface evaporation layer (m) %%",
+        paste0("EvapZmax : ", soil_params[["EvapZmax"]]),
+        "%% Maximum soil evaporation coefficient %%",
+        paste0("Kex : ", soil_params[["Kex"]]),
+        "%% Shape factor describing reduction in soil evaporation %%",
+        paste0("fevap : ", soil_params[["fevap"]]),
+        "%% Proportional value of Wrel at which soil evaporation layer expands %%",
+        paste0("fWrelExp : ", soil_params[["fWrelExp"]]),
+        "%% Maximum coefficient for soil evaporation reduction due to sheltering effect of withered canopy %%",
+        paste0("fwcc : ", soil_params[["fwcc"]]),
+        "%% Adjust default value for readily evaporable water (0: No, 1: Yes) %%",
+        paste0("AdjREW : ", soil_params[["AdjREW"]]),
+        "%% Readily evaporable water (mm) (only used if adjusting) %%",
+        paste0("REW : ", soil_params[["REW"]]),
+        "%% Adjust curve number for antecedent moisture content (0:No, 1:Yes) %%",
+        paste0("AdjCN : ", soil_params[["AdjCN"]]),
+        "%% Curve number %%",
+        paste0("CN : ", soil_params[["CN"]]),
+        "%% Thickness of soil surface (m) used to calculate water content to adjust curve number %%",
+        paste0("zCN : ", soil_params[["zCN"]]),
+        "%% Thickness of soil surface (m) used to calculate water content for germination %%",
+        paste0("zGerm : ", soil_params[["zGerm"]]),
+        "%% Depth of restrictive soil layer (set to negative value if not present) %%",
+        paste0("zRes : ", soil_params[["zRes"]]),
+        "%% Capillary rise shape factor %%",
+        paste0("fshape_cr : ", soil_params[["fshape_cr"]])
+    )
+    con = file(file.path(file_path, file_name))
+    writeLines(x, con)
+    close(con)    
+}
+
+write_water_table_input = function(water_table, method, depth, file_path=".", file_name="WaterTable.txt") {
+    
+    x = c(
+        "%% --------- Groundwater table for AquaCropOS ---------- %%",
+        "%% Water table present ('Y' or 'N') %%",
+        ifelse(water_table, "Y", "N"),
+        "%% Water table method ('Constant' depth; 'Variable' depth) %%",
+        method,
+        "%% Date (dd/mm/yyyy)   Depth (m) %%",        
+        "01/09/2000  2"
+    )
+    con = file(file.path(file_path, file_name))
+    writeLines(x, con)
+    close(con)    
+}
+
+write_weather_input = function(times, prec_vals, tmin_vals, tmax_vals, etref_vals, file_path=".", file_name="Weather.txt") {
+    x = c(
+        "%% ---------- Weather input time-series for AquaCropOS ---------- %%",
+        "%% Day	Month	Year	MinTemp	MaxTemp	Precipitation	ReferenceET %%")
+    times = as.POSIXlt(times)
+    tmin_vals = formatC(tmin_vals, digits=2, format="f")
+    data = data.frame(day=times$mday, month=times$mon + 1, year=times$year + 1900, tmin=tmin_vals, tmax=tmax_vals, prec=prec_vals, etref=etref_vals)
+    for (i in 1:nrow(data)) {
+        ln = paste0(data[i,], collapse="\t")
+        x = append(x, ln)        
+    }
+    con = file(file.path(file_path, file_name))
+    writeLines(x, con)
+    close(con)    
+}
+
+write_file_locations_input = function(file_path_in, file_path_out, file_path_aos, file_name="FileLocations.txt") {
+    x = c(
+        "%% Enter Location of Input files %%",
+        file_path_in,
+        "%% Enter Location of Output files %%",
+        file_path_out
+    )
+    con = file(file.path(file_path_aos, file_name))
+    writeLines(x, con)
+    close(con)
+}
+

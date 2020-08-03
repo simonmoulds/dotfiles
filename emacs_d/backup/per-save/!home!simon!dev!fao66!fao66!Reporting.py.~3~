@@ -1,0 +1,9 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import hydro_model_builder.Reporting
+from ncConverter import *
+import variable_list as VarDict
+
+class Reporting(hydro_model_builder.Reporting.Reporting):
+    pass

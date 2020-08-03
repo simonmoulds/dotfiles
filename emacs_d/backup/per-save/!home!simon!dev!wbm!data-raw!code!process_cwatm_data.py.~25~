@@ -1,0 +1,878 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import numpy as np
+import pandas as pd
+import netCDF4
+import calendar
+import datetime
+import os
+
+try:
+    WD = os.environ['WD']
+except:
+    WD = '/home/simon/dev/wbm/data-raw'
+
+CWATMDIR = os.path.join(WD, 'data-raw')
+PCRGLOBDIR = os.path.join('/data', 'pcrglobwb2_input', 'global_05min')
+
+F8_FILLVAL = netCDF4.default_fillvals['f8']
+F4_FILLVAL = netCDF4.default_fillvals['f4']
+I4_FILLVAL = netCDF4.default_fillvals['i4']
+
+# ######################################################### #
+# 1-extract raw data
+# ######################################################### #
+
+if not os.path.isdir(os.path.join(CWATMDIR, 'cwatm_input')):
+    os.system(
+        'mkdir '
+        + os.path.join(CWATMDIR, 'cwatm_input')
+    )
+    os.system(
+        'unzip '
+        + os.path.join(CWATMDIR, 'cwatm_input.zip') + ' -d '
+        + os.path.join(CWATMDIR, 'cwatm_input')
+    )
+
+# directory to write output
+OUTDIR = os.path.join(WD, 'data')
+
+# ######################################################### #
+# 2-Extract CWATM root fraction
+# ######################################################### #
+
+zlayer = np.array([0.3, 2.])
+zlayermid = np.array([0.15, 1.3])
+nlayer = zlayer.size
+
+lc_types = ['forest', 'grassland', 'irrPaddy', 'irrNonPaddy']
+for lc in lc_types:
+    rf1 = netCDF4.Dataset(os.path.join(
+        CWATMDIR, 'cwatm_input', 'landcover', lc, 'rootFraction1.nc'))
+    rf1_data = rf1.variables['rootFraction1'][:]
+    lat = rf1.variables['lat'][:]
+    lon = rf1.variables['lon'][:]
+    nlon = lon.size
+    nlat = lat.size
+    rf1.close()
+
+    rf1_data = np.ma.array(
+        data=rf1_data.data,
+        mask=np.isnan(rf1_data.data),
+        dtype=np.float32,
+        fill_value=F4_FILLVAL
+    )
+
+    rf2 = netCDF4.Dataset(os.path.join(
+        CWATMDIR, 'cwatm_input', 'landcover', lc, 'rootFraction2.nc')
+    )
+    rf2_data = rf2.variables['rootFraction2'][:]
+    rf2.close()
+
+    rf2_data = np.ma.array(
+        data=rf2_data.data,
+        mask=np.isnan(rf2_data.data),
+        dtype=np.float32,
+        fill_value=F4_FILLVAL
+    )
+
+    # Root fraction in soil layer 1
+    d = netCDF4.Dataset(os.path.join(OUTDIR,  lc + '_rootFraction1.nc'), 'w')
+    d.createDimension('lon', nlon)
+    d.createDimension('lat', nlat)
+
+    lono = d.createVariable('lon', np.float32, ('lon'),
+                            zlib=True, least_significant_digit=16)
+    lono.units = 'degrees_east'
+    lono.standard_name = 'longitude'
+    lono.long_name = 'longitude'
+    lono[:] = lon
+
+    lato = d.createVariable('lat', np.float32, ('lat'),
+                            zlib=True, least_significant_digit=16)
+    lato.units = 'degrees_north'
+    lato.standard_name = 'latitude'
+    lato.long_name = 'longitude'
+    lato[:] = lat
+
+    # # create container variable for CRS: lon/lat
+    # # WGS84 datum
+    # crso = d.createVariable('crs','i4')
+    # crso.long_name = 'Lon/Lat Coords in WGS84'
+    # crso.grid_mapping_name='latitude_longitude'
+    # crso.longitude_of_prime_meridian = 0.0
+    # crso.semi_major_axis = 6378137.0
+    # crso.inverse_flattening = 298.257223563
+
+    root = d.createVariable('root_fraction', np.float32, ('lat', 'lon'),
+                            zlib=True, least_significant_digit=16, fill_value=F4_FILLVAL)
+    root.units = '1'
+    root.standard_name = 'root_fraction'
+    root.long_name = 'root fraction in soil layer 1'
+    root[:] = rf1_data
+
+    d.Conventions = 'CF-1.6'
+    d.close()
+
+    # Root fraction in soil layer 2
+    d = netCDF4.Dataset(os.path.join(OUTDIR,  lc + '_rootFraction2.nc'), 'w')
+    d.createDimension('lon', nlon)
+    d.createDimension('lat', nlat)
+    d.createDimension('depth', nlayer)
+
+    lono = d.createVariable('lon', np.float32, ('lon'),
+                            zlib=True, least_significant_digit=16)
+    lono.units = 'degrees_east'
+    lono.standard_name = 'longitude'
+    lono.long_name = 'longitude'
+    lono[:] = lon
+
+    lato = d.createVariable('lat', np.float32, ('lat'),
+                            zlib=True, least_significant_digit=16)
+    lato.units = 'degrees_north'
+    lato.standard_name = 'latitude'
+    lato.long_name = 'longitude'
+    lato[:] = lat
+
+    # # create container variable for CRS: lon/lat
+    # # WGS84 datum
+    # crso = d.createVariable('crs','i4')
+    # crso.long_name = 'Lon/Lat Coords in WGS84'
+    # crso.grid_mapping_name='latitude_longitude'
+    # crso.longitude_of_prime_meridian = 0.0
+    # crso.semi_major_axis = 6378137.0
+    # crso.inverse_flattening = 298.257223563
+
+    root = d.createVariable('root_fraction', np.float32, ('lat', 'lon'),
+                            zlib=True, least_significant_digit=16, fill_value=F4_FILLVAL)
+    root.units = '1'
+    root.standard_name = 'root_fraction'
+    root.long_name = 'root fraction in soil layer 2'
+    root[:] = rf2_data
+
+    d.Conventions = 'CF-1.6'
+    d.close()
+
+# ==============
+# max root depth
+# ==============
+
+for lc in lc_types:
+
+    rd = netCDF4.Dataset(os.path.join(
+        CWATMDIR, 'cwatm_input', 'landcover', lc, 'maxRootDepth.nc')
+    )
+    rd_data = rd.variables['maxRootDepth'][:]
+    lat = rd.variables['lat'][:]
+    lon = rd.variables['lon'][:]
+    nlon = lon.size
+    nlat = lat.size
+    rd.close()
+
+    rd_data = np.ma.array(
+        data=rf1_data.data,
+        mask=np.isnan(rd_data.data),
+        dtype=np.float32,
+        fill_value=F4_FILLVAL
+    )
+
+    d = netCDF4.Dataset(os.path.join(OUTDIR, lc + '_maxRootDepth.nc'), 'w')
+    d.createDimension('lon', nlon)
+    d.createDimension('lat', nlat)
+
+    lono = d.createVariable('lon', np.float32, ('lon'),
+                            zlib=True, least_significant_digit=16)
+    lono.units = 'degrees_east'
+    lono.standard_name = 'longitude'
+    lono.long_name = 'longitude'
+    lono[:] = lon
+
+    lato = d.createVariable('lat', np.float32, ('lat'),
+                            zlib=True, least_significant_digit=16)
+    lato.units = 'degrees_north'
+    lato.standard_name = 'latitude'
+    lato.long_name = 'longitude'
+    lato[:] = lat
+
+    # # create container variable for CRS: lon/lat
+    # # WGS84 datum
+    # crso = d.createVariable('crs','i4')
+    # crso.long_name = 'Lon/Lat Coords in WGS84'
+    # crso.grid_mapping_name='latitude_longitude'
+    # crso.longitude_of_prime_meridian = 0.0
+    # crso.semi_major_axis = 6378137.0
+    # crso.inverse_flattening = 298.257223563
+
+    root = d.createVariable('max_root_depth', np.float32, ('lat', 'lon'),
+                            zlib=True, least_significant_digit=16, fill_value=F4_FILLVAL)
+    root.units = 'meter'
+    root.standard_name = 'max_root_depth'
+    root.long_name = 'maximum root depth'
+    root[:] = rd_data
+
+    d.Conventions = 'CF-1.6'
+    d.close()
+
+# ==================
+# intercept capacity
+# ==================
+
+# only provide interption capacity for forest and grassland
+
+lc_types = ['forest', 'grassland']
+intercept_fs = ['interceptCapForest10days.nc',
+                'interceptCapGrassland10days.nc']
+
+for index, lc in enumerate(lc_types):
+
+    fs = intercept_fs[index]
+    ic = netCDF4.Dataset(os.path.join(
+        CWATMDIR, 'cwatm_input', 'landcover', lc, fs))
+    ic_data = ic.variables['interceptcap'][:]
+    times = ic.variables['time']
+    t_units = times.units
+    t_cal = times.calendar
+    t_vals = np.int32(times[:])
+    lat = ic.variables['lat'][:]
+    lon = ic.variables['lon'][:]
+    nlon = lon.size
+    nlat = lat.size
+    ic.close()
+
+    ic_data = np.ma.array(
+        data=ic_data.data,
+        mask=np.isnan(ic_data.data),
+        dtype=np.float32,
+        fill_value=F4_FILLVAL
+    )
+
+    d = netCDF4.Dataset(os.path.join(
+        OUTDIR, lc + '_interceptCap10days.nc'), 'w')
+    d.createDimension('lon', nlon)
+    d.createDimension('lat', nlat)
+    d.createDimension('time', None)
+
+    lono = d.createVariable('lon', np.float32, ('lon'),
+                            zlib=True, least_significant_digit=16)
+    lono.units = 'degrees_east'
+    lono.standard_name = 'longitude'
+    lono.long_name = 'longitude'
+    lono[:] = lon
+
+    lato = d.createVariable('lat', np.float32, ('lat'),
+                            zlib=True, least_significant_digit=16)
+    lato.units = 'degrees_north'
+    lato.standard_name = 'latitude'
+    lato.long_name = 'longitude'
+    lato[:] = lat
+
+    time = d.createVariable('time', np.int32, ('time'), zlib=True)
+    time.units = t_units
+    time.calendar = t_cal
+    time.standard_name = 'time'
+    time.long_name = t_units
+    time[:] = t_vals
+
+    # # create container variable for CRS: lon/lat
+    # # WGS84 datum
+    # crso = d.createVariable('crs','i4')
+    # crso.long_name = 'Lon/Lat Coords in WGS84'
+    # crso.grid_mapping_name='latitude_longitude'
+    # crso.longitude_of_prime_meridian = 0.0
+    # crso.semi_major_axis = 6378137.0
+    # crso.inverse_flattening = 298.257223563
+
+    intc = d.createVariable('interceptcap', np.float32, ('time', 'lat', 'lon'),
+                            zlib=True, least_significant_digit=16, fill_value=F4_FILLVAL)
+    intc.units = '1'
+    intc.standard_name = 'interceptcap'
+    intc.long_name = 'interception capacity'
+    intc[:] = ic_data
+
+    d.Conventions = 'CF-1.6'
+    d.close()
+
+# ================
+# crop coefficient
+# ================
+
+lc_types = ['forest', 'grassland', 'irrPaddy', 'irrNonPaddy']
+kc_fs = [
+    'CropCoefficientForest_10days.nc',
+    'CropCoefficientGrassland_10days.nc',
+    'CropCoefficientirrPaddy_10days.nc',
+    'CropCoefficientirrNonPaddy_10days.nc'
+]
+
+for index, lc in enumerate(lc_types):
+
+    fs = kc_fs[index]
+    kc = netCDF4.Dataset(os.path.join(
+        CWATMDIR, 'cwatm_input', 'landcover', lc, fs))
+    kc_data = kc.variables['kc'][:]
+    times = kc.variables['time']
+    t_units = times.units
+    t_cal = times.calendar
+    t_vals = times[:]
+    lat = kc.variables['lat'][:]
+    lon = kc.variables['lon'][:]
+    nlon = lon.size
+    nlat = lat.size
+    kc.close()
+
+    kc_data = np.ma.array(
+        data=kc_data.data,
+        mask=np.isnan(kc_data.data),
+        dtype=np.float32,
+        fill_value=F4_FILLVAL
+    )
+
+    d = netCDF4.Dataset(os.path.join(
+        OUTDIR, lc + '_cropCoefficient10days.nc'), 'w')
+    d.createDimension('lon', nlon)
+    d.createDimension('lat', nlat)
+    d.createDimension('time', None)
+
+    lono = d.createVariable('lon', np.float32, ('lon'),
+                            zlib=True, least_significant_digit=16)
+    lono.units = 'degrees_east'
+    lono.standard_name = 'longitude'
+    lono.long_name = 'longitude'
+    lono[:] = lon
+
+    lato = d.createVariable('lat', np.float32, ('lat'),
+                            zlib=True, least_significant_digit=16)
+    lato.units = 'degrees_north'
+    lato.standard_name = 'latitude'
+    lato.long_name = 'longitude'
+    lato[:] = lat
+
+    time = d.createVariable('time', np.int32, ('time'), zlib=True)
+    time.units = t_units
+    time.calendar = t_cal
+    time.standard_name = 'time'
+    time.long_name = t_units
+    time[:] = np.int32(t_vals)
+
+    # # create container variable for CRS: lon/lat
+    # # WGS84 datum
+    # crso = d.createVariable('crs','i4')
+    # crso.long_name = 'Lon/Lat Coords in WGS84'
+    # crso.grid_mapping_name='latitude_longitude'
+    # crso.longitude_of_prime_meridian = 0.0
+    # crso.semi_major_axis = 6378137.0
+    # crso.inverse_flattening = 298.257223563
+
+    intc = d.createVariable('kc', np.float32, ('time', 'lat', 'lon'),
+                            zlib=True, least_significant_digit=16, fill_value=F4_FILLVAL)
+    intc.units = '1'
+    intc.standard_name = 'kc'
+    intc.long_name = 'crop coefficient'
+    intc[:] = kc_data
+
+    d.Conventions = 'CF-1.6'
+    d.close()
+
+# =============
+# storage depth
+# =============
+
+sd = netCDF4.Dataset(os.path.join(PCRGLOBDIR, 'landSurface',
+                                  'soil', 'soilProperties5ArcMin.nc'))
+lat = sd.variables['lat'][:]
+lon = sd.variables['lon'][:]
+nlon = lon.size
+nlat = lat.size
+sd1_data = sd.variables['firstStorDepth'][:]
+sd2_data = sd.variables['secondStorDepth'][:]
+sd.close()
+
+sd1_data = np.ma.array(
+    data=sd1_data.data,
+    mask=np.isnan(sd1_data.data),
+    dtype=np.float32,
+    fill_value=F4_FILLVAL
+)
+
+sd2_data = np.ma.array(
+    data=sd1_data.data,
+    mask=np.isnan(sd2_data.data),
+    dtype=np.float32,
+    fill_value=F4_FILLVAL
+)
+
+# reset latitude, longitude with greater precision
+xres = 1./12
+yres = 1./12
+minx, miny = -180, -90
+lon = np.arange(0, nlon) * xres + (minx + xres/2)
+lat = np.arange(0, nlat) * yres + (miny + yres/2)
+lat = lat[::-1]
+
+# first soil layer
+# ################
+
+d = netCDF4.Dataset(os.path.join(OUTDIR, 'soilDepth1.nc'), 'w')
+d.createDimension('lon', nlon)
+d.createDimension('lat', nlat)
+
+lono = d.createVariable('lon', np.float32, ('lon'),
+                        zlib=True, least_significant_digit=16)
+lono.units = 'degrees_east'
+lono.standard_name = 'longitude'
+lono.long_name = 'longitude'
+lono[:] = lon
+
+lato = d.createVariable('lat', np.float32, ('lat'),
+                        zlib=True, least_significant_digit=16)
+lato.units = 'degrees_north'
+lato.standard_name = 'latitude'
+lato.long_name = 'longitude'
+lato[:] = lat
+
+# # create container variable for CRS: lon/lat
+# # WGS84 datum
+# crso = d.createVariable('crs','i4')
+# crso.long_name = 'Lon/Lat Coords in WGS84'
+# crso.grid_mapping_name='latitude_longitude'
+# crso.longitude_of_prime_meridian = 0.0
+# crso.semi_major_axis = 6378137.0
+# crso.inverse_flattening = 298.257223563
+
+stor = d.createVariable('soil_depth', np.float32, ('lat', 'lon'),
+                        zlib=True, least_significant_digit=16, fill_value=F4_FILLVAL)
+stor.units = '1'
+stor.standard_name = 'soil_depth'
+stor.long_name = 'depth of first soil layer'
+stor[:] = sd1_data
+
+d.Conventions = 'CF-1.6'
+d.close()
+
+# second soil layer
+# #################
+
+d = netCDF4.Dataset(os.path.join(OUTDIR, 'soilDepth2.nc'), 'w')
+d.createDimension('lon', nlon)
+d.createDimension('lat', nlat)
+
+lono = d.createVariable('lon', np.float32, ('lon'),
+                        zlib=True, least_significant_digit=16)
+lono.units = 'degrees_east'
+lono.standard_name = 'longitude'
+lono.long_name = 'longitude'
+lono[:] = lon
+
+lato = d.createVariable('lat', np.float32, ('lat'),
+                        zlib=True, least_significant_digit=16)
+lato.units = 'degrees_north'
+lato.standard_name = 'latitude'
+lato.long_name = 'longitude'
+lato[:] = lat
+
+# # create container variable for CRS: lon/lat
+# # WGS84 datum
+# crso = d.createVariable('crs','i4')
+# crso.long_name = 'Lon/Lat Coords in WGS84'
+# crso.grid_mapping_name='latitude_longitude'
+# crso.longitude_of_prime_meridian = 0.0
+# crso.semi_major_axis = 6378137.0
+# crso.inverse_flattening = 298.257223563
+
+stor = d.createVariable('soil_depth', np.float32, ('lat', 'lon'),
+                        zlib=True, least_significant_digit=16, fill_value=F4_FILLVAL)
+stor.units = '1'
+stor.standard_name = 'soil_depth'
+stor.long_name = 'depth of second soil layer'
+stor[:] = sd2_data
+
+d.Conventions = 'CF-1.6'
+d.close()
+
+# ====================
+# Van Genuchten, alpha
+# ====================
+
+# /home/simon/dev/gandak_wb_data_model/data-raw/data/cwatm_input/others/alpha1,2,3.nc | lambda1,2,3.nc
+
+for layer in [1, 2, 3]:
+
+    # Van Genuchten alpha
+    a = netCDF4.Dataset(os.path.join(
+        CWATMDIR, 'cwatm_input', 'others', 'alpha' + str(layer) + '.nc'))
+    lat = a.variables['lat'][:]
+    lon = a.variables['lon'][:]
+    nlon = lon.size
+    nlat = lat.size
+    var_name = str([key for key in a.variables.keys()][-1])
+    alpha_data = a.variables[var_name][:]
+    a.close()
+
+    alpha_data = np.ma.array(
+        data=alpha_data.data,
+        mask=np.isnan(alpha_data.data),
+        dtype=np.float32,
+        fill_value=F4_FILLVAL
+    )
+
+    d = netCDF4.Dataset(os.path.join(
+        OUTDIR, 'alpha' + str(layer) + '.nc'), 'w')
+    d.createDimension('lon', nlon)
+    d.createDimension('lat', nlat)
+
+    lono = d.createVariable('lon', np.float32, ('lon'),
+                            zlib=True, least_significant_digit=16)
+    lono.units = 'degrees_east'
+    lono.standard_name = 'longitude'
+    lono.long_name = 'longitude'
+    lono[:] = lon
+
+    lato = d.createVariable('lat', np.float32, ('lat'),
+                            zlib=True, least_significant_digit=16)
+    lato.units = 'degrees_north'
+    lato.standard_name = 'latitude'
+    lato.long_name = 'longitude'
+    lato[:] = lat
+
+    # # create container variable for CRS: lon/lat
+    # # WGS84 datum
+    # crso = d.createVariable('crs','i4')
+    # crso.long_name = 'Lon/Lat Coords in WGS84'
+    # crso.grid_mapping_name='latitude_longitude'
+    # crso.longitude_of_prime_meridian = 0.0
+    # crso.semi_major_axis = 6378137.0
+    # crso.inverse_flattening = 298.257223563
+
+    a = d.createVariable('alpha', np.float32, ('lat', 'lon'),
+                         zlib=True, least_significant_digit=16, fill_value=F4_FILLVAL)
+    a.units = '1'
+    a.standard_name = 'alpha'
+    a.long_name = 'van Genuchten shape parameter alpha'
+    a[:] = alpha_data
+
+    d.Conventions = 'CF-1.6'
+    d.close()
+
+    # Van Genuchten Lambda
+    a = netCDF4.Dataset(os.path.join(CWATMDIR, 'cwatm_input', 'others',
+                                     'lambda' + str(layer) + '.nc'))
+    lat = a.variables['lat'][:]
+    lon = a.variables['lon'][:]
+    nlon = lon.size
+    nlat = lat.size
+    var_name = str([key for key in a.variables.keys()][-1])
+    lambda_data = a.variables[var_name][:]
+    a.close()
+
+    lambda_data = np.ma.array(
+        data=lambda_data.data,
+        mask=np.isnan(lambda_data.data),
+        dtype=np.float32,
+        fill_value=F4_FILLVAL
+    )
+
+    d = netCDF4.Dataset(os.path.join(
+        OUTDIR, 'lambda' + str(layer) + '.nc'), 'w')
+    d.createDimension('lon', nlon)
+    d.createDimension('lat', nlat)
+
+    lono = d.createVariable('lon', np.float32, ('lon'),
+                            zlib=True, least_significant_digit=16)
+    lono.units = 'degrees_east'
+    lono.standard_name = 'longitude'
+    lono.long_name = 'longitude'
+    lono[:] = lon
+
+    lato = d.createVariable('lat', np.float32, ('lat'),
+                            zlib=True, least_significant_digit=16)
+    lato.units = 'degrees_north'
+    lato.standard_name = 'latitude'
+    lato.long_name = 'longitude'
+    lato[:] = lat
+
+    # # create container variable for CRS: lon/lat
+    # # WGS84 datum
+    # crso = d.createVariable('crs','i4')
+    # crso.long_name = 'Lon/Lat Coords in WGS84'
+    # crso.grid_mapping_name='latitude_longitude'
+    # crso.longitude_of_prime_meridian = 0.0
+    # crso.semi_major_axis = 6378137.0
+    # crso.inverse_flattening = 298.257223563
+
+    a = d.createVariable('lambda', np.float32, ('lat', 'lon'),
+                         zlib=True, least_significant_digit=16, fill_value=F4_FILLVAL)
+    a.units = '1'
+    a.standard_name = 'lambda'
+    a.long_name = 'van Genuchten shape parameter lambda'
+    a[:] = lambda_data
+
+    d.Conventions = 'CF-1.6'
+    d.close()
+
+# ==========
+# topography
+# ==========
+
+# orography beta
+# tanslope
+
+topo = netCDF4.Dataset(os.path.join(PCRGLOBDIR, 'landSurface',
+                                    'topography', 'topography_parameters_5_arcmin_october_2015.nc'))
+
+lat = topo.variables['lat'][:]
+lon = topo.variables['lon'][:]
+nlat = lat.size
+nlon = lon.size
+dzrel_names = [
+    'dzRel0001', 'dzRel0005', 'dzRel0010', 'dzRel0020',
+    'dzRel0030', 'dzRel0040', 'dzRel0050', 'dzRel0060',
+    'dzRel0070', 'dzRel0080', 'dzRel0090', 'dzRel0100'
+]
+dzrel_data = {}
+for var_name in dzrel_names:
+    ncdata = topo.variables[var_name][:]
+    ncdata = np.ma.array(
+        data=ncdata.data,
+        mask=np.isnan(ncdata.data),
+        dtype=np.float32,
+        fill_value=F4_FILLVAL
+    )
+    dzrel_data[var_name] = ncdata
+
+dem_names = [
+    'dem_minimum', 'dem_maximum', 'dem_average', 'dem_standard_deviation'
+]
+dem_data = {}
+for var_name in dem_names:
+    ncdata = topo.variables[var_name][:]
+    ncdata = np.ma.array(
+        data=ncdata.data,
+        mask=np.isnan(ncdata.data),
+        dtype=np.float32,
+        fill_value=F4_FILLVAL
+    )
+    dem_data[var_name] = ncdata
+
+tanslope = topo.variables['tanslope'][:]
+tanslope[np.isnan(tanslope)] = F4_FILLVAL
+slope_length = topo.variables['slopeLength'][:]
+slope_length[np.isnan(slope_length)] = F4_FILLVAL
+orography_beta = topo.variables['orographyBeta'][:]
+orography_beta[np.isnan(orography_beta)] = F4_FILLVAL
+
+topo.close()
+
+# reset latitude, longitude with greater precision
+xres = 1./12
+yres = 1./12
+minx, miny = -180, -90
+lon = np.arange(0, nlon) * xres + (minx + xres/2)
+lat = np.arange(0, nlat) * yres + (miny + yres/2)
+lat = lat[::-1]
+
+# relative elevation
+# ##################
+d = netCDF4.Dataset(os.path.join(OUTDIR, 'relativeElevation.nc'), 'w')
+d.createDimension('lon', nlon)
+d.createDimension('lat', nlat)
+
+lono = d.createVariable('lon', np.float32, ('lon'),
+                        zlib=True, least_significant_digit=16)
+lono.units = 'degrees_east'
+lono.standard_name = 'longitude'
+lono.long_name = 'longitude'
+lono[:] = lon
+
+lato = d.createVariable('lat', np.float32, ('lat'),
+                        zlib=True, least_significant_digit=16)
+lato.units = 'degrees_north'
+lato.standard_name = 'latitude'
+lato.long_name = 'longitude'
+lato[:] = lat
+
+# # create container variable for CRS: lon/lat
+# # WGS84 datum
+# crso = d.createVariable('crs','i4')
+# crso.long_name = 'Lon/Lat Coords in WGS84'
+# crso.grid_mapping_name='latitude_longitude'
+# crso.longitude_of_prime_meridian = 0.0
+# crso.semi_major_axis = 6378137.0
+# crso.inverse_flattening = 298.257223563
+
+for var_name in dzrel_names:
+    elev = d.createVariable(var_name, np.float32, ('lat', 'lon'),
+                            zlib=True, least_significant_digit=16, fill_value=F4_FILLVAL)
+    elev.units = '1'
+    elev.standard_name = var_name
+    elev[:] = dzrel_data[var_name]
+
+d.Conventions = 'CF-1.6'
+d.close()
+
+# elevation min, max, mean, sd
+# ############################
+d = netCDF4.Dataset(os.path.join(OUTDIR, 'elevationStandardDeviation.nc'), 'w')
+d.createDimension('lon', nlon)
+d.createDimension('lat', nlat)
+
+lono = d.createVariable('lon', np.float32, ('lon'),
+                        zlib=True, least_significant_digit=16)
+lono.units = 'degrees_east'
+lono.standard_name = 'longitude'
+lono.long_name = 'longitude'
+lono[:] = lon
+
+lato = d.createVariable('lat', np.float32, ('lat'),
+                        zlib=True, least_significant_digit=16)
+lato.units = 'degrees_north'
+lato.standard_name = 'latitude'
+lato.long_name = 'longitude'
+lato[:] = lat
+
+# # create container variable for CRS: lon/lat
+# # WGS84 datum
+# crso = d.createVariable('crs','i4')
+# crso.long_name = 'Lon/Lat Coords in WGS84'
+# crso.grid_mapping_name='latitude_longitude'
+# crso.longitude_of_prime_meridian = 0.0
+# crso.semi_major_axis = 6378137.0
+# crso.inverse_flattening = 298.257223563
+
+for var_name in dem_names:
+    elev = d.createVariable(var_name, np.float32, ('lat', 'lon'),
+                            zlib=True, least_significant_digit=16, fill_value=F4_FILLVAL)
+    elev.units = 'meter'
+    elev.standard_name = var_name
+    elev[:] = dem_data[var_name]
+
+d.Conventions = 'CF-1.6'
+d.close()
+
+# tanslope
+# ########
+d = netCDF4.Dataset(os.path.join(OUTDIR, 'tanSlope.nc'), 'w')
+d.createDimension('lon', nlon)
+d.createDimension('lat', nlat)
+
+lono = d.createVariable('lon', np.float32, ('lon'),
+                        zlib=True, least_significant_digit=16)
+lono.units = 'degrees_east'
+lono.standard_name = 'longitude'
+lono.long_name = 'longitude'
+lono[:] = lon
+
+lato = d.createVariable('lat', np.float32, ('lat'),
+                        zlib=True, least_significant_digit=16)
+lato.units = 'degrees_north'
+lato.standard_name = 'latitude'
+lato.long_name = 'longitude'
+lato[:] = lat
+
+# # create container variable for CRS: lon/lat
+# # WGS84 datum
+# crso = d.createVariable('crs','i4')
+# crso.long_name = 'Lon/Lat Coords in WGS84'
+# crso.grid_mapping_name='latitude_longitude'
+# crso.longitude_of_prime_meridian = 0.0
+# crso.semi_major_axis = 6378137.0
+# crso.inverse_flattening = 298.257223563
+
+elev = d.createVariable('tanslope', np.float32, ('lat', 'lon'),
+                        zlib=True, least_significant_digit=16, fill_value=F4_FILLVAL)
+elev.units = 'meter'
+elev.standard_name = 'tanslope'
+elev[:] = tanslope
+
+d.Conventions = 'CF-1.6'
+d.close()
+
+# slope length
+# ############
+d = netCDF4.Dataset(os.path.join(OUTDIR, 'slopeLength.nc'), 'w')
+d.createDimension('lon', nlon)
+d.createDimension('lat', nlat)
+
+lono = d.createVariable('lon', np.float32, ('lon'),
+                        zlib=True, least_significant_digit=16)
+lono.units = 'degrees_east'
+lono.standard_name = 'longitude'
+lono.long_name = 'longitude'
+lono[:] = lon
+
+lato = d.createVariable('lat', np.float32, ('lat'),
+                        zlib=True, least_significant_digit=16)
+lato.units = 'degrees_north'
+lato.standard_name = 'latitude'
+lato.long_name = 'longitude'
+lato[:] = lat
+
+# # create container variable for CRS: lon/lat
+# # WGS84 datum
+# crso = d.createVariable('crs','i4')
+# crso.long_name = 'Lon/Lat Coords in WGS84'
+# crso.grid_mapping_name='latitude_longitude'
+# crso.longitude_of_prime_meridian = 0.0
+# crso.semi_major_axis = 6378137.0
+# crso.inverse_flattening = 298.257223563
+
+elev = d.createVariable('slopeLength', np.float32, ('lat', 'lon'),
+                        zlib=True, least_significant_digit=16, fill_value=F4_FILLVAL)
+elev.units = 'meter'
+elev.standard_name = 'slopeLength'
+elev[:] = slope_length
+
+d.Conventions = 'CF-1.6'
+d.close()
+
+# =================
+# Crop group number
+# =================
+
+cg = netCDF4.Dataset(os.path.join(
+    CWATMDIR, 'cwatm_input', 'others', 'cropgrp.nc'))
+cg_data = cg.variables['cropgrpn_o'][:]
+lat = cg.variables['lat'][:]
+lon = cg.variables['lon'][:]
+nlon = lon.size
+nlat = lat.size
+cg.close()
+
+d = netCDF4.Dataset(os.path.join(OUTDIR, 'cropGroupNumber.nc'), 'w')
+d.createDimension('lon', nlon)
+d.createDimension('lat', nlat)
+
+# TODO - continue!!!
+
+lono = d.createVariable('lon', np.float32, ('lon'),
+                        zlib=True, least_significant_digit=16)
+lono.units = 'degrees_east'
+lono.standard_name = 'longitude'
+lono.long_name = 'longitude'
+lono[:] = lon
+
+lato = d.createVariable('lat', np.float32, ('lat'),
+                        zlib=True, least_significant_digit=16)
+lato.units = 'degrees_north'
+lato.standard_name = 'latitude'
+lato.long_name = 'longitude'
+lato[:] = lat
+
+# # create container variable for CRS: lon/lat
+# # WGS84 datum
+# crso = d.createVariable('crs','i4')
+# crso.long_name = 'Lon/Lat Coords in WGS84'
+# crso.grid_mapping_name='latitude_longitude'
+# crso.longitude_of_prime_meridian = 0.0
+# crso.semi_major_axis = 6378137.0
+# crso.inverse_flattening = 298.257223563
+
+cgno = d.createVariable('crop_group_number', np.float32, ('lat', 'lon'),
+                        zlib=True, least_significant_digit=16, fill_value=F4_FILLVAL)
+cgno.units = '1'
+cgno.standard_name = 'crop_group_number'
+cgno.long_name = 'crop group number'
+cgno[:] = cg_data
+
+d.Conventions = 'CF-1.6'
+d.close()

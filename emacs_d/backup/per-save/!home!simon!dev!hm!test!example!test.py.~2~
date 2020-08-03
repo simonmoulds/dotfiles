@@ -1,0 +1,35 @@
+import datetime
+import hm.api as hm
+
+wd = '/home/simon/dev/hm/test/example/'
+os.chdir(wd)
+
+starttime=datetime.datetime(2000,1,1)
+endtime=datetime.datetime(2000,12,31)
+timedelta=datetime.timedelta(days=1)
+
+modeltime = hm.set_modeltime(starttime, endtime, timedelta)
+
+domain = hm.set_domain(
+    'test_data/qrparm.soil_HWSD_cont_cosbyNew.nc',
+    modeltime,
+    'field342',
+    is_1d=True,
+    xy_dimname='land'
+)
+
+domain.mask
+domain.starttime
+domain.endtime
+domain.n_timestep
+domain.dt
+
+# da = hm.open_hmdataarray(
+#     'test_data/SWdown_WFDEI_land_200306.nc',
+#     'field342',
+#     domain,
+#     True,
+#     'land'
+# )
+# import xarray as xr
+# ds = xr.open_dataset('test_data/AgMERRA_2010_tavg.nc4')

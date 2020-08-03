@@ -1,0 +1,50 @@
+#!/bin/bash
+
+# Raw data available from:
+
+# Huang, Yinghuai (2020): High spatiotemporal resolution mapping of
+# global urban change from 1985 to 2015. figshare. Dataset.
+# https://doi.org/10.6084/m9.figshare.11513178.v1
+
+WD=/data/GAUD
+
+# ##################################### #
+# Prepare GAUD
+# ##################################### #
+
+# # extract raw data file:
+# unzip -o 11513178.zip
+
+# # Ghana is covered by four grid boxes: 67, 68, 87, 88
+# unzip -o urban_grid_60-79.zip
+# unzip -o urban_grid_80-99.zip
+
+# # Use gdalwarp to build a map for Ghana
+# gdalwarp urban_grid_67.tif urban_grid_68.tif urban_grid_87.tif urban_grid_88.tif urban_grid_ghana.tif 
+
+# ##################################### #
+# Prepare building footprint data
+# ##################################### #
+
+# TODO - I can't remember exactly what I did here
+ogr2ogr \
+    -t_srs EPSG:4326 \
+    -clipdst -1 5 1 7 \
+    AFRICA_GHANA_building_32630.gdb \
+    AFRICA_GHANA_building_32630.gpkg
+
+# ##################################### #
+# Run GRASS script to query GAUD data
+# ##################################### #
+
+MAPSET=${HOME}/grassdata/latlong/ghana
+if [ ! -d $MAPSET ]
+then
+    grass -e -c $MAPSET
+fi
+
+chmod u+x ${WD}/grass-query-urban-change.sh
+export GRASS_BATCH_JOB=${WD}/grass-query-urban-change.sh
+grass $MAPSET
+unset GRASS_BATCH_JOB
+

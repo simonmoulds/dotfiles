@@ -1,0 +1,766 @@
+\documentclass[english]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{babel}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+
+\usepackage{tabularx}
+\usepackage{supertabular}
+\usepackage{multirow}
+\usepackage{rotating}
+\usepackage{url}
+
+\usepackage{array}
+\usepackage{booktabs}
+\setlength{\heavyrulewidth}{1.5pt}
+\setlength{\abovetopsep}{4pt}
+
+\newcommand{\scidatalogo}{\includegraphics[height=36pt]{SciData_logo.jpg}}
+\newcommand{\overleaflogo}{\includegraphics[height=36pt]{Overleaf-logo-300dpi.png}}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\setlength{\headheight}{40pt} 
+\lhead{\textsc{\scidatalogo}}
+\rhead{\textsc{\overleaflogo}}
+
+\begin{document}
+
+\title{A spatio-temporal land use and land cover reconstruction for India (1960--2010)}
+
+\author{Simon Moulds\textsuperscript{1{*}}, Wouter Buytaert\textsuperscript{2}, Ana Mijic\textsuperscript{2}}
+
+\maketitle
+\thispagestyle{fancy}
+
+1. Centre for Water Systems, College of Engineering, Mathematics and Physical Sciences, University of Exeter, Exeter, UK 2. Department of Civil and Environmental Engineering, Imperial College London, London, UK {*}corresponding author(s): Simon Moulds (s.moulds@exeter.ac.uk)
+
+\begin{abstract}
+  In recent decades India has undergone substantial land use/land cover change as a result of population growth and economic development. Historical land use/land cover maps are necessary to quantify the impact of change at global and regional scales, improve predictions about the quantity and location of future change and support planning decisions. Here, a regional land use change model driven by district-level inventory data is used to generate an annual time series of high-resolution gridded land use/land cover maps for the Indian subcontinent between 1960--2010. The allocation procedure is based on statistical analysis of the relationship between contemporary land use/land cover and various spatially explicit covariates. A comparison of the simulated map for 1985 against remotely-sensed land use/land cover maps for 1985 and 2005 reveals considerable discrepancy between the simulated and remote sensing maps, much of which arises due to differences in the amount of land use/land cover change between the inventory data and the remote sensing maps.
+
+  % , with the derived statistical models used to predict the suitability of individual pixels to the respective land use/land cover types.
+  
+\end{abstract}
+
+\section*{Background \& Summary}
+
+%% (700 words maximum) An overview of the study design, the assay(s)
+%% performed, and the created data, including any background information
+%% needed to put this study in the context of previous work and the literature.
+%% The section should also briefly outline the broader goals that motivated
+%% the creation of this dataset and the potential reuse value. We also
+%% encourage authors to include a figure that provides a schematic overview
+%% of the study and assay(s) design. This section and the other main
+%% body sections of the manuscript should include citations to the literature
+%% as needed \cite{cite1, cite2}. References should be included within the 
+%% manuscript file itself as our system cannot accept BibTeX bibliography files. 
+%% Authors who wish to use BibTeX to prepare their references should therefore 
+%% copy the reference list from the .bbl file that BibTeX generates and paste it 
+%% into the main manuscript .tex file (and delete the associated 
+%% \textbackslash{}bibliography and \textbackslash{}bibliographystyle commands).
+
+India's population has risen dramatically in recent decades, from 361 million in 1951 to 1,221 million at the last national census in 2011 \cite{james_indias_2011}, driving substantial environmental change \cite{tian_history_2014}. Increasing population density and a changing economy have resulted in urban development and expansion \cite{gururaja_population_2012}, while India's green revolution, initiated in the mid-1960s to achieve food security for its growing population, has resulted in the transformation of natural vegetation and rainfed agriculture to intensively managed agricultural systems \cite{scott_energy_2009,smilovic_limits_2015}. Land use/land cover change (henceforth ``land change'') has important consequences for biodiversity and the sustainability of ecosystem services upon which individuals and communities depend \cite{turner_emergence_2007}. Cumulatively, it is a major driver of global and regional environmental change \cite{foley_global_2005}, influencing the surface energy and water balance \cite{feddema_importance_2005,verburg_challenges_2011} as well as global biogeochemical cycles \cite{houghton_carbon_2012}. Since the rate and magnitude of land change varies over space and time \cite{tian_history_2014}, spatially explicit, historical datasets are necessary to accurately quantify the various environmental and societal impacts of change \cite{friedl_modis_2010,foley_solutions_2011,meiyappan_three_2012}, support planning decisions and inform predictions about the quantity and location of future change. \\
+
+Remote sensing provides one data source for mapping land change \cite{friedl_global_2002}. Recently, \cite{roy_development_2015} developed land use/land cover maps of India for 1985, 1995 and 2005 using multitemporal satellite data from various instruments. Developing such a dataset is resource intensive and severely constrained by the quality and availability of satellite data and ground truth points that are valid for the time period considered \cite{roy_development_2015}. Moreover, the launch of the first Landsat instrument in 1972 represents the earliest time at which remote sensing could be used for land use/land cover mapping. As a result of these factors, existing work to document historical land use/land cover at global and regional scales have used various algorithms to combine contemporary land use/land cover maps from remote sensing with national and sub-national inventory data \cite{meiyappan_three_2012}. Global datasets include the HYDE database \cite{klein_goldewijk_hyde_2011} and the Earthstat global cropland and pasture dataset \cite{ramankutty_estimating_1999}. These products have a 5 arcminute $\times$ 5 arcminute resolution (approximately 10km at the Equator) and cover the period 10,000BC~--~2005AD and 1700--2007, respectively. In India, global datasets such as these rely on land use/land cover inventory data aggregated to state and national levels because of the difficulties in obtaining district-level data collected before 1998. As a result, they do not adequately capture the variability in the rate of change between districts, which can be considerable. For example, while the northern State of Uttar Pradesh shows a net increase in the area of agricultural land between 1956 and 2010, the area in 20\% of district units ($n=\textrm{8}$) has decreased. \\
+
+Addressing this deficiency, \cite{tian_history_2014} developed an historical dataset for India which combines a contemporary land use/land cover map based on Resourcesat-1 satellite imagery with a commercially available dataset of district-level inventory data. The dataset has a spatial resolution of 5 arcminute $\times$ 5 arcminute and covers the period 1880--2010. Central to the approach adopted in this case as well as the global datasets mentioned previously is the assumption that the spatial distribution of historical land use/land cover is the same in relative terms as the present distribution \cite{tian_history_2014}. However, this does not adequately reproduce historical change because it fails to account for changes in the relative importance of the various factors influencing land change over time \cite{meiyappan_three_2012}. Spatially explicit land change models, which simulate future or historical land change based on statistical analysis of the quantitative relationship between the contemporary land use/land cover distribution and various socioeconomic and biophysical covariates \cite{verburg_spatial_1999}, have been suggested as an essential next step to improve historical land use/land cover reconstructions \cite{meiyappan_three_2012,tian_history_2014}. \\
+
+This paper presents a new dataset showing historical land change in India between 1960--2010. It uses the HIstoric Land Dynamics Assessment (HILDA) land change model \cite{fuchs_high-resolution_2013,fuchs_gross_2015} to combine district-level inventory data with a state of the art high-resolution land use/land cover product for the year 2005 \cite{roy_development_2015}. The resulting dataset, which has a spatial resolution of 100m $\times$ 100m and provides a land use/land cover map for each year of the study period, shows the evolution of cropland, forest, grassland, shrubland, wasteland, barren land and urban areas. It is the first publicly available, spatially explicit dataset derived from district-level inventory data showing land change in India during the second half the twentieth century. \\
+
+\section*{Methods}
+
+% The Methods should include detailed text describing any steps or procedures 
+% used in producing the data, including full descriptions of the experimental 
+% design, data acquisition assays, and any computational processing (e.g. 
+% normalization, image feature extraction). Related methods should be grouped 
+% under corresponding subheadings where possible, and methods should be described 
+% in enough detail to allow other researchers to interpret and repeat, if required, 
+% the full study. Specific data outputs should be explicitly referenced via data 
+% citation (see Data Records and Data Citations, below). Authors should cite 
+% previous descriptions of the methods under use, but ideally the method 
+% descriptions should be complete enough for others to understand and reproduce 
+% the methods and processing steps without referring to associated publications. 
+% There is no limit to the length of the Methods section.
+
+\subsection*{The HILDA land change model}
+The HIstoric Land Dynamics Assessment (HILDA) land change model \cite{fuchs_high-resolution_2013,fuchs_gross_2015} simulates land change over a spatial grid in which individual pixels belong to a single land use/land cover type. HILDA was originally developed for reconstructing historical land change in Europe \cite{fuchs_high-resolution_2013}. While the model is relatively simple compared to more sophisticated approaches \cite{verburg_modeling_2002,verburg_combining_2009}, it is well suited to modelling land change over large study regions because it is computationally efficient and guaranteed to produce a solution which satisfies the regional land change requirement. The allocation procedure is based on statistical analysis of the quantitative relationship between the contemporary distribution of land use/land cover and various socioeconomic and biophysical covariates. The resulting regression models are used to estimate the probability of pixels belonging to the respective land use/land cover type given the underlying biophysical and socioeconomic conditions. At each time point in the simulation period the model spatially allocates a given quantity of change amongst the various land use/land cover types. Allocation proceeds in a hierarchical way according to the perceived relative socioeconomic value of the various land use/land cover types under consideration. Land uses with increasing area at the regional level are only allowed to expand to areas currently occupied by land uses with lower socioeconomic value. In this case, \textit{n} pixels with the highest probability of belonging to the land use, but which do not currently belong to to it, are selected to change. In the case of land uses with decreasing area, \textit{n} pixels with the lowest probability of belonging to the land use are nominated for conversion to an alternative land use. \\
+
+\subsection*{Input data}
+
+\subsubsection*{Administrative boundaries}
+Contemporary district and state boundaries for India were obtained from version 2.7 of the Global Administrative Areas Database (GADM; \url{http://www.gadm.org/}). In order to account for boundary changes that occurred during the study period, contemporary GADM boundaries were manually adjusted until they corresponded with boundaries that were consistent over the course of the study period. Locations of boundary changes were identified from a scanned, historical geological map from the European digital archive on soil maps (EuDASM) \cite{panagos_european_2011} showing district boundaries in 1971. \\
+
+\subsubsection*{Land use and land cover inventory data}
+The amount of land change in each district and at each time point during the study period was derived from district-level land use/land cover inventory data. In India, data about land use/land cover are collected at the village level on an annual basis and aggregated to district and state administrative levels. The compilation of the village level data is coordinated by the Directorate of Economics and Statistics of India's Ministry of Agriculture. Data for the entire study period, except the period 1993--1997 which for unknown reasons was not available, was purchased from Indiastat (\url{https://www.indiastat.com/}), a commercial organisation which distributes socio-economic data about India. An additional source of district-level survey data for 19 States and Union Territories for the period 1966 to 2009 was obtained from the Icrisat Village Dynamics in South Asia (VDSA) project (\url{http://vdsa.icrisat.ac.in/}). This data originates from the same ultimate source as the Indiastat data but, as part of the VDSA project, has already undergone some data quality assurance and, moreover, includes data for the period 1993--1997. \\
+
+\subsubsection*{Observed land use/land cover data}
+Observed land use/land cover information was obtained from \cite{roy_development_2015}; a dataset providing maps at 100m $\times$ 100m resolution for 1985, 1995 and 2005 derived from multi-temporal satellite data from Landsat, IRS 1C-LISS III and Resourcesat1 instruments. According to the accuracy assessment conducted by \cite{roy_development_2015}, which utilised 12,606 ground truth points, the 2005 map had an overall mapping accuracy of 94.46\% and a Kappa coefficient of 0.9445. While the accuracy of the 1985 and 1995 map was not quantified due to the lack of ground truth data for these time points, \cite{roy_development_2015} argue that the accuracy is likely to be similar to that of the 2005 map. \\ % The overall classification accuracy of the 2005 map is more than 90\% \cite{roy_development_2015}. The 1985 and 1995 maps were not explicitly tested due to a lack of historical ground truth points. The 2005 map was used as the basis for statistical analysis and initialising the land change model and the 1985 and 1995 maps were used for evaluating the simulated land use/land cover maps. \\
+
+\subsubsection*{Biophysical and socio-economic predictor variables}
+The HILDA model is based on statistical relationships between land use/land cover and spatially-explicit biophysical and socio-economic predictor variables. In total, 16 covariables were used (Table~\ref{table:covariates}). Data on topography (elevation, slope, aspect), which is known as an important determinant of land use/land cover, was derived from the HydroSHEDS database, which itself is derived from the NASA Shuttle Radar Topographic Mission digital elevation model. Bioclimatic variables assumed to influence the spatial configuration of the landscape were obtained from the Bioclim dataset \cite{fick_worldclim_2017}. \\
+
+A map of population density for 2010 at 100m resolution was obtained from the WorldPop database \cite{gaughan_high_2013}. Accessibility was primarily represented by a map showing the estimated travel time to the nearest city with a population of 50,000 or more for the year 2000 \cite{nelson_travel_2008}. Additionally, distance to roads was estimated using a map of major roads from the Global Roads Open Access Dataset \cite{ciesin_global_2013}. These predictor variables were treated as static in time due to a lack of corresponding datasets for historical time points.\\
+
+\begin{sidewaystable}[p]
+  %% \tiny
+  \caption{Biophysical and socioeconomic covariates.}
+  \begin{tabular}{ p{8cm} p{3cm} p{3cm} p{2cm} }
+    \toprule
+    Variable                                & Source                                  & Spatial resolution & Time\\
+    \midrule
+    Topography                              & HydroSHEDS                              & 3 arcseconds       & N/A\\
+    Population density                      & WorldPop \cite{gaughan_high_2013}       & 30 arcseconds      & 2005\\
+    Road network                            & gROADS \cite{ciesin_global_2013}        & N/A                & Various\\
+    Travel time                             & \cite{nelson_travel_2008}               & 30 arcseconds      & 2000\\
+    Annual mean temperature                 & Bioclim                                 & 30 arcseconds      & 1970--2000\\
+    Mean diurnal range                      & Bioclim                                 & 30 arcseconds      & 1970--2000\\
+    Isothermality                           & Bioclim                                 & 30 arcseconds      & 1970--2000\\
+    Temperature seasonality                 & Bioclim                                 & 30 arcseconds      & 1970--2000\\
+    Maximum temperature of warmest month    & Bioclim                                 & 30 arcseconds      & 1970--2000\\
+    Minimum temperature of coldest month    & Bioclim                                 & 30 arcseconds      & 1970--2000\\
+    Temperature annual range                & Bioclim                                 & 30 arcseconds      & 1970--2000\\
+    Mean temperature of wettest quarter     & Bioclim                                 & 30 arcseconds      & 1970--2000\\
+    Mean temperature of driest quarter      & Bioclim                                 & 30 arcseconds      & 1970--2000\\
+    Mean temperature of warmest quarter     & Bioclim                                 & 30 arcseconds      & 1970--2000\\
+    Mean temperature of coldest quarter     & Bioclim                                 & 30 arcseconds      & 1970--2000\\
+    Annual precipitation                    & Bioclim                                 & 30 arcseconds      & 1970--2000\\
+    \bottomrule
+  \end{tabular}
+  \label{table:covariates}
+\end{sidewaystable}
+
+\subsection*{Data preparation}
+The geological map showing district boundaries for 1971 was geolocated and used together with historical records to identify changes in administrative boundaries over the course of the study period. Contemporary district polygons from GADM were manually dissolved until the resulting area corresponded with boundaries shown by the historical map. As a result of the changes the mean district unit area increased from 5307 km\textsuperscript{2} ($n=\textrm{594}$, $\sigma=\textrm{4673 km\textsuperscript{2}}$) in the original GADM map to 10650 km\textsuperscript{2} ($n=\textrm{296}$, $\sigma=\textrm{8777 km\textsuperscript{2}}$) in the modified version. \\
+
+Land use/land cover maps for India (1985, 1995, 2005) were reprojected from Universal Transverse Mercator to Lambert Conformal Conic projection using nearest neighbour interpolation. The resulting images were reclassified to nine land use/land cover types (Table~\ref{table:crosswalk}). Biophysical and socioeconomic covariates were resampled to the same projection and spatial resolution as the fractional land use/land cover maps using bilinear interpolation. Lastly, the modified administrative area map was reprojected to Lambert Conformal Conic projection and each polygon was converted to a raster image with the same spatial resolution as the other spatial data. \\
+
+\begin{sidewaystable}[p]
+  %% \tiny
+  \caption{Translation of land use/land cover classification schemes of inventory data and remote sensing product to the classes used in the land change modelling procedure.}
+  \begin{tabular}{ p{5cm} p{6cm} p{5cm} }
+  \toprule
+
+    HILDA modelling                & Inventory data                         & Remote sensing data \cite{roy_development_2015} \\
+
+    \midrule
+    Cropland                       & Net area sown                          & Cropland \\
+                                   & Miscellaneous tree crops               & Plantations \\
+                                   & Current fallows                        & Fallow land \\
+                                   & Fallow land other than current fallows & \\[0.2cm]
+    Forest                         & Forest                                 & Deciduous broadleaf forest \\
+                                   &                                        & Deciduous needleleaf forest \\
+                                   &                                        & Evergreen broadleaf forest \\
+                                   &                                        & Evergreen needleleaf forest \\
+                                   &                                        & Mixed forest \\
+                                   &                                        & Mangrove forest \\[0.2cm]
+    Grassland                      & Permanent pasture                      & Grassland \\
+    Shrubland                      & Culturable wasteland                   & Shrubland \\
+    Wasteland                      &                                        & Wasteland \\[0.2cm]
+    Barren land                    & Barren and unculturable land           & Barren land \\
+                                   &                                        & Salt pan \\[0.2cm]
+    Urban                          & Area under non-agricultural uses       & Artificial surfaces \\[0.2cm]
+    Water bodies                   & Area under non-agricultural uses       & Water bodies \\
+                                   &                                        & Wetlands \\
+                                   &                                        & Aquaculture\\[0.2cm]
+    Snow and ice                   & Barren and unculturable land           & Snow and ice \\
+    \bottomrule
+  \end{tabular}
+  \label{table:crosswalk}
+\end{sidewaystable}
+
+Inventory data from Icrisat and Indiastat were homogenized by checking for inconsistencies, identifying different spellings of administrative unit names, and applying consistent formatting. Although the inventory data for several districts was incomplete, either because of boundary changes or missing data, all district inventory data were mapped to a common annual time series between 1960--2010. The resulting data files were aggregated to correspond with the district units of the modified GADM administrative area map. This resulted in two new data files in which district units were associated with a unique time series of land use/land cover data from Indiastat and Icrisat respectively. \\
+
+The inventory data contains information about nine land use/land cover classes: (a) forests, (b) area under non-agricultural uses, (c) barren and unculturable land, (d) permanent pastures and other grazing land, (e) miscellaneous tree crops, (f) culturable waste land, (g) fallow land other than current fallows, (h) current fallows, and (i) net area sown. This classification scheme was simplified to provide the demand scenario input to the land change model (Table~\ref{table:crosswalk}). The change in urban area was estimated by multiplying the time series of area under non-agricultural uses, which includes artificial surfaces, by a scale factor equal to the urban area from the 2005 observed map divided by the area under non-agricultural uses for 2005 \cite{tian_history_2014}. The area of water and snow and ice are also obtained from the 2005 observed map and, assuming they remain constant during the study period, subtracted from the area under non-agricultural uses. Any remaining area under non-agricultural uses was assigned to barren land. \\
+
+Data quality control was performed at the district level by plotting the time series of each land use/land cover class, identifying quality issues and infilling or correcting problems as appropriate. Various types of error were identified, including: (1) data points labelled as one category but in fact belonging to another; (2) data points labelled with the wrong area units; (3) missing data points and outliers. Misclassified data points were reclassified to the correct category while data points labelled with the wrong units were multiplied by an appropriate conversion factor. Missing data points and outliers were infilled using linear interpolation or, if the problem occurred in the first or last data points, last observation carried forwards. \\
+
+The final processing step was to calibrate the district-level time series data with land use/land cover quantities from the 2005 land use/land cover map, following the approach of \cite{tian_history_2014}. This was necessary because the spatial allocation procedure requires the total area of each land cover type at the initial time point to be the same in the initial condition map (i.e. the 2005 map from \cite{roy_development_2015}) and the non-spatial demand scenario (i.e. the time series dataset derived from the inventory data). Discrepancies between the respective values may arise for a number of reasons, including inaccurate reporting of certain land cover types in the inventory data or misclassification of pixels in the remote sensing dataset. In each district unit a calibration factor was determined for each land use category by dividing the quantity from the 2005 land use/land cover map with the corresponding quantity from the inventory data. The time series of each category was then multiplied by the calibration factor to ensure the area of each land cover type between the 2005 land cover map and the inventory data in each district corresponded. Differences between the district area and the sum of the various land use/land cover types at each time point were resolved by visually identifying the land uses responsible for the discrepancy and adjusting the respective areas accordingly. \\
+
+\subsection*{Land change modelling procedure}
+
+Random forest, a non-parametric ensemble learning method that is robust against overfitting and efficiently handles datasets with a large number of input variables \cite{breiman_random_2001,svetnik_random_2003}, was used to fit models of the spatial distribution of land use/land cover in 2005 with the biophysical and socio-economic predictor variables. The random forest algorithm constructs multiple classification trees using different bootstrap samples of the data \cite{breiman_random_2001}, splitting tree nodes using the best split among a random selection of variables \cite{breiman_random_2001,liaw_classification_2002}. For regression tasks the results from individual trees are combined by taking the mean prediction. The statistical analysis was performed on a stratified random subset containing 1000 pixels from each land use/land cover class. This subset was further divided into training and test sets according to a 70:30 ratio. All models (cropland, forest, grassland, shrubland, wasteland, urban) were trained and tested on the same data partitions. A statistical model was not required for barren land because, as the land use/land cover class with the lowest socioeconomic value, it is automatically assigned to unallocated pixels once the other classes have been modelled. Figure~\ref{fig:suitability_maps} shows the suitability surfaces for each land use/land cover class. \\
+
+\begin{figure}[!htb]
+  \centering
+  \includegraphics{f01_suitability_maps.pdf}
+  \caption{Probability surfaces for cropland, forest, grassland, shrubland, wasteland and urban, calculated with random forest models. Barren land does not require a probability surface because it is allocated last, while water and snow and ice are considered constant during the simulation.}
+  \label{fig:suitability_maps}
+\end{figure}
+
+The HILDA model was applied to each district using demand scenarios constructed from the inventory data. This approach means that variability in the rate of land change between districts is implicitly taken into account, while the annual temporal resolution of the inventory data ensures that the temporal dynamics of land change in each district is properly represented. Seven land use/land cover types were modelled in the following order: urban land, cropland, grassland, shrubland, wasteland and barren land. Water and snow and ice classes were included in the simulation but assumed to be constant over the study period. The resulting district-level land use/land cover maps were combined to generate an historical land change dataset for the entire Indian subcontinent. Figure~\ref{fig:lulc_maps} shows the land use/land cover maps at decadal time steps between 1960 and 2010. \\
+
+\begin{figure}[!htb]
+  \centering
+  \includegraphics{f02_lulc_maps.pdf}
+  \caption{Simulated land use/land cover maps at decadal time steps over the study period.}
+  \label{fig:lulc_maps}
+\end{figure}
+
+\subsection*{Code availability}
+
+% For all studies using custom code in the generation or processing of datasets, 
+% a statement must be included here, indicating whether and how the code can be 
+% accessed, including any restrictions to access. This section should also include 
+% information on the versions of any software used, if relevant, and any specific 
+% variables or parameters used to generate, test, or process the current dataset. 
+
+All code used in the present study is provided under the GNU General Public Licence alongside the resulting datasets (see Data Records section). Spatial input data was processed in GRASS GIS. The R package \textit{randomForest}, which provides an interface to the original Fortran code \cite{breiman_random_2001}, was used for statistical analysis. Land change modelling was carried out using the \textit{lulcc} software package \cite{moulds_open_2015}. The implementation of HILDA is adapted from the original model description \cite{fuchs_high-resolution_2013}. The version of \textit{lulcc} used in the present study is provided in the data repository; in addition, a development version resides on the first author's GitHub account (\url{https://github.com/simonmoulds/r_lulcc2}). \\
+
+\section*{Data Records}
+
+% Please explain each data record associated with this work, including
+% the repository where this information is stored, and an overview of
+% the data files and their formats. Each external data record should
+% be listed in Data Citation section at the end of this template, and 
+% records should be cited throughout the manuscript as, for example 
+% (Data Citation 1). 
+
+% Tables should be used to support the data records, and should clearly indicate 
+% the samples and subjects, their provenance, and the experimental manipulations 
+% performed on each. They should also specify the data output resulting from each 
+% data-collection or analytical step, should these form part of the archived record. 
+% Please see the submission guidelines at the \emph{Scientific Data} website, and 
+% our Word templates for more information on preparing such tables. 
+
+The dataset provides annual maps of each land use/land cover type for the period 1960--2010 in Lambert Conformal Conic projection (Data Citation 1). Land use/land cover inventory data from Indiastat and ICRISAT have been converted to a consistent format and placed in an R data package which is included alongside the spatial data. The archive also contains the scripts and input data (or instructions about how to obtain the data) together with instructions for reproducing the dataset. \\
+
+\section*{Technical Validation}
+
+% This section presents any experiments or analyses that are needed
+% to support the technical quality of the dataset. This section may
+% be supported by up figures and tables, as needed. This is a required
+% section; authors must present information justifying the reliability
+% of their data.
+
+\subsection*{Statistical analysis}
+The statistical models were evaluated using the receiver operator characteristic (ROC) curve; a graphical technique which is commonly used to measure the performance of presence-absence models \cite{pontius_recommendations_2014}. The curve is constructed by plotting the true positive rate (sensitivity) against the false positive rate (1 $-$ specificity) for various cut-off points. It is summarised by estimating the area under the curve (AUC) value, where an area of 1 indicates a perfect model and a value of 0.5 indicates a random model. The ROC curves for the six random forest models are shown in Figure~\ref{fig:roc_curves}, demonstrating that the models simulate the occurrence of the respective land uses with an acceptable degree of accuracy. \\
+
+\begin{figure}[!htb]
+  \centering
+  \includegraphics{f03_roc_plots.pdf}
+  \caption{Receiver operator characteristic curves and associated area under the curve (AUC) for the random forest models of cropland, forest, grassland, shrubland, wasteland and urban land.}
+  \label{fig:roc_curves}
+\end{figure}
+
+\subsection*{Land use change modelling}
+Figures \ref{fig:vegdemand} and \ref{fig:urbandemand} compare the aggregated demand scenarios of the various land use/land cover types with the raw inventory data and the corresponding areas from the 1985, 1995 and 2005 remote sensing maps. These plots demonstrate the discrepancy between land use/land cover areas according to remote sensing on the one hand and inventory data on the other. In addition, they show that while the trajectory of cropland, grassland and barren land observable in the raw data is maintained in the calibrated demand scenarios, the direction of change of forest is different in the two time series. The rate of change of grassland (which in this plot includes shrubland and wasteland) between 1985 and 2005 is more gradual in the remote sensing data compared to the inventory data, which may arise because of uncertainty about the transition between shrubland and forest. \\
+
+\begin{figure}[!htb]
+  \centering
+  \includegraphics{f04_veg_demand.pdf}
+  \caption{Comparison of the area of cropland, forest, grassland (including shrubland and wasteland) and barren land at the national level considering the raw inventory data and the inventory data after quality control and calibration, as well as the corresponding areas from the remote sensing product.}
+  \label{fig:vegdemand}
+\end{figure}
+
+\begin{figure}[!htb]
+  \centering
+  \includegraphics{f05_urban_demand.pdf}
+  \caption{Comparison of the area of urban areas at the national level considering the inventory data in raw, quality controlled and calibrated forms, as well as the urban area from the remote sensing product. The land use/land cover class corresponding to urban area also includes various non-urban, non-agricultural land uses.}
+  \label{fig:urbandemand}
+\end{figure}
+
+% Pattern validation was carried out by comparing the initial condition (2005) with observed and simulated maps for 1985.
+The spatial distribution of land change was validated for 1985; the earliest time point for which a reference land cover map was available. The validation was performed using the method developed by \cite{pontius_comparison_2011}, in which a simulated land cover map for time 2 is compared with reference maps for time 2 and time 1. In the present study, the simulated map for 1985 was compared with reference maps for 1985 and 2005, which were taken from the remote sensing dataset described previously \cite{roy_development_2015}. The comparison was performed at multiple resolutions in order to distinguish between minor allocation disagreement (disagreement at native resolution which is counted as agreement at a coarser resolution) with major allocation disagreement (disagreement at the native and coarse resolution). Figure~\ref{fig:agreement} shows the components of agreement and disagreement between the three maps at multiple resolutions, while Table~\ref{table:agreement} shows the value of each component of agreement and disagreement at the various spatial resolutions. The comparison was not carried out on resolutions finer than 16 times the native resolution because of difficulties performing the analysis on very large raster maps. At 16 times the native resolution there is 91\% agreement between the observed and simulated maps for 1985, with the vast majority of agreement arising from correctly simulated persistence (i.e. pixels which have not changed between 1985 and 1995). At this resolution the largest source of disagreement between the observed and simulated maps is change simulated as persistence. Of all pixels that were observed to change between 1985 and 2005, the simulated map for 1985 is in agreement with the reference map in around 6\% of cases at 16 times the native resolution, rising to 19\% at 1,024 times the native resolution (i.e. around 100km $\times$ 100km resolution) and 35\% at the coarsest resolution. Overall disagreement is 9\% at the finest resolution considered, 3.8\% at 1,024 times the native resolution and 1.1\% at the coarsest resolution. At 65,536 times the native resolution the entire study area is represented as one pixel, which necessarily means that disagreement is entirely due to quantity disagreement; in other words, disagreement between the inventory data and the remote sensing data about the total quantity of change when it is aggregated nationally. Since quantity disagreement is consistent across all resolutions, around 10\% of the disagreement at 16 times the native resolution is the result of quantity, rather than allocation, disagreement. \\
+
+\begin{figure}[!htb]
+  \centering
+  \includegraphics{f06_comparison.pdf}
+  \caption{Components of agreement and disagreement at multiple resolutions, excluding persistence simulated correctly.}
+  \label{fig:agreement}
+\end{figure}
+
+\begin{table*}[!htb]
+  \centering
+  \caption{Components of agreement and disagreement at multiple resolutions (fraction of study area).}
+  \begin{tabular}{ l c c c c c }
+    \toprule
+    Multiple of native resolution  & (1) & (2) & (3) & (4) & (5)\\
+    \midrule
+    16    & 0.042 & 0.006 & 0.011 & 0.037 & 0.904\\
+    32    & 0.037 & 0.006 & 0.013 & 0.034 & 0.910\\
+    64    & 0.031 & 0.007 & 0.016 & 0.030 & 0.917\\
+    128   & 0.026 & 0.008 & 0.017 & 0.025 & 0.925\\
+    256   & 0.021 & 0.008 & 0.018 & 0.020 & 0.934\\
+    512   & 0.016 & 0.009 & 0.017 & 0.014 & 0.944\\
+    1024  & 0.013 & 0.009 & 0.015 & 0.010 & 0.954\\
+    2048  & 0.009 & 0.008 & 0.013 & 0.007 & 0.963\\
+    4096  & 0.006 & 0.008 & 0.011 & 0.005 & 0.971\\
+    8192  & 0.004 & 0.007 & 0.010 & 0.004 & 0.975\\
+    16384 & 0.003 & 0.008 & 0.008 & 0.003 & 0.977\\
+    32768 & 0.001 & 0.007 & 0.008 & 0.002 & 0.982\\
+    65536 & 0.001 & 0.006 & 0.008 & 0.002 & 0.983\\
+    \bottomrule
+    \multicolumn{6}{@{}p{9cm}}{\footnotesize (1) Change simulated as persistence (misses)}\\
+    \multicolumn{6}{@{}p{9cm}}{\footnotesize (2) Change simulated correctly (hits)}\\
+    \multicolumn{6}{@{}p{9cm}}{\footnotesize (3) Change simulated as change to wrong category (wrong hits)}\\
+    \multicolumn{6}{@{}p{9cm}}{\footnotesize (4) Persistence simulated as change (false alarms)}\\
+    \multicolumn{6}{@{}p{9cm}}{\footnotesize (5) Persistence simulated correctly (correct rejections)}\\
+  \end{tabular}
+  \label{table:agreement}
+\end{table*}
+
+\section*{Usage Notes}
+
+% Brief instructions that may help other researchers reuse these dataset.
+% This is an optional section, but strongly encouraged when helpful
+% to readers. This may include discussion of software packages that
+% are suitable for analyzing the assay data files, suggested downstream
+% processing steps (e.g. normalization, etc.), or tips for integrating
+% or comparing this with other datasets. If needed, authors are encouraged
+% to provide code, programs, or data processing workflows when they may help 
+% others analyse the data. We encourage authors to archive related code in 
+% a DOI-issuing archive when possible, but code may also be supplied as 
+% supplementary information files. 
+
+% For studies involving privacy or safety controls on public access
+% to the data, this section should describe in detail these controls,
+% including how authors can apply to access the data, and what criteria
+% will be used to determine who may access the data, and any limitations
+% on data use. 
+
+% It is envisaged that the dataset will be used in a variety of contexts across disciplines. For example, historical land use/land cover maps are used to gain insight into human-environment interactions and to develop policy concerning sustainable agricultural development, urban expansion and the protection of ecosystem services. They are an essential input to assessments of global and regional change because land cover influences the water and energy fluxes. Moreover, land use/land cover maps are a necessary first step towards developing datasets of land management and land use intensity \cite{houghton_carbon_2012}. Thus, a valuable extension to the present dataset would be the inclusion of more information about specific land management practices such as irrigation and multiple cropping. \\
+
+It is envisaged that the dataset will be used in a variety of contexts across disciplines. For example, it may be used in combination with impact assessment models to quantify the environmental impacts of land use change. Such analyses may inform policies designed to support sustainable agricultural development, urban expansion and the protection of ecosystem services. Historical land cover maps are an essential input to assessments of global and regional change because land cover influences the water and energy fluxes. Moreover, land use/land cover maps are a necessary first step towards developing datasets of land management and land use intensity \cite{houghton_carbon_2012}. Thus, a valuable extension to the present dataset would be the inclusion of more information about specific land management practices such as irrigation and multiple cropping. \\
+
+The dataset is associated with a large amount of uncertainty from various sources. In particular, the raw district-level inventory data contains a large amount of noise which had to be manually removed before supplying it to the land change model. To ensure decisions made during quality control are open, reproducible and amendable the data processing scripts are included alongside the land use/land cover maps. The HILDA land change model is strongly influenced by the statistical analysis of the spatial distribution of contemporary land use/land cover. The random forest models employed in the present study use several publicly available datasets (Table~\ref{table:covariates}). Recognising that other members of the community may have access to alternative, or additional, datasets outside the public domain, the source code includes clear instructions about incorporating additional data into the statistical analysis. Users of the dataset should be aware that in the present analysis the explanatory factors of population density, accessibility and distance to roads have been treated as static in time due to the lack of historical, spatially explicit data showing the evolution of these variables during the study period. \\
+
+Individual land use/land cover maps are provided as GeoTIFF files which can be processed in standard Geographical Information System (GIS) software as well as data processing languages such as R and Python. To assist users who may require maps at relatively coarse resolutions (e.g. for supplying to Earth system models), the data repository includes maps in unprojected format at 5 arcminutes $\times$ 5 arcminutes spatial resolution, showing the fraction of each pixel belonging to the various land use/land cover types. Users should be aware that reprojecting the maps from the original Lambert Conformal Conic projection will change the aggregate area of each land use/land cover type. \\
+
+\section*{Acknowledgements}
+
+% Text acknowledging non-author contributors. Acknowledgements should
+% be brief, and should not include thanks to anonymous referees and
+% editors, or effusive comments. Grant or contribution numbers may be
+% acknowledged. Author contributions Please describe briefly the contributions
+% of each author to this work on a separate line. 
+
+% AK did this and that. 
+
+% BG did this and that and the other. 
+
+SM, WB and AM acknowledge support of the UK Natural Environment Research Council (contracts NE/I022558/1 and NE/N01670X/1). SM additionally acknowledges support of the Grantham Institute for Climate Change and the Environment, Imperial College London. WB acknowledges the support of the Mountain-EVO project funded by the UK NERC/ESRC/DFID ESPA programme (contract NE/K010239/1). \\
+
+\section*{Author contributions}
+S.M. and W.B devised the project. S.M. performed data collection, pre-processing and modelling work to produce the finalland use/land cover dataset. S.M., W.B and A.M. wrote the manuscript.
+
+\section*{Competing financial interests}
+
+% A competing financial interests statement is required for all accepted
+% papers published in \emph{Scientific Data}. If none exist simply write,
+% ``The author(s) declare no competing financial interests''.
+
+The authors declare no competing financial interests.
+
+% \section*{Figures Legends}
+
+% Figure should be referred to using a consistent numbering scheme through
+% the entire Data Descriptor. For initial submissions, authors may choose
+% to supply this document as a single PDF with embedded figures, but
+% separate figure image files must be provided for revisions and accepted
+% manuscripts. In most cases, a Data Descriptor should not contain more
+% than three figures, but more may be allowed when needed. We discourage
+% the inclusion of figures in the Supplementary Information \textendash{}
+% all key figures should be included here in the main Figure section. 
+
+% Figure legends begin with a brief title sentence for the whole figure
+% and continue with a short description of what is shown in each panel,
+% as well as explaining any symbols used. Legend must total no more
+% than 350 words, and may contain literature references. 
+
+
+% \section*{Tables}
+
+% Tables supporting the Data Descriptor. These can provide summary information
+% (sample numbers, demographics, etc.), but they should generally not
+% be used to present primary data (i.e. measurements). Tables containing
+% primary data should be submitted to an appropriate data repository. 
+
+% Tables may be provided within the \LaTeX{} document or as separate
+% files (tab-delimited text or Excel files). Legends, where needed,
+% should be included here. Generally, a Data Descriptor should have
+% fewer than ten Tables, but more may be allowed when needed. Tables
+% may be of any size, but only Tables which fit onto a single printed
+% page will be included in the PDF version of the article (up to a maximum
+% of three). 
+
+\begin{thebibliography}{1}
+\expandafter\ifx\csname url\endcsname\relax
+  \def\url#1{\texttt{#1}}\fi
+\expandafter\ifx\csname urlprefix\endcsname\relax\def\urlprefix{URL }\fi
+\providecommand{\bibinfo}[2]{#2}
+\providecommand{\eprint}[2][]{\url{#2}}
+
+% \bibitem{cite1}
+% \bibinfo{author}{Califano, A.}, \bibinfo{author}{Butte, A.~J.},
+%   \bibinfo{author}{Friend, S.}, \bibinfo{author}{Ideker, T.} \&
+%   \bibinfo{author}{Schadt, E.}
+% \newblock \bibinfo{title}{{Leveraging models of cell regulation and GWAS data
+%   in integrative network-based association studies}}.
+% \newblock \emph{\bibinfo{journal}{Nature Genetics}}
+%   \textbf{\bibinfo{volume}{44}}, \bibinfo{pages}{841--847}
+%   (\bibinfo{year}{2012}).
+
+% \bibitem{cite2}
+% \bibinfo{author}{Wang, R.} \emph{et~al.}
+% \newblock \bibinfo{title}{{PRIDE Inspector: a tool to visualize and validate MS
+%   proteomics data.}}
+% \newblock \emph{\bibinfo{journal}{Nature Biotechnology}}
+%   \textbf{\bibinfo{volume}{30}}, \bibinfo{pages}{135--137}
+%   (\bibinfo{year}{2012}).
+
+\bibitem{james_indias_2011}
+  \bibinfo{author}{James, K.~S.}
+  \newblock \bibinfo{title}{{India's demographic change: Opportunities and challenges}}.
+  \newblock \emph{\bibinfo{journal}{Science}}
+  \textbf{\bibinfo{volume}{333}}, \bibinfo{pages}{576--580}
+  (\bibinfo{year}{2011}).
+% \newblock ISSN 0036-8075, 1095-9203.
+% \newblock \doi{10.1126/science.1207969}.
+% \newblock URL \url{http://www.sciencemag.org/cgi/doi/10.1126/science.1207969}.
+
+\bibitem{tian_history_2014}
+  \bibinfo{author}{Tian, H.}, \bibinfo{author}{Banger, K.},
+  \bibinfo{author}{Bo, T.} \&
+  \bibinfo{author}{Dadhwal, V.~K.}
+  \newblock \bibinfo{title}{{History of land use in India during 1880{\textendash}2010: Large-scale land transformations reconstructed from satellite data and historical archives}}.
+  \newblock \emph{\bibinfo{journal}{Glob. Planet. Change}}
+  \textbf{\bibinfo{volume}{121}}, \bibinfo{pages}{78--88}
+  (\bibinfo{year}{2014}).
+% \newblock ISSN 09218181.
+% \newblock \doi{10.1016/j.gloplacha.2014.07.005}.
+% \newblock URL
+%   \url{http://linkinghub.elsevier.com/retrieve/pii/S0921818114001283}.
+
+\bibitem{gururaja_population_2012}
+  \bibinfo{author}{Gururaja, K.~V.} \&
+  \bibinfo{author}{Sudhira, H.~S.}
+  \newblock \bibinfo{title}{{Population crunch in India: is it urban or still rural?}}
+  \newblock \emph{\bibinfo{journal}{Curr. Sci.}}
+  \textbf{\bibinfo{volume}{103}}, \bibinfo{pages}{37--40}
+  (\bibinfo{year}{2012}).
+% \newblock URL \url{http://eprints.iisc.ernet.in/44814/}.
+
+\bibitem{scott_energy_2009}
+  \bibinfo{author}{Scott, C.~A.} \& \bibinfo{author}{Sharma, B.}
+  \newblock \bibinfo{title}{{Energy supply and the expansion of groundwater irrigation in the Indus-Ganges Basin}}.
+  \newblock \emph{\bibinfo{journal}{Int. J. River Basin Management}}
+  \textbf{\bibinfo{volume}{7}}, \bibinfo{pages}{119--124}
+  (\bibinfo{year}{2009}).
+% \newblock URL
+%   \url{http://www.tandfonline.com/doi/abs/10.1080/15715124.2009.9635374}.
+
+\bibitem{smilovic_limits_2015}
+  \bibinfo{author}{Smilovic, M.}, \bibinfo{author}{Gleeson, T.} \&
+  \bibinfo{author}{Siebert, S.}
+  \newblock \bibinfo{title}{{The limits of increasing food production with irrigation in India}}.
+  \newblock \emph{\bibinfo{journal}{Food Secur.}}
+  \textbf{\bibinfo{volume}{7}}, \bibinfo{pages}{835--856}
+  (\bibinfo{year}{2015}).
+% \newblock ISSN 1876-4517, 1876-4525.
+% \newblock \doi{10.1007/s12571-015-0477-2}.
+% \newblock URL \url{http://link.springer.com/10.1007/s12571-015-0477-2}.
+
+\bibitem{turner_emergence_2007}
+  \bibinfo{author}{Turner, B.~L.}, \bibinfo{author}{Lambin, E.~F.} \&
+  \bibinfo{author}{Reenberg, A.}
+  \newblock \bibinfo{title}{{The emergence of land change science for global environmental change and sustainability}}.
+  \newblock \emph{\bibinfo{journal}{Proc. Natl. Acad. Sci.}}
+  \textbf{\bibinfo{volume}{104}}, \bibinfo{pages}{20666--20671}
+  (\bibinfo{year}{2007}).
+% \newblock URL \url{http://www.pnas.org/content/104/52/20666.short}.
+
+\bibitem{foley_global_2005}
+  \bibinfo{author}{Foley, J.~A.}
+  \newblock \bibinfo{title}{{Global consequences of land use}}.
+  \newblock \emph{\bibinfo{journal}{Science}}
+  \textbf{\bibinfo{volume}{309}}, \bibinfo{pages}{570--574}
+  (\bibinfo{year}{2005}).
+% \newblock ISSN 0036-8075, 1095-9203.
+% \newblock \doi{10.1126/science.1111772}.
+% \newblock URL \url{http://www.sciencemag.org/cgi/doi/10.1126/science.1111772}.
+
+\bibitem{feddema_importance_2005}
+  \bibinfo{author}{Feddema, J.~J.}
+  \newblock \bibinfo{title}{{The importance of land-cover change in simulating future climates}}.
+  \newblock \emph{\bibinfo{journal}{Science}}
+  \textbf{\bibinfo{volume}{310}}, \bibinfo{pages}{1674--1678}
+  (\bibinfo{year}{2001}).
+% \newblock ISSN 0036-8075, 1095-9203.
+% \newblock \doi{10.1126/science.1118160}.
+% \newblock URL \url{http://www.sciencemag.org/cgi/doi/10.1126/science.1118160}.
+
+\bibitem{verburg_challenges_2011}
+  \bibinfo{author}{Verburg, P.~H.}, \bibinfo{author}{Neumann, K.} \&
+  \bibinfo{author}{Nol, L.}
+  \newblock \bibinfo{title}{{Challenges in using land use and land cover data for global change studies}}
+  \newblock \emph{\bibinfo{journal}{Glob. Change Biol.}}
+  \textbf{\bibinfo{volume}{17}}, \bibinfo{pages}{974--989}
+  (\bibinfo{year}{2011}).
+% \newblock ISSN 13541013.
+% \newblock \doi{10.1111/j.1365-2486.2010.02307.x}.
+% \newblock URL \url{http://doi.wiley.com/10.1111/j.1365-2486.2010.02307.x}.
+
+\bibitem{houghton_carbon_2012}
+  \bibinfo{author}{Houghton, R.~A.} \emph{et~al.}
+  \newblock \bibinfo{title}{{Carbon emissions from land use and land-cover change}}.
+  \newblock \emph{\bibinfo{journal}{Biogeosciences}}
+  \textbf{\bibinfo{volume}{9}}, \bibinfo{pages}{5125--5142}
+  (\bibinfo{year}{2012}).
+% \newblock ISSN 1726-4189.
+% \newblock \doi{10.5194/bg-9-5125-2012}.
+% \newblock URL \url{http://www.biogeosciences.net/9/5125/2012/}.
+
+\bibitem{friedl_modis_2010}
+  \bibinfo{author}{Friedl, M.~A.} \emph{et~al.}
+  \newblock \bibinfo{title}{{MODIS Collection 5 global land cover: algorithm refinements and characterization of new datasets}}.
+  \newblock \emph{\bibinfo{journal}{Remote Sens. Environ.}}
+  \textbf{\bibinfo{volume}{114}}, \bibinfo{pages}{168--182}
+  (\bibinfo{year}{2010}).
+% \newblock ISSN 00344257.
+% \newblock \doi{10.1016/j.rse.2009.08.016}.
+% \newblock URL
+%   \url{http://linkinghub.elsevier.com/retrieve/pii/S0034425709002673}.
+
+\bibitem{foley_solutions_2011}
+  \bibinfo{author}{Foley, J.~A.} \emph{et~al.}
+  \newblock \bibinfo{title}{{Solutions for a cultivated planet}}.
+  \newblock \emph{\bibinfo{journal}{Nature}}
+  \textbf{\bibinfo{volume}{478}}, \bibinfo{pages}{337--342}
+  (\bibinfo{year}{2011}).
+% \newblock ISSN 0028-0836, 1476-4687.
+% \newblock \doi{10.1038/nature10452}.
+% \newblock URL \url{http://www.nature.com/doifinder/10.1038/nature10452}.
+
+\bibitem{meiyappan_three_2012}
+  \bibinfo{author}{Meiyappan, P.} \& \bibinfo{author}{Jain, A.~K.}
+  \newblock \bibinfo{title}{{Three distinct global estimates of historical land-cover change and land-use conversions for over 200 years}}.
+  \newblock \emph{\bibinfo{journal}{Front. Earth Sci.}},
+  \textbf{\bibinfo{volume}{6}}, \bibinfo{pages}{122--139}
+  (\bibinfo{year}{2012}).
+% \newblock ISSN 2095-0195, 2095-0209.
+% \newblock \doi{10.1007/s11707-012-0314-2}.
+% \newblock URL \url{http://link.springer.com/10.1007/s11707-012-0314-2}.
+  
+\bibitem{friedl_global_2002}
+  \bibinfo{author}{Friedl, M.~A.} \emph{et~al.}
+  \newblock \bibinfo{title}{{Global land cover mapping from {MODIS}: algorithms and early results}}.
+  \newblock \emph{\bibinfo{journal}{Remote Sens. Environ.}}
+  \textbf{\bibinfo{volume}{83}}, \bibinfo{pages}{287--302}
+  (\bibinfo{year}{2002}).
+% \newblock URL
+%   \url{http://www.sciencedirect.com/science/article/pii/S0034425702000780}.
+
+\bibitem{roy_development_2015}
+  \bibinfo{author}{Roy, P.}  \emph{et~al.}
+  \newblock \bibinfo{title}{{Development of decadal (1985{\textendash}1995{\textendash}2005) land use and land cover database for India}}.
+  \newblock \emph{\bibinfo{journal}{Remote Sens.}}
+  \textbf{\bibinfo{volume}{7}}, \bibinfo{pages}{2401--2430}
+  (\bibinfo{year}{2015}).
+% \newblock ISSN 2072-4292.
+% \newblock \doi{10.3390/rs70302401}.
+% \newblock URL \url{http://www.mdpi.com/2072-4292/7/3/2401/}.
+
+\bibitem{klein_goldewijk_hyde_2011}
+  \bibinfo{author}{Klein~Goldewijk, K.}, \bibinfo{author}{Beusen, A.},
+  \bibinfo{author}{Van~Drecht, G.} \& \bibinfo{author}{De~Vos, M.}
+  \newblock \bibinfo{title}{{The HYDE 3.1 spatially explicit database of human-induced global land-use change over the past 12,000 years}}.
+  \newblock \emph{\bibinfo{journal}{Glob. Ecol. Biogeogr.}}
+  \textbf{\bibinfo{volume}{20}}, \bibinfo{pages}{73--86}
+  (\bibinfo{year}{2011}).
+% \newblock URL
+%   \url{http://onlinelibrary.wiley.com/doi/10.1111/j.1466-8238.2010.00587.x/full}.
+
+\bibitem{ramankutty_estimating_1999}
+  \bibinfo{author}{Ramankutty, N.} \& \bibinfo{author}{Foley, J.~A.}
+  \newblock \bibinfo{title}{{Estimating historical changes in global land cover: croplands from 1700 to 1992}}.
+  \newblock \emph{\bibinfo{journal}{Glob. Biogeochem. Cycles}}
+  \textbf{\bibinfo{volume}{13}}, \bibinfo{pages}{997--1027}
+  (\bibinfo{year}{1999}).
+% \newblock ISSN 1944-9224.
+% \newblock \doi{10.1029/1999GB900046}.
+% \newblock URL \url{http://dx.doi.org/10.1029/1999GB900046}.
+
+\bibitem{verburg_spatial_1999}
+  \bibinfo{author}{Verburg, P.~H.}, \bibinfo{author}{De~Koning, G.~H.~J.},
+  \bibinfo{author}{Kok, K.}, \bibinfo{author}{Veldkamp, A.} \&
+  \bibinfo{author}{Bouma, J.}
+  \newblock \bibinfo{title}{{A spatial explicit allocation procedure for modelling the pattern of land use change based upon actual land use}}.
+  \newblock \emph{\bibinfo{journal}{Ecol. Model.}}
+  \textbf{\bibinfo{volume}{116}}, \bibinfo{pages}{45--61}
+  (\bibinfo{year}{1999}).
+% \newblock URL
+%   \url{http://www.sciencedirect.com/science/article/pii/S0304380098001562}.
+
+\bibitem{fuchs_high-resolution_2013}
+  \bibinfo{author}{Fuchs, R.}, \bibinfo{author}{Herold, M.},
+  \bibinfo{author}{Verburg, P.~H.} \& \bibinfo{author}{Clevers, J.~G.~P.~W.}
+  \newblock \bibinfo{title}{{A high-resolution and harmonized model approach for reconstructing and analysing historic land changes in Europe}}.
+  \newblock \emph{\bibinfo{journal}{Biogeosciences}}
+  \textbf{\bibinfo{volume}{10}}, \bibinfo{pages}{1543--1559}
+  (\bibinfo{year}{2013})
+% \newblock ISSN 1726-4189.
+% \newblock \doi{10.5194/bg-10-1543-2013}.
+% \newblock URL \url{http://www.biogeosciences.net/10/1543/2013/}.
+
+\bibitem{fuchs_gross_2015}
+  \bibinfo{author}{Fuchs, R.}, \bibinfo{author}{Herold, M.},
+  \bibinfo{author}{Verburg, P.~H.}, \bibinfo{author}{Clevers, J.~G.~P.~W.} \&
+  \bibinfo{author}{Eberle. J.}
+  \newblock \bibinfo{title}{{Gross changes in reconstructions of historic land cover/use for Europe between 1900 and 2010}}.
+  \newblock \emph{\bibinfo{journal}{Glob. Change Biol.}}
+  \textbf{\bibinfo{volume}{21}}, \bibinfo{pages}{299--313}
+  (\bibinfo{year}{2015}).
+% \newblock ISSN 13541013.
+% \newblock \doi{10.1111/gcb.12714}.
+% \newblock URL \url{http://doi.wiley.com/10.1111/gcb.12714}.
+
+\bibitem{verburg_modeling_2002}
+  \bibinfo{author}{Verburg, P.~H.}, \bibinfo{author}{Soepboer, W.},
+  \bibinfo{author}{Veldkamp, A.}, \bibinfo{author}{Limpiada, R.},
+  \bibinfo{author}{Espaldon, V.} \&
+  \bibinfo{author}{Mastura, S.~S.~A.}
+  \newblock \bibinfo{title}{{Modeling the spatial dynamics of regional Land Use: the CLUE-S model}}.
+  \newblock \emph{\bibinfo{journal}{Environ. Manag.}}
+  \textbf{\bibinfo{volume}{30}}, \bibinfo{pages}{391--405},
+  (\bibinfo{year}{2002}).
+% \newblock ISSN 0364-152X, 1432-1009.
+% \newblock \doi{10.1007/s00267-002-2630-x}.
+% \newblock URL \url{http://link.springer.com/10.1007/s00267-002-2630-x}.
+
+\bibitem{verburg_combining_2009}
+  \bibinfo{author}{Verburg, P.~H.} \&
+  \bibinfo{author}{Overmars, K.~P.}
+  \newblock \bibinfo{title}{{Combining top-down and bottom-up dynamics in land use modeling: exploring the future of abandoned farmlands in Europe with the Dyna-CLUE model}}.
+  \newblock \emph{\bibinfo{journal}{Landsc. Ecol.}}
+  \textbf{\bibinfo{volume}{24}}, \bibinfo{pages}{1167--1181}
+  (\bibinfo{year}{2009}).
+% \newblock ISSN 0921-2973, 1572-9761.
+% \newblock \doi{10.1007/s10980-009-9355-7}.
+% \newblock URL \url{http://link.springer.com/10.1007/s10980-009-9355-7}.
+
+\bibitem{panagos_european_2011}
+  \bibinfo{author}{Panagos, P.}, \bibinfo{author}{Jones, A.},
+  \bibinfo{author}{Bosco, C.} \&
+  \bibinfo{author}{Senthil~Kumar, P.S.}
+  \newblock \bibinfo{title}{{European digital archive on soil maps ({EuDASM}): preserving important soil data for public free access}}.
+  \newblock \emph{\bibinfo{journal}{Int. J. Digit. Earth}}
+  \textbf{\bibinfo{volume}{4}}, \bibinfo{pages}{434--443}
+  (\bibinfo{year}{2011}).
+% \newblock ISSN 1753-8947, 1753-8955.
+% \newblock \doi{10.1080/17538947.2011.596580}.
+% \newblock URL
+%   \url{http://www.tandfonline.com/doi/abs/10.1080/17538947.2011.596580}.
+
+\bibitem{fick_worldclim_2017}
+  \bibinfo{author}{Fick, S.~E.} \& \bibinfo{author}{Hijmans, R.~J.}
+  \newblock \bibinfo{title}{{WorldClim 2: new 1-km spatial resolution climate surfaces for global land areas}}.
+  \newblock \emph{\bibinfo{journal}{Int. J. Climatol.}}
+  \textbf{\bibinfo{volume}{37}}, \bibinfo{pages}{4302--4315}
+  (\bibinfo{year}{2017}).
+% \newblock ISSN 08998418.
+% \newblock \doi{10.1002/joc.5086}.
+% \newblock URL \url{http://doi.wiley.com/10.1002/joc.5086}.
+
+\bibitem{gaughan_high_2013}
+  \bibinfo{author}{Gaughan, A.~E.}, \bibinfo{author}{Stevens, F.~R.},
+  \bibinfo{author}{Linard, C.}, \bibinfo{Jia, P.} \&
+  \bibinfo{author}{Tatem, A.~J.}
+  \newblock \bibinfo{title}{{High resolution population distribution maps for Southeast Asia in 2010 and 2015}}.
+  \newblock \emph{\bibinfo{journal}{PLoS One}}
+  \textbf{\bibinfo{volume}{8}}, \bibinfo{pages}{e55882}
+  (\bibinfo{year}{2013}).
+% \newblock ISSN 1932-6203.
+% \newblock \doi{10.1371/journal.pone.0055882}.
+% \newblock URL \url{http://dx.plos.org/10.1371/journal.pone.0055882}.
+
+\bibitem{nelson_travel_2008}
+  \bibinfo{author}{Nelson, A.}
+  \newblock \bibinfo{title}{{Travel time to major cities: a global map of accessibility}}.
+  \newblock Office for Official Publications of the European Communities, Luxembourg
+  (\bibinfo{year}{2008}).
+
+\bibitem{ciesin_global_2013}
+  \bibinfo{author}{Center for International Earth Science Information Network (CIESIN)}
+  % Columbia~University \& Information Technology Outreach Services
+  % (ITOS),~University of~Georgia.
+  \newblock \bibinfo{title}{{Global Roads Open Access Data Set (gROADS), version 1}}.
+  \newblock US NASA Socioeconomic Data and Applications Center (SEDAC)
+  (\bibinfo{year}{2013}).
+  % \newblock \url{http://dx.doi.org/10.7927/H4VD6WCT}.
+  
+\bibitem{breiman_random_2001}
+  \bibinfo{author}{Breiman, L.}
+  \newblock \bibinfo{title}{{Random forests}}.
+  \newblock \emph{\bibinfo{journal}{Mach. Learn.}}
+  \textbf{\bibinfo{volume}{45}}, \bibinfo{pages}{5--32}
+  (\bibinfo{year}{2001}).
+% \newblock URL \url{http://link.springer.com/article/10.1023/A:1010933404324}.
+
+\bibitem{svetnik_random_2003}
+  \bibinfo{author}{Svetnik, V.}, \bibinfo{author}{Liaw, A.},
+  \bibinfo{author}{Tong, C.}, \bibinfo{author}{Culberson, J.~C.},
+  \bibinfo{author}{Sheridan, R.~P.} \&
+  \bibinfo{author}{Feuston, B.~P.}
+  \newblock \bibinfo{title}{{Random forest: a classification and regression tool for compound classification and QSAR modeling}}.
+  \newblock \emph{\bibinfo{journal}{J. Chem. Inf. Model.}}
+  \textbf{\bibinfo{volume}{43}}, \bibinfo{pages}{1947--1958}
+  (\bibinfo{year}{2003}).
+% \newblock ISSN 1549-9596.
+% \newblock \doi{10.1021/ci034160g}.
+% \newblock URL \url{http://pubs.acs.org/cgi-bin/doilookup/?10.1021/ci034160g}.
+
+\bibitem{liaw_classification_2002}
+  \bibinfo{author}{Liaw, A.} \& \bibinfo{author}{Wiener, M.}
+  \newblock \bibinfo{title}{{Classification and regression by randomForest}}.
+  \newblock \emph{\bibinfo{journal}{R News}}
+  \textbf{\bibinfo{volume}{2}}, \bibinfo{pages}{18--22}
+  (\bibinfo{year}{2002}).
+% \newblock URL
+%   \url{ftp://131.252.97.79/Transfer/Treg/WFRE_Articles/Liaw_02_Classification%20and%20regression%20by%20randomForest.pdf}.
+
+\bibitem{moulds_open_2015}
+  \bibinfo{author}{Moulds, S.}, \bibinfo{author}{Buytaert, W.} \&
+  \bibinfo{author}{Mijic, A.}
+  \newblock \bibinfo{title}{{An open and extensible framework for spatially explicit land use change modelling: the lulcc R package}}.
+  \newblock \emph{\bibinfo{journal}{Geosci. Model Dev.}}
+  \textbf{\bibinfo{volume}{8}}, \bibinfo{pages}{3215--3229}
+  (\bibinfo{year}{2015}).
+% \newblock ISSN 1991-9603.
+% \newblock \doi{10.5194/gmd-8-3215-2015}.
+% \newblock URL \url{http://www.geosci-model-dev.net/8/3215/2015/}.
+
+\bibitem{pontius_recommendations_2014}
+  \bibinfo{author}{Pontius, R.~G.} \&
+  \bibinfo{author}{Parmentier, B.}
+  \newblock \bibinfo{title}{{Recommendations for using the relative operating characteristic (ROC)}}.
+  \newblock \emph{\bibinfo{journal}{Landsc. Ecol.}}
+  \textbf{\bibinfo{volume}{29}}, \bibinfo{pages}{367--382}
+  (\bibinfo{year}{2014}).
+% \newblock ISSN 0921-2973, 1572-9761.
+% \newblock \doi{10.1007/s10980-013-9984-8}.
+% \newblock URL \url{http://link.springer.com/10.1007/s10980-013-9984-8}.
+
+\bibitem{pontius_comparison_2011}
+  \bibinfo{author}{Pontius, R.~G.}, \bibinfo{author}{Peethambaram, S.} \&
+  \bibinfo{author}{Castella, J.~C.}
+  \newblock \bibinfo{title}{{Comparison of three maps at multiple resolutions: a case study of land change simulation in Cho Don District, Vietnam}}.
+  \newblock \emph{\bibinfo{journal}{Ann. Assoc. Am. Geogr.}}
+  \textbf{\bibinfo{volume}{101}}, \bibinfo{pages}{45--62}
+  (\bibinfo{year}{2011}).
+% \newblock ISSN 0004-5608, 1467-8306.
+% \newblock \doi{10.1080/00045608.2010.517742}.
+% \newblock URL
+%   \url{http://www.tandfonline.com/doi/abs/10.1080/00045608.2010.517742}.
+
+\end{thebibliography}
+
+\section*{Data Citations}
+1. Moulds, S., Buytaert, W. \& Mijic, A. \emph{Figshare} XXXXX (2018).
+
+% Bibliographic information for the data records described in the manuscript.
+
+% 1. Lastname1, Initial1., Lastname2, Initial2., ...\& LastnameN, InitialN. \emph{Repository name} Dataset accession number or DOI (YYYY).
+
+\end{document}

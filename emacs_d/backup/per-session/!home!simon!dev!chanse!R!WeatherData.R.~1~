@@ -1,0 +1,3 @@
+#' @include class-WeatherData.R
+NULL
+

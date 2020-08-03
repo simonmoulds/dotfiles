@@ -1,0 +1,964 @@
+\documentclass[english]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{babel}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+
+\usepackage{tabularx}
+\usepackage{tabulary}
+\usepackage{supertabular}
+\usepackage{multirow}
+\usepackage{rotating}
+\usepackage{url}
+
+\usepackage{natbib}
+
+\newcommand{\scidatalogo}{\includegraphics[height=36pt]{SciData_logo.jpg}}
+\newcommand{\overleaflogo}{\includegraphics[height=36pt]{Overleaf-logo-300dpi.png}}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\setlength{\headheight}{40pt} 
+\lhead{\textsc{\scidatalogo}}
+\rhead{\textsc{\overleaflogo}}
+
+\begin{document}
+
+\title{IndiaCropAtlas, a spatio-temporal dataset of irrigated and rainfed crop area in India (1970--2010)}
+
+\author{Simon Moulds\textsuperscript{1{*}}, Wouter Buytaert\textsuperscript{2}, Slobodan Djordjevic\textsuperscript{1}, Dragan Savic\textsuperscript{1}}
+
+\maketitle
+\thispagestyle{fancy}
+
+1. Centre for Water Systems, College of Engineering, Mathematics and Physical Sciences, University of Exeter, Exeter, UK 2. Department of Civil and Environmental Engineering, Imperial College London, London, UK {*}corresponding author(s): Simon Moulds (s.moulds@exeter.ac.uk)
+
+\begin{abstract}
+  India's green revolution has resulted in large-scale agricultural intensification to meet a growing demand for food. Irrigation has been central to this transformation, providing a buffer against the variability of the South Asian monsoon and allowing farmers to grow crops in the dry winter season. Historical datasets showing the change in irrigated area over time are necessary for assessments of global and regional change. Here, district-level inventory data showing the area of specific crop types are spatially disaggregated using various spatial input datasets, including maps of irrigated area, cropland fraction and biophysical crop suitability. The resulting dataset provides a time series of maps which show the area of 33 crop types at 5 arcminute $\times$ 5 arcminute resolution between 1970--2010. The maps of individual crops are further divided between rainfed and irrigated fractions and major growing seasons. The maps show good agreement with existing contemporary maps of crop area. However, there are no equivalent datasets providing maps before the year 2000 available for comparison. Hence, the dataset is associated with considerable uncertainty at the grid cell scale arising from the district-level inventory data as well as the spatial disaggregation procedure. Consequently, we argue the dataset is most suited to global and regional applications rather than localised studies where the results are sensitive to the values of individual grid cells.
+  % This is a manuscript template for Data Descriptor submissions to \emph{Scientific
+  % Data} (http://www.nature.com/scientificdata). The abstract must be
+  % no longer than 170 words, and should succinctly describe the study,
+  % the assay(s) performed, the resulting data, and the reuse potential,
+  % but should not make any claims regarding new scientific findings.
+  % No references are allowed in this section. 
+\end{abstract}
+
+\section*{Background \& Summary}
+
+% Furthermore, the South Asian monsoon, which provides up to 85\% of the total annual rainfall across the Indian subcontinent \cite{turner_climate_2012}, shows increasing variability as a result of climate change and other factors \cite{bollasina_hydrology:_2014,singh_observed_2014}. Given these threats to food security, irrigation will continue to be an essential feature of Indian agriculture \cite{biemans_future_2013,smilovic_limits_2015}; indeed, irrigated area is projected to increase in the future \cite{neumann_exploring_2011,elliott_constraints_2014,haddeland_global_2014}. \\
+
+% The widespread use of irrigation, which provides a buffer against intraseasonal monsoon variability and allows farmers to grow crops throughout the year, has been essential to this transformation \cite{alauddin_agricultural_2008,shukla_response_2014}.
+
+% it has also caused a dramatic increase in the exploitation of natural resources, particularly the vast aquifers of the fertile Indo-Gangetic plains in northern India \cite{rodell_satellite-based_2009,gleeson_water_2012}.
+
+% For example, \cite{freydank_towards_2008} combined data from the FAOSTAT database \cite{FAO2015a} and other sources to create an annual time series of area equipped for irrigation at the country level for the period 1900 to 2003. This data set has been used in several global studies to quantify the impact of irrigation on river discharge \cite{haddeland_hydrologic_2007,biemans_impact_2011,pokhrel_incorporating_2012}, surface fluxes and climate \cite{puma_effects_2010}, water extractions \cite{gerten_causes_2008,yoshikawa_assessment_2014} and water storage \cite{doll_impact_2012}. The majority of these studies used a scaling factor to disaggregate the country level data to a spatial grid, resulting in considerable inaccuracies in large countries such as India.
+
+% Area equipped for irrigation (AEI) is useful for water resource managers and policy-makers because it gives an indication of the maximum capacity of the agricultural system and highlights areas for future development. The area actually irrigated (AAI) is usually less than the area equipped for irrigation because of land that is left fallow or devoted to rainfed agriculture in certain years \cite{siebert_development_2005}. Historical information on AAI is important because it allows water resource managers to understand how demand changes in response to variations in supply at various spatial and temporal scales \cite{siebert_global_2015}. In addition, hydrological and earth system models that simulate irrigation processes require the actually irrigated area, rather than the area equipped for irrigation, as an input variable because irrigated area is usually represented as a separate land use \cite{nazemi_inclusion_2015}. Lastly, actually irrigated area is usually reported with the crop type, allowing a more detailed estimation of water demand taking into account specific crop water requirements. \\
+
+% As \cite{laborte_riceatlas_2017} point out, this dataset does not adequately handle crops which are grown more than once during the growing season.
+
+India's green revolution, initiated in the mid-1960s to achieve food security for the country's rapidly growing population \cite{singh_environmental_2000}, has driven large scale land use and land management change from natural land cover and low-intensity cropland to high-input agricultural systems \cite{evenson_assessing_2003,foley_solutions_2011}. While the green revolution has enabled the country to become self sufficient in food production and supported the livelihoods of millions \cite{wada_multimodel_2013}, it has also caused a dramatic increase in the exploitation of natural resources \cite{rodell_satellite-based_2009,gleeson_water_2012}, which is expected to intensify as the country experiences major social and economic change \cite{zhao_land_2006,james_indias_2011,elliott_constraints_2014}. Spatio-temporal datasets showing the change in extent and distribution of rainfed and irrigated area over time are necessary to quantify the environmental impacts of large-scale agricultural intensification \cite{wisser_global_2008,nazemi_inclusion_2015,siebert_global_2015}. Such analyses provide insight into the drivers of change, highlight areas of unsustainable exploitation of resources and improve projections of future irrigation requirements \cite{doll_global_2002,wisser_global_2008}. \\
+
+Several datasets of contemporary irrigated and rainfed cropland have been developed at global and regional scales. For example, the Global Irrigated Area Mapping project (GIAM) produced a global map of irrigated area with a 5 arcminutes $\times$ 5 arcminutes spatial resolution around the year 2000 based on various data sources including Advanced Very High Resolution Radiometer products and the Syst\`{e}me pour l'Observation de la Terra Vegetation (SPOT VGT) product. Separate maps based on Moderate Resolution Imaging Spectroradiometer (MODIS) data with a 500m resolution were produced for the Indo-Gangetic Plain \cite{thenkabail_ganges_2005}, the Krishna basin in the Indian peninsula \cite{biggs_irrigated_2006} and the entire Indian subcontinent \cite{dheeravath_irrigated_2010}. Data products derived from remote sensing have a high spatial resolution and the use of multitemporal satellite imagery enables the detection of environmental change \cite{portmann_mirca2000-global_2010}. However, remote sensing approaches have a number of important limitations for spatio-temporal irrigated area mapping. Current classification algorithms cannot reliably distinguish between specific crop types or between irrigated and rainfed crops \cite{portmann_mirca2000-global_2010}. The fact that remotely sensed data only specifies the dominant land use/land cover class introduces a large amount of uncertainty to the resulting maps \cite{dheeravath_irrigated_2010}. Classification algorithms, which must be trained on a large number of ground truth points, are also subject to uncertainty \cite{portmann_mirca2000-global_2010}. Moreover, using satellite data for land use/land cover mapping for historical periods is challenging because of poor data availability as a result of operational decisions taken during satellite programmes \cite{wulder_global_2016}, spatial and temporal inconsistencies in satellite images \cite{verburg_challenges_2011} and persistent cloud cover during the monsoon season \cite{ju_availability_2008}.\\
+
+An alternative strategy is to use national and subnational agricultural census data \cite{monfreda_farming_2008}. The Global Map of Irrigated Area (GMIA) \cite{siebert_development_2005}, which shows the area equipped for irrigation (AEI) around the year 2005, was produced by downscaling national and subnational inventory data about the area equipped for irrigation and maps of cropland extent. An extended version of the dataset shows AEI between 1900 and 2005 with decadal time steps \cite{siebert_global_2015}. However, the maps do not distinguish between crop types and only provide the area equipped for irrigation rather than the area actually irrigated. In contrast, the Monthly Irrigated and Rainfed Crop Areas around the year 2000 (MIRCA2000) dataset \cite{portmann_mirca2000-global_2010} provides monthly grids showing rainfed and irrigated areas of 26 crops at 5 arcminute $\times$ 5 arcminute resolution. The temporal disaggregation of crop areas to monthly grids is not based on specific data about the area of crops grown in each growing season but rather based on assumed cropping intensities from \cite{monfreda_farming_2008} and regional data about the cropping periods of irrigated crops \cite{portmann_mirca2000-global_2010}. Some researchers have extrapolated MIRCA2000 back and forwards in time using country-level crop statistics, supplying the resulting spatio-temoporal dataset in impact assessment models \cite{wada_nonsustainable_2012,dalin_groundwater_2017}. Another dataset showing the spatial distribution of irrigated crops is the MapSPAM product \cite{you_generating_2014}, which downscales national and subnational data for the year 2005 using a cross-entropy optimisation technique. However, these maps neither show the growing season of individual crops, nor provide data for years other than 2005. \\
+
+As we have shown, there is a critical shortage of spatially-explicit datasets which show changes in area of rainfed and irrigated crops over time. Moreover, existing datasets of crop area such as MIRCA2000 and MapSPAM have important limitations to do with the temporal disaggregation of crop areas between growing seasons. In this paper, we describe a new set of maps showing the rainfed and irrigated area of 33 crops on a seasonal basis between 1970--2010 at a spatial resolution of 5 arcminutes $\times$ 5 arcminutes. \\
+
+% (700 words maximum) An overview of the study design, the assay(s)
+% performed, and the created data, including any background information
+% needed to put this study in the context of previous work and the literature.
+% The section should also briefly outline the broader goals that motivated
+% the creation of this dataset and the potential reuse value. We also
+% encourage authors to include a figure that provides a schematic overview
+% of the study and assay(s) design. This section and the other main
+% body sections of the manuscript should include citations to the literature
+% as needed \citep{cite1, cite2}. References should be included within the 
+% manuscript file itself as our system cannot accept BibTeX bibliography files. 
+% Authors who wish to use BibTeX to prepare their references should therefore 
+% copy the reference list from the .bbl file that BibTeX generates and paste it 
+% into the main manuscript .tex file (and delete the associated 
+% \textbackslash{}bibliography and \textbackslash{}bibliographystyle commands).
+
+\section*{Methods}
+
+\subsection*{Study area}
+The Indian agricultural sector supports the livelihoods of more than 60\% of India's working population and accounts for approximately 70\% of the country's exports \cite{gadgil_indian_2006}. There are two main growing seasons in India: the \textit{kharif} season between June and October, coinciding with the South Asian monsoon, and the \textit{rabi} between October and April \cite{smilovic_limits_2015}. In some parts of India an additional growing season is possible between \textit{rabi} and \textit{kharif} \cite{thenkabail_ganges_2005}. At the country level, the main \textit{kharif} crop is rice and the main \textit{rabi} crop is wheat, although different crops are locally important. Irrigation is mainly practiced during the dry \textit{rabi} season but may also be used during the \textit{kharif} season to supplement weak monsoon rainfall and provide a buffer against intraseasonal monsoon variability. \\
+
+\subsection*{Preparing a spatial database of sub-national agricultural inventory data}
+
+\subsubsection*{Input data}
+
+Indian agricultural inventory data shows the are area and production of multiple crop types as well as the proportion of each crop type that receives irrigation during a given year. The collection of agricultural data is decentralised and data collection methods vary between India's various States and Union Territories (territories administered by the Central Government). These can be separated into three broad groups: %
+
+\begin{enumerate}
+\item \textit{States and Union Territories which been cadastrally surveyed.} In this case village revenue agencies survey all fields during each growing season to compile crop and irrigation inventory data;
+\item \textit{The States of Kerala, Orissa and West Bengal.} Villages in these States do not have their own revenue agency and statistics are collected from a random sample of 20\% of villages, such that over a five year period each village is surveyed once, and extrapolated to all villages
+\item \textit{States and Union Territories without a formal reporting system.} In this case inventory data are based on estimates made at the village level
+\end{enumerate}
+
+% \begin{figure}[t]
+%   \includegraphics[width=8cm]{f01_survey_type.png}
+%   \caption{Survey group to which each district unit in the study region belongs. The majority of districts belong to survey group 1 which are subject to a full survey based on cadastral survey information. In Kerala, Orissa and West Bengal, shown in blue, agricultural data is collected from a random sample of 20\% of districts in any given year such that in a five year period all districts will have been surveyed once. Lastly, certain districts in north-east India, shown in red, do not have a formal reporting procedure and inventory data is based on estimates made at the village level.}
+%   \label{fig:survey_type}
+% \end{figure}
+
+\noindent In all cases the raw village level statistics are compiled and aggregated to district and state administrative levels by the Directorate of Economics and Statistics (DES). While village level data, which has the finest spatial granularity, is not usually released to the public, the DES ensures that district level inventory data collected post-1998 is freely available. We obtained this data, which shows the area of irrigated and rainfed crops for the period 1998--2013, from India's online data portal (\url{https://data.gov.in/}, Accessed April 2018). For earlier years we were able to purchase district-level inventory data from Indiastat, a commercial enterprise that collects and distributes socioeconomic data about India. This dataset shows the irrigated area of multiple crops for the periods 1950--1992 and 1998--2013. Unfortunately, however, information on rainfed crops was not available from Indiastat. Thus, we obtained an additional source of district level data for 19 States and Union Territories (out of a total of 29 States and 7 Union Territories) for the period 1966--2009 from the ICRISAT Village Dynamics in South Asia (VDSA) project (\url{http://vdsa.icrisat.ac.in/}, accessed August 2015). This data has the same ultimate source as the DES and Indiastat data (i.e. the village level statistics) but has undergone some data processing as part of the VDSA project. Considering all data sources, the data availability in district units surveyed using the first data collection method ($n=\textrm{251}$, $\mu=\textrm{47.42}$, $\sigma=\textrm{16.25}$) is higher than in districts surveyed using methods two ($n=\textrm{32}$, $\mu=\textrm{18.67}$, $\sigma=\textrm{8.01}$) or three ($n=\textrm{13}$, $\mu=\textrm{7.67}$, $\sigma=\textrm{5.52}$), although this varies at different times during the study period. In addition to the subnational data from Indiastat and ICRISAT, we also obtained country-level time series data from FAOSTAT (\url{http://www.fao.org/faostat/en/#home}, Accessed May 2018), which shows the area of every crop type present in the study area between 1961--2016. \\
+
+The spatial disaggregation procedure requires the geographical area of each district unit to be consistent throughout the study period. However, there have been several district boundary changes over the course of the study period for various reasons. During the period 1971--2001, for example, the number of districts increased from 356 to 593 \cite{kumar_mapping_2009}, with a consequent decrease in the average district size. However, reducing the number of district units to ensure consistent district boundaries during the entire study period would result in a substantial loss of the spatial granularity that is present in the inventory data for recent periods. We therefore split the study period into two parts covering 1970--1999 and 2000--2010, which hereafter we refer to as historical and recent periods, respectively. We obtained a digital map of contemporary administrative boundaries from the FAO Global Administrative Unit Layers (GAUL) dataset. For the historical period we visually identified the location of boundary changes by overlaying the contemporary district map with district boundaries shown on an historical geological map for India retrieved from the European digital archive on soil maps (EuDASM) \cite{panagos_european_2011}. Potential changes were cross-referenced with boundary changes identified by \cite{kumar_mapping_2009} and the Administrative Atlas of India (\url{http://censusindia.gov.in/2011census/maps/maps2011.html}, Accessed April 2018). For the recent period we identified boundary changes by examining the GAUL dataset at different time points. In both cases we manually dissolved the boundaries of contemporary district units until the resulting boundaries were such that they remained consistent throughout the respective time periods.\\
+
+% \begin{figure}[t]
+%   \includegraphics[width=12cm]{f02_data_availability.png}
+%   \caption{Mean Indiastat data availability in each district unit over 5 year time slices. Data availability during the 1990s is poor because the Indiastat dataset does not provide data for the period 1993--1997. However, for most districts it was possible to infill this period using ICRISAT data.}
+%   \label{fig:data_availability}
+% \end{figure}
+
+\subsubsection*{Data preparation}
+In the first instance we performed data quality control on the district-level inventory dataset to remove noise from the time series data. The main data quality problems we encountered in the dataset were time series labelled as one crop type but actually belonging to another, data points labelled with the wrong area units, outliers and missing data points. These were identified by plotting the time series data of each crop type under consideration for each district unit. Mislabelled time series, to the extent that they could be identified, were changed to the correct crop type. Where possible missing data points were infilled using the ICRISAT dataset; otherwise they were infilled using a combination of linear interpolation or, if data points were missing from the start or end of the time series, last observation carried forwards. Outliers were removed and treated as missing data points. \\
+
+For the recent period (2000--2010) it was possible to use district-level inventory data for every district and crop combination. However, as a result of reduced quality and availability of data prior to 2000 it was necessary to use a combination of subnational and national data for the historical period. Combining Indiastat and ICRISAT datasets yielded district-level data for 19 states and 16 crop types, which together represent around XY\% of India's total crop production during the historical period. Missing data was infilled using the difference between the aggregated district-level data and the country-level data from FAOSTAT. The resulting time series was apportioned between district units and irrigated and rainfed fractions using the relevant crop maps for 2005 when these became available. Similarly, since inventory data for the historical period does not provide information on the fraction of irrigated and rainfed in each growing season, we used the seasonal fraction from the corresponding base maps to disaggregate historical data to specific growing seasons. Figure~\ref{fig:study_area} shows the district boundaries used in the analysis for the two time periods, with stippling indicating the regions where FAOSTAT data was used for all crops. \\
+
+\begin{figure}[!htb]
+  \centering
+  \includegraphics[width=12cm]{study_area.pdf}
+  \caption{District boundaries used to constrain the spatial allocation procedure for historical (1970--1999) and recent (2000--2010) periods. Stippling indicates the regions where FAOSTAT data was used to derive the non-spatial crop areas which drive the allocation procedure.}
+  \label{fig:study_area}
+\end{figure}
+
+\subsection*{Spatial downscaling}
+
+\subsubsection*{Input data to the downscaling routine}
+Maps defining cropland extent were obtained from a new land use/land cover change dataset providing annual land cover maps for India between 1960--2010 \cite{moulds_spatiotemporal_2018}. Maps of showing the maximum attainable yield under prevailing soil, terrain and climatic conditions during 1961--1990 were obtained from the FAO Global Agro-Ecological Zones (GAEZ) database, version 3.0. Table~\ref{table:gaez_crop} provides a list of crop types included in the analysis and the corresponding potential yield map. A map of contemporary market accessibility was obtained from \cite{weiss_global_2018}. Maps of irrigated area for recent and historical periods were obtained from \cite{ambika_remotely_2016} and \cite{siebert_global_2015}, respectively. Where necessary, the input maps were aggregated to a spatial resolution of 5 arcminutes $\times$ 5 arcminutes. \\
+
+Vector maps showing administrative boundaries for historical and recent periods were converted to raster images with the same spatial resolution as the other spatial data layers. We calculated the fractional membership of pixels to each district unit in the respective time periods, such that pixels entirely within the boundary have a value of one while pixels which intersect boundaries have values between zero and one. The resulting series of maps were used to define the grid cells to which the district level inventory data were apportioned during the disaggregation procedure. \\
+
+\begin{table*}[t]
+  %% \tiny
+  \caption{Table showing the crop types included in the analysis and the corresponding potential yield maps from the GAEZ database.}
+  \begin{tabular}{ l l }
+  % \topline
+  Crop type & FAO GAEZ Suitability map \\
+  % \middleline
+  Wheat                  & Wheat \\
+  Maize                  & Maize \\
+  Rice (Autumn)          & Rice \\
+  Rice (Winter)          & Rice \\
+  Rice (Summer)          & Rice \\
+  Barley                 & Barley \\
+  Bajra                  & Millet \\
+  Ragi                   & Millet \\
+  Sorghum (Kharif)       & Sorghum \\
+  Sorghum (Rabi)         & Sorghum \\
+  Other cereals (Kharif) & Rye, foxtail millet, oat, buckwheat \\
+  Other cereals (Rabi)   & Rye, foxtail millet, oat, buckwheat \\
+  Gram                   & Gram \\ 
+  Tur                    & Tur \\
+  Other pulses (Kharif)  & Phaseolus bean, chickpea, cowpea, dry pea \\
+  Other pulses (Rabi)    & Phaseolus bean, chickpea, cowpea, dry pea \\
+  Sugarcane              & Sugarcane \\
+  Condiments and spices  & -\\
+  Fruit                  & Banana, citrus, coconut, cacao \\
+  Vegetables             & Cabbage, carrot, onion, tomato, white potato, sweet potato \\
+  Other food crops       & -\\
+  Groundnut              & Groundnut \\
+  Sesamum                & -\\
+  Rapeseed               & Rapeseed \\
+  Linseed                & -\\
+  Other oilseed          & -\\
+  Cotton                 & Cotton \\
+  Tobacco                & Tobacco \\
+  Fodder                 & -\\
+  Other non-food crops   & -\\
+  % \bottomline
+  \end{tabular}
+  \label{table:gaez_crop}
+  % \belowtable{}
+\end{table*}
+
+% Maps of cropland extent and crop suitability were reprojected to Albers Equal Area projection using bilinear interpolation. The reprojected maps had a spatial resolution of approximately 9km $\times$ 9km, ensuring that each grid cell in the study region had the same geographical area: a requirement of the spatial disaggregation algorithm. In some cases there was no corresponding crop suitability map for crop types included in the inventory data. The suitability map for irrigated fruit was prepared by computing the mean suitability to banana, citrus, coconut and cacao, while the suitability map for vegetables was the mean suitability of cabbage, carrot, onion, tomato, white and sweet potato. In addition, the same crop suitability map was used for bajra (pearl millet) and ragi (finger millet) because the FAO GAEZ database does not separate different types of millet. For some minor crops it was not possible to assign a crop suitability map and in these cases uniform suitability was assumed. Table~\ref{table:suitability_maps} shows the crop types mapped and the corresponding suitability map. \\
+
+% The map of administrative boundaries was also reprojected to Albers Equal Area projection. Each district polygon in the digital map was converted to a raster image with the same spatial resolution as the maps of cropland extent and crop suitability. Cell values in these images represent the fraction of the cell belonging to the corresponding district unit such that cells entirely contained in the polygon had a value of one while cells on district boundaries had values between zero and one. These maps were used to define the grid cells to which district-level inventory data was apportioned by the spatial disaggregation procedure. \\
+
+% The cross entropy approach ``can be stated as a minimization problem'' in which the objective is to minimize the amount of additional information imposed upon the prior distribution $q$ in order to meet various model constraints. \\
+
+% From You 2009: "Our production allocation problem is underdetermined with quite incomplete data, and the entropy approach is ideally suited for our spatial allocation model."
+
+\subsection*{Spatial allocation}
+The spatial allocation procedure is divided into two parts. First, we establish a set of base maps for the year 2005 using a cross-entropy optimization method. Using these maps we complete the subnational database for the historical period, as described above. We then use the maps as the main input to spatially disaggregate rainfed and irrigated crop areas from the subnational database for the other years in the study period.
+
+\subsubsection*{Method to create base maps}
+Following \cite{you_generating_2014}, we adopt a cross entropy approach to allocate sub-national crop area estimates to a spatial grid. The notion of cross entropy derives from the concept of information entropy first put forward in seminal work by Claude Shannon \cite{shannon_mathematical_1948}. According to Shannon's definition, entropy is the weighted sum of information about a random variable that is contained in its probability distribution $p_{i}, i=1,2, ...,n$, expressed:
+
+\begin{equation}
+  H(p) = - \sum_{i=1}^{n} p_{i} \ln p_{i}
+\end{equation}
+
+\noindent where convention dictates that $\ln 0 = 0$, such that a probability of zero provides no information. Cross entropy measures the difference in information content between the posterior distribution $p_{i}$ and its prior $q_{i}$, as follows:
+
+\begin{equation}
+  CE(p,q) = \sum_{i=1}^{n}p_{i} \ln (p_{i} / q_{i}) = \sum_{i=1}^{n} p_{i} \ln p_{i} - \sum_{i=1}^{n} p_{i} \ln q_{i}
+\end{equation}
+
+\noindent where $CE(p,q)$ is the cross-entropy of $p$ with respect to $q$. \\
+
+Cross-entropy is an appropriate technique for the spatial allocation of crop areas because it effectively draws together various disparate and incomplete data sources which either constrain the likelihood or suggest the presence of a crop type in a particular location \cite{you_generating_2014}. We formulate the spatial allocation model as a cross entropy minimization problem. The posterior probability distribution is the area share, $s$, allocated to pixel $i$, crop $j$, water source $l$, such that
+
+\begin{equation}
+  s_{ijl} = \frac{A_{ijl}}{CropArea_{jl}}
+\end{equation}
+
+\noindent where $A_{ijl}$ is the allocated area in pixel $i$ of crop $j$ with water source $l$, and $CropArea_{jl}$ is the corresponding total area within the district unit according to the sub-national database. With this in mind, the spatial allocation model can be written:
+
+\begin{equation} \label{eq:objfun}
+  \begin{aligned}
+  & \underset{\scriptscriptstyle{\{s_{ijl}\}}}{\text{Minimize}} \qquad CE(s,\pi) = \sum_{i}\sum_{j}\sum_{l}s_{ijl} \ln s_{ijl} - \sum_{i}\sum_{j}\sum_{l}s_{ijl} \ln \pi_{ijl}\\
+  & \text{Subject to:}\\
+  & \sum_{i} s_{ijl} = 1 \qquad \forall j \forall l\\
+  & \sum_{j}\sum_{l} CropArea_{jl} \times s_{ijl} = Avail_{i} \qquad \forall i\\
+  & \sum_{j}\sum_{l \epsilon L} CropArea_{jl} \times s_{ijl} = IrrArea_{i} \qquad \forall i\\
+  \end{aligned}
+\end{equation}
+
+\noindent where $\pi_{ijl}$ is the prior area share, $Avail_{i}$ and $IrrArea_{i}$ are respectively the total cropland and total area irrigated in pixel $i$ and $L$ is the set of irrigated crops in the district unit. The objective function (Equation~\ref{eq:objfun}) minimises the cross entropy between the estimated area shares, $s_{ijl}$ and the prior estimates, $\pi_{ijl}$. In other words, the objective of the spatial allocation model is to minimize the amount of extraneous information imposed upon the prior estimates in order to meet the model constraints. \\
+
+It is clear that the success of the model is highly dependent upon an accurate prior distribution, $\pi_{ijl}$ \cite{you_generating_2009}. We base the estimation of prior area shares on the revenue model proposed by \cite{you_generating_2014}, which is expressed as
+
+\begin{equation}
+Rev_{ijl} = Price_{j} \times Access_{ij} \times PotYield_{ijl} \times Suitable_{ijl}
+\end{equation}
+
+\noindent where $Rev$ is revenue, $Access$ is market accessibility, $PotYield$ is potential yield and $Suitable_{ijl}$ is binary variable which indicates whether pixel $i$ is suited to crop $j$ and water source $l$. The prior area allocation $\bar{A}_{ijk}$ of a given crop is then given by:
+
+\begin{equation} \label{eq:priorarea}
+  \bar{A}_{ijl} = CropArea_{jl} \times \frac{Rev_{ijl}}{\sum\limits_{i}Rev_{ijl}} \qquad \forall i \forall j \forall l
+\end{equation}
+
+\noindent The prior area share is thus:
+
+\begin{equation}
+  \pi_{ijl} = \frac{\bar{A}_{ijl}}{\sum\limits_{i}\bar{A}_{ijl}}
+\end{equation}
+
+The implementation of the spatial allocation algorithm is adapted from the General Purpose Cross Entropy Matrix Adjustment (GPCEMA) program \cite{lemelin_gpcema_2009}. The original program seeks to adjust a prior matrix such that the sum of rows and columns in the resulting posterior matrix equal a set of marginal totals. In GPCEMA, cross-entropy is used as a measure of the extent to which the adjusted matrix diverges from the prior matrix. In our case, the prior matrix contains the estimated area of concurrently grown irrigated and rainfed crops such that matrix rows correspond to individual grid cells and columns refer to unique crop type and water supply combinations (e.g. irrigated and rainfed rice are treated separately). We adapted these constraints to those outlined in Equation~\ref{eq:objfun}. To solve the model we use the General Algebraic Modeling System with the CONOPT solver.
+
+\subsubsection*{Method to create maps for recent and historical periods}
+% For the recent period (2000--2010) we use subnational inventory data associated with the same district units as were used to construct the 2005 base maps. For the historical period (1970--1999) we use a combination of subnational and national data to overcome the reduced data quality and availability during these years. Combining Indiastat and ICRISAT datasets yielded district-level data for 19 states and 16 crop types, together supplying XY\% of India's total crop production during the historical period \cite{}. Missing data was infilled using country-level data from FAOSTAT, apportioned between district units and irrigated and rainfed fractions based on the 2005 base maps. Similarly, since inventory data for the historical period (1970-2000) does not provide information on the fraction of irrigated and rainfed in each growing season we used the seasonal fraction from the corresponding base maps to disaggregate historical data to growing season. Because the district boundaries for the historical and recent periods are not the same, we used the average fraction of all cells within the respective historical district polygon. \\
+
+We used the 2005 maps as the basis for disaggregating inventory data for the historical and recent period. In essence, pixel values from the base maps for the respective district units replace $Rev$ in Equation~\ref{eq:priorarea}, so that the relative spatial distribution of the prior area allocation of the particular crop and year under consideration is consistent with that of the 2005 map. We perform the optimisation in the same way as for the 2005 maps, but use cropland and irrigated area constraints appropriate for the time period in question. \\
+
+% The Methods should include detailed text describing any steps or procedures 
+% used in producing the data, including full descriptions of the experimental 
+% design, data acquisition assays, and any computational processing (e.g. 
+% normalization, image feature extraction). Related methods should be grouped 
+% under corresponding subheadings where possible, and methods should be described 
+% in enough detail to allow other researchers to interpret and repeat, if required, 
+% the full study. Specific data outputs should be explicitly referenced via data 
+% citation (see Data Records and Data Citations, below). Authors should cite 
+% previous descriptions of the methods under use, but ideally the method 
+% descriptions should be complete enough for others to understand and reproduce 
+% the methods and processing steps without referring to associated publications. 
+% There is no limit to the length of the Methods section.
+
+\subsection*{Code availability}
+The analysis was performed in the R environment for statistical computing. The set of R scripts used to perform each stage of the analysis, including data preparation and allocation of irrigated land, is provided alongside the data (see Data Records section) under the GNU General Public Licence. To run the scripts users must download the FAO GAEZ data independently, since we do not have permission to distribute the data. Full instructions about where to place these files in relation to the data processing scripts is provided with the code. The optimisation itself is performed in GAMS, which we access using the Python client of the Network-Enabled Optimization System (NEOS) Server (\url{https://neos-server.org/neos/}). \\
+
+% For all studies using custom code in the generation or processing of datasets, 
+% a statement must be included here, indicating whether and how the code can be 
+% accessed, including any restrictions to access. This section should also include 
+% information on the versions of any software used, if relevant, and any specific 
+% variables or parameters used to generate, test, or process the current dataset. 
+
+\section*{Data Records}
+The dataset is divided into two parts. The first part (Data Citation 1) provides monthly and seasonal irrigated area maps for 33 crop types for year 2005 for the entire Indian subcontinent. The second part (Data Citation 2) provides monthly and seasonal irrigated area maps for 33 crop types for the period 1970-2010. All maps have a spatial resolution of 5 arcminutes $\times$ 5 arcminutes and are provided in unprojected (i.e. latitude-longitude) format. \\
+
+% Please explain each data record associated with this work, including
+% the repository where this information is stored, and an overview of
+% the data files and their formats. Each external data record should
+% be listed in Data Citation section at the end of this template, and 
+% records should be cited throughout the manuscript as, for example 
+% (Data Citation 1). 
+
+% Tables should be used to support the data records, and should clearly indicate 
+% the samples and subjects, their provenance, and the experimental manipulations 
+% performed on each. They should also specify the data output resulting from each 
+% data-collection or analytical step, should these form part of the archived record. 
+% Please see the submission guidelines at the \emph{Scientific Data} website, and 
+% our Word templates for more information on preparing such tables. 
+
+\section*{Technical Validation}
+Ideally, the dataset would be validated by comparing the constituent maps with relevant ground truth data at various time points during the study period. Unfortunately such data does not exist and hence it is impossible to properly validate the spatial distribution of crop types shown by the maps. Instead, we evaluated the dataset against alternative datasets pertaining to the area and spatial distribution of crops in India. First, we compared the aggregated area of various crops with country-level data from FAOSTAT in order to verify that at each time point the disaggregation algorithm had allocated the correct area of each crop. The results of this comparison, shown in Figure~\ref{fig:faostat_comparison}, demonstrate good agreement between IndiaCropAtlas and FAOSTAT in terms of the total area of each crop type. \\
+
+\begin{figure}[!htb]
+  \centering
+  \includegraphics[width=12cm]{faostat_comparison.pdf}
+  \caption{}
+  \label{fig:faostat_comparison}
+\end{figure}
+
+To evaluate the monthly crop calendars we compared the monthly aggregated area of each crop in 2005 with the corresponding areas from MIRCA2000 \cite{portmann_mirca2000-global_2010}. Figure~\ref{fig:wheat_monthly_comparison} reveals considerable differences between the present dataset and MIRCA2000 in terms of wheat production. In particular, MIRCA2000 indicates that a large amount of wheat is grown during the \textit{kharif} growing season whereas we assume that wheat is entirely grown during the \textit{rabi} season. This assumption is consistent with a number of sources which state that in India wheat is grown exclusively as an irrigated \textit{rabi} crop \cite{ref}. As Figure~\ref{fig:rice_monthly_comparison} shows, both datasets agree that rice is predominantly grown during the \textit{kharif} season. However, the contrast between \textit{kharif} and \textit{rabi} is greater in our dataset compared to MIRCA2000. In addition, whereas MIRCA2000 designates the \textit{rabi} crop as exclusively irrigated, our dataset shows an approximately equal split between rainfed and irrigated rice. \\% We additionally compared the monthly rice areas with the corresponding areas from RiceAtlas \cite{laborte_riceatlas_2017}. While this dataset does not distinguish between irrigated and rainfed areas, Figure~\ref{fig:rice_monthly_comparison} shows that... [TODO]. \\
+
+\begin{figure}[!htb]
+  \centering
+  \includegraphics[width=12cm]{mirca_monthly_comparison_wheat.pdf}
+  \caption{}
+  \label{fig:wheat_monthly_comparison}
+\end{figure}
+
+\begin{figure}[!htb]
+  \centering
+  \includegraphics[width=12cm]{mirca_monthly_comparison_rice.pdf}
+  \caption{}
+  \label{fig:rice_monthly_comparison}
+\end{figure}
+
+% A quantitative, pixel-by-pixel comparison of the new dataset with MIRCA2000 or MapSPAM would be of little value since none of these datasets have been validated against ground truth data in India \cite{}.
+
+A% s previously stated, the set of base maps for the year 2005 are constructed by spatially downscaling district-level inventory data which provides the area of each crop disaggregated according to the water source (i.e. irrigated or rainfed) and growing season (e.g. \textit{kharif} or \textit{rabi}). 
+The maps for historical and recent periods are spatially consistent with the subnational inventory data for each district unit shown in Figure~\ref{}. Further validation at the pixel level is not possible due to a lack of independent datasets which themselves have been validated with ground truth data. Instead, we evaluated the spatial distribution of crops by visually comparing the new dataset with equivalent images from MIRCA2000 \cite{portmann_mirca2000-global_2010} and MapSPAM \cite{you_generating_2014}. Figure~\ref{fig:wheat_map_comparison} shows the results of the comparison for irrigated and rainfed wheat during the \textit{rabi} season. There is clear agreement between the three maps about the location of the Indo-Gangetic Plain in northern India as the main wheat producing region. Considering the distribution of wheat, the IndiaCropAtlas map shows a larger area being grown in north-west India compared to the other two maps. As far as MIRCA2000 is concerned this is at least in part due to the discrepancy between the crop calendars for wheat identified in Figure~\ref{fig:wheat_monthly_comparison}. The MIRCA2000 map shows a smaller rainfed wheat area which is restricted to the north of the country. In the case of IndiaCropAtlas and MapSPAM the division between rainfed and irrigated area is determined from the district-level inventory data. Figure~\ref{fig:rice_map_comparison} shows the maps of irrigated and rainfed \textit{kharif} rice in 2005. The three datasets show broad agreement in the location of irrigated \textit{kharif} rice and identify the Indo-Gangetic Plain as the main growing region. There is more disagreement in the location of the rainfed crop, with MapSPAM showing more rainfed \textit{kharif} rice in the Indo-Gangetic Plain than the other two datasets. \\
+
+\begin{figure}[!htb]
+  \centering
+  \includegraphics[width=12cm]{mirca_wheat_comparison_2005.pdf}
+  \caption{}
+  \label{fig:wheat_map_comparison}
+\end{figure}
+
+\begin{figure}[!htb]
+  \centering
+  \includegraphics[width=12cm]{mirca_rice_comparison_2005.pdf}
+  \caption{}
+  \label{fig:rice_map_comparison}
+\end{figure}
+
+% This section presents any experiments or analyses that are needed
+% to support the technical quality of the dataset. This section may
+% be supported by up figures and tables, as needed. This is a required
+% section; authors must present information justifying the reliability
+% of their data.
+
+\section*{Usage Notes}
+
+IndiaCropAtlas provides a set of maps showing the area of rainfed and irrigated crops at 5 arcminute $\times$ 5 arcminute resolution. A set of maps is included for each year between 1970--2010, at either a seasonal or monthly temporal resolution. A set of base maps were created for 2005 using a cross-entropy optimisation method which combined district-level inventory data with various spatially explicit data sources pertaining to the spatial distribution of crops. The base maps were subsequently used to downscale district and national-level inventory data for subsequent years. The dataset has not been validated at the pixel level due to a lack of appropriate data. Crop area maps from the contemporary period (2000--2010) are consistent with district-level inventory data specifying the total area of each crop divided between irrigated and rainfed and the various seasons in which it is grown. Maps belonging to the historical period (1970--2000) are consistent with inventory data specifying rainfed and irrigated crop area. However, since the inventory data for the historical period does not divide crop area between growing areas, we divided the total irrigated and rainfed crop areas between seasons on the basis of proportions from the 2005 base maps. Both contemporary and historical maps comply with estimates of cropland extent \cite{moulds2018}. In the contemporary period maps of irrigated crops comply with a time series of remote-sensing based irrigated area maps \cite{ambika_remotely_2016}, while historical maps are consistent with a spatio-temporal database of area equipped for irrigation \cite{siebert_global_2015}. Given the lack of validation at the pixel level, we recommend that the dataset is used in regional applications rather than local analyses which are sensitive to the value of individual pixels. \\
+
+The primary purpose of the dataset is to constrain regional and global impact assessment models to quantify and understand the environmental consequences of agricultural intensification in India. In addition, the methodology we outline may be used as a template for constructing similar datasets for other regions. There are a number of ways in which the dataset could be improved. % We have chosen here to use RiceAtlas dataset \cite{laborte_riceatlas_2017} for comparison, but it would also be possible to integrate the crop calendar maps from this dataset to augment the crop calendars we currently use to derive the monthly maps. Currently, the dataset incoporates the XYZ dataset showing the spatial distribution of rice. 
+At present, remote-sensing datasets showing the spatial distribution of specific crops, other than rice, at regional scales are scarce, due to limitations associated with satellite data and processing algorithms \cite{ref}. However, as technology improves it may become possible to incorporate additional remote sensing based datasets in the spatial allocation routine. \\
+
+Individual maps are provided as GeoTIFF files in latitude/longitude (i.e. unprojected) format. Such files may be loaded with standard Geographical Information System (GIS) software as well as various data processing languages. Pixel values represent the area of the particular crop in hectares. Users of the dataset should be aware that projecting the maps (for example to an equal-area projection) will change the aggregate area of each crop type so that it will almost certainly no longer correspond with the inventory data. \\
+
+% Brief instructions that may help other researchers reuse these dataset.
+% This is an optional section, but strongly encouraged when helpful
+% to readers. This may include discussion of software packages that
+% are suitable for analyzing the assay data files, suggested downstream
+% processing steps (e.g. normalization, etc.), or tips for integrating
+% or comparing this with other datasets. If needed, authors are encouraged
+% to provide code, programs, or data processing workflows when they may help 
+% others analyse the data. We encourage authors to archive related code in 
+% a DOI-issuing archive when possible, but code may also be supplied as 
+% supplementary information files. 
+
+% For studies involving privacy or safety controls on public access
+% to the data, this section should describe in detail these controls,
+% including how authors can apply to access the data, and what criteria
+% will be used to determine who may access the data, and any limitations
+% on data use. 
+
+\section*{Acknowledgements}
+We acknowledge the support of the UK Natural Environment Research Council (contracts NE/I022558/1 and NE/N01670X/1).\\
+
+% Text acknowledging non-author contributors. Acknowledgements should
+% be brief, and should not include thanks to anonymous referees and
+% editors, or effusive comments. Grant or contribution numbers may be
+% acknowledged.
+
+\section*{Author contributions}
+S.M., W.B., S.D. and D.S. devised the project. S.M. performed data collection, pre-processing and modelling to produce the final set of maps. D.S. provided guidance on the cross-entropy optimisation method. S.M wrote the manuscript with contributions from the other authors.\\
+
+% Please describe briefly the contributions
+% of each author to this work on a separate line. 
+
+% AK did this and that. 
+
+% BG did this and that and the other. 
+
+\section*{Competing financial interests}
+The authors declare no competing financial interests.
+
+% A competing financial interests statement is required for all accepted
+% papers published in \emph{Scientific Data}. If none exist simply write,
+% ``The author(s) declare no competing financial interests''.
+
+% \section*{Figures Legends}
+
+% Figure should be referred to using a consistent numbering scheme through
+% the entire Data Descriptor. For initial submissions, authors may choose
+% to supply this document as a single PDF with embedded figures, but
+% separate figure image files must be provided for revisions and accepted
+% manuscripts. In most cases, a Data Descriptor should not contain more
+% than three figures, but more may be allowed when needed. We discourage
+% the inclusion of figures in the Supplementary Information \textendash{}
+% all key figures should be included here in the main Figure section. 
+
+% Figure legends begin with a brief title sentence for the whole figure
+% and continue with a short description of what is shown in each panel,
+% as well as explaining any symbols used. Legend must total no more
+% than 350 words, and may contain literature references. 
+
+
+% \section*{Tables}
+
+% Tables supporting the Data Descriptor. These can provide summary information
+% (sample numbers, demographics, etc.), but they should generally not
+% be used to present primary data (i.e. measurements). Tables containing
+% primary data should be submitted to an appropriate data repository. 
+
+% Tables may be provided within the \LaTeX{} document or as separate
+% files (tab-delimited text or Excel files). Legends, where needed,
+% should be included here. Generally, a Data Descriptor should have
+% fewer than ten Tables, but more may be allowed when needed. Tables
+% may be of any size, but only Tables which fit onto a single printed
+% page will be included in the PDF version of the article (up to a maximum
+% of three). 
+
+% \bibliographystyle{plainnat}
+% \bibliography{Zotero_library.bib}{}
+
+\begin{thebibliography}{1}
+\expandafter\ifx\csname url\endcsname\relax
+  \def\url#1{\texttt{#1}}\fi
+\expandafter\ifx\csname urlprefix\endcsname\relax\def\urlprefix{URL }\fi
+\providecommand{\bibinfo}[2]{#2}
+\providecommand{\eprint}[2][]{\url{#2}}
+% \begin{thebibliography}{49}
+% \providecommand{\natexlab}[1]{#1}
+% \providecommand{\url}[1]{\texttt{#1}}
+% \expandafter\ifx\csname urlstyle\endcsname\relax
+%   \providecommand{\doi}[1]{doi: #1}\else
+%   \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem{singh_environmental_2000}
+  \bibinfo{author}{Singh, R.~B.}
+  \newblock \bibinfo{title}{{Environmental consequences of agricultural development: a case study from the {Green} {Revolution} state of {Haryana}, {India}}}.
+  \newblock \emph{\bibinfo{journal}{Agric. Ecosyst. Environ.}}
+  \textbf{\bibinfo{volume}{82}, \bibinfo{pages}{97--103}}
+  (\bibinfo{year}{2000})
+
+\bibitem{evenson_assessing_2003}
+  \bibinfo{author}{Evenson, R.~E.} \&
+  \bibinfo{author}{Gollin, D.}
+  \newblock \bibinfo{title}{{Assessing the impact of the {Green} {Revolution}, 1960 to 2000}}.
+  \newblock \emph{\bibinfo{journal}{Science}}
+  \textbf{\bibinfo{volume}{300}, \bibinfo{pages}{758--762}}
+  (\bibinfo{year}{2003})
+
+\bibitem{foley_solutions_2011}
+  \bibinfo{author}{Foley, J.~A.} \emph{et~al.}
+  \newblock \bibinfo{title}{{Solutions for a cultivated planet}}.
+  \newblock \emph{\bibinfo{journal}{Nature}}
+  \textbf{\bibinfo{volume}{478}, \bibinfo{pages}{337--342}}
+  (\bibinfo{year}{2011})
+
+\bibitem{wada_multimodel_2013}
+  \bibinfo{author}{Wada, Y.} \emph{et~al.}
+  \newblock \bibinfo{title}{{Multimodel projections and uncertainties of irrigation water demand
+  under climate change}}.
+  \newblock \emph{\bibinfo{journal}{Geophys. Res. Lett.}}
+  \textbf{\bibinfo{volume}{40}, \bibinfo{pages}{4626--4632}}
+  (\bibinfo{year}{2013})
+
+\bibitem{rodell_satellite-based_2009}
+  \bibinfo{author}{Rodell, M.}, \bibinfo{author}{Velicogna, I.} \&
+  \bibinfo{author}{Famiglietti, J.~S.}
+  \newblock \bibinfo{title}{{Satellite-based estimates of groundwater depletion in {India}}}.
+  \newblock \emph{\bibinfo{journal}{Nature}}
+  \textbf{\bibinfo{volume}{460}, \bibinfo{pages}{999--1002}}
+  (\bibinfo{year}{2009})
+
+\bibitem{gleeson_water_2012}
+  \bibinfo{author}{Gleeson, T.}, \bibinfo{author}{Wada, Y.},
+  \bibinfo{author}{Bierkens, M.~F.~P.} \&
+  \bibinfo{author}{van~Beek, L.~P.~H.}
+  \newblock \bibinfo{title}{{Water balance of global aquifers revealed by groundwater footprint}}.
+  \newblock \emph{\bibinfo{journal}{Nature}}
+  \textbf{\bibinfo{volume}{488}, \bibinfo{pages}{197--200}}
+  (\bibinfo{year}{2012})
+
+\bibitem{zhao_land_2006}
+  \bibinfo{author}{Zhao, S.} \emph{et~al.}
+  \newblock \bibinfo{title}{{Land use change in {Asia} and the ecological consequences}}.
+  \newblock \emph{\bibinfo{journal}{Ecol. Res.}}
+  \textbf{\bibinfo{volume}{21}, \bibinfo{pages}{890--896}}
+  (\bibinfo{year}{2006})
+
+\bibitem{james_indias_2011}
+  \bibinfo{author}{James, K.S.}
+  \newblock \bibinfo{title}{{India's {Demographic} {Change}: {Opportunities} and {Challenges}}}.
+  \newblock \emph{\bibinfo{journal}{Science}}
+  \textbf{\bibinfo{volume}{333}, \bibinfo{pages}{576--580}}
+  (\bibinfo{year}{2011})
+
+\bibitem{elliott_constraints_2014}
+  \bibinfo{author}{Elliott, J.} \emph{et~al.}
+  \newblock \bibinfo{title}{{Constraints and potentials of future irrigation water availability on agricultural production under climate change}}.
+  \newblock \emph{\bibinfo{journal}{Proc. Natl. Acad. Sci.}}
+  \textbf{\bibinfo{volume}{111}, \bibinfo{pages}{3239--3244}}
+  (\bibinfo{year}{2014})
+
+\bibitem{wisser_global_2008}
+  \bibinfo{author}{Wisser, D.} \emph{et~al.}
+  \newblock \bibinfo{title}{{Global irrigation water demand: {Variability} and uncertainties arising from agricultural and climate data sets}}.
+  \newblock \emph{\bibinfo{journal}{Geophys. Res. Lett.}}
+  \textbf{\bibinfo{volume}{35}}% , \bibinfo{pages}{}}
+  (\bibinfo{year}{2008})
+
+\bibitem{nazemi_inclusion_2015}
+  \bibinfo{author}{Nazemi, A.} \& \bibinfo{author}{Wheater, H.~S.}
+  \newblock \bibinfo{title}{{On inclusion of water resource management in {Earth} system models
+  \&amp;ndash; {Part} 2: {Representation} of water supply and allocation and
+  opportunities for improved modeling}}.
+  \newblock \emph{\bibinfo{journal}{Hydrol. Earth Syst. Sci.}}
+  \textbf{\bibinfo{volume}{19}, \bibinfo{pages}{63--90}}
+  (\bibinfo{year}{2015})
+
+\bibitem{siebert_global_2015}
+  \bibinfo{author}{Siebert, S.}, \bibinfo{author}{Kummu, M.},
+  \bibinfo{author}{Porkka, M.},
+  \bibinfo{author}{Döll, P.},
+  \bibinfo{author}{Ramankutty, N.} \&
+  \bibinfo{author}{Scanlon, B.~R.}
+  \newblock \bibinfo{title}{{A global data set of the extent of irrigated land from 1900 to 2005}}.
+  \newblock \emph{\bibinfo{journal}{Hydrol. Earth Syst. Sci.}}
+  \textbf{\bibinfo{volume}{19}, \bibinfo{pages}{1521--1545}}
+  (\bibinfo{year}{2015})
+
+\bibitem{doll_global_2002}
+  \bibinfo{author}{Döll, P.} \&
+  \bibinfo{author}{Siebert, S.}
+  \newblock \bibinfo{title}{{Global modeling of irrigation water requirements}}.
+  \newblock \emph{\bibinfo{journal}{Water Resour. Res.}}
+  \textbf{\bibinfo{volume}{38}}% , \bibinfo{pages}{}}
+  (\bibinfo{year}{2002})
+
+\bibitem{thenkabail_ganges_2005}
+  \bibinfo{author}{Thenkabail, P.~S.}, \bibinfo{author}{Schull, M.} \&
+  \bibinfo{author}{Turral, H.}
+  \newblock \bibinfo{title}{{Ganges and {Indus} river basin land use/land cover ({LULC}) and irrigated area mapping using continuous streams of {MODIS} data}}.
+  \newblock \emph{\bibinfo{journal}{Remote Sens. Environ.}}
+  \textbf{\bibinfo{volume}{95}, \bibinfo{pages}{317--341}}
+  (\bibinfo{year}{2005})
+
+\bibitem{biggs_irrigated_2006}
+  \bibinfo{author}{Biggs, T.~W.} \emph{et~al.}
+  \newblock \bibinfo{title}{{Irrigated area mapping in heterogeneous landscapes with {MODIS} time
+      series, ground truth and census data, {Krishna} {Basin}, {India}}}.
+  \newblock \emph{\bibinfo{journal}{Int. J. Remote Sens.}}
+  \textbf{\bibinfo{volume}{27}, \bibinfo{pages}{4245-4266}}
+  (\bibinfo{year}{2006})
+
+\bibitem{dheeravath_irrigated_2010}
+  \bibinfo{author}{Dheeravath, V.} \emph{et~al.}
+  \newblock \bibinfo{title}{{Irrigated areas of {India} derived using {MODIS} 500m time series for the years 2001–2003}}.
+  \newblock \emph{\bibinfo{journal}{ISPRS J. of Photogramm. Remote Sens.}}
+  \textbf{\bibinfo{volume}{65}, \bibinfo{pages}{42--59}}
+  (\bibinfo{year}{2010})  
+
+\bibitem{portmann_mirca2000-global_2010}
+  \bibinfo{author}{Portmann, F.~T.}, \bibinfo{author}{Siebert, S.} \&
+  \bibinfo{author}{Döll, P.}
+  \newblock \bibinfo{title}{{{MIRCA}2000-{Global} monthly irrigated and rainfed crop areas around
+  the year 2000: {A} new high-resolution data set for agricultural and
+  hydrological modeling}}.
+  \newblock \emph{\bibinfo{journal}{Global Biogeochem. Cycles}}
+  \textbf{\bibinfo{volume}{24}}%, \bibinfo{pages}{}}
+  (\bibinfo{year}{2010})
+
+\bibitem{wulder_global_2016}
+  \bibinfo{author}{Wulder, M.~A.} \emph{et~al.}
+  \newblock \bibinfo{title}{{The global {Landsat} archive: {Status}, consolidation, and direction}}.
+  \newblock \emph{\bibinfo{journal}{Remote Sens. Environ.}}
+  \textbf{\bibinfo{volume}{185}, \bibinfo{pages}{271--283}}
+  (\bibinfo{year}{2016}).
+
+\bibitem{verburg_challenges_2011}
+  \bibinfo{author}{Verburg, P.~H.}, \bibinfo{author}{Neumann, K.} \&
+  \bibinfo{author}{Nol, L.},
+  \newblock \bibinfo{title}{{Challenges in using land use and land cover data for global change studies}}.
+  \newblock \emph{\bibinfo{journal}{Glob. Change Biol.}}
+  \textbf{\bibinfo{volume}{17}, \bibinfo{pages}{974--989}}
+  (\bibinfo{year}{2011}).
+
+\bibitem{ju_availability_2008}
+  \bibinfo{author}{Ju, J.} \& \bibinfo{author}{Roy, D.~P.}
+  \newblock \bibinfo{title}{{{The availability of cloud-free {Landsat} {ETM}+ data over the conterminous {United} {States} and globally}}}.
+  \newblock \emph{\bibinfo{journal}{Remote Sens. Environ.}}
+  \textbf{\bibinfo{volume}{112}, \bibinfo{pages}{1196--1211}}
+  (\bibinfo{year}{2008}).
+
+
+\bibitem{monfreda_farming_2008}
+  \bibinfo{author}{Monfreda, C.}, \bibinfo{author}{Ramankutty, N.} \&
+  \bibinfo{author}{Foley, J.~A.}
+  \newblock \bibinfo{title}{{Farming the planet: 2. {Geographic} distribution of crop areas,
+  yields, physiological types, and net primary production in the year 2000}}.
+  \newblock \emph{\bibinfo{journal}{Global Biogeochem. Cycles}}
+  \textbf{\bibinfo{volume}{22}}%, \bibinfo{pages}{}}
+  (\bibinfo{year}{2008})
+
+\bibitem{siebert_development_2005}
+  \bibinfo{author}{Siebert, S.} \emph{et~al.}
+  \newblock \bibinfo{title}{{Development and validation of the global map of irrigation areas}}.
+  \newblock \emph{\bibinfo{journal}{Hydrol. Earth Syst. Sci.}}
+  \textbf{\bibinfo{volume}{9}, \bibinfo{pages}{535--547}}
+  (\bibinfo{year}{2005})
+
+\bibitem{wada_nonsustainable_2012}
+  \bibinfo{author}{Wada, Y.}, \bibinfo{author}{van Beek, L.~P.~H.} \&
+  \bibinfo{author}{Bierkens, M.~F.~P.}
+  \newblock \bibinfo{title}{{Nonsustainable groundwater sustaining irrigation: A global assessment}}.
+  \newblock \emph{\bibinfo{journal}{Water Resour. Res.}}
+  \textbf{\bibinfo{volume}{48}, \bibinfo{pages}{W00L06}}
+  (\bibinfo{year}{2012}).
+
+\bibitem{dalin_groundwater_2017}
+  \bibinfo{author}{Dalin, C.}, \bibinfo{author}{Wada, Y.},
+  \bibinfo{author}{Kastner, T.} \&
+  \bibinfo{author}{Puma, M.~J.}
+  \newblock \bibinfo{title}{{Groundwater depletion embedded in international food trade}}.
+  \newblock \emph{\bibinfo{journal}{Nature}}
+  \textbf{\bibinfo{volume}{543}, \bibinfo{pages}{700--704}}
+  (\bibinfo{year}{2017}).
+
+\bibitem{you_generating_2014}
+  \bibinfo{author}{You, L.}, \bibinfo{author}{Wood, S.},
+  \bibinfo{author}{Wood-Sichra, U.} \&
+  \bibinfo{author}{Wu, W.}
+  \newblock \bibinfo{title}{{Generating global crop distribution maps: {From} census to grid}}.
+  \newblock \emph{\bibinfo{journal}{Agric. Sys.}}
+  \textbf{\bibinfo{volume}{127}, \bibinfo{pages}{53--60}}
+  (\bibinfo{year}{2014})
+
+\bibitem{gadgil_indian_2006}
+  \bibinfo{author}{Gadgil, S.} \& \bibinfo{author}{Gadgil, S.},
+  \newblock \bibinfo{title}{{The Indian monsoon, GDP, and agriculture}}.
+  \newblock \emph{\bibinfo{journal}{Econ. Political Wkly.}}
+  \textbf{\bibinfo{volume}{41}, \bibinfo{pages}{4887, 4889--4895}}
+  (\bibinfo{year}{2006})
+
+\bibitem{smilovic_limits_2015}
+  \bibinfo{author}{Smilovic, M.}, \bibinfo{author}{Gleeson, T.} \&
+  \bibinfo{author}{Siebert, S.},
+  \newblock \bibinfo{title}{{The limits of increasing food production with irrigation in {India}}}.
+  \newblock \emph{\bibinfo{journal}{Food Secur.}}
+  \textbf{\bibinfo{volume}{7}, \bibinfo{pages}{835--856}}
+  (\bibinfo{year}{2015})
+
+\bibitem{kumar_mapping_2009}
+  \bibinfo{author}{Kumar, H.} \& \bibinfo{author}{Somanathan, R.}
+  \newblock \bibinfo{title}{{Mapping Indian districts across census years, 1971--2001}}.
+  \newblock \emph{\bibinfo{journal}{Econ. Political Wkly.}}
+  \textbf{\bibinfo{volume}{44}, \bibinfo{pages}{69--73}}
+  (\bibinfo{year}{2009})  
+
+\bibitem{panagos_european_2011}
+  \bibinfo{author}{Panagos, P.}, \bibinfo{author}{Jones, A.},
+  \bibinfo{author}{Bosco, C.} \&
+  \bibinfo{author}{Sentil Kumar, P.~S.}
+  \newblock \bibinfo{title}{{European digital archive on soil maps ({EuDASM}): preserving
+  important soil data for public free access}}.
+  \newblock \emph{\bibinfo{journal}{Int. J. Digit. Earth}}
+  \textbf{\bibinfo{volume}{4}, \bibinfo{pages}{434--443}}
+  (\bibinfo{year}{2011})
+
+\bibitem{moulds_spatiotemporal_2018}
+  \bibinfo{author}{Moulds, S.}, \bibinfo{author}{Buytaert, W.} \&
+  \bibinfo{author}{Mijic, A.}
+  \newblock \bibinfo{title}{{A spatio-temporal land use and land cover reconstruction for India (1960--2010)}}
+  \newblock \emph{\bibinfo{journal}{Sci. Data}}
+  \textbf{\bibinfo{volume}{TBC}, \bibinfo{pages}{TBC}}\
+  (\bibinfo{year}{2018})
+
+\bibitem{weiss_global_2018}
+  \bibinfo{author}{Weiss, D.~J.} \emph{et~al.}
+  \newblock \bibinfo{title}{{A global map of travel time to cities to assess inequalities in
+  accessibility in 2015}}.
+  \newblock \emph{\bibinfo{journal}{Nature}}
+  \textbf{\bibinfo{volume}{553}, \bibinfo{pages}{333--336}}
+  (\bibinfo{year}{2018})
+
+\bibitem{ambika_remotely_2016}
+  \bibinfo{author}{Ambika, A.~K.}, \bibinfo{author}{Wardlow, B.} \&
+  \bibinfo{author}{Mishra, V.}
+  \newblock \bibinfo{title}{{Remotely sensed high resolution irrigated area mapping in {India} for
+      2000 to 2015}}.
+  \newblock \emph{\bibinfo{journal}{Sci.}}
+  \textbf{\bibinfo{volume}{3}, \bibinfo{pages}{160118}}
+  (\bibinfo{year}{2016}).
+
+\bibitem{shannon_mathematical_1948}
+  \bibinfo{author}{Shannon, C.}
+  \newblock \bibinfo{title}{{A mathematical theory of communication}}.
+  \newblock \emph{\bibinfo{journal}{Bell Syst. Tech. J.}}
+  \textbf{\bibinfo{volume}{27}, \bibinfo{pages}{379--423}}
+  (\bibinfo{year}{1948})
+  
+\bibitem{you_generating_2009}
+  \bibinfo{author}{You, L.}, \bibinfo{author}{Wood, S.} \&
+  \bibinfo{author}{Wood-Sichra, U.}
+  \newblock \bibinfo{title}{{Generating plausible crop distribution maps for {Sub}-{Saharan} {Africa} using a spatially disaggregated data fusion and optimization approach}}.
+  \newblock \emph{\bibinfo{journal}{Agric. Sys.}}
+  \textbf{\bibinfo{volume}{99}, \bibinfo{pages}{126--140}}
+  (\bibinfo{year}{2009})
+
+\bibitem{lemelin_gpcema_2009}
+  \bibinfo{Lemelin, A.}
+  \newblock \bibinfo{title}{{A GRAS variant for solving for minimum information loss}}
+  \newblock \emph{\bibinfo{journal}{Econ. Sys. Res.}}
+  \textbf{\bibinfo{volume}{21}, \bibinfo{pages}{399--408}}
+  (\bibinfo{year}{2009})
+    
+% \bibitem{laborte_riceatlas_2017}
+%   \bibinfo{author}{Laborte, A.~G.} \emph{et~al.}
+%   \newblock \bibinfo{title}{{{RiceAtlas}, a spatial database of global rice calendars and production}}.
+%   \newblock \emph{\bibinfo{journal}{Scientific Data}}
+%   \textbf{\bibinfo{volume}{4}, \bibinfo{pages}{170074}}
+%   (\bibinfo{year}{2017})
+
+% not used:
+% %%%%%%%%%
+
+% \bibitem{shukla_response_2014}
+%   \bibinfo{author}{Shukla, S.~P.}, \bibinfo{author}{Puma, M.~J.} \&
+%   \bibinfo{author}{Cook, B.~I.}
+%   \newblock \bibinfo{title}{{The response of the {South} {Asian} {Summer} {Monsoon} circulation to intensified irrigation in global climate model simulations}}.
+%   \newblock \emph{\bibinfo{journal}{Climate Dynamics}}
+%   \textbf{\bibinfo{volume}{42}, \bibinfo{pages}{21--36}}
+%   (\bibinfo{year}{2014})
+  
+% \bibitem{alauddin_agricultural_2008}
+%   \bibinfo{author}{Alauddin, M.} \& \bibinfo{author}{Quiggin, J.}
+%   \newblock \bibinfo{title}{{Agricultural intensification, irrigation and the environment in
+%       {South} {Asia}: {Issues} and policy options}}.
+%   \newblock \emph{\bibinfo{journal}{Ecological Economics}}
+%   \textbf{\bibinfo{volume}{65}, \bibinfo{pages}{111--124}}
+%   (\bibinfo{year}{2008}).
+
+% \bibitem{biemans_impact_2011}
+%   \bibinfo{author}{Biemans, H.} \emph{et~al.}
+%   \newblock \bibinfo{title}{{Impact of reservoirs on river discharge and irrigation water supply
+%       during the 20th century}}
+%   \newblock \emph{\bibinfo{journal}{Water Resources Research}}
+%   \textbf{\bibinfo{volume}{47}}%, \bibinfo{pages}{n/a--n/a}}
+%   (\bibinfo{year}{2011}).
+
+% \bibitem{biemans_future_2013}
+%   \bibinfo{author}{Biemans, H.} \emph{et~al.}
+%   \newblock \bibinfo{title}{{Future water resources for food production in five {South} {Asian}
+%       river basins and potential for adaptation — {A} modeling study}}.
+%   \newblock \emph{\bibinfo{journal}{Science of The Total Environment}}
+%   \textbf{\bibinfo{volume}{468--469}, \bibinfo{pages}{S117--S131}}
+%   (\bibinfo{year}{2013})
+
+% \bibitem{bollasina_hydrology:_2014}
+%   \bibinfo{author}{Bollasina, M.~A.}
+%   \newblock \bibinfo{title}{{{Probing} the monsoon pulse}}.
+%   \newblock \emph{\bibinfo{journal}{Nature Climate Change}}
+%   \textbf{\bibinfo{volume}{4}, \bibinfo{pages}{422--423}}
+%   (\bibinfo{year}{2014})  
+
+% \bibitem{douglas_changes_2006}
+%   \bibinfo{author}{Douglas, E.~M.} \emph{et~al.}
+%   \newblock \bibinfo{title}{{Changes in moisture and energy fluxes due to agricultural land use
+%   and irrigation in the {Indian} {Monsoon} {Belt}}}.
+%   \newblock \emph{\bibinfo{journal}{Geophysical Research Letters}}
+%   \textbf{\bibinfo{volume}{33}, \bibinfo{pages}{L14403}}
+%   (\bibinfo{year}{2006})  
+
+% \bibitem{doll_impact_2012}
+%   \bibinfo{author}{Döll, P.} \emph{et~al.}
+%   \newblock \bibinfo{title}{{Impact of water withdrawals from groundwater and surface water on
+%   continental water storage variations}}.
+%   \newblock \emph{\bibinfo{journal}{Journal of Geodynamics}}
+%   \textbf{\bibinfo{volume}{59-60}, \bibinfo{pages}{143--156}}
+%   (\bibinfo{year}{2012})
+  
+% \bibitem{gerten_causes_2008}
+%   \bibinfo{author}{Gerten, D.}, \bibinfo{author}{Rost, S.},
+%   \bibinfo{author}{von~Bloh, W.} \&
+%   \bibinfo{author}{Lucht, W.}
+%   \newblock \bibinfo{title}{{Causes of change in 20th century global river discharge}}.
+%   \newblock \emph{\bibinfo{journal}{Geophysical Research Letters}}
+%   \textbf{\bibinfo{volume}{35}}%, \bibinfo{pages}{}}
+%   (\bibinfo{year}{2008})
+
+% \bibitem{haddeland_hydrologic_2007}
+%   \bibinfo{author}{Haddeland, I.}, \bibinfo{author}{Skaugen, T.} \&
+%   \bibinfo{author}{Lettenmaier, D.~P.}
+%   \newblock \bibinfo{title}{{Hydrologic effects of land and water management in {North} {America}
+%   and {Asia}: 1700--1992}}.
+%   \newblock \emph{\bibinfo{journal}{Hydrology and Earth System Sciences}}
+%   \textbf{\bibinfo{volume}{11}, \bibinfo{pages}{1035--1045}}
+%   (\bibinfo{year}{2007})
+
+% \bibitem{haddeland_global_2014}
+%   \bibinfo{author}{Haddeland, I.} \emph{et~al.}
+%   \newblock \bibinfo{title}{{Global water resources affected by human interventions and climate change}}.
+%   \newblock \emph{\bibinfo{journal}{Proceedings of the National Academy of Sciences}}
+%   \textbf{\bibinfo{volume}{111}, \bibinfo{pages}{3251--3256}}
+%   (\bibinfo{year}{2014})
+
+% \bibitem{houghton_carbon_2012}
+%   \bibinfo{author}{Houghton, R.~A.} \emph{et~al.}
+%   \newblock \bibinfo{title}{{Carbon emissions from land use and land-cover change}}.
+%   \newblock \emph{\bibinfo{journal}{Biogeosciences}}
+%   \textbf{\bibinfo{volume}{9}}, \bibinfo{pages}{5125--5142}
+%   (\bibinfo{year}{2012}).
+
+% \bibitem{koster_glace:_2006}
+%   \bibinfo{author}{Koster, R.~D.} \emph{et~al.}
+%   \newblock \bibinfo{title}{{{GLACE}: the global land-atmosphere coupling experiment. {Part} {I}: overview}}.
+%   \newblock \emph{\bibinfo{journal}{Journal of Hydrometeorology}}
+%   \textbf{\bibinfo{volume}{7}, \bibinfo{pages}{590--610}}
+%   (\bibinfo{year}{2006})
+  
+% \bibitem{laborte_riceatlas_2017}
+%   \bibinfo{author}{Laborte, A.~G.} \emph{et~al.}
+%   \newblock \bibinfo{title}{{{RiceAtlas}, a spatial database of global rice calendars and production}}.
+%   \newblock \emph{\bibinfo{journal}{Scientific Data}}
+%   \textbf{\bibinfo{volume}{4}, \bibinfo{pages}{170074}}
+%   (\bibinfo{year}{2017})
+
+% \bibitem{neumann_exploring_2011}
+%   \bibinfo{author}{Neumann, K.}, \bibinfo{author}{Stehfest, E.},
+%   \bibinfo{author}{Verburg, P.~H.},
+%   \bibinfo{author}{Siebert, S.},
+%   \bibinfo{author}{Müller, C.} \&
+%   \bibinfo{author}{Veldkamp, T.}
+%   \newblock \bibinfo{title}{{Exploring global irrigation patterns: {A} multilevel modelling
+%   approach}}.
+%   \newblock \emph{\bibinfo{journal}{Agricultural Systems}}
+%   \textbf{\bibinfo{volume}{104}, \bibinfo{pages}{703--713}}
+%   (\bibinfo{year}{2011})
+
+% \bibitem{niyogi_observational_2010}
+%   \bibinfo{author}{Niyogi, D.}, \bibinfo{author}{Kishtawal, C.},
+%   \bibinfo{author}{Tripathi, S.} \&
+%   \bibinfo{author}{Govindaraju, R.~S.}
+%   \newblock \bibinfo{title}{{Observational evidence that agricultural intensification and land use
+%   change may be reducing the {Indian} summer monsoon rainfall}}.
+%   \newblock \emph{\bibinfo{journal}{Water Resources Research}}
+%   \textbf{\bibinfo{volume}{46}}%, \bibinfo{pages}{}}
+%   (\bibinfo{year}{2010})
+
+% \bibitem{osborne_jules-crop:_2015}
+%   \bibinfo{author}{Osborne, T.} \emph{et~al.}
+%   \newblock \bibinfo{title}{{{JULES}-crop: a parametrisation of crops in the {Joint} {UK} {Land}
+%   {Environment} {Simulator}}}.
+%   \newblock \emph{\bibinfo{journal}{Geoscientific Model Development}}
+%   \textbf{\bibinfo{volume}{8}, \bibinfo{pages}{1139--1155}}
+%   (\bibinfo{year}{2015})
+
+% \bibitem{pitman_uncertainties_2009}
+%   \bibinfo{author}{Pitman, A.~J.} \emph{et~al.}
+%   \newblock \bibinfo{title}{{Uncertainties in climate responses to past land cover change: {First} results from the {LUCID} intercomparison study}}.
+%   \newblock \emph{\bibinfo{journal}{Geophysical Research Letters}}
+%   \textbf{\bibinfo{volume}{36}}%, \bibinfo{pages}{}}
+%   (\bibinfo{year}{2009})
+
+% \bibitem{pokhrel_incorporating_2012}
+%   \bibinfo{author}{Pokhrel, Y.} \emph{et~al.}
+%   \newblock \bibinfo{title}{{Incorporating {Anthropogenic} {Water} {Regulation} {Modules} into a
+%   {Land} {Surface} {Model}}}.
+%   \newblock \emph{\bibinfo{journal}{Journal of Hydrometeorology}}
+%   \textbf{\bibinfo{volume}{13}, \bibinfo{pages}{255--269}}
+%   (\bibinfo{year}{2012})
+
+% \bibitem{puma_effects_2010}
+%   \bibinfo{author}{Puma, M.~J.} \& \bibinfo{author}{Cook, B.~I.}
+%   \newblock \bibinfo{title}{{Effects of irrigation on global climate during the 20th century}}.
+%   \newblock \emph{\bibinfo{journal}{Journal of Geophysical Research}}
+%   \textbf{\bibinfo{volume}{115}}%, \bibinfo{pages}{}}
+%   (\bibinfo{year}{2010})
+
+% \bibitem{sen_roy_impacts_2011}
+%   \bibinfo{author}{Sen~Roy, S.}, \bibinfo{author}{Mahmood, R.},
+%   \bibinfo{author}{Quintanar, A.~I.} \&
+%   \bibinfo{author}{Gonzalez, A.}
+%   \newblock \bibinfo{title}{{Impacts of irrigation on dry season precipitation in {India}}}.
+%   \newblock \emph{\bibinfo{journal}{Theoretical and Applied Climatology}}
+%   \textbf{\bibinfo{volume}{104}, \bibinfo{pages}{193--207}}
+%   (\bibinfo{year}{2011})
+
+% \bibitem{seneviratne_soil_2006}
+%   \bibinfo{author}{Seneviratne, S.~I.} \emph{et~al.}
+%   \newblock \bibinfo{title}{{Soil moisture memory in {AGCM} simulations: {Analysis} of global
+%   land-atmosphere coupling experiment ({GLACE}) data}}.
+%   \newblock \emph{\bibinfo{journal}{Journal of Hydrometeorology}}
+%   \textbf{\bibinfo{volume}{7}, \bibinfo{pages}{1090--1112}}
+%   (\bibinfo{year}{2006})
+
+% \bibitem{singh_observed_2014}
+%   \bibinfo{author}{Singh, D.}, \bibinfo{author}{Tsiang, M.},
+%   \bibinfo{author}{Rajaratnam, B.} \&
+%   \bibinfo{author}{Diffenbaugh, N.~S.},
+%   \newblock \bibinfo{title}{{Observed changes in extreme wet and dry spells during the {South}
+%   {Asian} summer monsoon season}}.
+%   \newblock \emph{\bibinfo{journal}{Nature Climate Change}}
+%   \textbf{\bibinfo{volume}{4}, \bibinfo{pages}{456--461}}
+%   (\bibinfo{year}{2014})
+
+% \bibitem{turner_climate_2012}
+%   \bibinfo{author}{Turner, A.~G.} \& \bibinfo{author}{Annamalai, H.},
+%   \newblock \bibinfo{title}{{Climate change and the {South} {Asian} summer monsoon}}.
+%   \newblock \emph{\bibinfo{journal}{Nature Climate Change}}
+%   \textbf{\bibinfo{volume}{2}, \bibinfo{pages}{587--595}}
+%   (\bibinfo{year}{2012})
+
+% \bibitem{yoshikawa_assessment_2014}
+%   \bibinfo{author}{Yoshikawa, S.}, \bibinfo{author}{Cho, J.},
+%   \bibinfo{author}{Yamada, H.~G.},
+%   \bibinfo{author}{Hanasaki, N.} \&
+%   \bibinfo{author}{Kanae, S.}
+%   \newblock \bibinfo{title}{{An assessment of global net irrigation water requirements from
+%   various water supply sources to sustain irrigation: rivers and reservoirs
+%   (1960\&amp;ndash;2050)}}.
+%   \newblock \emph{\bibinfo{journal}{Hydrology and Earth System Sciences}}
+%   \textbf{\bibinfo{volume}{18}, \bibinfo{pages}{4289--4310}}
+%   (\bibinfo{year}{2014})
+
+\end{thebibliography}
+
+% \begin{thebibliography}{1}
+% \expandafter\ifx\csname url\endcsname\relax
+%   \def\url#1{\texttt{#1}}\fi
+% \expandafter\ifx\csname urlprefix\endcsname\relax\def\urlprefix{URL }\fi
+% \providecommand{\bibinfo}[2]{#2}
+% \providecommand{\eprint}[2][]{\url{#2}}
+
+% \bibitem{cite1}
+% \bibinfo{author}{Califano, A.}, \bibinfo{author}{Butte, A.~J.},
+%   \bibinfo{author}{Friend, S.}, \bibinfo{author}{Ideker, T.} \&
+%   \bibinfo{author}{Schadt, E.}
+% \newblock \bibinfo{title}{{Leveraging models of cell regulation and GWAS data
+%   in integrative network-based association studies}}.
+% \newblock \emph{\bibinfo{journal}{Nature Genetics}}
+%   \textbf{\bibinfo{volume}{44}}, \bibinfo{pages}{841--847}
+%   (\bibinfo{year}{2012}).
+
+% \bibitem{cite2}
+% \bibinfo{author}{Wang, R.} \emph{et~al.}
+% \newblock \bibinfo{title}{{PRIDE Inspector: a tool to visualize and validate MS
+%   proteomics data.}}
+% \newblock \emph{\bibinfo{journal}{Nature Biotechnology}}
+%   \textbf{\bibinfo{volume}{30}}, \bibinfo{pages}{135--137}
+%   (\bibinfo{year}{2012}).
+
+% \end{thebibliography}
+
+\section*{Data Citations}
+
+Bibliographic information for the data records described in the manuscript.
+
+1. Lastname1, Initial1., Lastname2, Initial2., ...\& LastnameN, InitialN. \emph{Repository name} Dataset accession number or DOI (YYYY).
+
+\end{document}

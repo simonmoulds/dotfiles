@@ -1,0 +1,25 @@
+{
+  "out_dir" : ".",
+  "images" : [
+      { "img" : "corrected_WV02_2010-01-12.10-37-48_5.956.-0.479_C-B-G-Y-R-RE-N-N2_0.31.tif"},
+      { "img" : "corrected_WV02_2010-01-12.10-37-49_5.850.-0.479_C-B-G-Y-R-RE-N-N2_0.25.tif"}
+    ],
+  "full_img" : true,
+  "matching_algorithm" : "mgm",
+  "horizontal_margin": 20,
+  "vertical_margin": 5,
+  "sift_match_thresh" : 0.6,
+  "disp_range_extra_margin" : 0.2,
+  "n_gcp_per_axis" : 5,
+  "epipolar_thresh" : 0.5,
+  "debug" : false,
+  "temporary_dir" : "/tmp",
+  "tile_size" : 300,
+  "clean_tmp" : true,
+  "clean_intermediate" : false,
+  "fusion_thresh" : 3,
+  "disp_range_method" : "sift",
+  "skip_existing" : false,
+  "msk_erosion": 0,
+  "dsm_resolution": 0.5,
+}

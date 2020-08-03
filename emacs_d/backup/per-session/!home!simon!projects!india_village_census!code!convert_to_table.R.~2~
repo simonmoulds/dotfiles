@@ -1,0 +1,11 @@
+## Author : Simon Moulds
+## Date   : April 2020
+
+library(raster)
+
+r = raster("../data/igp_well_wo_el_sum.tif")
+
+plot(r)
+
+r = raster("../data/modis_max_kharif_anomaly_2001.tif")
+## r = raster("~/Downloads/imageToDriveExample1.tif")

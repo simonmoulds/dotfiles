@@ -1,0 +1,5 @@
+#!/bin/bash
+
+aqdir=$HOME/projects/AquaCrop/AquaCrop_Py
+projdir=$HOME/projects/AquaCrop/Gandak_FAO56
+echo $aqdir/deterministic_runner.py $projdir/Config/fao56_gandak_config.ini

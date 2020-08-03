@@ -1,0 +1,112 @@
+import numpy as np
+import datetime
+import time
+import gdal
+import scipy.interpolate as interpolate
+import matplotlib.pyplot as plt
+
+from netCDF4 import Dataset, date2num
+from pandas import read_csv
+
+ds = gdal.Open('../data/ksat_topsoil_gapfilled_5m.tif')
+a = ds.ReadAsArray()
+nlat,nlon = np.shape(a)
+xres = 1./12
+yres = 1./12
+
+b = ds.GetGeoTransform() #bbox, interval
+minx = b[0]
+maxx = b[0] + nlon * xres
+maxy = b[3] 
+miny = b[3] + nlat * -yres
+
+lon = np.arange(0,nlon) * xres + (minx + xres/2)
+lat = np.arange(0,nlat) * yres + (miny + yres/2)
+lat = lat[::-1]
+# layer = np.array([0.3,2.])
+# nlayer = len(layer)
+
+# For now, let's create method using rice, wheat, sugarcane
+crop_map_path = '/home/simon/projects/india_crop_area_2005/data/output_2005/monthly_maps'
+crop_nms = ['irr_rice_kharif',
+            'rain_rice_kharif',
+            'irr_rice_rabi',
+            'rain_rice_kharif',
+            'irr_wheat_rabi',
+            'rain_wheat_rabi',
+            'irr_sugarcane_whole_year',
+            'rain_sugarcane_whole_year']
+
+ncrop = len(crop_nms)
+
+# create netCDF file containing parameters
+nco = Dataset('../data/Gandak_irri_params.nc','w',clobber=True)
+
+# create dimensions, variables and attributes:
+nco.createDimension('lon',nlon)
+nco.createDimension('lat',nlat)
+nco.createDimension('crop',ncrop)
+
+lono = nco.createVariable('lon',np.float64,('lon'),zlib=True,least_significant_digit=16)
+lono.units = 'degrees_east'
+lono.standard_name = 'longitude'
+lono[:]=lon
+
+lato = nco.createVariable('lat',np.float64,('lat'),zlib=True,least_significant_digit=16)
+lato.units = 'degrees_north'
+lato.standard_name = 'latitude'
+lato[:]=lat
+
+crpo = nco.createVariable('crop','f4',('crop'))
+crpo.units = '1'
+crpo.standard_name = 'crop'
+crpo.long_name = 'crop'
+crpo[:]=np.arange(1, ncrop + 1)
+
+# create container variable for CRS: lon/lat WGS84 datum
+crso = nco.createVariable('crs','i4')
+crso.long_name = 'Lon/Lat Coords in WGS84'
+crso.grid_mapping_name='latitude_longitude'
+crso.longitude_of_prime_meridian = 0.0
+crso.semi_major_axis = 6378137.0
+crso.inverse_flattening = 298.257223563
+
+nco.Conventions='CF-1.6'
+
+# irrigation method
+# #################
+
+# soil moisture based (1) and rainfed (0)
+irrmethod = nco.createVariable('IrrMethod', np.int32, ('crop','lat','lon'))
+irrmethod[:] = np.array([1,0,1,0,1,0,1,0])[:,None,None] * np.ones((nlat,nlon))   
+
+# only used if irrmethod = 2
+irrinterval = nco.createVariable('IrrInterval', np.int32, ('crop','lat','lon'))
+irrinterval[:] = 3
+
+smt1 = nco.createVariable('SMT1', np.float64, ('crop','lat','lon'))
+smt1[:] = 70.
+
+smt2 = nco.createVariable('SMT2', np.float64, ('crop','lat','lon'))
+smt2[:] = 70.
+
+smt3 = nco.createVariable('SMT3', np.float64, ('crop','lat','lon'))
+smt3[:] = 70.
+
+smt4 = nco.createVariable('SMT4', np.float64, ('crop','lat','lon'))
+smt4[:] = 70.
+
+maxirr = nco.createVariable('MaxIrr', np.float64, ('crop','lat','lon'))
+maxirr[:] = 25.
+
+appeff = nco.createVariable('AppEff', np.float64, ('crop','lat','lon'))
+appeff[:] = 90.
+
+netirrsmt = nco.createVariable('NetIrrSMT', np.float64, ('crop','lat','lon'))
+netirrsmt[:] = 80.5
+
+wetsurf = nco.createVariable('WetSurf', np.float64, ('crop','lat','lon'))
+wetsurf[:] = 100.
+
+# close dataset
+nco.close()

@@ -1,0 +1,34 @@
+import requests
+import pandas as pd
+import numpy as np
+
+API_USER = ".\twiga_hl"
+API_PASSWORD = "321321Demo!"
+
+requestBody = {
+    "Readers": [
+        {
+            "DataSourceCode": "TAHMO.Connectors.Stations",
+            "Settings": {
+                "LocationCodes": [
+                    'TA00429'
+                ],
+                "VariableCodes": [
+                    'TAHMO.Connectors.Stations.SoilMoisture'
+                ],
+                "StartDate": '20180129000000',
+                "EndDate": '20190101000000',
+                "StructureType": "TimeSeries"
+            }
+        }
+    ]
+}
+response = requests.post(
+    # 'https://tahmotwiga.mybluemix.net/twiga/api/timeSeries/get',
+    'https://twiga-api.hydronet.com/api/entity/datasources/get',
+    json=requestBody,
+    auth=requests.auth.HTTPBasicAuth(API_USER, API_PASSWORD)
+)
+
+responseJSON = response.json()
+

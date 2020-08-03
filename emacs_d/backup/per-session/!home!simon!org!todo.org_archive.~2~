@@ -1,0 +1,355 @@
+#    -*- mode: org -*-
+
+
+* DONE Reply to Giulia re: PEHC follow-up                           :ARCHIVE:
+  CLOSED: [2019-05-08 Wed 15:24] SCHEDULED: <2019-05-08 Wed>
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2019-05-10 Fri 08:33
+  :ARCHIVE_FILE: ~/org/todo.org
+  :ARCHIVE_OLPATH: Tasks
+  :ARCHIVE_CATEGORY: Tasks
+  :ARCHIVE_TODO: DONE
+  :END:
+
+
+* DONE Reply to Rebecca Naessens wrt Imperial College listings      :ARCHIVE:
+  CLOSED: [2019-05-07 Tue 14:43]
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2019-05-10 Fri 08:33
+  :ARCHIVE_FILE: ~/org/todo.org
+  :ARCHIVE_OLPATH: Tasks
+  :ARCHIVE_CATEGORY: Tasks
+  :ARCHIVE_TODO: DONE
+  :END:
+
+* CANCELLED Check bug in OrderedModel identified by Zeren
+  CLOSED: [2019-05-07 Tue 15:07]
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2019-05-10 Fri 08:34
+  :ARCHIVE_FILE: ~/org/todo.org
+  :ARCHIVE_OLPATH: Projects/lulcc package
+  :ARCHIVE_CATEGORY: Projects
+  :ARCHIVE_TODO: CANCELLED
+  :END:
+
+
+* DONE On the server, install a serial netCDF installation and compile AMBHAS in home directory
+  CLOSED: [2019-05-08 Wed 08:56]
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2019-05-10 Fri 08:34
+  :ARCHIVE_FILE: ~/org/todo.org
+  :ARCHIVE_OLPATH: Projects/CHANSE
+  :ARCHIVE_CATEGORY: Projects
+  :ARCHIVE_TODO: DONE
+  :END:
+  +N.B. On the server, this will require a serial netCDF installation (AMBHAS won't compile with the current parallel installation)+
+  Did 'make NC_LIBS="-L/usr/lib64 -lnetcdf"' (i.e. point to system netCDF installation, which is installed in serial mode
+
+* DONE Add simple representation of canal access
+  CLOSED: [2019-05-10 Fri 08:32]
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2019-05-10 Fri 08:34
+  :ARCHIVE_FILE: ~/org/todo.org
+  :ARCHIVE_OLPATH: Projects/CHANSE
+  :ARCHIVE_CATEGORY: Projects
+  :ARCHIVE_TODO: DONE
+  :END:
+
+* DONE List all variables required to store the model state
+ CLOSED: [2018-04-27 Fri 12:26]
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2019-05-10 Fri 08:34
+  :ARCHIVE_FILE: ~/org/todo.org
+  :ARCHIVE_OLPATH: Projects/AquaCrop
+  :ARCHIVE_CATEGORY: Projects
+  :ARCHIVE_TODO: DONE
+  :END:
+
+
+* DONE Check routines in VirtualOS which handle regridding - don't appear well suited to resolutions with recurring decimal
+ CLOSED: [2018-07-27 Fri 05:38]
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2019-05-10 Fri 08:34
+  :ARCHIVE_FILE: ~/org/todo.org
+  :ARCHIVE_OLPATH: Projects/AquaCrop
+  :ARCHIVE_CATEGORY: Projects
+  :ARCHIVE_TODO: DONE
+  :END:
+
+* DONE Read comp/layer thicknesses from netCDF, not configuration
+ CLOSED: [2018-08-08 Wed 05:33]
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2019-05-10 Fri 08:34
+  :ARCHIVE_FILE: ~/org/todo.org
+  :ARCHIVE_OLPATH: Projects/AquaCrop
+  :ARCHIVE_CATEGORY: Projects
+  :ARCHIVE_TODO: DONE
+  :END:
+
+* CANCELLED Curve number estimation for the Gandak - use Hydrologic Soil Group combined with land use map
+  CLOSED: [2019-05-07 Tue 15:37]
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2019-05-10 Fri 08:34
+  :ARCHIVE_FILE: ~/org/todo.org
+  :ARCHIVE_OLPATH: Projects/AquaCrop
+  :ARCHIVE_CATEGORY: Projects
+  :ARCHIVE_TODO: CANCELLED
+  :END:
+
+* DONE Work on options to supply initial condition - at the moment we just supply a netCDF file
+ CLOSED: [2018-08-13 Mon 14:18]
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2019-05-10 Fri 08:34
+  :ARCHIVE_FILE: ~/org/todo.org
+  :ARCHIVE_OLPATH: Projects/AquaCrop
+  :ARCHIVE_CATEGORY: Projects
+  :ARCHIVE_TODO: DONE
+  :END:
+
+* DONE Groundwater coupling method - write additional groundwater module
+ CLOSED: [2018-07-27 Fri 05:37]
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2019-05-10 Fri 08:34
+  :ARCHIVE_FILE: ~/org/todo.org
+  :ARCHIVE_OLPATH: Projects/AquaCrop
+  :ARCHIVE_CATEGORY: Projects
+  :ARCHIVE_TODO: DONE
+  :END:
+
+* DONE Translate AquaCrop testing modules to current AquaCropOS format, as well as AquaCrop_Py format
+ CLOSED: [2018-08-13 Mon 14:18]
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2019-05-10 Fri 08:34
+  :ARCHIVE_FILE: ~/org/todo.org
+  :ARCHIVE_OLPATH: Projects/AquaCrop
+  :ARCHIVE_CATEGORY: Projects
+  :ARCHIVE_TODO: DONE
+  :END:
+
+* DONE Create error class (see CWATMError class for example)
+ CLOSED: [2018-08-08 Wed 18:41]
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2019-05-10 Fri 08:34
+  :ARCHIVE_FILE: ~/org/todo.org
+  :ARCHIVE_OLPATH: Projects/AquaCrop
+  :ARCHIVE_CATEGORY: Projects
+  :ARCHIVE_TODO: DONE
+  :END:
+
+
+* DONE Change PlantingDate and HarvestDate to PlantingDay and HarvestDay, respectively, and introduce a PlantingDate to check whether a crop is planted before model start time
+ CLOSED: [2018-08-21 Tue 14:11]
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2019-05-10 Fri 08:34
+  :ARCHIVE_FILE: ~/org/todo.org
+  :ARCHIVE_OLPATH: Projects/AquaCrop
+  :ARCHIVE_CATEGORY: Projects
+  :ARCHIVE_TODO: DONE
+  :END:
+
+
+* DONE Flatten spatial dimension so that we can ignore cells which are not in the current region
+ CLOSED: [2018-09-24 Mon 08:16]
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2019-05-10 Fri 08:34
+  :ARCHIVE_FILE: ~/org/todo.org
+  :ARCHIVE_OLPATH: Projects/AquaCrop
+  :ARCHIVE_CATEGORY: Projects
+  :ARCHIVE_TODO: DONE
+  :END:
+
+* DONE Add IrrigationSupply.py module, which should deal with gw/sw apportioning, and take into account farmer livelihood
+ CLOSED: [2018-08-21 Tue 14:11]
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2019-05-10 Fri 08:34
+  :ARCHIVE_FILE: ~/org/todo.org
+  :ARCHIVE_OLPATH: Projects/AquaCrop
+  :ARCHIVE_CATEGORY: Projects
+  :ARCHIVE_TODO: DONE
+  :END:
+
+* CANCELLED Add FarmIncome.py module, which should calculate production and income
+  CLOSED: [2019-05-07 Tue 15:37]
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2019-05-10 Fri 08:34
+  :ARCHIVE_FILE: ~/org/todo.org
+  :ARCHIVE_OLPATH: Projects/AquaCrop
+  :ARCHIVE_CATEGORY: Projects
+  :ARCHIVE_TODO: CANCELLED
+  :END:
+  Cancelled because this software should focus on implementing the AquaCrop model over a spatial grid
+
+* CANCELLED Think about whether we should allow users to specify a day of the year on which to make decisions?
+  CLOSED: [2019-05-07 Tue 15:39]
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2019-05-10 Fri 08:34
+  :ARCHIVE_FILE: ~/org/todo.org
+  :ARCHIVE_OLPATH: Projects/AquaCrop
+  :ARCHIVE_CATEGORY: Projects
+  :ARCHIVE_TODO: CANCELLED
+  :END:
+  Cancelled for the same reason as above.
+
+* DONE Download DSSAT software
+  CLOSED: [2019-05-09 Thu 16:52] SCHEDULED: <2019-05-09 Thu>
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2019-05-10 Fri 08:34
+  :ARCHIVE_FILE: ~/org/todo.org
+  :ARCHIVE_OLPATH: Projects/TWIGA/Setup DSSAT for cocoa
+  :ARCHIVE_CATEGORY: Projects
+  :ARCHIVE_TODO: DONE
+  :END:
+
+* DONE Email Jacob Tettah re: data requirements for hydrological modelling etc.
+  CLOSED: [2019-05-08 Wed 15:24] SCHEDULED: <2019-05-08 Wed>
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2019-05-10 Fri 08:34
+  :ARCHIVE_FILE: ~/org/todo.org
+  :ARCHIVE_OLPATH: Projects/Pathways to Equitable Healthy Cities
+  :ARCHIVE_CATEGORY: Projects
+  :ARCHIVE_TODO: DONE
+  :END:
+  Jake is visiting representatives of various agencies concerned with water management in Accra, and may be able to obtain data. Some thoughts:
+  - Discharge data
+  - Flood maps
+  - High resolution DEM (unlikely to be any higher than 30m, but worth asking)
+  - Drainage network
+
+* DONE Examine the use of Worldview data to obtain a high resolution DEM
+  CLOSED: [2019-05-08 Wed 16:22] SCHEDULED: <2019-05-08 Wed>
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2019-05-10 Fri 08:35
+  :ARCHIVE_FILE: ~/org/todo.org
+  :ARCHIVE_OLPATH: Projects/Pathways to Equitable Healthy Cities
+  :ARCHIVE_CATEGORY: Projects
+  :ARCHIVE_TODO: DONE
+  :END:
+
+* DONE Setup Zotero directory for PEHC literature
+  CLOSED: [2019-05-07 Tue 17:25]
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2019-05-10 Fri 08:35
+  :ARCHIVE_FILE: ~/org/todo.org
+  :ARCHIVE_OLPATH: Projects/Pathways to Equitable Healthy Cities
+  :ARCHIVE_CATEGORY: Projects
+  :ARCHIVE_TODO: DONE
+  :END:
+
+
+* DONE Email Charles @ Imperial to get update on Andes water demand topology paper
+  CLOSED: [2018-01-10 Wed 16:38]
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2019-05-10 Fri 08:35
+  :ARCHIVE_FILE: ~/org/todo.org
+  :ARCHIVE_OLPATH: Projects/Glaciers/South America water demand topology paper
+  :ARCHIVE_CATEGORY: Projects
+  :ARCHIVE_TODO: DONE
+  :END:
+
+* DONE Process MapSPAM data for South America
+  CLOSED: [2018-01-31 Wed 10:13] SCHEDULED: <2018-01-31 Wed>
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2019-05-10 Fri 08:35
+  :ARCHIVE_FILE: ~/org/todo.org
+  :ARCHIVE_OLPATH: Projects/Glaciers/South America water demand topology paper
+  :ARCHIVE_CATEGORY: Projects
+  :ARCHIVE_TODO: DONE
+  :END:
+
+
+* India land use paper
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2019-05-10 Fri 08:35
+  :ARCHIVE_FILE: ~/org/todo.org
+  :ARCHIVE_OLPATH: Projects/Hydroflux
+  :ARCHIVE_CATEGORY: Projects
+  :END:
+** DONE Submit Scientific Data manuscript
+   CLOSED: [2018-01-03 Wed 16:12]
+** DONE Receive comments from Ana
+   CLOSED: [2018-01-02 Tue 09:03]
+** DONE Make changes suggested by Wouter and Ana
+   CLOSED: [2018-01-03 Wed 16:12]
+
+** DONE Revisions
+ CLOSED: [2018-05-13 Sun 11:30] SCHEDULED: <2018-05-31 Thu>
+
+* DONE Integrate 2005 and 1960-2010 workflows
+  CLOSED: [2018-04-27 Fri 12:24]
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2019-05-10 Fri 08:35
+  :ARCHIVE_FILE: ~/org/todo.org
+  :ARCHIVE_OLPATH: Projects/Hydroflux/India irrigated area paper
+  :ARCHIVE_CATEGORY: Projects
+  :ARCHIVE_TODO: DONE
+  :END:
+
+* DONE Use seasonal fractions from 2005 data to disaggregate 1960-2010 data
+  CLOSED: [2018-04-27 Fri 12:24]
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2019-05-10 Fri 08:35
+  :ARCHIVE_FILE: ~/org/todo.org
+  :ARCHIVE_OLPATH: Projects/Hydroflux/India irrigated area paper
+  :ARCHIVE_CATEGORY: Projects
+  :ARCHIVE_TODO: DONE
+  :END:
+
+* DONE Prepare irrigated area maps for 2005
+  CLOSED: [2018-05-11 Fri 19:35]
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2019-05-10 Fri 08:35
+  :ARCHIVE_FILE: ~/org/todo.org
+  :ARCHIVE_OLPATH: Projects/Hydroflux/"Promoting surface water irrigation can reactivate the GWM"
+  :ARCHIVE_CATEGORY: Projects
+  :ARCHIVE_TODO: DONE
+  :END:
+
+* DONE Obtain esimates of surface water/groundwater irrigation from FAO GMIA (http://www.fao.org/nr/water/aquastat/irrigationmap/index10.stm)
+  CLOSED: [2018-05-11 Fri 19:35]
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2019-05-10 Fri 08:35
+  :ARCHIVE_FILE: ~/org/todo.org
+  :ARCHIVE_OLPATH: Projects/Hydroflux/"Promoting surface water irrigation can reactivate the GWM"
+  :ARCHIVE_CATEGORY: Projects
+  :ARCHIVE_TODO: DONE
+  :END:
+
+
+* DONE Comment on abstract from Jorge Ramirez (U of Bern)
+  CLOSED: [2018-01-02 Tue 10:06] SCHEDULED: <2018-01-30 Tue>
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2019-05-10 Fri 08:35
+  :ARCHIVE_FILE: ~/org/todo.org
+  :ARCHIVE_OLPATH: Projects/Switzerland land use model
+  :ARCHIVE_CATEGORY: Projects
+  :ARCHIVE_TODO: DONE
+  :END:
+
+* STARTED Research complex adaptive systems, the way that cities may be seen as such, and the use of system dynamics modelling to simulate these systems
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2019-05-10 Fri 17:48
+  :ARCHIVE_FILE: ~/org/todo.org
+  :ARCHIVE_OLPATH: Projects/Pathways to Equitable Healthy Cities
+  :ARCHIVE_CATEGORY: Projects
+  :ARCHIVE_TODO: STARTED
+  :END:
+
+* DONE Research the use of system dynamics modelling as a tool for public health
+  CLOSED: [2019-05-10 Fri 16:37] SCHEDULED: <2019-05-08 Wed>
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2019-05-10 Fri 17:48
+  :ARCHIVE_FILE: ~/org/todo.org
+  :ARCHIVE_OLPATH: Projects/Pathways to Equitable Healthy Cities
+  :ARCHIVE_CATEGORY: Projects
+  :ARCHIVE_TODO: DONE
+  :END:
+
+* DONE Restructure code to match that of water_balance_model
+  CLOSED: [2019-05-10 Fri 16:38] SCHEDULED: <2019-05-08 Wed>
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2019-05-10 Fri 17:48
+  :ARCHIVE_FILE: ~/org/todo.org
+  :ARCHIVE_OLPATH: Projects/AquaCrop
+  :ARCHIVE_CATEGORY: Projects
+  :ARCHIVE_TODO: DONE
+  :END:

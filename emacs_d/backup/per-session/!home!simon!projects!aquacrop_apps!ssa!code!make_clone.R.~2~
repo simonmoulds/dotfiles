@@ -1,0 +1,4 @@
+library(raster)
+r=raster("../data-raw/AgMERRA_2010_prate.nc4", layer=1)
+r[!is.na(r)] = 1
+r[is.na(r)] = 0

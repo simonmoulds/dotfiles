@@ -1,0 +1,9 @@
+## Author : Simon Moulds
+## Date   : 29/04/2020
+
+library(raster)
+
+datadir='/data/earthengine/'
+
+fs = list.files(
+r = raster(file.path(datadir, "

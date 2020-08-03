@@ -1,0 +1,85 @@
+## Author : Simon Moulds
+## Date   : August 2019
+
+library(raster)
+
+## ===================================
+## Part 1: read calendar to data frame
+## ===================================
+
+system("unzip -o /data/MIRCA2000/condensed_cropping_calendars.zip -d ../data")
+system("gunzip -f ../data/cropping_calendar_irrigated.txt.gz")
+system("gunzip -f ../data/cropping_calendar_rainfed.txt.gz")
+rainfed_calendar_path = "/data/MIRCA2000/cropping_calendar_rainfed.txt"
+x = readLines(rainfed_calendar_path)
+n = nchar(x)
+x = x[n>0]
+x = x[5:length(x)]
+y = strsplit(x, "\\s+")
+nc = sapply(y, length)
+maxcol = max(nc)
+df = as.data.frame(matrix(data=NA, nrow=length(y), ncol=maxcol))    
+for (i in 1:length(y)) {
+    line = y[[i]]
+    df[i,1:length(line)] = as.numeric(line)
+}
+maxnsc = max(df[,3])
+names(df) = c(
+    "unit_code","crop_class","n_SC",
+    paste0(
+        c("area","start","end"),
+        rep(1:maxnsc, each=3)
+    )
+)
+
+## ===============================
+## Part 2: assign calendar to grid
+## ===============================
+
+system("unzip -o /data/MIRCA2000/unit_code_grid.zip -d ../data")
+system("gunzip -f ../data/unit_code.asc.gz")
+unit_code_5m = raster("../data/unit_code.asc")
+unit_code_0pt25d = raster::aggregate(unit_code_5m, fact=3, fun=modal)
+start_map = raster(unit_code_0pt25d)
+end_map = raster(unit_code_0pt25d)
+
+## maize: crop_class == 2
+
+df_maize = df[df$crop_class == 2,]
+for (i in 1:nrow(df_maize)) {
+    unit_code = df_maize$unit_code[i]
+    start1 = df_maize$start1[i]
+    end1 = df_maize$end1[i]
+    start_map[unit_code_0pt25d == unit_code] = start1
+    end_map[unit_code_0pt25d == unit_code] = end1
+}
+
+library(rnaturalearthdata)
+library(rnaturalearth)
+world = ne_countries(scale = "medium", returnclass = "sp")
+plot(start_map)
+lines(world)
+
+## convert month to first/last day
+## of month (start/end)
+start_rcl = matrix(
+    c(1,2,3,4,5,6,7,8,9,10,11,12,
+      1,2,3,4,5,6,7,8,9,10,11,12,
+      1,32,60,91,121,152,182,213,244,274,305,335),
+    nrow=12, ncol=3
+)
+start_rcl[,1] = start_rcl[,1] - 0.1
+start_rcl[,2] = start_rcl[,2] + 0.1
+start_map_jd = reclassify(start_map, start_rcl)
+
+end_rcl = matrix(
+    c(1,2,3,4,5,6,7,8,9,10,11,12,
+      1,2,3,4,5,6,7,8,9,10,11,12,
+      31,59,90,120,151,181,212,243,273,304,334,365),
+    nrow=12, ncol=3
+)
+end_rcl[,1] = end_rcl[,1] - 0.1
+end_rcl[,2] = end_rcl[,2] + 0.1
+end_map_jd = reclassify(end_map, end_rcl)
+
+## writeRaster(start_map, "../data/maize_planting_mo

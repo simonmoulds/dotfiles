@@ -1,0 +1,7 @@
+## Author : Simon Moulds
+## Date   : July 2019
+
+## script to calculate monthly irrigation maps for
+## 2005
+
+jan_maps = list.files("data/output_2005/monthly_maps", pattern="TOTAL_2005_001.tif")

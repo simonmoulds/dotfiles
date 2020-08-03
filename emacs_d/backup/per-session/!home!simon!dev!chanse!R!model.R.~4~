@@ -1,0 +1,41 @@
+#' Create a model object.
+#'
+#' @param start_time POSIXct. Start time of the simulation.
+#' @param end_time POSIXct. End time of the simulation.
+#' @param weather_data weather_data. See \code{\link{weather_data}}.
+#' @param price_data price_data. See \code{\link{price_data}}.
+#' @param yield_data yield_data. See \code{\link{yield_data}}.
+#' @param farm_parameters farm_parameters. See \code{\link{farm_parameters}}
+#' @param crop_parameters crop_parameters. See \code{\link{crop_parameters}}
+#' @param irrigation_schedule irrigation_schedule. See \code{\link{irrigation_schedule}}
+#' @param initial_condition initial_condition. See \code{\link{initial_condition}}
+#'
+#' @return model
+#' 
+model = function(start_time,
+                 end_time,
+                 weather_data,
+                 price_data,
+                 yield_data,
+                 farm_parameters,
+                 crop_parameters,
+                 irrigation_schedule,
+                 initial_condition) {
+
+    ## TODO: checks
+    ## TODO: ensure all data has the correct temporal characteristics
+    ## TODO: make all price data a daily time series
+    
+    x = list(
+        start_time = start_time,
+        end_time = end_time,
+        weather_data = weather_data,
+        price_data = price_data,
+        yield_data = yield_data,
+        farm_parameters = farm_parameters,
+        crop_parameters = crop_parameters,
+        irrigation_schedule = irrigation_schedule,
+        initial_condition = initial_condition
+    )
+    structure(x, "model")
+}

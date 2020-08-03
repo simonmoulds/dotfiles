@@ -1,0 +1,10 @@
+*~
+\#*\#
+lulcc.Rcheck/
+.Rhistory
+.Rd2pdf*
+.Rd*
+lulcc.pdf
+lulcc_*.tar.gz
+test-ordered.R
+

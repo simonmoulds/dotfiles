@@ -1,0 +1,30 @@
+## Author : Simon Moulds
+## Date   : 29/04/2020
+
+library(raster)
+
+datadir='/data/earthengine/'
+
+## ====================================================================
+## ====================================================================
+## 
+## A note on the file naming convention:
+## 
+## The date string (e.g. 2008281) is the year + Julian day, such
+## that 2008001 = 1 Jan 2008.
+## 
+## The values contained in the string are temporal aggregations
+## for the 8 days (inclusive), starting from the date included
+## in the filename. So, 2008281 is the total ET from 7 Oct (=281)
+## to 14 Oct. 
+##
+## N.B. See documentation:
+## https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/modis/MOD16_ET_User-Guide_2017.pdf
+## 
+##
+## ====================================================================
+## ====================================================================
+
+fs = list.files(datadir, pattern="MODIS_NTSG_MOD16A2_105_A2010[0-9]{3}.tif", full.names=TRUE)
+r = raster(fs[1])
+v = getValues(r)

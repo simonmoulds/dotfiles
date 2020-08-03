@@ -1,0 +1,12 @@
+class GandakDataModel(object):
+    def __init__(self, configuration, variable_list, initial_state = None):
+        self._configuration = configuration
+
+    def initial(self):
+        pass
+
+    def get_model_dimensions(self):
+        pass
+
+    def dynamic(self):
+        pass

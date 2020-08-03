@@ -1,0 +1,86 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import os
+import shutil
+import sys
+import math
+import gc
+import numpy as np 
+# import pcraster as pcr
+import file_handling as vos
+import rasterio
+import xarray as xr
+
+# TODO:
+# class Model(object)
+# class GriddedModel(Model)
+# class LumpedModel(Model)
+
+class Model(object):
+    
+    def __init__(self, configuration, modelTime, initialState = None):                
+        self._configuration = configuration
+        self._modelTime = modelTime
+        self.set_clone_map()
+        self.set_landmask()
+        self.set_grid_cell_area()
+        self.get_model_dimensions()
+        
+    def set_clone_map(self):
+        # TODO: REMOVE DEPENDENCY ON PCRASTER
+        print self._configuration.cloneMap
+        # pcr.setclone(self._configuration.cloneMap)  # TODO: CHECK IF THIS IS NECESSARY
+        self.cloneMap = self._configuration.cloneMap
+        self.cloneMapAttributes = vos.get_map_attributes(self.cloneMap)
+
+    def set_landmask(self):
+        # self.landmask = vos.readPCRmapClone(
+        #     self._configuration.landmask,
+        #     self._configuration.cloneMap,
+        #     self._configuration.tmpDir,
+        #     None,
+        #     # self._configuration.globalOptions['inputDir'],
+        #     True)
+        # ds = gdal.Open(self.configuration.landmask)
+        # self.landmask = ds.ReadAsArray()
+        # ds = rasterio.open(self.configuration.landmask)
+        # self.landmask = ds.read(1)
+        ds = xr.open_rasterio(self.configuration.landmask)
+        ds = np.array(ds)
+        self.landmask = self.landmask > 0  # make boolean
+
+    def set_grid_cell_area(self):
+        # grid_cell_area = vos.netcdf2PCRobjCloneWithoutTime(
+        #     str(self._configuration.MASK_OUTLET['gridCellAreaInputFile']),
+        #     str(self._configuration.MASK_OUTLET['gridCellAreaVariableName']),
+        #     cloneMapFileName = self.cloneMap)
+        # grid_cell_area = np.float64(grid_cell_area)
+        # self.grid_cell_area = grid_cell_area[self.landmask]
+        self.grid_cell_area = np.ones_like(self.landmask)  # TEMP
+
+    def get_model_dimensions(self):
+        """Function to set model dimensions"""
+        self.nLat = int(self.cloneMapAttributes['rows'])
+        # self.latitudes = np.unique(pcr.pcr2numpy(pcr.ycoordinate(self.cloneMap), vos.MV))[::-1]
+        ds = xr.open_rasterio(self.cloneMap)        
+        self.latitudes = ds['y']
+        self.nLon = int(self.cloneMapAttributes['cols'])
+        # self.longitudes = np.unique(pcr.pcr2numpy(pcr.xcoordinate(self.cloneMap), vos.MV))
+        self.longitudes = ds['x']
+        self.nCell = int(np.sum(self.landmask))
+        # self.nLayer = 3         # FIXED
+        # self.nComp = 12         # TEMPORARY
+        self.nLayer = int(self._configuration.SOIL_PARAMETERS['nLayer'])
+        self.nComp = int(self._configuration.SOIL_PARAMETERS['nComp'])
+        self.dimensions = {
+            'time'     : None,
+            # 'depth'    : np.arange(self.nLayer), # TODO - put nComp in config section [SOIL_PARAMETERS]
+            'depth'    : np.arange(self.nComp), # TODO - put nComp in config section [SOIL_PARAMETERS]
+            'lat'      : self.latitudes,
+            'lon'      : self.longitudes,
+        }
+        
+    @property
+    def configuration(self):
+        return self._configuration

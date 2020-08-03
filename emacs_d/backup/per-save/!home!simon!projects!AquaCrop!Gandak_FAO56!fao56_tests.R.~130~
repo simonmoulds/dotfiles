@@ -1,0 +1,277 @@
+library(magrittr)
+library(zoo)
+library(xts)
+library(dplyr)
+library(ncdf4)
+library(raster)
+library(rgdal)
+
+template = raster("Input/Gandak05min.landmask.map")
+
+## Gandak polygons (for plotting)
+## ##############################
+wd = "/home/simon/projects/gandak_systems_model"
+gandak_india_poly = readOGR(dsn=file.path(wd, "data"), layer="gandak_basin_india_ll")
+gandak_poly = readOGR(dsn=file.path(wd, "data"), layer="gandak_basin_ll")
+gandak_rivers = readOGR(dsn=file.path(wd, "data"), layer="gandak_rivers_ll")
+
+system("unzip -o /home/simon/projects/gandak_systems_model/data-raw/Gandak_canal+nodes.zip -d data")
+gandak_canal_main = readOGR(dsn=file.path(wd, "data", "Gandak_canal+nodes"), layer="main_canal")
+gandak_canal_branch = readOGR(dsn=file.path(wd, "data", "Gandak_canal+nodes"), layer="branch_canal")
+gandak_canal_distr = readOGR(dsn=file.path(wd, "data", "Gandak_canal+nodes"), layer="distributary")
+gandak_canal_subbranch = readOGR(dsn=file.path(wd, "data", "Gandak_canal+nodes"), layer="subbranch canal")
+gandak_canal_subdistr = readOGR(dsn=file.path(wd, "data", "Gandak_canal+nodes"), layer="subdistributary")
+
+adm2 = readOGR(dsn=file.path(wd, "pkg", "india_adm2_1990", "data"), layer="g2010_2_India")
+adm0 = readOGR(dsn=file.path(wd, "data"), layer="India_Country_ll")
+
+## AquaCrop output files
+## #####################
+fs = list.files(file.path("Output", "netcdf"), pattern="^.*\\.nc$", full.names=TRUE)
+
+## data = vector(mode="list", length=length(fs))
+## nms = rep(NA, length(fs))
+## for (i in 1:length(fs)) {
+##     nc = nc_open(fs[i])
+##     nm = attributes(nc$var)$names[1]
+##     var = ncvar_get(nc, nm)
+##     lat = ncvar_get(nc, "lat")
+##     lon = ncvar_get(nc, "lon")
+##     tm = ncvar_get(nc, "time")
+##     data[[i]] = var
+##     nc_close(nc)
+## }
+
+get_nc_var = function(fn) {
+    nc = nc_open(fn)
+    nm = attributes(nc$var)$names[1]
+    var = ncvar_get(nc, nm)
+    nc_close(nc)
+    var
+}
+
+## GwPumping
+x = get_nc_var("Output/netcdf/GwPumpingVol_yearTot_output.nc")
+x = x[,,1]
+gwpumping = raster(template)
+gwpumping[] = t(x)
+plot(gwpumping)
+
+## Recharge
+x = get_nc_var("Output/netcdf/Recharge_yearTot_output.nc")
+x = x[,,1]
+recharge = raster(template)
+recharge[] = t(x)
+plot(recharge)
+
+## Production
+## ##########
+library(rasterVis)
+library(viridis)
+library(grid)
+
+## irrigated rice, 2001
+x = get_nc_var("Output/netcdf/Production_yearMax_output.nc")
+x = x[,,1,1]
+r1 = raster(template)
+r1[] = t(x)
+r1[r1 == 0] = NA
+
+p = levelplot(r1,
+              margin=FALSE,
+              xlab=NULL,
+              ylab=NULL,
+              par.settings=list(axis.line=list(lwd=1),
+                                axis.components=list(left=list(tck=0.5), right=list(tck=0.5), top=list(tck=0.5), bottom=list(tck=0.5)),
+                                background=list(col="transparent"),
+                                layout.widths=list(right.padding=2)),
+              par.strip.text=list(cex=0.9),
+              main=list("Irrigated kharif rice, 2001"),
+              col.regions=viridis(91, direction=-1),
+              colorkey=list(space="bottom",
+                            width=1,
+                            at=seq(0,30000,length.out=91),
+                            labels=list(at=seq(0,30000,10000),
+                                        labels=seq(0,30000,10000), cex=0.9), tck=0),
+              panel=function(...) {
+                  grid.rect(gp=gpar(col=NA, fill="white"))
+                  panel.levelplot(...)
+              })
+
+p <- p + layer(sp.polygons(adm2, lwd=0.25)) + layer(sp.polygons(adm0, lwd=3))
+
+pname <- file.path(file.path("doc/rice_irri_kharif_production_2001.png"))
+trellis.device(device="png", width=3.5, height=3.75, units="in", res=320, file=pname, bg="transparent")
+print(p)
+pushViewport(viewport(0.52,0.035,0.5,0.07))  ## TODO
+grid.text("Production (tonne)", gp=gpar(cex=0.9, font=1, col="black"))
+dev.off()
+
+## rainfed rice, 2001
+x = get_nc_var("Output/netcdf/Production_yearMax_output.nc")
+x = x[,,1,2]
+r2 = raster(template)
+r2[] = t(x)
+plot(r2)
+r2[r2 == 0] = NA
+
+p = levelplot(r2,
+              margin=FALSE,
+              xlab=NULL,
+              ylab=NULL,
+              par.settings=list(axis.line=list(lwd=1),
+                                axis.components=list(left=list(tck=0.5), right=list(tck=0.5), top=list(tck=0.5), bottom=list(tck=0.5)),
+                                background=list(col="transparent"),
+                                layout.widths=list(right.padding=2)),
+              par.strip.text=list(cex=0.9),
+              main=list("Rainfed kharif rice, 2001"),
+              col.regions=viridis(91, direction=-1),
+              colorkey=list(space="bottom",
+                            width=1,
+                            at=seq(0,30000,length.out=91),
+                            labels=list(at=seq(0,30000,10000),
+                                        labels=seq(0,30000,10000), cex=0.9), tck=0),
+              panel=function(...) {
+                  grid.rect(gp=gpar(col=NA, fill="white"))
+                  panel.levelplot(...)
+              })
+
+p <- p + layer(sp.polygons(adm2, lwd=0.25)) + layer(sp.polygons(adm0, lwd=3))
+
+pname <- file.path(file.path("doc/rice_rain_kharif_production_2001.png"))
+trellis.device(device="png", width=3.5, height=3.75, units="in", res=320, file=pname, bg="transparent")
+print(p)
+pushViewport(viewport(0.52,0.035,0.5,0.07))  ## TODO
+grid.text("Production (tonne)", gp=gpar(cex=0.9, font=1, col="black"))
+dev.off()
+
+## irrigated wheat, 2001-02
+x = get_nc_var("Output/netcdf/Production_yearMax_output.nc")
+x = x[,,2,5]
+r3 = raster(template)
+r3[] = t(x)
+r3[r3 == 0] = NA
+
+p = levelplot(r3,
+              margin=FALSE,
+              xlab=NULL,
+              ylab=NULL,
+              par.settings=list(axis.line=list(lwd=1),
+                                axis.components=list(left=list(tck=0.5), right=list(tck=0.5), top=list(tck=0.5), bottom=list(tck=0.5)),
+                                background=list(col="transparent"),
+                                layout.widths=list(right.padding=2)),
+              par.strip.text=list(cex=0.9),
+              main=list("Irrigated rabi wheat, 2001"),
+              col.regions=viridis(91, direction=-1),
+              colorkey=list(space="bottom",
+                            width=1,
+                            at=seq(0,30000,length.out=91),
+                            labels=list(at=seq(0,30000,10000),
+                                        labels=seq(0,30000,10000), cex=0.9), tck=0),
+              panel=function(...) {
+                  grid.rect(gp=gpar(col=NA, fill="white"))
+                  panel.levelplot(...)
+              })
+
+p <- p + layer(sp.polygons(adm2, lwd=0.25)) + layer(sp.polygons(adm0, lwd=3))
+
+pname <- file.path(file.path("doc/wheat_irri_rabi_production_2002.png"))
+trellis.device(device="png", width=3.5, height=3.75, units="in", res=320, file=pname, bg="transparent")
+print(p)
+pushViewport(viewport(0.52,0.035,0.5,0.07))  ## TODO
+grid.text("Production (tonne)", gp=gpar(cex=0.9, font=1, col="black"))
+dev.off()
+
+## irrigated sugarcane, 2001-02
+x = get_nc_var("Output/netcdf/Production_yearMax_output.nc")
+x = x[,,2,7]
+r4 = raster(template)
+r4[] = t(x)
+r4[r4 < 1] = NA
+
+p = levelplot(r4,
+              margin=FALSE,
+              xlab=NULL,
+              ylab=NULL,
+              par.settings=list(axis.line=list(lwd=1),
+                                axis.components=list(left=list(tck=0.5), right=list(tck=0.5), top=list(tck=0.5), bottom=list(tck=0.5)),
+                                background=list(col="transparent"),
+                                layout.widths=list(right.padding=2)),
+              par.strip.text=list(cex=0.9),
+              main=list("Irrigated sugarcane, 2002"),
+              col.regions=viridis(91, direction=-1),
+              colorkey=list(space="bottom",
+                            width=1,
+                            at=seq(0,30000,length.out=91),
+                            labels=list(at=seq(0,30000,10000),
+                                        labels=seq(0,30000,10000), cex=0.9), tck=0),
+              panel=function(...) {
+                  grid.rect(gp=gpar(col=NA, fill="white"))
+                  panel.levelplot(...)
+              })
+
+p <- p + layer(sp.polygons(adm2, lwd=0.25)) + layer(sp.polygons(adm0, lwd=3))
+
+pname <- file.path(file.path("doc/sugarcane_irri_production_2002.png"))
+trellis.device(device="png", width=3.5, height=3.75, units="in", res=320, file=pname, bg="transparent")
+print(p)
+pushViewport(viewport(0.52,0.035,0.5,0.07))  ## TODO
+grid.text("Production (tonne)", gp=gpar(cex=0.9, font=1, col="black"))
+dev.off()
+
+## zGW - year avg
+## ##############
+x = get_nc_var("Output/netcdf/zGW_yearAvg_output.nc")
+x = x[,,1]
+r = raster(template)
+r[] = t(x)
+plot(r)
+
+## zGW - month avg
+## ###############
+x = get_nc_var("Output/netcdf/zGW_monthAvg_output.nc")
+st = vector(mode="list", length=dim(x)[3])
+for (i in 1:dim(x)[3]) {
+    xx = x[,,i]
+    r = raster(template)
+    r[] = t(xx)
+    st[[i]] = r
+}
+plot(stack(st))
+    
+## ## zGW - daily
+## ## ###########
+## x = get_nc_var("Output/netcdf/zGW_dailyTot_output.nc")
+## st = vector(mode="list", length=dim(x)[3])
+## for (i in 1:dim(x)[3]) {
+##     xx = x[,,i]
+##     r = raster(template)
+##     r[] = t(xx)
+##     st[[i]] = r
+## }
+## plot(stack(st))
+
+## ## gwpumping - daily
+## ## #################
+## x = get_nc_var("Output/netcdf/GwPumpingVol_dailyTot_output.nc")
+## st = vector(mode="list", length=dim(x)[3])
+## for (i in 1:dim(x)[3]) {
+##     xx = x[,,i]
+##     r = raster(template)
+##     r[] = t(xx)
+##     st[[i]] = r
+## }
+## plot(stack(st))
+
+## ## recharge - daily
+## ## ################
+## x = get_nc_var("Output/netcdf/Recharge_dailyTot_output.nc")
+## st = vector(mode="list", length=dim(x)[3])
+## for (i in 1:dim(x)[3]) {
+##     xx = x[,,i]
+##     r = raster(template)
+##     r[] = t(xx)
+##     st[[i]] = r
+## }
+## plot(stack(st))
+

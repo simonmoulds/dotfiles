@@ -1,0 +1,13 @@
+from crop_growth_funs import *
+
+class CropYield(object):
+    def __init__(self, CropYield_variable):
+        self.var = CropYield_variable
+
+    def dynamic(self):
+        """Function to calculate crop yield"""
+        cond1 = self.GrowingSeasonIndex
+        self.Y[cond1] = ((self.B / 100) * self.HIadj)[cond1]
+        cond11 = (cond1 & (((self.crop_pars.CalendarType == 1) & ((self.DAP - self.DelayedCDs) >= self.Maturity)) | ((self.crop_pars.CalendarType == 2) & ((self.GDDcum - self.DelayedGDDs) >= self.Maturity))))
+        self.CropMature[cond11] = True
+        self.Y[np.logical_not(self.GrowingSeasonIndex)] = 0

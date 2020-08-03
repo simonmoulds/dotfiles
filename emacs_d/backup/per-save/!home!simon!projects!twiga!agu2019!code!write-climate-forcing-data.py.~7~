@@ -1,0 +1,167 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+import os
+import numpy as np
+import netCDF4 as nc
+import pandas as pd
+import datetime
+import time
+import glob
+import re
+
+from collections import namedtuple
+
+era5_datadir = "../data-raw/ERA5"
+tahmo_datadir = "../data-raw/TAHMO"
+met_datadir = "../data/pt_met_data"
+out_dir = "../data/pt_met_data"
+
+tahmo_metadata = pd.read_csv(
+    os.path.join(
+        tahmo_datadir,
+        'tahmo_stn_metadata.csv'
+    )
+)
+
+met_filenames = glob.glob(
+    met_datadir + '/' + 'tahmo_era5_stn_TA*_met.csv'
+)
+
+_BoundingBox = namedtuple('BoundingBox', ('left','bottom','right','top'))
+class BoundingBox(_BoundingBox):
+    pass
+
+# GHANA
+ghana_bbox = BoundingBox(
+    left = -3.261,
+    bottom = 4.539,
+    right = 1.273,
+    top = 11.175
+)
+
+# KENYA
+kenya_bbox = BoundingBox(
+    left = 33.910,
+    bottom = -4.900,
+    right = 41.900,
+    top = 4.620
+)
+
+availability_threshold = 0.9
+
+def main():
+    
+    for fn in met_filenames:
+    
+        met_data = pd.read_csv(fn)        
+        dates = [datetime.datetime.strptime(date, "%Y-%m-%d") for date in list(met_data['DATE'])]
+        met_data['DATE'] = dates
+        met_data = met_data.set_index('DATE')
+        ix0 = np.where(np.logical_not(np.isnan(met_data['P_TAHMO'])))[0][0]
+        ix1 = len(met_data)
+        complete_2018 = dates[ix0] < datetime.datetime(2018, 1, 1)
+        avail = (
+            met_data['2018-01-01':]['P_TAHMO'].count() /
+            len(met_data['2018-01-01':])
+        )
+        good_avail = avail >= availability_threshold
+        
+        code = re.search('TA[0-9]{5}', fn).group(0)
+        idx = [index for index,value in enumerate(tahmo_metadata['Code']) if value in code]
+        lat_coord = float(tahmo_metadata['Y'][idx])
+        lon_coord = float(tahmo_metadata['X'][idx])
+        
+        in_ghana = \
+            (lat_coord > ghana_bbox.bottom) \
+            & (lat_coord < ghana_bbox.top) \
+            & (lon_coord > ghana_bbox.left) \
+            & (lon_coord < ghana_bbox.right)
+        in_kenya = \
+            (lat_coord > kenya_bbox.bottom) \
+            & (lat_coord < kenya_bbox.top) \
+            & (lon_coord > kenya_bbox.left) \
+            & (lon_coord < kenya_bbox.right)
+
+        in_region = in_ghana | in_kenya
+        
+        # round to nearest 0.25 (corresponds to ERA5 lat/lon)
+        lat_coord = round(lat_coord * 4) / 4
+        lon_coord = round(lon_coord * 4) / 4
+        
+        if complete_2018 & good_avail & in_region:
+            met_data_sel = met_data['2016-01-01':'2018-12-31'].copy()
+            met_data_sel.loc['2016':'2017','P_TAHMO'] = met_data_sel.loc['2016':'2017','P_ERA5']
+            met_data_sel['DATE'] = met_data_sel.index
+            out_filename = os.path.join(
+                met_datadir,
+                'tahmo_era5_stn_' + code + '_met_2016-2019.csv'
+            )
+            met_data_sel.to_csv(out_filename, index=False)
+            
+            dates_sel = [datetime.datetime.utcfromtimestamp(tm / 1e9) for tm in np.array(met_data_sel.index).tolist()]
+            prec_tahmo = np.array(met_data_sel['P_TAHMO'])
+            prec_era5 = np.array(met_data_sel['P_ERA5'])
+
+            # fill gaps in TAHMO using ERA5
+            prec_tahmo[np.isnan(prec_tahmo)] = prec_era5[np.isnan(prec_tahmo)]        
+            tmin_era5 = np.array(met_data_sel['TMIN_ERA5'])
+            tmax_era5 = np.array(met_data_sel['TMAX_ERA5'])
+            eto_era5  = np.array(met_data_sel['ETO_ERA5'])
+       
+            # write netCDF output containing all met data for
+            # the current location
+            ds = nc.Dataset(os.path.join(out_dir, 'tahmo_era5_stn_' + code + '_met_2016-2019.nc'), 'w')
+            ds.description = 'meteorological forcing data'
+            ds.history = 'created ' + time.ctime(time.time())
+            ds.createDimension('lat', 1)
+            ds.createDimension('lon', 1)
+            ds.createDimension('time', None)
+
+            lats = ds.createVariable('lat', np.float64, ('lat',))
+            lats.units = 'degrees_north'
+            lats[:] = lat_coord
+
+            lons = ds.createVariable('lon', np.float64, ('lon',))
+            lons.units = 'degrees_east'
+            lons[:] = lon_coord
+
+            times = ds.createVariable('time', np.int32, ('time',))
+            times.units = 'days since 1900-01-01 00:00:00'
+            times.calendar = 'gregorian'
+            times[:] = nc.date2num(dates_sel, units=times.units, calendar=times.calendar)
+
+            prc = ds.createVariable('prec_tahmo', np.float64, ('time','lat','lon'))
+            prc.units = 'mm d-1'
+            prc[:] = prec_tahmo
+
+            prc = ds.createVariable('prec_era5', np.float64, ('time','lat','lon'))
+            prc.units = 'mm d-1'
+            prc[:] = prec_era5
+
+            # prc = dataset.createVariable('prec_tamsat', np.float64, ('time','lat','lon'))
+            # prc = 'mm d-1'
+            # prc[:] = np.array(prec_data['TAMSAT'])[:,None,None]
+            # prc = dataset.createVariable('prec_GPM', np.float64, ('time','lat','lon'))
+            # prc = 'mm d-1'
+            # prc[:] = np.array(prec_data['GPM'])[:,None,None]
+
+            tmin = ds.createVariable('tmin_era5', np.float64, ('time','lat','lon'))
+            tmin.units = 'deg_c'
+            tmin[:] = tmin_era5
+
+            tmax = ds.createVariable('tmax_era5', np.float64, ('time','lat','lon'))
+            tmax.units = 'deg_c'
+            tmax[:] = tmax_era5
+
+            eto = ds.createVariable('eto_era5', np.float64, ('time','lat','lon'))
+            eto.units = 'mm d-1'
+            eto[:] = eto_era5
+
+            ds.close()
+
+if __name__ == '__main__':
+    if len(met_filenames) > 0:
+        main()
+    else:
+        print("No met data available")

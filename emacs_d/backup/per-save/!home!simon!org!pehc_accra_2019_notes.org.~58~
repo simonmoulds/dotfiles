@@ -1,0 +1,198 @@
+* Giulia
+** Need blog posts!
+** Wellcome Trust will not fund publications which are not fully OA (check w/ Giulia!)
+
+* Majid - overview of the project
+** Only 8 months through the project
+** Renewed attention to inequality as a barrier to sustainable dev and social cohesion
+** Cities as policy innovators - they can often bypass national policies; setting for mobilisation
+** Advances in data and measurement methodology
+** Four sectors: Urban services/built and natural envt/transportation/water, sanitation and waste mgmt
+** Progress on data sharing and computing (IC RDS?)
+** MRC Centre for Envt & Health
+** Some discussions w/ Google about large-scale access to imagery
+** Some work on data harmonisation and curation
+** [TODO: explore use of Planet Labs hi-res data - DEM?]
+** Year 1
+*** Admin
+*** Baseline poverty mapping, health and environmental/sector/service mapping
+*** Links between sectors and health outcomes
+*** ...
+*** Example 2: Big data for urban envt and health research
+**** Ames Centre (NASA), Arizona State Univ, CANUE
+**** Discussion with Google
+**** Methodological development
+*** Example 3: Air and noise pollution measurement campaign
+**** 10 fixed sites
+**** 1301-150 rotating (7-day) sites
+*** BMJ series on cities and health
+**** Cities as key actors in global health action
+**** Extreme events
+**** Water resources
+**** Housing
+**** Emerging tech
+** Year 2
+*** Complete baseline health mapping
+*** Cross-sectoral integration
+*** ...
+** Year 3, 4
+*** ...
+** Framework for integrating policy and empirical research
+*** Cities as *imperfect* producers of good health?
+*** Recognise the positives, capture the negatives
+*** Keeping an eye on external trends (e.g. climate change)
+** Aims of the meeting
+*** Review work so far in specific areas and cities
+*** Draw out cross-sectoral linkages, and links between sectors and health
+*** Common policy themes in and across cities
+**** Decide on areas of exclusion
+
+* Mike
+** Sanitation features in Accra, Dhaka
+** Common tools and methods (imagery, census, direct measurement)
+** What is a scenario?
+*** Things that are happening (i.e. cities are doing these things)
+*** Things that cities are considering
+*** Overarching trends
+** Evaluate the outcomes of a particular project (e.g. employment, social connection/cohesion), then map these to health outcomes
+** Location is important
+** Wellcome Trust provides funding for grantholders for public engagement
+** Accessibility - affordability
+
+* Engagement with policy partners
+** Co-production of Knowledge is not a new idea
+** Start with a problem - policy scenarios
+** Framing a question has to be collaborative
+*** Who do you include/exclude? 
+** Knowledge production is a social process which happens at all levels
+** Semantically, prefer partners to stakeholders
+** When work is being done societal partners often play less of a role, but this shouldn't be the case
+** Science is better when there are diverse voices involved in the process
+** Participatory impact pathway analysis (?)
+** Learn from co-creation, design sector
+*** E.g. design of stethoscope
+** Multiscale issues - at what levels do we want to have an impact
+** Use of the arts in disrupting ways of thinking - sometimes you need a tool to engage with policymakers
+** "Stakeholder workshop" often exploitative - never hear again from researchers
+** Model variables which are relevant to the specific questions
+** IFS?
+** What can cities do that are not related to health (infrastructure) to improve health?
+* Aruna
+** Demand (for transport) modelling
+** Lack of transport, or poor access to activitiy oppotunities, can negatively impact health and well-being
+** Integrated land use and transport modelling
+** Accessibility is therefore a key component of govt policy
+*** What is meant by accessibility in the context of flexible working etc.
+** Strong links between land use change, transportation, also water supply and sanitation, housing
+* Brian Robinson: Where do the urban poor live?
+** Why a spatial perspective
+*** Social groups often separate into neighbourhoods -> spatial perspective
+*** Push for baseline data
+** Mapping SES is important
+** Data on cities
+*** Greater Accra - 5007 enumeration areas (2010 census data, but there may be time series data available - i.e. previous censuses)
+** Spatial inequalities across cities
+*** Income inequality
+*** Unemployment rate
+*** Housing prices (Smets & Salman, 2008?)
+** Reading the maps - data, clusters
+** Different metrics of SES give different spatial patterns
+** Are the spatial patterns important? Perhaps.
+** Field of spatial comparison is actively evolving
+** Next steps:
+*** More data! 
+*** Linking Accra to other data
+*** Harmonize with Beijing
+*** Urban expansion (Seto et al 2015)
+*** Urban Source Watersheds (UNESCO, WNS?)
+*** Incorporate land cover/land use data -> predictors of spatial patterns
+
+* Zahidul
+** Multidimensional poverty index
+** Slums of Dhaka from 2006-2010
+** Steele, JE et al. 2017
+** WorldPop may have some useful variables for Accra
+
+* Ying Long: Mapping poverty/SES
+
+* Emily Muller, Ricky Nath...? Street level imaging
+** Can networks be trained in cities with high-quality data and applied in other cities? 
+** Outlined 36 other cities (Delhi - share census data?)
+** Neural networks are essentially black boxes 
+** Object detection (identifying specific objects e.g. car) - does the count of specific objects relate to health?
+** Class activation maps
+** Accra environmental mapping
+*** Housing quality/sanitation [Could we use hi-res Planet Lab data to detect urban water systems?
+** See John Weeks (?), Engstrom - aerial imagery for poverty mapping in Accra?
+** Comment by Majid:
+*** Must be interpretability; the outcome must be what we actually care about (e.g. careful of using proxies)
+*** If we ask something to predict something which we call 'poverty', we must be sure that that measure is actually poverty
+
+* Quality of housing
+** The Conversation: Informal housing easing pressure in Accra (paraphrasing...)
+** How to frame a health and housing strategy
+** WHO Housing and Health Guidelines
+** Many of the SDGs are related to housing quality
+** Links to water - a house which is vulnerable to flooding as a result of climate change is not a healthy home
+
+* Discussion w/ X from People's Dialogue(?) 
+** Old Fadama is a slum in Accra which has developed on a wetland, and frequently floods;
+** Floods often occur because of household waste (debris etc), but because the drains have also been used for human waste there are also outbreaks of cholera (?).
+** La (?) is another region (?) which frequently floods
+** Consequently the 
+
+* Chatted with Brian Robinson (McGill), could be some interesting overlap - he's on sabattical in London this year, so would be good to run things by him
+
+* Cholera risk mapping?
+* Possible data: https://bmcpublichealth.biomedcentral.com/articles/10.1186/s12889-017-4803-9
+* System dynamics modelling? Find out whether these are accepted research tool in environmental health
+* Flood mapping - do we need to link this with specific health outcomes, or can we just assume that flooding in urban areas leads to variousnegative health outcomes?
+* Could we find a section of river that often floods and map this area in more detail (perhaps using drone flights, river depth measures, etc.)
+
+* Health outcomes
+** Why spatial mapping of outcomes
+*** Burke et al., 2016 - good to identify where improvements are being made, and where things may be getting worse
+** What outcomes will we consider?
+*** Appropriate for the city context
+*** Comparable across sites (?)
+*** Data availability
+*** Interests and expertise of investigators
+** Focus areas:
+*** Mortality, life expectancy (all)
+*** Cardiovascular (Beijing)
+*** Access to hospitals (Beijing, Dhaka)
+*** ...
+** [Idea: simple flood risk map?]
+** World Bank 2014 dataset, # deaths/EA (10%), overlaid with info about formal-informal/slum-commercial-natural - [potential to downscale on the basis of a land use map?]
+** Focus on non-fatal disease? Child mortality has come down much faster than the spread of clean water/sanitation
+** Diarhoea is difficult to measure - it may be easier to focus on Cholera, which is probably easier to map
+** WHO - improved/unimproved (very difficult to show exposure pathways)
+** Jill: perhaps easier to think about SES and equality issues than specific exposures because these are notoriously difficult to identify
+
+* TODO:
+** What do climate change scenarios show for Accra?
+** Any WorldPop data that is relevant?
+** Potential for a flood risk map?
+** Are the spatial implications of droughts?
+** System dynamics model?
+
+* Data storage
+** Relevance, validity, efficiency
+** Research Data Storage space;
+*** Three directories (general, NASA satellite, fieldwork data and imagery)
+** Version control
+*** Different versions of Ghanaian census data
+** Everyone act as a data provider
+** Dataverse?
+** Publication principles
+*** Reach out to community
+*** Include country specific partners
+*** Giulia - ask what publications are planned (6 month interval)
+
+* Group discussion
+** Accra, water
+** Finding out where people get the water they use, and what is the ultimate source of that water - 
+** Health 
+
+
+

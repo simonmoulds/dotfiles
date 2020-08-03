@@ -1,0 +1,51 @@
+# Data for WEAP modelling
+
+## Hydrological boundaries
+gandak_basin_ll.shp is the whole catchment
+(India + Nepal), whereas gandak_basin_india_ll.shp
+contains the portion of the basin downstream of the
+barrage only.
+
+## Land cover map
+Globcover_2009_{cropland|forest|...|water_bodies}.tif
+shows the land cover in the basin. Land cover itself
+is not particularly dynamic (instead the growth of
+irrigated area dominates, but we attempt to model
+this process endogenously). I do have maps of
+irrigated area for various crops, so let me know if
+these would be helpful.
+
+## Soil type
+
+## Aquifer properties
+These should all be in gw_data.nc, which was created
+by Johanna Scheidegger @ BGS.
+
+## Estimated travel time
+I've emailed a PhD student here at Exeter (Laura
+Wignall) who has been developing a model of the
+Gandak river using MIKE, and should therefore have a
+good idea of travel times. I'll let you know when I
+hear back from her.
+
+## Meteorological inputs (meteo/*)
+I've used a combination of IMD and PRINCETON
+data for the meteorology (IMD + PRINCETON for
+precipitation, PRINCETON for everything else). The
+subdirectory doesn't contain all the variables you
+requested because I precompute reference ET. I can
+send these but the dataset is rather large (~14Gb),
+so it may be just as easy for you to download the
+data yourself.
+
+## Farmer practices
+(Jimmy O'Keeffe)
+
+## Inflows and outflows
+TODO
+
+## Urban water demand
+TODO
+
+## Calibration data
+TODO

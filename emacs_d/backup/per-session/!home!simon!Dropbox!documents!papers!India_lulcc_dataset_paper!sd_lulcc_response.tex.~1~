@@ -1,0 +1,32 @@
+\documentclass [12pt,a4paper ]{article}
+\setlength {\ topmargin }{-2cm}
+\setlength {\ oddsidemargin }{0cm}
+\setlength {\ textheight }{24cm}
+\setlength {\ textwidth }{16cm}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{sectsty}
+%Use  Helvetica  as the  sans  serif  font
+\usepackage{helvet}
+%Use  sffamily  for all  titles
+\allsectionsfont {\ sffamily}
+\begin{document}
+\title {\ sffamily \huge \textbf{ Using   \LaTeX\ for  report  writing }}
+\date{Additional  information  for  SESG1009/SESA2009}
+\author{Hans  Fangohr}
+\maketitle
+\tableofcontents
+\newpage
+\section{Introduction}
+This  document  provides a couple  of  hints  that  may be  useful  if you  use
+\LaTeX {} for the  first  time  for  writing a report.
+We  append  the  source  of this  file  should  you  want to  study it.
+The  main  purpose  of this  document  is to make  you  aware of \LaTeX{}
+commands  that  may be  useful. It is not  possible  to  explain  all of
+these  on a few  pages. Instead , you  should  understand  this  document  as
+a help  providing  pointers  to ‘‘interesting ’’ commands  which  you can
+then  look up in  other  documentation (for  example  the  pdf  file  provided
+on the  module ’s online  documents  web page ,
+www.soton.ac.uk/$^\ sim$sesa2006 )
+
+\end{document}

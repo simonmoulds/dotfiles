@@ -1,0 +1,67 @@
+References: <874lmmegvn.fsf@yamunotri.localdomain> <06915D01-8762-4A69-ACE6-78E4E14694F0@manchester.ac.uk>
+User-agent: mu4e 1.0-alpha2; emacs 24.5.1
+From: Simon Moulds <s.moulds@exeter.ac.uk>
+To: Timothy Foster <timothy.foster@manchester.ac.uk>
+Cc: "O'Keeffe, Jimmy M" <jimmy.okeeffe@imperial.ac.uk>
+Subject: Re: AquaCrop-OS - regional application?
+In-reply-to: <06915D01-8762-4A69-ACE6-78E4E14694F0@manchester.ac.uk>
+
+Thanks a lot for your detailed response, Tim - it's really helpful. I
+think it sounds promising. Jimmy, what do you think?
+
+Yes, when I initially started thinking about this I thought the crop
+growth parameters would be a challenge. We would probably start simply
+and focus on rice-wheat (which, as you know, is by far the most common 
+
+Timothy Foster writes:
+
+> Hi Simon,
+>
+> Thanks for getting in touch. Trust all is well in Exeter?
+>
+> In answer to your question, it may be possible to apply AquaCrop at this kind of scale. In general, for each grid cell you would need daily weather data (precipitation, temperature, reference ET - which could be temperature dependent), soil characteristics/type, irrigation management practices, and crop growth parameters.
+>
+> The hardest bit of the above would probably be the definition of crop growth parameters. What crop mix would you be looking at? One option might be to aggregate crops in to classes where data are limited and water requirements are similar, or alternatively transferring parameters from default values and/or similar production systems may be an option. A different, but simpler approach, would be to look at a hybrid of AquaCrop and crop coefficient based methods (e.g. FAO56), and is something I’ve focused on in more data limited environments/conditions in recent work.
+>
+> Finally, with regard to irrigation management, I’d be a bit cautious about extrapolating too far on the behavioural insights from Jimmy’s analysis. This is not because this is not good work (it is great), but more because some of behavioural insights will be locally-specific and may not be valid at national or regional scales. Nevertheless, I like the idea of combining some simple irrigation heuristics based on Jimmy’s fieldwork with an AquaCrop (or similar) crop modelling approach for regional scale assessment of water demand for irrigation.
+>
+> I’d be happy to talk further about all this if it would be helpful, and also to provide insights and some technical guidance as the modelling work moves forward. Let me know if the would be helpful, and, if so, an initial step might be set up a time to talk via Skype (perhaps also with Jimmy if he is involved in this directly too)?
+>
+> Best,
+>
+> Tim
+>
+> Tim Foster, PhD
+> Lecturer in Water-Food Security
+> School of Mechanical, Aerospace and Civil Engineering
+> Room B14 | Pariser Building |
+> The University of Manchester | Sackville Street | M13 9PL
+> e: timothy.foster@manchester.ac.uk<x-msg://46/timothy.foster@manchester.ac.uk>
+> p: +44(0)161-275-4411
+> w: https://www.research.manchester.ac.uk/portal/timothy.foster.html
+> AquaCrop-OS : http://www.aquacropos.com<http://www.aquacropos.com/>
+>
+> On 12 Feb 2018, at 08:45, Simon Moulds <S.Moulds@exeter.ac.uk<mailto:S.Moulds@exeter.ac.uk>> wrote:
+>
+> Dear Tim,
+>
+> I'm working with Jimmy on Ana's CHANSE project, developing a systems
+> model for the IGP which includes human-environment feedbacks. Crop
+> production is a crucial link here, so developing an appropriate crop
+> model will be a key part of our work. Ultimately I hope to develop a
+> gridded model (e.g. 5 arcminute resolution) that simulates water
+> supply and demand amongst various sectors.
+>
+> I wonder whether you have any insight into whether AquaCrop is an
+> appropriate tool for use in a relatively data scarce region like the
+> IGP? We have quite good data on land use, crop rotation, spatial
+> distribution etc., and Jimmy has unique insights into farmer
+> behaviour. However, we don't have detailed, spatially explicit
+> biophysical data that perhaps AquaCrop requires, so we would be relying
+> on global/regional datasets and/or parameter values from other parts of
+> the world.
+>
+> Thanks a lot for you help. I hope Manchester is treating you well!
+>
+> Simon
+

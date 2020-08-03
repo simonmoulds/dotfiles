@@ -1,0 +1,67 @@
+## Author : Simon Moulds
+## Date   : January 2018
+
+## Quality control for Dadra and Nagar Haveli
+
+## Crops not grown: ...
+
+## banana
+## ######
+
+xx[["apy_banana-whole_year"]] = xx[["mapspam_atot_banana"]]
+xx[["irr_banana-whole_year"]] = xx[["mapspam_xirr_banana"]]
+
+## chickpea
+## ########
+
+## all ok
+
+## coconut
+## #######
+
+xx[["apy_coconut-whole_year"]] = xx[["mapspam_atot_coconut"]]
+xx[["irr_coconut-whole_year"]] = xx[["mapspam_xirr_coconut"]]
+
+## groundnut
+## #########
+
+## all ok
+
+## maize
+## #####
+
+xx[["apy_maize-kharif"]] %<>% locf_interp(c(1:2,8:10), fromLast=TRUE)
+
+## other cereals
+## #############
+
+## all ok
+
+## other fibre crops
+## #################
+
+xx[["apy_other_fibre_crops-kharif"]] %<>% locf_interp(8:10, fromLast=TRUE)
+xx[["apy_other_fibre_crops-rabi"]] %<>% locf_interp(6:11, fromLast=TRUE)
+
+## other pulses
+## ############
+
+## all ok
+
+## pigeonpea
+## #########
+
+xx[["apy_pigeonpea-rabi"]] = 0
+
+## rapeseed
+## ########
+
+xx[["apy_rapeseed-rabi"]] = xx[["mapspam_atot_rapeseed"]][6]
+xx[["irr_rapeseed-rabi"]] = xx[["mapspam_xirr_rapeseed"]][6]
+
+## rest of crops
+## #############
+
+xx[["apy_rest_of_crops-whole_year"]] = xx[["mapspam_atot_rest_of_crops"]][6]
+xx[["irr_rest_of_crops-whole_year"]] = xx[["mapspam_xirr_rest_of_crops"]][6]
+

@@ -1,0 +1,212 @@
+## Author : Simon Moulds
+## Date   : January 2018
+
+## Quality control for Goa
+
+## Crops not grown: ...
+
+## banana
+## ######
+
+xx[["apy_banana-whole_year"]] = xx[["mapspam_atot_banana"]]
+xx[["irr_banana-whole_year"]] = xx[["mapspam_xirr_banana"]]
+
+## cassava
+## ######
+
+xx[["apy_cassava-whole_year"]] = xx[["mapspam_atot_cassava"]]
+xx[["irr_cassava-whole_year"]] = xx[["mapspam_xirr_cassava"]]
+
+## chickpea
+## ######
+
+xx[["apy_chickpea-rabi"]] = xx[["mapspam_atot_chickpea"]]
+xx[["irr_chickpea-rabi"]] = xx[["mapspam_xirr_chickpea"]]
+
+## cotton
+## ######
+
+xx[["apy_cotton-kharif"]] = xx[["mapspam_atot_cotton"]]
+xx[["irr_cotton-kharif"]] = xx[["mapspam_xirr_cotton"]]
+
+## cowpea
+## ######
+
+xx[["apy_cowpea-kharif"]] = xx[["mapspam_atot_cowpea"]]
+xx[["irr_cowpea-kharif"]] = xx[["mapspam_xirr_cowpea"]]
+
+## groundnut
+## #########
+
+xx[["apy_groundnut-kharif"]] = xx[["mapspam_atot_groundnut"]]
+xx[["irr_groundnut-kharif"]] = xx[["mapspam_xirr_groundnut"]]
+
+## lentil
+## ######
+
+xx[["apy_lentil-rabi"]] = xx[["mapspam_atot_lentil"]]
+xx[["irr_lentil-rabi"]] = xx[["mapspam_xirr_lentil"]]
+
+## maize
+## #####
+
+xx[["apy_maize-kharif"]] %<>% locf_interp(9:11)
+
+## other cereals
+## #############
+
+xx[["apy_other_cereals-kharif"]] = xx[["mapspam_atot_other_cereals"]]
+xx[["irr_other_cereals-kharif"]] = xx[["mapspam_xirr_other_cereals"]]
+
+## other fibre crops
+## #################
+
+xx[["apy_other_fibre_crops-kharif"]] = xx[["mapspam_atot_other_fibre_crops"]]
+xx[["irr_other_fibre_crops-kharif"]] = xx[["mapspam_xirr_other_fibre_crops"]]
+
+## other oil crops
+## #################
+
+xx[["apy_other_oil_crops-kharif"]] = xx[["mapspam_atot_other_oil_crops"]]
+xx[["irr_other_oil_crops-kharif"]] = xx[["mapspam_xirr_other_oil_crops"]]
+
+## other pulses
+## ############
+
+xx[["apy_other_pulses-kharif"]] %<>% locf_interp(9:11)
+
+if (dist_nm %in% c("Ukhrul")) {
+    xx[["apy_other_pulses-kharif"]] %<>% locf_interp(1, fromLast=TRUE)
+}
+
+## pigeonpea
+## #########
+
+xx[["apy_pigeonpea-kharif"]] = xx[["mapspam_atot_pigeonpea"]][6]
+xx[["irr_pigeonpea-kharif"]] = xx[["mapspam_xirr_pigeonpea"]][6]
+
+## sweet potato
+## ############
+
+xx[["apy_sweet_potato-whole_year"]] = xx[["mapspam_atot_sweet_potato"]][6]
+xx[["irr_sweet_potato-whole_year"]] = xx[["mapspam_xirr_sweet_potato"]][6]
+
+## rapeseed
+## ########
+
+xx[["apy_rapeseed-rabi"]] = xx[["mapspam_atot_rapeseed"]]
+xx[["irr_rapeseed-rabi"]] = xx[["mapspam_xirr_rapeseed"]]
+
+## rest of crops
+## #############
+
+xx[["apy_rest_of_crops-whole_year"]] %<>% locf_interp(9:11)
+xx[["irr_rest_of_crops-whole_year"]] %<>% locf_interp(9:11)
+
+## rice
+## ####
+
+xx[["irr_rice-winter"]] = xx[["irr_rice-autumn"]]
+xx[["irr_rice-autumn"]] = 0
+
+xx[["apy_rice-winter"]] %<>% locf_interp(9:11)
+
+if (dist_nm %in% c("Bishnupur","Chandel","Churachandpur","East Imphal","Senapati","Tamenglong","Thoubal","Ukhrul")) {
+    xx[["irr_rice-winter"]] %<>% irr_frac_interp(xx[["apy_rice-winter"]], 6:11, 5)
+}
+
+if (dist_nm %in% c("West Imphal")) {
+    xx[["irr_rice-winter"]] %<>% irr_frac_interp(xx[["apy_rice-winter"]], 6:11, 4)
+}
+
+if (dist_nm %in% c("East Imphal","Chandel")) {
+    xx[["irr_rice-winter"]] %<>% irr_frac_interp(xx[["apy_rice-winter"]], 2:4, c(1,5))
+}
+
+if (dist_nm %in% c("Churachandpur")) {
+    xx[["irr_rice-winter"]] %<>% irr_frac_interp(xx[["apy_rice-winter"]], 2, c(1,3))
+    xx[["irr_rice-winter"]] %<>% irr_frac_interp(xx[["apy_rice-winter"]], 4, c(3,5))
+}
+
+## sesameseed
+## ##########
+
+if (dist_nm %in% c("Chandel","Churachandpur")) {
+    xx[["apy_sesameseed-kharif"]] %<>% locf_interp(9:11)
+}
+
+if (dist_nm %in% c("Senapati","Tamenglong")) {
+    xx[["apy_sesameseed-kharif"]] = xx[["mapspam_atot_sesameseed"]]
+}
+
+## sorghum
+## #######
+
+xx[["apy_sorghum-kharif"]] = xx[["mapspam_atot_sorghum"]]
+xx[["irr_sorghum-kharif"]] = xx[["mapspam_xirr_sorghum"]]
+
+## soybean
+## #######
+
+if (dist_nm %in% c("Chandel")) {
+    xx[["apy_soybean-kharif"]] %<>% locf_interp(9:11)
+    xx[["apy_soybean-kharif"]] %<>% locf_interp(1, fromLast=TRUE)
+} else {
+    xx[["apy_soybean-kharif"]] = xx[["mapspam_atot_soybean"]][6]
+    xx[["irr_soybean-kharif"]] = xx[["mapspam_xirr_soybean"]][6]
+}
+
+## sugarcane
+## #########
+
+xx[["apy_sugarcane-whole_year"]] = xx[["mapspam_atot_sugarcane"]][6]
+xx[["irr_sugarcane-whole_year"]] = xx[["mapspam_xirr_sugarcane"]][6]
+
+## sunflower
+## #########
+
+xx[["apy_sunflower-kharif"]] = xx[["mapspam_atot_sunflower"]][6]
+xx[["irr_sunflower-kharif"]] = xx[["mapspam_xirr_sunflower"]][6]
+
+## tea
+## ###
+
+xx[["apy_tea-whole_year"]] = xx[["mapspam_atot_tea"]][6]
+xx[["irr_tea-whole_year"]] = xx[["mapspam_xirr_tea"]][6]
+
+## temperate fruit
+## ###############
+
+xx[["apy_temperate_fruit-whole_year"]] = xx[["mapspam_atot_temperate_fruit"]][6]
+xx[["irr_temperate_fruit-whole_year"]] = xx[["mapspam_xirr_temperate_fruit"]][6]
+
+## tobacco
+## #######
+
+xx[["apy_tobacco-kharif"]] = xx[["mapspam_atot_tobacco"]][6]
+xx[["irr_tobacco-kharif"]] = xx[["mapspam_xirr_tobacco"]][6]
+
+## tropical fruit
+## ##############
+
+xx[["apy_tropical_fruit-whole_year"]] = xx[["mapspam_atot_tropical_fruit"]][6]
+xx[["irr_tropical_fruit-whole_year"]] = xx[["mapspam_xirr_tropical_fruit"]][6]
+
+## vegetables
+## ##########
+
+## TODO: work out season
+
+xx[["apy_vegetables-kharif"]] = xx[["mapspam_atot_vegetables"]][6]
+xx[["irr_vegetables-kharif"]] = xx[["mapspam_xirr_vegetables"]][6]
+
+## wheat
+## #####
+xx[["apy_wheat-rabi"]] = xx[["mapspam_atot_wheat"]][6]
+xx[["irr_wheat-rabi"]] = xx[["mapspam_xirr_wheat"]][6]
+
+
+
+    
+
+

@@ -1,0 +1,26 @@
+## Author : Simon Moulds
+## Date   : April 2018
+
+library(maptools)
+library(rasterVis)
+library(grid)
+library(viridis)
+library(magrittr)
+library(dplyr)
+library(tidyr)
+library(tibble)
+library(ggplot2)
+library(raster)
+
+load("data/input_data.RData")
+
+## extract data
+unzip("data-raw/GMIA/gmia_v5_aei_ha_asc.zip", exdir="data")
+unzip("data-raw/GMIA/gmia_v5_aeigw_pct_aei_asc.zip", exdir="data")
+unzip("data-raw/GMIA/gmia_v5_aeisw_pct_aei_asc.zip", exdir="data")
+unzip("data-raw/GMIA/gmia_v5_aeinc_pct_aei_asc.zip", exdir="data")
+
+aei = raster("data/gmia_v5_aei_ha.asc") %>% crop(template)
+aeigw = raster("data/gmia_v5_aeigw_pct_aei.asc") %>% crop(template)
+aeisw = raster("data/gmia_v5_aeisw_pct_aei.asc") %>% crop(template)
+aeinc = raster("data/gmia_v5_aeinc_pct_aei.asc") %>% crop(template)

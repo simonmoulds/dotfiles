@@ -1,0 +1,71 @@
+## Author : Simon Moulds
+## Date   : Dec 2019
+
+## Time parameters
+maxtime = 200
+dt = 1#0.001
+t = seq(0, maxtime, dt)
+nt = length(t)
+
+## Compute inter-arrival time of flood events, plus flood magnitude
+t_mean = 3
+H_mult = 1
+w = rep(0, nt)
+index = 0
+t_flood0 = 0
+while (index < nt) {
+    x = runif(1)
+    t_flood = t_flood0 + (t_mean * log(1/(1-x)))
+    index = which.min(abs(t - t_flood))
+    y = runif(1)
+    w[index] = H_mult * ((theta + 1) / theta) * (1 - (1 - y) ** theta)
+    t_flood0 = t_flood
+}
+
+## Parameters
+alpha_H = 10
+xi_H = 0.2
+rho_D = 0.03
+alpha_D = 5
+epsilon_T = 1.1
+keta_T = 2e-05
+mu_S = 0.06 
+
+## State variables
+F = rep(0, nt)
+D = rep(0.1, nt)
+H = rep(0, nt)
+M = rep(0, nt)
+
+for (i in 1:nt) {
+
+    ## proportion of settlement that is damaged
+    if ((w[i] + xi_H * H[i]) > H[i]) {
+        F[i] = 1 - exp(-(w[i] + xi_H * H[i]) / alpha_H)
+    } else {
+        F[i] = 0
+    }
+    
+    ## raising of levees
+    if (F[i] > 0) { 
+        R[i] = epsilon_T * (w[i] + xi_H * H[i] - H[i])
+    } else {
+        R[i] = 0
+    }
+
+    ## value of Dirac comb
+    if (w[i] > 0) {
+        Delta = 1
+    } else {
+        Delta = 0
+    }
+
+    dD_dt = rho_D * (1 - D[i] * (1 + alpha_D * M[i])) - Delta * F[i] * D[i]
+    dH_dt = Delta * R[i] - keta_T * H[i]
+    dM_dt = Delta * F[i] * D[i] - mu_S * M[i]
+
+    D[i+1] = max(0, D[i] + dD_dt)
+    H[i+1] = max(0, H[i] + dH_dt)
+    M[i+1] = max(0, M[i] + dM_dt)
+}
+

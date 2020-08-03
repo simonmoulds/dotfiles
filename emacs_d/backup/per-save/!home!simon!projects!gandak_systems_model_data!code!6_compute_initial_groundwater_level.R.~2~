@@ -1,0 +1,21 @@
+## Author : Simon Moulds
+## Date   : Nov 2018
+
+library(raster)
+library(ncdf4)
+
+nc = nc_open("../data/h_ini.nc")
+h_ini = ncvar_get(nc, "h")
+nc_close(nc)
+
+nc = nc_open("../data/gw_data.nc")
+dem = ncvar_get(nc, "DEM")
+nc_close(nc)
+
+gwlevel = round(dem - h_ini, digits=3)
+
+template = raster(xmn=83, ymn=25, xmx=86.5, ymx=28, ncols=42, nrows=36)
+template[] = t(gwlevel)
+
+writeRaster(template, "../data/initial_groundwater_level.tif", overwrite=TRUE, format="GTiff")
+

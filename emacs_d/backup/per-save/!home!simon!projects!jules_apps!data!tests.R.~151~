@@ -1,0 +1,207 @@
+## Author : Simon Moulds
+## Date   : January 2020
+
+library(rgdal)
+library(raster)
+
+## ####################################################### ##
+## 1. JULES_LAND_FRAC                                      ##
+## ####################################################### ##
+
+## compare with WFDEI data; ensure compatability
+wfdei = raster("/data/WFDEI/PSurf_daily_WFDEI/PSurf_daily_WFDEI_201612.nc")
+wfdei = !is.na(wfdei)
+gshhs = raster("jules_land_frac/gshhs_0.500000Deg.tif")
+jules_frac = raster("jules_land_frac/jules_land_frac_0.500000Deg.tif")
+
+## any cells included in JULES_LAND_FRAC but not in WFDEI grid?
+## (i.e. no met forcing data available for the cell when using
+## WFDEI)
+v0 = getValues(wfdei)
+v1 = getValues(jules_frac)
+length(which(v1 > 0 & v0 == 0))
+
+## any cells where forcing data is available, but we do not
+## consider it to be land? -15 currently
+length(which(v0 > 0 & v1 == 0))
+
+## where are they? -mainly arctic, some lakes in Europe, islands
+pts = as(wfdei, "SpatialPointsDataFrame")
+pts = pts[which(v0 > v1),]
+plot(wfdei)
+points(pts)
+
+## ####################################################### ##
+## 2. JULES_FRAC (land cover)                              ##
+## ####################################################### ##
+
+## Check: make sure the sum of fractions equals 1
+
+## 5 PFT
+fs = c("lc_c3_grass_2015_0.500000Deg.tif",
+       "lc_c4_grass_2015_0.500000Deg.tif",
+       "lc_tree_broadleaf_2015_0.500000Deg.tif",
+       "lc_tree_needleleaf_2015_0.500000Deg.tif",
+       "lc_shrub_2015_0.500000Deg.tif",
+       "lc_bare_soil_2015_0.500000Deg.tif",
+       "lc_urban_2015_0.500000Deg.tif",
+       "lc_water_2015_0.500000Deg.tif",
+       "lc_snow_ice_2015_0.500000Deg.tif")
+st = stack(paste0("jules_frac/", fs))
+r = stackApply(st, indices=rep(1, nlayers(st)), fun=sum)
+plot(r)
+
+## 9 PFT
+fs = c("lc_c3_grass_2015_0.500000Deg.tif",
+       "lc_c4_grass_2015_0.500000Deg.tif",
+       "lc_shrub_deciduous_2015_0.500000Deg.tif",
+       "lc_shrub_evergreen_2015_0.500000Deg.tif",
+       "lc_tree_broadleaf_deciduous_2015_0.500000Deg.tif",
+       "lc_tree_broadleaf_evergreen_temperate_2015_0.500000Deg.tif",
+       "lc_tree_broadleaf_evergreen_tropical_2015_0.500000Deg.tif",
+       "lc_tree_needleleaf_deciduous_2015_0.500000Deg.tif",
+       "lc_tree_needleleaf_evergreen_2015_0.500000Deg.tif",
+       "lc_bare_soil_2015_0.500000Deg.tif",
+       "lc_urban_2015_0.500000Deg.tif",
+       "lc_water_2015_0.500000Deg.tif",
+       "lc_snow_ice_2015_0.500000Deg.tif")
+st = stack(paste0("jules_frac/", fs))
+r = stackApply(st, indices=rep(1, nlayers(st)), fun=sum)
+plot(r)
+
+## ####################################################### ##
+## 3. JULES_OVERBANK_PROPS                                 ##
+## ####################################################### ##
+
+logn_mean = raster("jules_overbank_props/merit_dem_logn_mean_global_0.500000Deg.tif")
+logn_stddev = raster("jules_overbank_props/merit_dem_logn_stddev_global_0.500000Deg.tif")
+plot(logn_stddev)
+pts = as(jules_frac, "SpatialPoints")
+logn_mean_vals = logn_mean[pts]
+nan_pts = pts[!is.finite(logn_mean_vals)]
+
+## ####################################################### ##
+## 4. JULES_PDM                                            ##
+## ####################################################### ##
+
+slope = raster("jules_pdm/merit_dem_slope_0.500000Deg.tif")
+plot(slope)
+
+## ####################################################### ##
+## 5. JULES_RIVERS_PROPS                                   ##
+## ####################################################### ##
+
+flowdir = raster("jules_rivers_props/drt_draindir_trip_0.500000Deg.tif")
+unique(getValues(flowdir))
+plot(flowdir)
+
+accum = raster("jules_rivers_props/drt_accum_cell_0.500000Deg.tif")
+min(getValues(accum))
+plot(accum)
+
+## writeOGR(pts[is.na(accum_vals),], "tmp", layer="missing_pts", driver="ESRI Shapefile", overwrite=TRUE)
+
+## ####################################################### ##
+## 6. JULES_SOIL_PROPS                                     ##
+## ####################################################### ##
+
+## Toby Marthews' data:
+
+library(ncdf4)
+ds = nc_open("jules_soil_props/qrparm.soil_HWSD_cont_cosbyNew.nc")
+b_tm = ncvar_get(ds, "field1381")
+hcap_tm = ncvar_get(ds, "field335")
+hcon_tm = ncvar_get(ds, "field336")
+ksat_tm = ncvar_get(ds, "field333")
+sathh_tm = ncvar_get(ds, "field342")
+thcrit_tm = ncvar_get(ds, "field330")
+thsat_tm = ncvar_get(ds, "field332")
+thwilt_tm = ncvar_get(ds, "field329")
+nc_close(ds)
+
+jules_frac = raster("jules_land_frac/jules_land_frac_0.500000Deg.tif")
+pts = as(jules_frac, "SpatialPoints")
+water = raster("jules_frac/lc_water_2015_0.500000Deg.tif")
+ice = raster("jules_frac/lc_snow_ice_2015_0.500000Deg.tif")
+b_cos = raster("jules_soil_props/b_cosby_sl1_0.500000Deg.tif")
+b_cos[water == 1] = 0
+b_cos[ice == 1] = 0
+b_cos_filled = raster("b_filled.tif")
+missing_pts = pts[is.na(getValues(b_cos))]
+b_cos[missing_pts] = b_cos_filled[missing_pts]
+plot(b_cos)
+
+## b_cos = focal(b_cos, w=matrix(data=1, nrow=3, ncol=3), fun=mean, na.rm=TRUE, NAonly=TRUE)
+
+## b_cos_filled = raster("b_filled.tif")
+vals = b_cos[pts]
+## N.B. most of the missing cells are in Greenland
+length(which(is.na(vals)))
+
+## Cosby
+b_cos = raster("jules_soil_props/b_cosby_sl1_0.500000Deg.tif")
+b_tom = raster("jules_soil_props/b_tomas_sl1_0.500000Deg.tif")
+mean(b_tm, na.rm=TRUE)
+mean(getValues(b_cos), na.rm=TRUE)
+mean(getValues(b_tom), na.rm=TRUE)
+
+hcap_cos = raster("jules_soil_props/hcap_cosby_sl1_0.500000Deg.tif")
+hcap_tom = raster("jules_soil_props/hcap_tomas_sl1_0.500000Deg.tif")
+mean(hcap_tm, na.rm=TRUE)
+mean(getValues(hcap_cos), na.rm=TRUE)
+mean(getValues(hcap_tom), na.rm=TRUE)
+
+hcon_cos = raster("jules_soil_props/hcon_cosby_sl1_0.500000Deg.tif")
+hcon_tom = raster("jules_soil_props/hcon_tomas_sl1_0.500000Deg.tif")
+mean(hcon_tm, na.rm=TRUE)
+mean(getValues(hcon_cos), na.rm=TRUE)
+mean(getValues(hcon_tom), na.rm=TRUE)
+
+ksat_cos = raster("jules_soil_props/k_sat_cosby_sl1_0.500000Deg.tif")
+ksat_tom = raster("jules_soil_props/k_sat_tomas_sl1_0.500000Deg.tif")
+mean(ksat_tm, na.rm=TRUE)
+mean(getValues(ksat_cos), na.rm=TRUE)
+mean(getValues(ksat_tom), na.rm=TRUE)
+
+lambda_cos = raster("jules_soil_props/lambda_cosby_sl1_0.500000Deg.tif")
+lambda_tom = raster("jules_soil_props/lambda_tomas_sl1_0.500000Deg.tif")
+mean(getValues(lambda_cos), na.rm=TRUE)
+mean(getValues(lambda_tom), na.rm=TRUE)
+
+sathh_cos = raster("jules_soil_props/psi_m_cosby_sl1_0.500000Deg.tif")
+sathh_tom = raster("jules_soil_props/psi_m_tomas_sl1_0.500000Deg.tif")
+mean(sathh_tm, na.rm=TRUE)
+mean(getValues(sathh_cos), na.rm=TRUE)
+mean(getValues(sathh_tom), na.rm=TRUE)
+
+thcrit_cos = raster("jules_soil_props/theta_crit_cosby_sl1_0.500000Deg.tif")
+thcrit_tom = raster("jules_soil_props/theta_crit_tomas_sl1_0.500000Deg.tif")
+mean(thcrit_tm, na.rm=TRUE)
+mean(getValues(thcrit_cos), na.rm=TRUE)
+mean(getValues(thcrit_tom), na.rm=TRUE)
+
+thsat_cos = raster("jules_soil_props/theta_sat_cosby_sl1_0.500000Deg.tif")
+thsat_tom = raster("jules_soil_props/theta_sat_tomas_sl1_0.500000Deg.tif")
+mean(thsat_tm, na.rm=TRUE)
+mean(getValues(thsat_cos), na.rm=TRUE)
+mean(getValues(thsat_tom), na.rm=TRUE)
+
+thwilt_cos = raster("jules_soil_props/theta_wilt_cosby_sl1_0.500000Deg.tif")
+thwilt_tom = raster("jules_soil_props/theta_wilt_tomas_sl1_0.500000Deg.tif")
+mean(thwilt_tm, na.rm=TRUE)
+mean(getValues(thwilt_cos), na.rm=TRUE)
+mean(getValues(thwilt_tom), na.rm=TRUE)
+
+## ####################################################### ##
+## 7. JULES_TOP                                            ##
+## ####################################################### ##
+
+## TODO: get Toby Marthews' topographic index data
+
+fexp = raster("jules_top/merit_dem_fexp_0.500000Deg.tif")
+topidx_mean = raster("jules_top/merit_dem_topidx_mean_0.500000Deg.tif")
+topidx_stddev = raster("jules_top/merit_dem_topidx_stddev_0.500000Deg.tif")
+
+plot(fexp)
+plot(topidx_mean)
+plot(topidx_stddev)

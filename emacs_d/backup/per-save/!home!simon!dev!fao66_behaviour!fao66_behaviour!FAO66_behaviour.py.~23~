@@ -1,0 +1,187 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+# AquaCrop crop growth model
+import os
+import shutil
+import sys
+import math
+import gc
+
+import pcraster as pcr
+# import VirtualOS as vos
+
+from hydro_model_builder.Model import Model
+from hydro_model_builder import VirtualOS as vos
+
+from aquacrop.Meteo import Meteo
+from aquacrop.Groundwater import Groundwater
+from aquacrop.CropArea import *
+from aquacrop.SoilAndTopoParameters import *
+from aquacrop.CheckGroundwaterTable import *
+from aquacrop.PreIrrigation import *
+from aquacrop.Drainage import *
+from aquacrop.RainfallPartition import *
+from aquacrop.Irrigation import *
+from aquacrop.Infiltration import *
+from aquacrop.CapillaryRise import *
+from aquacrop.Inflow import *
+
+from FarmParameters import *
+from CropParameters import *
+from FieldMgmtParameters import *
+from IrrigationMgmtParameters import *
+from InitialCondition import *
+from RootZoneWater import *
+from GrowthStage import *
+from RootDevelopment import *
+from Evapotranspiration import *
+from CropYield import *
+
+from CanalSupply import *
+from CanalAccess import *
+from Tubewells import *
+from FertiliserApplication import *
+from IrrigationSupply import *
+from Income import *
+from Accounting import *
+from Investment import *
+from GridCellMean import *
+
+import logging
+logger = logging.getLogger(__name__)
+
+class FAO66_behaviour(Model):
+
+    def initial(self):
+        self.meteo_module = Meteo(self)
+        self.groundwater_module = Groundwater(self)
+        self.canal_supply_module = CanalSupply(self)
+        self.farm_parameters_module = FarmParameters(self)
+        self.crop_parameters_module = FAO56CropParameters(self)
+        self.crop_area_module = CropArea(self)
+        self.field_mgmt_parameters_module = FieldMgmtParameters(self)
+        self.irrigation_mgmt_parameters_module = IrrigationMgmtParameters(self)
+        self.soil_parameters_module = SoilAndTopoParameters(self)        
+        self.initial_condition_module = InitialCondition(self)        
+        self.check_groundwater_table_module = CheckGroundwaterTable(self)
+        self.pre_irrigation_module = PreIrrigation(self)
+        self.drainage_module = Drainage(self)
+        self.rainfall_partition_module = RainfallPartition(self)
+        self.root_zone_water_module = FAO56RootZoneWater(self)
+
+        self.fertiliser_app_module = FertiliserApplication(self)
+        self.irrigation_demand_module = Irrigation(self)
+        
+        self.tubewell_module = Tubewells(self)
+        self.canal_access_module = CanalAccess(self)
+        self.irrigation_supply_module = IrrigationSupply(self)
+        
+        self.infiltration_module = Infiltration(self)
+        self.capillary_rise_module = CapillaryRise(self)
+        self.growth_stage_module = FAO56GrowthStage(self)
+        self.root_development_module = FAO56RootDevelopment(self)
+        self.evapotranspiration_module = Evapotranspiration(self)
+        self.inflow_module = Inflow(self)
+        self.crop_yield_module = CropYield(self)
+
+        self.income_module = Income(self)
+        self.investment_module = Investment(self)
+        self.accounting_module = Accounting(self)
+
+        self.grid_cell_mean_module = GridCellMean(self)
+
+        # initialize modules
+        self.meteo_module.initial()
+        self.groundwater_module.initial()
+        self.canal_supply_module.initial()
+        self.farm_parameters_module.initial()        
+        self.crop_parameters_module.initial()
+        self.crop_area_module.initial()
+        # self.crop_price_module.initial()
+        self.field_mgmt_parameters_module.initial()
+        self.fertiliser_app_module.initial()
+        # self.fertiliser_price_module.initial()
+        self.irrigation_mgmt_parameters_module.initial()
+        self.soil_parameters_module.initial()        
+        self.initial_condition_module.initial()
+        self.check_groundwater_table_module.initial()
+        self.pre_irrigation_module.initial()
+        self.drainage_module.initial()
+        self.rainfall_partition_module.initial()
+        self.root_zone_water_module.initial()
+        self.irrigation_demand_module.initial()
+
+        self.tubewell_module.initial()
+        self.canal_access_module.initial()
+        self.irrigation_supply_module.initial()
+        
+        self.infiltration_module.initial()
+        self.capillary_rise_module.initial()
+        self.growth_stage_module.initial()
+        self.root_development_module.initial()
+        self.evapotranspiration_module.initial()
+        self.inflow_module.initial()
+        self.crop_yield_module.initial()
+
+        self.income_module.initial()
+        self.investment_module.initial()
+        self.accounting_module.initial()
+
+        self.grid_cell_mean_module.initial()
+        
+        self.get_model_dimensions()
+        
+    def get_model_dimensions(self):
+        # TODO: remove dependency on PCRaster
+        latitudes = np.unique(pcr.pcr2numpy(pcr.ycoordinate(self.cloneMap), vos.MV))[::-1]
+        longitudes = np.unique(pcr.pcr2numpy(pcr.xcoordinate(self.cloneMap), vos.MV))
+        self.dimensions = {
+            'lat' : latitudes,
+            'lon' : longitudes,
+            'time': None,
+            'depth' : np.arange(self.nComp),
+            # 'compartment' : np.arange(self.nComp),
+            # 'layer' : np.arange(self.nLayer),
+            'crop' : np.arange(self.nCrop),
+            'farm' : np.arange(self.nFarm),
+            'category' : np.arange(self.nFarmSizeCategory)}
+        
+    def dynamic(self):
+        """Function to update model state for current time step"""
+
+        logger.info("Reading forcings for time %s", self._modelTime)
+        self.meteo_module.dynamic()
+        self.groundwater_module.dynamic()
+        self.canal_supply_module.dynamic()
+        self.farm_parameters_module.dynamic()
+        self.crop_parameters_module.dynamic()
+        self.crop_area_module.dynamic()
+        self.fertiliser_app_module.dynamic()
+        self.irrigation_mgmt_parameters_module.dynamic()
+        self.initial_condition_module.dynamic()
+        self.check_groundwater_table_module.dynamic()
+        self.pre_irrigation_module.dynamic()
+        self.drainage_module.dynamic()
+        self.rainfall_partition_module.dynamic()                
+        self.root_zone_water_module.dynamic()        
+        self.irrigation_demand_module.dynamic()
+
+        self.tubewell_module.dynamic()
+        self.canal_access_module.dynamic()
+        self.irrigation_supply_module.dynamic()
+        
+        self.infiltration_module.dynamic()
+        self.capillary_rise_module.dynamic()
+        self.growth_stage_module.dynamic()
+        self.root_zone_water_module.dynamic()
+        self.evapotranspiration_module.dynamic()
+        self.inflow_module.dynamic()
+        self.crop_yield_module.dynamic()
+        self.root_zone_water_module.dynamic()
+
+        self.income_module.dynamic()
+        self.investment_module.dynamic()
+        self.accounting_module.dynamic()
+
+        self.grid_cell_mean_module.dynamic()

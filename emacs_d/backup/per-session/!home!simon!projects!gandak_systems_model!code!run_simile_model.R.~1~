@@ -1,0 +1,34 @@
+## testing the Simile R package
+## ############################
+
+library(Simile)
+use.simile.at("/usr/lib/simile-6.9")
+
+## load Simile model
+model.handle = load.model("/home/simon/Simile/models/gandak_model_v2.so")
+objs = list.objects(model.handle)
+for (obj in objs) {
+    print(c(obj, get.model.property(model.handle, obj, "Dims")))
+}
+
+## create model instance, reset time and execute model
+instance.handle = create.model(model.handle)
+reset.model(instance.handle, -2)
+get.model.time(instance.handle)
+
+## load file parameters
+param.file = "/home/simon/Simile/models/gandak_model_v2.spf"
+consult.parameter.metafile(instance.handle, param.file)
+
+ts = 0:365
+groundwater_depth = rep(0, length(ts))
+recharge = rep(0, length(ts))
+prec = rep(0, length(ts))
+etref = rep(0, length(ts))
+for (count in ts) {
+    execute.model(instance.handle, count+1, "Euler", count)
+    groundwater_depth[count] = get.value.list(instance.handle, "/aquifer/groundwater_depth")
+    recharge[count] = get.value.list(instance.handle, "/aquifer/recharge")
+    prec[count] = get.value.list(instance.handle, "/Prec")
+    etref[count] = get.value.list(instance.handle, "/ETref")
+}

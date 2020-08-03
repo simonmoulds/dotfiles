@@ -1,0 +1,168 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import numpy as np
+
+from hm import file_handling
+
+class Temperature(object):
+    def __init__(self, Temperature_variable):
+        self.var = Temperature_variable
+
+    def initial(self):
+        self.set_temperature_input_filenames()
+        self.set_temperature_offset()
+        self.set_temperature_scale_factor()
+    
+    def set_temperature_input_filenames(self):
+        self.var.compute_tmin_tmax_from_subdaily_data = \
+            self.var._configuration.WEATHER['compute_daily_min_max_temperature_from_subdaily_data']
+        if self.var.compute_tmin_tmax_from_subdaily_data == 'True':
+            self.var.compute_tmin_tmax_from_subdaily_data = True
+        else:
+            self.var.compute_tmin_tmax_from_subdaily_data = False
+
+        self.var.compute_tmean_from_subdaily_data = \
+            self.var._configuration.WEATHER['compute_daily_mean_temperature_from_subdaily_data']
+        if self.var.compute_tmean_from_subdaily_data == 'True':
+            self.var.compute_tmean_from_subdaily_data = True
+        else:
+            self.var.compute_tmean_from_subdaily_data = False
+            
+        if self.var.compute_tmean_from_subdaily_data or self.var.compute_tmin_tmax_from_subdaily_data:
+            self.get_subdaily_temperature_netcdf_file()
+
+        if not self.var.compute_tmean_from_subdaily_data:
+            self.get_daily_average_temperature_netcdf_file()
+
+        if not self.var.compute_tmin_tmax_from_subdaily_data:
+            self.get_daily_min_temperature_netcdf_file()
+            self.get_daily_max_temperature_netcdf_file()
+                            
+    def get_subdaily_temperature_netcdf_file(self):
+        self.var.subDailyTempFileNC = \
+            self.var._configuration.WEATHER['subDailyTemperatureNC']
+        self.var.subDailyTempVarName = \
+            self.var._configuration.WEATHER['subDailyTemperatureVarName']
+        self.var.subDailyTimeDimName = \
+            self.var._configuration.WEATHER['subDailyTemperatureTimeDimName']
+
+    def get_daily_average_temperature_netcdf_file(self):
+        self.var.meanDailyTempFileNC = \
+            self.var._configuration.WEATHER['meanDailyTemperatureNC']
+        self.var.meanDailyTempVarName = \
+            self.var._configuration.WEATHER['meanDailyTemperatureVarName']
+        self.var.meanDailyTempTimeDimName = \
+            self.var._configuration.WEATHER['meanDailyTemperatureTimeDimName']
+
+    def get_daily_min_temperature_netcdf_file(self):
+        self.var.minDailyTempFileNC = \
+            self.var._configuration.WEATHER['minDailyTemperatureNC']
+        self.var.minDailyTempVarName = \
+            self.var._configuration.WEATHER['minDailyTemperatureVarName']
+        self.var.minDailyTempTimeDimName = \
+            self.var._configuration.WEATHER['minDailyTemperatureTimeDimName']
+
+    def get_daily_max_temperature_netcdf_file(self):
+        self.var.maxDailyTempFileNC = \
+            self.var._configuration.WEATHER['maxDailyTemperatureNC']
+        self.var.maxDailyTempVarName = \
+            self.var._configuration.WEATHER['maxDailyTemperatureVarName']
+        self.var.maxDailyTempTimeDimName = \
+            self.var._configuration.WEATHER['maxDailyTemperatureTimeDimName']
+
+    def set_temperature_offset(self):
+        self.meanDailyTempOffset = \
+            self.var._configuration.WEATHER['meanDailyTemperatureOffset']
+        self.minDailyTempOffset = \
+            self.var._configuration.WEATHER['minDailyTemperatureOffset']
+        self.maxDailyTempOffset = \
+            self.var._configuration.WEATHER['maxDailyTemperatureOffset']
+
+    def set_temperature_scale_factor(self):
+        self.meanDailyTempFactor = \
+            self.var._configuration.WEATHER['meanDailyTemperatureFactor']
+        self.minDailyTempFactor = \
+            self.var._configuration.WEATHER['minDailyTemperatureFactor']
+        self.maxDailyTempFactor = \
+            self.var._configuration.WEATHER['maxDailyTemperatureFactor']
+
+    def read_temperature_data(self):        
+        day = self.var._modelTime.currTime.day
+        month = self.var._modelTime.currTime.month
+        year = self.var._modelTime.currTime.year
+        if self.var.compute_tmean_from_subdaily_data or self.var.compute_tmin_tmax_from_subdaily_data:
+            self.read_subdaily_temperature_data(day, month, year)
+            
+        if self.var.compute_tmean_from_subdaily_data:
+            self.compute_tmean_from_subdaily_data()
+        else:
+            self.read_daily_mean_temperature(day, month, year)
+            
+        if self.var.compute_tmin_tmax_from_subdaily_data:
+            self.compute_tmin_from_subdaily_data()
+            self.compute_tmax_from_subdaily_data()
+        else:
+            self.read_daily_min_temperature(day, month, year)
+            self.read_daily_max_temperature(day, month, year)
+
+    def read_daily_min_temperature(self, day, month, year):
+        self.var.tmin = file_handling.netcdf_to_array(
+            self.var.minDailyTempFileNC.format(day=day, month=month, year=year),
+            self.var.minDailyTempVarName,
+            str(self.var._modelTime.fulldate),
+            useDoy = None,
+            cloneMapFileName = self.var.cloneMapFileName,
+            LatitudeLongitude = True)[self.var.landmask]
+        
+    def read_daily_max_temperature(self, day, month, year):        
+        self.var.tmax = file_handling.netcdf_to_array(
+            self.var.maxDailyTempFileNC.format(day=day, month=month, year=year),
+            self.var.maxDailyTempVarName,
+            str(self.var._modelTime.fulldate),
+            useDoy = None,
+            cloneMapFileName = self.var.cloneMapFileName,
+            LatitudeLongitude = True)[self.var.landmask]
+    
+    def read_daily_mean_temperature(self, day, month, year):
+        self.var.tmean = file_handling.netcdf_to_array(
+            self.var.meanDailyTempFileNC.format(day=day, month=month, year=year),
+            self.var.meanDailyTempVarName,
+            str(self.var._modelTime.fulldate),
+            useDoy = None,
+            cloneMapFileName = self.var.cloneMapFileName,
+            LatitudeLongitude = True)[self.var.landmask]
+                                   
+    def read_subdaily_temperature_data(self, day, month, year):
+        # TODO: introduce a check to ensure that the resulting array contains more than one time point?
+        self.var.subdaily_temperature_data = file_handling.netcdf_daily_time_slice_to_array(
+            self.var.subDailyTempFileNC.format(day=day, month=month, year=year),
+            self.var.subDailyTempVarName,
+            str(self.var._modelTime.fulldate),
+            useDoy = None,
+            cloneMapFileName = self.var.cloneMapFileName,
+            LatitudeLongitude = True)[...,self.var.landmask]
+
+    def compute_tmin_from_subdaily_data(self):
+        self.var.tmin = np.amin(self.var.subdaily_temperature_data, axis=0)
+
+    def compute_tmax_from_subdaily_data(self):
+        self.var.tmax = np.amax(self.var.subdaily_temperature_data, axis=0)
+
+    def compute_tmean_from_subdaily_data(self):
+        self.var.tmean = np.mean(self.var.subdaily_temperature_data, axis=0)
+
+    def apply_temperature_scale_factor(self):
+        self.var.tmean *= self.meanDailyTempFactor
+        self.var.tmin *= self.minDailyTempFactor
+        self.var.tmax *= self.maxDailyTempFactor
+                      
+    def apply_temperature_offset(self):
+        self.var.tmean -= self.meanDailyTempOffset
+        self.var.tmin -= self.minDailyTempOffset
+        self.var.tmax -= self.maxDailyTempOffset
+        
+    def dynamic(self):
+        self.read_temperature_data()
+        self.apply_temperature_scale_factor()
+        self.apply_temperature_offset()

@@ -1,0 +1,49 @@
+References: <VI1PR06MB39034400442108E96DF62714C0C60@VI1PR06MB3903.eurprd06.prod.outlook.com>
+User-agent: mu4e 1.0; emacs 26.1
+From: Simon Moulds <simon.moulds@imperial.ac.uk>
+To: "Faures, Ariane" <ariane.faures18@imperial.ac.uk>
+Cc: "Moulds, Simon C" <simon.moulds@imperial.ac.uk>, "Buytaert, Wouter" <w.buytaert@imperial.ac.uk>
+Subject: Re: Stats - possible meeting on Friday?
+In-reply-to: <VI1PR06MB39034400442108E96DF62714C0C60@VI1PR06MB3903.eurprd06.prod.outlook.com>
+
+Hi Ariane,
+
+Hmm, that's strange - the order of variables shouldn't make a difference. I would expect the Matlab implementation of linear regression to be reliable, so we can probably rule out a software glitch. Just to be sure though, you may try the linear regression example here: https://uk.mathworks.com/help/stats/linear-regression-workflow.html - check whether changing the order of variables in 'modelspec' changes the R-squared value. Assuming it doesn't, I'm not sure what could be going on...
+
+With respect to the difference between rabi/kharif, I think your explanation is a good one - with very few exceptions it's impossible to grow crops in the rabi season without irrigation, so the impact of drought will be much reduced and hence we do not see the same impact of drought.
+
+We could meet tomorrow late afternoon - say 4pm?
+
+Cheers,
+Simon
+
+Faures, Ariane writes:
+
+> Hi Simon,
+>
+> I am having some troubles with the statistical analysis. 
+>
+> The main thing is that the Rsquared value which I was using to assess the validity of the model seems to change
+> according to the order in which I add different variables, and I don't understand why. 
+>
+> Also, I tried to work on the rabi data as well, to see what differences there could be, especially as it seems that it is
+> the main agricultural season in UP (largest sown area, largest production etc.). I didn't go into much detail, but the
+> first results don't match at all. For example, the NDVI deviation patter that was clearly shown in the graphs for the
+> kharif season is absent for the rabi one, and using the model with the "optimal" subset of kharif variables gives
+> negative Rsquared values (no correlation!).
+>
+> For this last problem (rabi-kharif difference) I thought that the cause might be the fact that crops grown in the rabi
+> season are mainly irrigated, while kharif crops are much more dependent on rainfall and therefore the NDVI-drought
+> relationship is much stronger. 
+>
+> I don't know if that makes sense or if it could at least be the start of an explanation, but in any case I was wondering
+> if it would be possible to meet on Friday to discuss a little about all of this (so that I have some more time to look for
+> solutions tomorrow)? However, if tomorrow works better for you I am available as well.
+>
+> Let me know when it would suit you the best and if you have any questions!
+>
+> Thanks in advance.
+>
+> Best regards,
+> Ariane
+

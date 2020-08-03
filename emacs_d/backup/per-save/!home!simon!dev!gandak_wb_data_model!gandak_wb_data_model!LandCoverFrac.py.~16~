@@ -1,0 +1,77 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import os
+import numpy as np
+import rasterio
+
+from ncConverter import np2netCDF
+from hydro_model_builder import VirtualOS as vos
+
+import variable_list as variable_list
+from utils import *
+
+class LandCoverFrac(object):    
+    def __init__(self, LandCoverFrac_variable):
+        self.var = LandCoverFrac_variable
+        self.var.LandCoverFracOutputFile = str(
+            self.var._configuration.LANDCOVER['landCoverPathOut'])
+        self.bbox = vos.get_clone_map_extent(self.var._configuration.cloneMap)
+
+    def initial(self):
+        pass
+
+    def dynamic(self):
+        lc_types = [lc.strip() for lc in self.var._configuration.LANDCOVER['landCoverTypes'].split(',')]
+        veg_types = ['forest','grassland','irrPaddy','irrNonPaddy']
+        natural_veg_types = ['forest','grassland']
+        
+        # lc_filename = self.var._configuration.landCoverOptions['landCoverInputFile']
+        lc_data = []
+        for lc in lc_types:
+            config_section = getattr(self.var._configuration, lc)
+            lc_outpath = config_section['landCoverTypePathOut']
+            
+            # land cover fraction            
+            lc_filename = config_section['landCoverFractionInputFile']
+            fn = get_data_smart(
+                'gandak_wb_data_model',
+                '../data' + '/' + lc_filename.format(lc=lc),
+                as_string = False)
+            fn = lc_filename
+            r = read_gdal_raster_image(fn, self.bbox, 0)  # write to netCDF
+            lc_data.append(r)
+            print lc
+            if lc in veg_types:
+                # crop coefficient
+                kc_filename = config_section['cropCoefficientInputFile']
+                print kc_filename
+            
+                # root fraction
+                rf_filename = config_section['rootFractionInputFile']
+                print rf_filename
+            
+                # interception capacity
+                if lc in natural_veg_types:
+                    ic_filename = config_section['interceptCapInputFile']
+                    print ic_filename
+
+                # root depth
+                rd_filename = config_section['maxRootDepthInputFile']
+                print rd_filename
+            
+        
+        # cropland_area_filename = get_data_smart(
+        #     'gandak_data_model',
+        #     '../data/iiasa_ifpri_cropland_map_5m.tif',
+        #     as_string = False)
+        # self.var.cropland_area = read_gdal_raster_image(
+        #     cropland_area_filename,
+        #     self.bbox,
+        #     0)
+        # netcdf = np2netCDF(self.var._configuration, self.var.dimensions, variable_list)        
+        # netcdf.create_netCDF(self.var.CroplandAreaOutputFile, 'cropland_area')        
+        # netcdf.data2NetCDF(
+        #     self.var.CroplandAreaOutputFile,
+        #     'cropland_area',
+        #     self.var.cropland_area)

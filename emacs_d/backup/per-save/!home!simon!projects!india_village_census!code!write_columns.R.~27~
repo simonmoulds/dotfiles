@@ -1,0 +1,79 @@
+## Author : Simon Moulds
+## Date   : February 2020
+
+library(rgdal)
+library(magrittr)
+
+## v = readOGR("/data/india_village_level_geospatial_socio_econ_data/india-village-census-2001-PB_ll.gpkg")
+## cols = names(v)
+
+character_vars = c(
+    "NAME", "NAME_1", "TRU", "SOU_SUMM", "NEAR_TOWN", "NEWS_PAP",
+    "MAGAZINE", "MAN_COMM1", "MAN_COMM2", "MAN_COMM3"
+)
+
+categorical_vars = c(
+    "SID", "DID", "TID", "VILL_CODE", "C_CODE01", "UID", "CENSUS_COD",
+    "STATE", "DISTRICT", "SUB_DIST", "TOWN_VILL", "WARD", "EB", "LEVEL",
+    "ST_CODE", "DIST_CODE", "THSIL_CODE", "BLOCK_CODE", "V_CT_CODE",
+    "VILL_NAME", "AREA", "EDU_FAC", "RANG_P_SCH", "RANG_M_SCH","RANG_COLL",
+    "MEDI_FAC", "RANG_ALL", "RANG_MCW", "RANG_PHC", "DRNK_WAT_F",
+    "RANG_WAT_F", "TAP", "WELL", "TANK", "TUBEWELL", "HANDPUMP", "RIVER",
+    "CANAL", "LAKE", "SPRING", "OTHER", "RANG_SS", "SS_CODE", "P_T_FAC",
+    "RANG_PO",
+    "RANG_PHONE", "COMM_FAC", "BS_FAC", "RANG_BS", "RS_FAC", "RANG_RS",
+    "NW_FAC", "RANG_NW", "BANK_FAC", "RANG_COMM", "RANG_COOP", "CRSOC_FAC",
+    "RANG_ACS", "RANG_NAC", "RANG_OTH", "RC_FAC", "RANG_CV", "RANG_SPCL",
+    "RANG_STAU", "APP_PR", "APP_MR", "APP_FP", "APP_NAVRIV", "APP_NAVCAN",
+    "APP_NW", "DIST_TOWN", "POWER_SUPL", "POWER_DOM", "POWER_AGR",
+    "POWER_OTH", "POWER_ALL", "PAP_MAG", "A_INCEXP"
+    )
+
+continuous_vars = c(
+    "No_HH", "TOT_P", "TOT_M", "TOT_F", "P_06", "M_06", "F_06", "P_SC",
+    "M_SC", "F_SC", "P_ST", "M_ST", "F_ST", "P_LIT", "M_LIT", "F_LIT",
+    "P_ILL", "M_ILL", "F_ILL", "TOT_WORK_P", "TOT_WORK_M", "TOT_WORK_F",
+    "MAINWORK_P", "MAINWORK_M", "MAINWORK_F", "MAIN_CL_P", "MAIN_CL_M",
+    "MAIN_CL_F", "MAIN_AL_P", "MAIN_AL_M", "MAIN_AL_F", "MAIN_HH_P",
+    "MAIN_HH_M", "MAIN_HH_F", "MAIN_OT_P", "MAIN_OT_M", "MAIN_OT_F",
+    "MARGWORK_P", "MARGWORK_M", "MARGWORK_F", "MARG_CL_P", "MARG_CL_M",
+    "MARG_CL_F", "MARG_AL_P", "MARG_AL_M", "MARG_AL_F", "MARG_HH_P",
+    "MARG_HH_M", "MARG_HH_F", "MARG_OT_P", "MARG_OT_M", "MARG_OT_F",
+    "NON_WORK_P", "NON_WORK_M", "NON_WORK_F", "T_HH", "T_P", "T_M", "T_F",
+    "SC_P", "SC_M", "SC_F", "ST_P", "ST_M", "ST_F", "P_SCH", "M_SCH",
+    "S_SCH", "S_S_SCH",
+    "COLLEGE", "IND_SCH", "TR_SCH", "ADLT_LT_CT", "OTH_SCH", "ALL_HOSP",
+    "AYU_HOSP", "UN_HOSP", "HOM_HOSP", "ALL_DISP", "AYU_DISP", "UN_DISP",
+    "HOM_DISP", "MCW_CNTR", "M_HOME", "CWC", "H_CNTR", "PH_CNTR",
+    "PHS_CNT", "FWC_CNTR", "TB_CLN", "N_HOME", "RMP", "SMP", "CHW",
+    "OTH_CNTR", "POST_OFF", "TELE_OFF", "POST_TELE", "PHONE", "COMM_BANK",
+    "COOP_BANK", "AC_SOC", "NAC_SOC", "OTHER_SOC", "C_V_HALL", "SP_CL_FAC",
+    "ST_AU_FAC", "TOT_INC", "TOT_EXP", "LAND_FORES", "CANAL_GOVT",
+    "CANAL_PVT", "WELL_WO_EL", "WELL_W_EL", "TW_WO_EL", "TW_W_EL",
+    "TANK_IRR", "RIVER_IRR", "LAKE_IRR", "W_FALL", "OTH_IRR", "TOT_IRR",
+    "UN_IRR", "CULT_WASTE", "AREA_NA_CU"
+)
+
+## ## TEST:
+## all_vars = c(character_vars, categorical_vars, continuous_vars)
+## all(cols %in% all_vars)
+## all(all_vars %in% cols)
+
+## ####################################################### ##
+## Write data
+## ####################################################### ##
+
+## Write text files
+fs = c("categorical_columns.txt", "continuous_columns.txt")
+for (i in 1:length(fs)) {
+    if (file.exists(fn)) {
+        unlink(fn)
+    }
+}
+
+fileConn<-file(fn)
+for (nm in cols) {
+    write(nm, fn, append=TRUE)
+}
+close(fileConn)
+

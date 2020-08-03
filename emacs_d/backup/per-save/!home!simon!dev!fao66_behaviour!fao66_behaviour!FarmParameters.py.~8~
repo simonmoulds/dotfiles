@@ -1,0 +1,104 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import os
+import numpy as np
+import pcraster as pcr
+import netCDF4 as nc
+import datetime as datetime
+import calendar as calendar
+
+from hydro_model_builder import VirtualOS as vos
+
+import logging
+logger = logging.getLogger(__name__)
+
+class FarmArea(object):
+    def __init__(self, FarmArea_variable):
+        self.var = FarmArea_variable
+        # self.var.nFarm = int(self.var._configuration.farmOptions['nFarm'])
+        self.var.FarmAreaFileNC = str(self.var._configuration.farmOptions['farmAreaFileNC'])
+        self.var.FarmAreaVarName = str(self.var._configuration.farmOptions['farmAreaVariableName'])
+        self.var.AnnualChangeInFarmArea = bool(int(self.var._configuration.farmOptions['AnnualChangeInFarmArea']))                
+        
+    def initial(self):
+        self.set_farm_area()
+
+    def read_farm_area(self, date = None):
+        if date is None:
+            farm_area = vos.netcdf2PCRobjCloneWithoutTime(
+                self.var.FarmAreaFileNC,
+                self.var.FarmAreaVarName,
+                cloneMapFileName = self.var.cloneMap)            
+        else:
+            farm_area = vos.netcdf2PCRobjClone(
+                self.var.FarmAreaFileNC,
+                self.var.FarmAreaVarName,
+                date,
+                useDoy = None,
+                cloneMapFileName = self.var.cloneMap,
+                LatitudeLongitude = True)
+
+        farm_area = np.reshape(
+            farm_area[self.var.landmask_farm],
+            (self.var.nFarm, self.var.nCell))
+        farm_area = np.broadcast_to(
+            farm_area[:,None,:],
+            (self.var.nFarm,
+             self.var.nCrop,
+             self.var.nCell)).copy()
+        return farm_area
+        
+    def set_farm_area(self):
+        """Function to read crop area"""
+        if self.var.AnnualChangeInFarmArea:
+            if self.var._modelTime.timeStepPCR == 1 or self.var._modelTime.doy == 1:
+                date = '%04i-%02i-%02i' % (self.var._modelTime.year, 1, 1)
+                self.var.FarmAreaNew = self.read_farm_area(date = date)
+                    
+            if np.any(self.var.GrowingSeasonDayOne):
+                self.var.FarmArea[self.var.GrowingSeasonDayOne] = self.var.FarmAreaNew[self.var.GrowingSeasonDayOne]
+                
+        else:
+            if self.var._modelTime.timeStepPCR == 1:
+                if not self.var.FarmAreaFileNC == "None":
+                    self.var.FarmArea = self.read_farm_area(date = None)
+                else:
+                    self.var.FarmArea = np.ones(
+                        (self.var.nFarm,
+                         self.var.nCrop,
+                         self.var.nCell))
+        
+    def dynamic(self):
+        self.set_farm_area()    
+
+class FarmParameters(object):
+
+    def __init__(self, FarmParameters_variable):
+        self.var = FarmParameters_variable
+        self.var.nFarm = int(self.var._configuration.farmOptions['nFarm'])
+        self.var.landmask_farm = np.broadcast_to(
+            self.var.landmask[None,:,:],
+            (self.var.nFarm, self.var.nLat, self.var.nLon))
+        self.var.StartOfYear = 305  # TODO: check this is right, and add to configuration
+        self.farm_area_module = FarmArea(FarmParameters_variable)
+        
+    def initial(self):
+        self.farm_area_module.initial()
+
+    def update_first_day_of_year(self):
+        isLeapYear = calendar.isleap(self.var._modelTime.year)
+        day_of_year = self.var._modelTime.doy
+        start_of_year = self.var.StartOfYear
+        if (isLeapYear & (start_of_year >= 60)):
+            start_of_year += 1            
+        self.var.IsFirstDayOfYear = False
+        self.var.IsLastDayOfYear = False
+        if day_of_year == start_of_year:
+            self.var.IsFirstDayOfYear = True
+        elif ((day_of_year + 1) == start_of_year):
+            self.var.IsLastDayOfYear = True
+                
+    def dynamic(self):
+        self.update_first_day_of_year()
+        self.farm_area_module.dynamic()

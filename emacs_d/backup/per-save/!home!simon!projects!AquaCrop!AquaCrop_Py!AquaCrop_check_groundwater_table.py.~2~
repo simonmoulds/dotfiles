@@ -1,0 +1,12 @@
+# TODO: header info
+
+class checkGroundwaterTable(object):
+
+    def __init__(self, checkGroundwaterTable_variable):
+        self.var = checkGroundwaterTable_variable
+
+    def initial(self):
+        # TODO
+
+    def dynamic(self):
+        # TODO

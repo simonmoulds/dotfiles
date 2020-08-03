@@ -1,0 +1,124 @@
+model_ineq = function(w, init, params, n_community, n_scenario) {    
+
+    n_time = length(w)
+    
+    ## set dimensions
+    dims = list(
+        "scenario" = sprintf("s%d", 1:n_scenario),
+        "time" = 1:n_time,
+        "community" = sprintf("c%d", 1:n_community)
+    )
+    ndims = sapply(dims, length)
+    
+    ## prepare output variables
+    F = array(NA, ndims) %>% `dimnames<-`(dims)
+    R = array(NA, ndims) %>% `dimnames<-`(dims)
+    R0 = array(NA, ndims) %>% `dimnames<-`(dims)
+    S = array(NA, ndims) %>% `dimnames<-`(dims)
+    G = array(NA, ndims) %>% `dimnames<-`(dims)
+    D = array(NA, ndims) %>% `dimnames<-`(dims)
+    H = array(NA, ndims) %>% `dimnames<-`(dims)
+    M = array(NA, ndims) %>% `dimnames<-`(dims)
+    G[,1,] = rep(init$G, each=n_scenario)
+    D[,1,] = rep(init$D, each=n_scenario)
+    H[,1,] = rep(init$H, each=n_scenario)
+    M[,1,] = rep(init$M, each=n_scenario)
+    
+    ## run simulation
+    for (i in 1:n_scenario) {
+
+        failure = rep(FALSE, n_community)            
+        
+        for (j in 1:(n_time - 1)) {
+            for (k in 1:n_community) {
+
+                if (!failure[k]) {
+                    
+                    ## damage function: proportion of settlement
+                    ## that is damaged
+                    if ((w[j] + params$xi_H[i,k] * H[i,j,k]) > H[i,j,k]) {
+                        F[i,j,k] = 1 - exp(-(w[j] + params$xi_H[i,k] * H[i,j,k]) / (params$alpha_H[i,k] * D[i,j,k]))
+                    } else {
+                        F[i,j,k] = 0
+                    }
+
+                    ## raising of levees: first calculate the theoretical
+                    ## amount by which the community would want to raise
+                    ## the levee, then constrain based on wealth/incentive
+                    R0[i,j,k] = compute_protection_increase(
+                        F[i,j,k],
+                        w[j],
+                        H[i,j,k],
+                        params$epsilon_T[i,k],
+                        params$xi_H[i,k]
+                    )
+                    R[i,j,k] = constrain_protection_increase(
+                        R0[i,j,k],
+                        F[i,j,k],
+                        G[i,j,k],
+                        H[i,j,k],
+                        ## H_max=params$H_max[i,k],
+                        params$gamma_E[i,k],
+                        params$keta_T[i,k],
+                        check_incentive=TRUE,
+                        check_affordable=TRUE
+                    )
+
+                    ## shock magnitude
+                    if (R[i,j,k] > 0) {
+                        S[i,j,k] = F[i,j,k] * params$alpha_S[i,k]
+                    } else {
+                        S[i,j,k] = F[i,j,k]
+                    }
+
+                    ## value of Dirac comb
+                    if (w[j] > 0) {
+                        Delta = 1 / dt
+                    } else {
+                        Delta = 0
+                    }
+
+                    ## compute system dynamics without redistribution
+                    income = params$rho_E[i,] * (1 - D[i,j,]) * G[i,j,]
+                    avg_income = mean(income, na.rm=TRUE)
+
+                    ## Hoover Index:
+                    redistr = rep(0, n_community)
+                    if (avg_income > 0) {
+                        HI = 0.5 * sum(abs(income - avg_income), na.rm=TRUE) / sum(income, na.rm=TRUE)
+                        if (HI > 0) {
+                            ## redistribution:
+                            rel = (income - mean(income, na.rm=TRUE)) / sum(abs(income - mean(income, na.rm=TRUE)), na.rm=TRUE) * 2
+                            redistr = sum(income) * HI * params$tau[i,k] * (income - mean(income)) / sum(abs(income - mean(income))) * -2
+                        }                
+                    }            
+
+                    ## change in wealth
+                    dG_dt = params$rho_E[i,k] * (1 - D[i,j,k]) * G[i,j,k] + redistr[k] - Delta * (F[i,j,k] * G[i,j,k] + params$gamma_E[i,k] * R[i,j,k] * sqrt(G[i,j,k]))
+                    ## dG_dt = params$rho_E[i,k] * (1 - D[i,j,k] ** (1/params$s[i,k])) * G[i,j,k] + redistr[k] - Delta * (F[i,j,k] * G[i,j,k] + params$gamma_E[i,k] * R[i,j,k] * sqrt(G[i,j,k]))
+
+                    ## change in distance from river
+                    dD_dt = (M[i,j,k] - D[i,j,k] / params$lambda_P[i,k]) * (params$phi_P[i,k] / sqrt(G[i,j,k]))
+
+                    ## change in levee height
+                    dH_dt = Delta * R[i,j,k] - params$keta_T[i,k] * H[i,j,k]
+
+                    ## change in community memory
+                    dM_dt = Delta * S[i,j,k] - params$mu_S[i,k] * M[i,j,k]
+
+                    ## update state variables
+                    G[i,j+1,k] = max(0, G[i,j,k] + dG_dt * dt)
+                    D[i,j+1,k] = max(0, D[i,j,k] + dD_dt * dt)
+                    H[i,j+1,k] = max(0, H[i,j,k] + dH_dt * dt)
+                    M[i,j+1,k] = max(0, M[i,j,k] + dM_dt * dt)
+
+                    ## check failure
+                    if (G[i,j+1,k] <= 0.00001) {
+                        failure[k] = TRUE
+                    }
+                }                
+            }
+        }
+    }
+    return(list(F=F, R=R, S=S, G=G, D=D, H=H, M=M))
+}

@@ -1,0 +1,25 @@
+## Author : Simon Moulds
+## Date   : July 2020
+
+library(rgdal)
+library(raster)
+
+lu_maps = list.files("../data", pattern="^(ESACCI|C3S)-(.*)_poopo.tif$", full.names=TRUE)
+
+basin = readOGR("../data/basin_poopo.shp")
+r=raster(lu_maps[1])
+basin_rast = rasterize(basin, r, field=1)
+
+years = c(1992:2018)
+
+maps = vector(mode="list", length=length(years))
+for (i in 1:length(years)) {
+    year = years[i]
+    f = list.files(
+        "../data",
+        pattern=paste0("^(ESACCI|C3S)-LC-L4-LCCS-Map-300m-P1Y-", year, "-(.*)_poopo.tif$"),
+        full.names=TRUE
+    )
+    r = raster(f)
+    
+    

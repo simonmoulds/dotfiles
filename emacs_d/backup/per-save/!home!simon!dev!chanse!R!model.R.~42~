@@ -1,0 +1,56 @@
+#' Create a model object.
+#'
+#' @param start_time POSIXct. Start time of the simulation.
+#' @param end_time POSIXct. End time of the simulation.
+#' @param weather_ts xts. TODO.
+#' @param price_ts xts. TODO.
+#' @param irrig_data list. Each list element should be another list containing
+#' the following entries:
+#' \itemize{
+#'   \item{schedule: }{numeric. Julian days on which irrigation takes place}
+#'   \item{sd: }{numeric. Standard deviation for the timing of irrigation events}
+#'   \item{min: }{numeric. Maximum irrigation depth (mm)}
+#'   \item{max: }{Minimum irrigation depth (mm)}
+#' }
+#' List elements should be named after the crops included in the simulation
+#' (e.g. rice, wheat), and an entry must be provided for every crop.
+#' @param canal_data list.
+#' @param yield_data xts or data.frame. TODO.
+#' @param farm_parameters list. TODO.
+#' @param crop_parameters list. TODO.
+#' @param initial_condition data.frame. TODO
+#'
+#' @return model
+#' 
+model = function(start_time,
+                 end_time,
+                 weather_ts,
+                 price_ts,
+                 irrig_data,
+                 canal_data,
+                 yield_data,
+                 farm_parameters,
+                 crop_parameters,
+                 initial_condition,
+                 n_categories,
+                 well_depths
+                 ) {
+
+    ## TODO: checks
+    ## TODO: ensure all data has the correct temporal characteristics
+    ## TODO: make all price data a daily time series
+    
+    x = list(
+        start_time = start_time,
+        end_time = end_time,
+        weather_ts = weather_ts,
+        price_ts = price_ts,
+        irrig_data = irrig_data,
+        canal_data = canal_data,
+        yield_data = yield_data,
+        farm_parameters = farm_parameters,
+        crop_parameters = crop_parameters,
+        initial_condition = initial_condition,
+    )
+    structure(x, class="model")
+}

@@ -1,0 +1,20 @@
+Model grid
+==========
+
+.. currentmodule:: aquacrop
+
+Configuration file entries
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: python
+
+    [MODEL_GRID]
+    mask = mask.nc
+
+Options
+~~~~~~~
+
+``mask`` : ``str``
+    The name of the region mask netCDF. This must be provided if running a two-dimensional simulation.
+    
+

@@ -1,0 +1,83 @@
+## Author : Simon Moulds
+## Date   : January 2020
+
+## Agro-climatically attainable yield
+
+library(raster)
+
+suffix = "res02_crav6190"
+crops = c("rice","whea","sugc")
+
+lut = read.table(header=TRUE, text="
+gaez name
+alfa alfalfa
+bana banana
+bckw buckwheat
+bean bean
+brly barley
+cabb cabbage
+carr carrot
+casv cassava
+chck chickpea
+cocn coconut
+coco cocoa
+coff coffee
+cott cotton
+cowp cowpea
+dpea drypea
+flax flaxseed
+fmlt finger_millet
+gram gram
+grnd groundnut
+jatr jatropha
+maiz maize
+misc miscellaneous
+oats oats
+oilp oil_palm
+oliv olive
+onio onion
+pigp pigeonpea
+pmlt pearl_millet
+puls pulses
+rape rapeseed
+ricd dryland_rice
+ricw wetland_rice
+ryes ryeseed
+sorg sorghum
+soyb soybean
+spot sweet_pototo
+sugb sugarbeet
+sugc sugarcane
+sunf sunflower
+swgr switchgrass
+teas tea
+toba tobacco
+toma tomato
+whea wheat
+wpot white_potato
+yams yams
+")
+
+clone = raster("../data/Gandak05min.clone.tif")
+
+for (i in 1:nrow(lut)) {
+    gaez_crop = lut$gaez[i]
+    irr = raster(paste0("../data/gaez_data/res02_crav6190i_", gaez_crop, "000a_yld_ll.tif"))
+    rain = raster(paste0("../data/gaez_data/res02_crav6190i_", gaez_crop, "150b_yld_ll.tif"))
+    ## irr = readAll(irr)
+    ## irr = crop(irr, extent(clone))
+    ## rain = crop(rain, extent(clone))
+    writeRaster(
+        irr,
+        ## "tmp.asc",
+        file.path("../data", paste0("potential_yield_", gaez_crop, "_irri_intermediate_input.tif")),
+        ## format="GTiff",
+        overwrite=TRUE
+    )
+    writeRaster(
+        rain,
+        file.path("../data", paste0("potential_yield_", gaez_crop, "_rain_intermediate_input.tif")),
+        format="GTiff",
+        overwrite=TRUE
+    )    
+}

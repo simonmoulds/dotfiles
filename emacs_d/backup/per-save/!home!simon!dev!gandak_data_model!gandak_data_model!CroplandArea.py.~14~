@@ -1,0 +1,59 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import os
+import numpy as np
+import rasterio
+
+from hydro_model_builder.ncConverter import np2netCDF
+from hydro_model_builder import VirtualOS as vos
+
+import variable_list as variable_list
+from utils import *
+
+class CroplandArea(object):    
+    def __init__(self, CroplandArea_variable):
+        self.var = CroplandArea_variable
+        self.var.CroplandAreaOutputFile = vos.getFullPath(
+            self.var._configuration.croplandAreaOptions['outputFile'],
+            self.var._configuration.globalOptions['outputDir'])
+        self.bbox = vos.get_clone_map_extent(self.var._configuration.cloneMap)
+
+    def initial(self):
+        pass
+
+    def dynamic(self):
+        # TODO: put tmp file in a temporary directory, somewhere (self.var.outputDir?)
+        cropland_area_filename = get_data_smart(
+            'gandak_data_model',
+            '../data/modelMaskCellArea.tif',
+            as_string = False)
+
+        cropland_area = read_gdal_raster_image(
+            cropland_area_filename,
+            self.bbox,
+            0)
+        
+        # vos.gdal_warp(
+        #     self.var.CroplandAreaInputFile,
+        #     'tmp_crop_area.tif',
+        #     self.bbox[0],
+        #     self.bbox[1],
+        #     self.bbox[2],
+        #     self.bbox[3])
+        
+        # r = rasterio.open('tmp_crop_area.tif')
+        # cropland_area = r.read(masked=True)[0,...]
+        # mask = np.ma.getmask(cropland_area)
+        # cropland_area[mask] = 0.
+        # os.remove('tmp_crop_area.tif')
+
+        netcdf = np2netCDF(
+            self.var._configuration,
+            self.var.dimensions,
+            variable_list)        
+        netcdf.create_netCDF(self.var.CroplandAreaOutputFile, 'cropland_area')        
+        netcdf.data2NetCDF(
+            self.var.CroplandAreaOutputFile,
+            'cropland_area',
+            cropland_area)

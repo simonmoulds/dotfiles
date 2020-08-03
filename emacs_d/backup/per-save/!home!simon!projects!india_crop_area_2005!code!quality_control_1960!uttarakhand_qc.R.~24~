@@ -1,0 +1,63 @@
+## Author : Simon Moulds
+## Date   : Apr 2018
+
+## Quality control for Uttarakhand
+
+## Barley
+## ######
+
+xx[["apy_barley"]] %<>% locf_interp(61)
+xx[["apy_barley"]] %<>% locf_interp(51:52)
+xx[["apy_barley"]] %<>% locf_interp(21:29, fromLast=TRUE)
+
+## Finger millet
+## #############
+
+xx[["apy_finger_millet"]] %<>% locf_interp(61)
+xx[["apy_finger_millet"]] %<>% linear_interp(41:49)
+xx[["apy_finger_millet"]] %<>% linear_interp(53)
+xx[["apy_finger_millet"]] %<>% locf_interp(21:29, fromLast=TRUE)
+
+## Maize
+## #####
+
+xx[["apy_maize"]] %<>% locf_interp(61)
+xx[["apy_maize"]] %<>% locf_interp(21:29, fromLast=TRUE)
+
+## Rapeseed
+## ########
+
+xx[["apy_rapeseed"]] %<>% tot_frac_interp(xx[["irr_rapeseed"]], 61, 60)
+xx[["apy_rapeseed"]] %<>% tot_frac_interp(xx[["irr_rapeseed"]], 54, 53)
+xx[["irr_rapeseed"]] %<>% locf_interp(21:24)
+xx[["apy_rapeseed"]] %<>% locf_interp(21:24)
+
+## Rice
+## ####
+
+xx[["apy_rice"]] %<>% tot_frac_interp(xx[["apy_rice"]], 61, 60)
+xx[["apy_rice"]] %<>% tot_frac_interp(xx[["irr_rice-autumn"]], 26:29, 30)
+xx[["apy_rice"]] %<>% locf_interp(21:25)
+xx[["irr_rice"]] %<>% locf_interp(21:25)
+xx[["irr_rice-autumn"]][41:42] = xx[["irr_rice-winter"]][41:42]
+xx[["irr_rice-autumn"]] %<>% irr_frac_interp(xx[["apy_rice"]], 44:50, 43)
+
+## Sesamum
+## #######
+
+xx[["apy_sesamum"]] %<>% locf_interp(61)
+
+## Soyabean
+## ########
+
+xx[["apy_soyabean"]] %<>% locf_interp(33:37)
+
+## Wheat
+## #####
+
+xx[["apy_wheat"]] %<>% tot_frac_interp(xx[["apy_wheat"]], 61, 60)
+xx[["apy_wheat"]] %<>% tot_frac_interp(xx[["irr_wheat"]], 25:29, 30)
+xx[["apy_wheat"]] %<>% locf_interp(21:24)
+xx[["irr_wheat"]] %<>% locf_interp(21:24)
+xx[["apy_wheat"]] %<>% tot_frac_interp(xx[["irr_wheat"]], 53:54, 52)
+

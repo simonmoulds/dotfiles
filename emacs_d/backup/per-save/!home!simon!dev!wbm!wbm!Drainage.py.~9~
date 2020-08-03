@@ -1,0 +1,142 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import numpy as np
+
+import logging
+logger = logging.getLogger(__name__)
+
+
+class Drainage(object):
+    def __init__(self, land_cover):
+        self.land_cover = land_cover
+
+    def initial(self):
+        arr_zeros = np.zeros(
+            (self.land_cover.nFarm,
+             self.land_cover.nCrop,
+             self.land_cover.model.nCell)
+        )
+        self.land_cover.perc1to2 = arr_zeros.copy()
+        self.land_cover.perc2to3 = arr_zeros.copy()
+        self.land_cover.perc3toGW = arr_zeros.copy()
+        self.land_cover.interflow = arr_zeros.copy()
+        self.land_cover.deep_percolation = arr_zeros.copy()
+        self.land_cover.percolation_impedance = arr_zeros.copy()
+
+    def dynamic(self):
+        available_water = np.maximum(
+            0., self.land_cover.wc - self.land_cover.wc_res
+        )
+        storage_capacity = self.land_cover.wc_sat - self.land_cover.wc
+        sat_term = np.divide(
+            available_water,
+            self.land_cover.wc_range,
+            out=np.zeros_like(self.land_cover.wc_range),
+            where=self.land_cover.wc_range > 0
+        )
+        sat_term = sat_term.clip(0., 1.)
+        k = (
+            self.land_cover.ksat
+            * np.sqrt(sat_term)
+            * np.square(
+                1.
+                - (1. - sat_term ** self.land_cover.van_genuchten_inv_m)
+                ** self.land_cover.van_genuchten_m
+            )
+        )
+        num_sub_steps = 3
+        dtsub = 1. / num_sub_steps
+
+        # Copy current value of W1 and W2 to temporary variables,
+        # because computed fluxes may need correction for storage
+        # capacity of subsoil and in case soil is frozen (after loop)
+        wc_temp = self.land_cover.wc.copy()
+
+        # Initialize top- to subsoil flux (accumulated value for all sub-steps)
+        # Initialize fluxes out of subsoil (accumulated value for all sub-steps)
+        self.land_cover.perc1to2 = np.zeros(
+            (self.land_cover.nFarm,
+             self.land_cover.nCrop,
+             self.land_cover.model.nCell)
+        )
+        self.land_cover.perc2to3 = np.zeros(
+            (self.land_cover.nFarm,
+             self.land_cover.nCrop,
+             self.land_cover.model.nCell)
+        )
+        self.land_cover.perc3toGW = np.zeros(
+            (self.land_cover.nFarm,
+             self.land_cover.nCrop,
+             self.land_cover.model.nCell)
+        )
+
+        # Start iterating
+        for i in range(num_sub_steps):
+            if i > 0:           # because we have only just calculated k
+                available_water = np.maximum(
+                    0., wc_temp - self.land_cover.wc_res
+                )
+                sat_term = available_water / self.land_cover.wc_range
+                sat_term = sat_term.clip(0., 1.)
+                k = (
+                    self.land_cover.ksat
+                    * np.sqrt(sat_term)
+                    * np.square(
+                        1.
+                        - (1. - sat_term ** self.land_cover.van_genuchten_inv_m)
+                        ** self.land_cover.van_genuchten_m)
+                )
+
+            # flux from topsoil to subsoil
+            subperc1to2 = np.minimum(available_water[..., 0, :], np.minimum(
+                k[..., 0, :] * dtsub, storage_capacity[..., 1, :]))
+            subperc2to3 = np.minimum(available_water[..., 1, :], np.minimum(
+                k[..., 1, :] * dtsub, storage_capacity[..., 2, :]))
+            subperc3toGW = np.minimum(available_water[..., 2, :], np.minimum(
+                k[..., 2, :] * dtsub, available_water[..., 2, :]))
+
+            available_water[..., 0, :] -= subperc1to2
+            available_water[..., 1, :] += subperc1to2 - subperc2to3
+            available_water[..., 2, :] += subperc2to3 - subperc3toGW
+
+            wc_temp = available_water + self.land_cover.wc_res
+            storage_capacity = self.land_cover.wc_sat - wc_temp
+
+            self.land_cover.perc1to2 += subperc1to2
+            self.land_cover.perc2to3 += subperc2to3
+            self.land_cover.perc3toGW += subperc3toGW
+
+        # When the soil is frozen (frostindex larger than threshold), no perc1 and 2
+        self.land_cover.perc1to2[self.land_cover.frost_index >
+                                 self.land_cover.frost_index_threshold] = 0
+        self.land_cover.perc2to3[self.land_cover.frost_index >
+                                 self.land_cover.frost_index_threshold] = 0
+
+        # update soil moisture
+        self.land_cover.wc[..., 0, :] -= self.land_cover.perc1to2
+        self.land_cover.wc[..., 1, :] += self.land_cover.perc1to2 - \
+            self.land_cover.perc2to3
+        self.land_cover.wc[..., 2, :] += self.land_cover.perc2to3 - \
+            self.land_cover.perc3toGW
+
+        # compute the amount of water that could not infiltrate and add this water to the surface runoff
+        excess = np.maximum(
+            self.land_cover.wc[..., 0, :] - self.land_cover.wc_sat[..., 0, :], 0.)
+        self.land_cover.infiltration -= excess
+        self.land_cover.direct_runoff += excess
+
+        # CWATM, soil.py, lines 540-542
+        recharge_or_preferential_flow = self.land_cover.perc3toGW + \
+            self.land_cover.preferential_flow
+        self.land_cover.interflow = self.land_cover.percolation_impedance * \
+            recharge_or_preferential_flow
+        self.land_cover.deep_percolation = (
+            (1 - self.land_cover.percolation_impedance)
+            * recharge_or_preferential_flow
+            - self.land_cover.capillary_rise_from_gw)
+
+        # update water content (what about excess water?)
+        self.land_cover.wc[..., 0, :] = np.minimum(
+            self.land_cover.wc[..., 0, :], self.land_cover.wc_sat[..., 0, :])
+        self.land_cover.th = self.land_cover.wc / self.land_cover.root_depth

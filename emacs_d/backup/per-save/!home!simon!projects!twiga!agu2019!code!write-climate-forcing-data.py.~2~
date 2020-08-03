@@ -1,0 +1,92 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+import os
+import numpy as np
+import netCDF4 as nc
+import pandas as pd
+import datetime
+import time
+import glob
+import re
+
+era5_datadir = "../data-raw/ERA5"
+tahmo_datadir = "../data-raw/TAHMO"
+prec_datadir = "../data"
+out_dir = "../data"
+
+tahmo_metadata = pd.read_csv(
+    os.path.join(
+        tahmo_datadir,
+        'tahmo_stn_metadata.csv'
+    )
+)
+
+# met data is from various sources
+
+# experiment 1:
+# =============
+# Ghana, 0.25 degree, ERA5 forcing
+# TODO: use cdo daymin|max|sum etc. to convert ERA5 to daily vals
+# cdo daymin infile.nc outfile.nc # temperature
+# cdo daymax infile.nc outfile.nc # temperature
+# cdo daysum infile.nc outfile.nc # prec, ref ET
+
+# experiment 2:
+# =============
+# TAHMO station points:
+# 2.1 TAHMO prec, ERA5 otherwise
+# 2.2 TAMSAT prec, ERA5 otherwise
+# 2.3 GMD prec, ERA5 otherwise
+
+prec_filenames = glob.glob(
+    prec_datadir + '/' + 'tahmo_era5_stn_*_prec.csv'
+)
+
+for fn in prec_filenames:
+    
+    prec_data = pd.read_csv(fn)
+    dates = [datetime.datetime.strptime(date, "%Y-%m-%d") for date in list(prec_data['Date'])]
+    code = prec_data['Location'][0]
+    idx = [index for index,value in enumerate(tahmo_metadata['Code']) if value in code]
+    lat_coord = float(tahmo_metadata['Y'][idx])
+    lon_coord = float(tahmo_metadata['X'][idx])
+
+    ds = nc.Dataset(os.path.join(out_dir, 'met_data_' + code + '_2017-2019.nc'), 'w')
+    ds.description = 'meteorological forcing data'
+    ds.history = 'created ' + time.ctime(time.time())
+    ds.createDimension('latitude', 1)
+    ds.createDimension('longitude', 1)
+    ds.createDimension('time', None)
+
+    lats = ds.createVariable('latitude', np.float64, ('latitude',))
+    lats.units = 'degrees_north'
+    lats[:] = lat_coord
+
+    lons = ds.createVariable('longitude', np.float64, ('longitude',))
+    lons.units = 'degrees_east'
+    lons[:] = lon_coord
+
+    times = ds.createVariable('time', np.int32, ('time',))
+    times.units = 'days since 1901-01-01 00:00:00'
+    times.calendar = 'gregorian'
+    times[:] = nc.date2num(dates, units=times.units, calendar=times.calendar)
+
+    prc = ds.createVariable('prec_tahmo', np.float64, ('time','latitude','longitude'))
+    prc.units = 'mm d-1'
+    prc[:] = np.array(prec_data['TAHMO'])[:,None,None]
+
+    prc = ds.createVariable('prec_era5', np.float64, ('time','latitude','longitude'))
+    prc.units = 'mm d-1'
+    prc[:] = np.array(prec_data['ERA5'])[:,None,None]
+
+    # prc = dataset.createVariable('prec_tamsat', np.float64, ('time','latitude','longitude'))
+    # prc = 'mm d-1'
+    # prc[:] = np.array(prec_data['TAMSAT'])[:,None,None]
+
+    # prc = dataset.createVariable('prec_GPM', np.float64, ('time','latitude','longitude'))
+    # prc = 'mm d-1'
+    # prc[:] = np.array(prec_data['GPM'])[:,None,None]
+
+    ds.close()
+    

@@ -1,0 +1,13 @@
+from setuptools import setup
+
+setup(name='gandak_data_model',
+      version=0.1,
+      description='Python package to generate data for Gandak systems model',
+      url='https://github.com/simonmoulds/gandak_data_model',
+      author='Simon Moulds',
+      author_email='sim.moulds@gmail.com',
+      license='GPL',
+      packages=['gandak_data_model'],
+      package_dir={'gandak_data_model' : 'gandak_data_model'},
+      package_data={'gandak_data_model' : ['data/*']},
+      zip_safe=False)

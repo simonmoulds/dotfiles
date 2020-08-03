@@ -1,0 +1,73 @@
+References: <87h84s98h0.fsf@yamunotri> <DM5PR06MB329219E4CBAFD567412B3C97D99D0@DM5PR06MB3292.namprd06.prod.outlook.com>
+User-agent: mu4e 1.0; emacs 26.1
+From: Simon Moulds <simon.moulds@imperial.ac.uk>
+To: Stewart Wyseman <wyseman@pcigeomatics.com>
+Subject: Re: PCI Geomatics quote
+In-reply-to: <DM5PR06MB329219E4CBAFD567412B3C97D99D0@DM5PR06MB3292.namprd06.prod.outlook.com>
+
+Dear Stewart,
+
+Thanks a lot for your reply.
+
+An executive summary of the research is as follows:
+
+"Urban flooding is a frequent occurrence in Ghana which has severe consequences for human health and wellbeing, as well as threatening economic development at micro and macro levels. The reasons for this are complex, including climate variability and climate change, as well as a lack of proper planning, inadequate waste management, and insufficient drainage. However, the hydrological and anthropogenic factors which contribute to flood risk in Ghana’s cities are poorly understood. The lack of high-resolution topographic data for Ghanaian cities is a major bottleneck to quantifying and understanding urban flood risk in the region. This project will use Pleiades-1B 0.5m panchromatic tri-stereo images from the ESA archive to generate high-resolution digital surface and elevation models for three cities in Ghana. The DEM will be supplied to an urban flood model in order to calculate inundation maps for the study areas, considering fluvial and pluvial flood processes. The resulting dataset will be used in further analyses to gain insight into the nature of flood risk in the study areas in particular, and Ghanaian cities in general."
+
+The proposal I'm working on will be submitted to the European Space Agency (ESA). If successful I will gain access to the Pleiades dataset but receive no additional funding. However, I do hope that the work will contribute to two projects I'm currently working on - one funded by the EU Horizon 2020 programme, the other by the Wellcome Trust. That said, I do not have a specific budget for software within those two projects.
+
+The intention would be to publish the research in a disciplinary journal (e.g. Water Resources Research, Hydrology and Earth System Science). I routinely attend the main conferences in my field (e.g. American Geophysical Union Fall Meeting, European Geosciences Union General Assembly), and would anticipate presenting at one or other of these next year (of course, this is all dependent on the ESA proposal being successful).
+
+The basic procedure I envisage is covered in this PCI Geomatics video: https://www.youtube.com/watch?v=3zR53KueGIM
+
+Hope the above helps to clarify my needs.
+
+Thanks a lot for your help! 
+
+Simon
+
+Stewart Wyseman writes:
+
+> Hello Simon,
+>
+> Many thanks for the email, and pleasure to 'e-meet' you.  
+>
+> No need to apologize at all since this was the correct procedure indeed.  I am the Territory Sales Manager for Africa, Europe and Eurasia, so definitely the correct person to get in contact with!  I hope everything is going well with you lately?
+>
+> I appreciate the information regarding your project, and I do agree that Geomatica might be able to assist.  Is there any chance that you could provide me more information regarding this project?  Is this a paid research project?  Is this for a specific agency?  If so, can you let me know which one?  Will you be presenting your findings at any conferences, workshops, papers, etc.?  Any additional information would be greatly appreciated.
+>
+> With respect to the image processing itself; for the DSM/DTM is this simply to identify urban expansion, or something along those lines?  Only reason I ask is because your study is the impact on water resources, and our software typically handles  ground!! 😊  Our software has been used for underwater mapping before (using submersible's), but that is not an 'out-of-the-box' solution.  Any additional information you could also provide about the image processing would be greatly appreciated.  That way I can help point you to specific algorithms that might be of assistance.
+>
+> I apologize for all of the questions, but this will help me to not only better understand your requirements, but also to see what we can do for you with respect to your research project.
+>
+> Thanks in advance.
+>
+> All the best,
+>
+> Stew 
+>
+> ==============
+>
+> Stewart Wyseman
+> Territory Sales Manager – Africa, Europe & Eurasia
+> Phone: 905-764-0614 Ext.2246
+> Fax: 905-764-9604
+> Email: wyseman@pcigeomatics.com
+> Website: www.pcigeomatics.com
+>
+>
+>
+> -----Original Message-----
+> From: Moulds, Simon C <simon.moulds@imperial.ac.uk> 
+> Sent: October 1, 2019 4:27 AM
+> To: Stewart Wyseman <wyseman@pcigeomatics.com>
+> Subject: PCI Geomatics quote
+>
+> Dear Stewart,
+>
+> The PCI Geomatics website has directed me to you for a quote - I hope this is the correct procedure, and apologise if not!
+>
+> In any case, I'm an academic based at Imperial College London working on the impact of environmental change on water resources. I'm writing a proposal to the European Space Agency to gain access to the Plaiedes archive. If successful I hope to use the imagery to derive a DEM/DTM for three urban areas in Ghana (Accra, Kumasi, Tamale). I think PCI Geomatics could be a good option. Please could you provide a quote for an academic license?
+>
+> Kind regards,
+> Simon
+

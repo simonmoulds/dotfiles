@@ -1,0 +1,41 @@
+* Tasks
+#+CATEGORY: Tasks
+
+* Projects
+#+CATEGORY: Projects
+** Hydroflux
+** CHANSE
+** AquaCrop
+*** DONE List all variables required to store the model state
+   CLOSED: [2018-04-27 Fri 12:26]
+
+*** DONE Check routines in VirtualOS which handle regridding - don't appear well suited to resolutions with recurring decimal
+   CLOSED: [2018-07-27 Fri 05:38]
+*** DONE Read comp/layer thicknesses from netCDF, not configuration
+   CLOSED: [2018-08-08 Wed 05:33]
+*** TODO Curve number estimation for the Gandak - use Hydrologic Soil Group combined with land use map
+*** DONE Work on options to supply initial condition - at the moment we just supply a netCDF file
+   CLOSED: [2018-08-13 Mon 14:18]
+*** DONE Groundwater coupling method - write additional groundwater module
+   CLOSED: [2018-07-27 Fri 05:37]
+*** DONE Translate AquaCrop testing modules to current AquaCropOS format, as well as AquaCrop_Py format
+   CLOSED: [2018-08-13 Mon 14:18]
+*** TODO Create SQLite database containing default parameter sets for crops, and write method to use these if not supplied in netCDF file
+
+*** DONE Create error class (see CWATMError class for example)
+   CLOSED: [2018-08-08 Wed 18:41]
+
+*** DONE Change PlantingDate and HarvestDate to PlantingDay and HarvestDay, respectively, and introduce a PlantingDate to check whether a crop is planted before model start time
+   CLOSED: [2018-08-21 Tue 14:11]
+
+*** DONE Flatten spatial dimension so that we can ignore cells which are not in the current region
+   CLOSED: [2018-09-24 Mon 08:16]
+*** DONE Add IrrigationSupply.py module, which should deal with gw/sw apportioning, and take into account farmer livelihood
+   CLOSED: [2018-08-21 Tue 14:11]
+*** TODO Add FarmIncome.py module, which should calculate production and income
+*** Maybe specify a day of the year on which to make decisions?
+*** TODO Change name of VirtualOS.py
+*** TODO Enable code to read I/O as daily/monthly/annual files, using placeholders
+
+** TWIGA
+** Pathways

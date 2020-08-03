@@ -1,0 +1,5 @@
+# process_hihydrosoil.sh
+Processes soil input data, model region and landmask
+
+# get_price_data.R
+Gets price data for crops, fertiliser and diesel

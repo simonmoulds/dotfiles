@@ -1,0 +1,44 @@
+## Author : Simon Moulds
+## Date   : January 2018
+
+## Quality control for Andaman and Nicobar Island
+
+## Crops not grown: ...
+
+## banana
+## ######
+
+xx[["apy_banana-whole_year"]] = xx[["mapspam_atot_banana"]]
+xx[["irr_banana-whole_year"]] = xx[["mapspam_xirr_banana"]]
+
+## cassava
+## #######
+
+xx[["apy_banana-whole_year"]] = xx[["mapspam_atot_banana"]]
+xx[["irr_banana-whole_year"]] = xx[["mapspam_xirr_banana"]]
+
+## coconut
+## #######
+
+xx[["apy_coconut-whole_year"]] = xx[["mapspam_atot_coconut"]]
+xx[["irr_coconut-whole_year"]] = xx[["mapspam_xirr_coconut"]]
+
+## groundnut
+## #########
+
+xx[["apy_groundnut-rabi"]][11] = 0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,38 @@
+## Water balance model, based on the Global Crop Water Model
+compute_eta = function(eto, ks) {
+    eta = ks * eto
+    eta
+}
+
+compute_ks = function(s, taw, p) {
+    ks = max((s / ((1 - p) * taw)), 1)
+    ks
+}
+
+compute_p = function(p_std, eto) {
+    p = p_std + 0.04 * (5 - eto)
+}
+
+compute_runoff = function(prec, s0, taw, gamma) {
+    runoff = prec * (s0 / taw) ** gamma
+    return(runoff)
+}
+
+get_crop_params = function(db, crop) {
+    row_ix = which(db$Crop %in% crop)
+    params =
+        db %>%
+        `[`(row_ix,) %>%
+        dplyr::select(-Crop) %>%
+        as.list
+    params
+}
+
+model = function(prec, eto, p_std, s0, taw, gamma) {
+    p = compute_p(p_std, eto)
+    ks = compute_ks(s0, taw, p)
+    eta = compute_eta(eto, ks)
+    runoff = compute_runoff(prec, s0, taw, gamma)
+    s1 = max(s0 + prec - runoff - eta, 0)
+    return(s1)
+}

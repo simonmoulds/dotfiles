@@ -1,0 +1,50 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import pytest
+import numpy as np
+import distutils
+import os
+
+# from mock import patch, Mock, MagicMock
+# from CanopyCover import CanopyCover
+# from AquaCrop import AquaCrop
+
+# @pytest.fixture
+# def datadir(tmpdir, request):
+#     """Fixture responsible for searching a folder with the same name of 
+#     test module and, if available, moving all contents to a temporary 
+#     directory so tests can use them freely.
+#     """
+#     filename = request.module.__file__
+#     test_dir, _ = os.path.splitext(filename)
+#     if os.path.isdir(test_dir):
+#         distutils.dir_util.copy_tree(test_dir, bytes(tmpdir))
+#     return tmpdir
+
+@pytest.fixture
+def context(request):
+# def context(datadir):
+    """Run AquaCrop model"""
+    filename = request.module.__file__
+    test_dir, _ = os.path.splitext(filename)    
+    cwd = os.getcwd()
+    print os.listdir(test_dir)
+    yrs = os.walk(test_dir).next()[1].sort()
+    # yrs = os.walk(datadir).next()[1].sort()
+    for yr in yrs:
+        # os.chdir(os.path.join(datadir, str(yr)))
+        cmd = "../../../deterministic_runner.py Config/aos_ch7_ex1a_tunis_wheat_" + str(yr) + "_config.ini aquacrop"
+        print cmd
+        # subprocess.call("AquaCrop_Py/deterministic_runner.py
+        # os.chdir(cwd)
+
+# @pytest.fixture
+# def context():
+#     """What to do before/after the test."""
+#     print("Entering !")
+#     yield
+#     print("Exiting !")
+
+def test_Ch9_Ex1a_Tunis_Wheat(context):
+    assert True

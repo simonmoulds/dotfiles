@@ -1,0 +1,118 @@
+## Author : Simon Moulds
+## Date   : August 2019
+
+library(raster)
+library(magrittr)
+
+ext = extent(c(-20, 55, -35, 38))
+
+## ######################################
+## 1 - clone/landmask for Africa based
+## on AgMERRA/WFDEI only
+## ######################################
+
+r1=raster("../data/AgMERRA/AgMERRA_2000_wndspd.nc4", band=2) %>% crop(ext)
+r2=raster("../data/AgMERRA/AgMERRA_2000_prate.nc4", band=2) %>% crop(ext)
+r3=raster("../data/AgMERRA/AgMERRA_2000_rhstmax.nc4", band=2) %>% crop(ext)
+r4=raster("../data/AgMERRA/AgMERRA_2000_srad.nc4", band=2) %>% crop(ext)
+r5=raster("../data/AgMERRA/AgMERRA_2000_tavg.nc4", band=2) %>% crop(ext)
+r6=raster("../data/AgMERRA/AgMERRA_2000_tmin.nc4", band=2) %>% crop(ext)
+r7=raster("../data/AgMERRA/AgMERRA_2000_tmax.nc4", band=2) %>% crop(ext)
+r8=raster("../data/WFDEI/PSurf_daily_WFDEI/PSurf_daily_WFDEI_200001.nc", band=2) %>% crop(ext) %>% disaggregate(2)
+
+r9 = stackApply(stack(r1,r2,r3,r4,r5,r6,r7,r8), indices=c(1,1,1,1,1,1,1,1), fun=sum, na.rm=FALSE)
+r9[!is.na(r9)] = 1
+
+clone = raster(r1)
+clone[] = 1
+landmask = clone
+landmask[is.na(r9)] = 0
+
+## writeRaster(
+##     clone,
+##     "../data/africa_etref_clone_0pt25degree.tif",
+##     overwrite=TRUE)
+
+## writeRaster(
+##     landmask,
+##     "../data/africa_etref_landmask_0pt25degree.tif",
+##     overwrite=TRUE)
+
+## ######################################
+## 2 - clone/landmask for Africa based on
+## soil/planting/harvest date
+## ######################################
+
+r2=raster("../data-raw/soil/theta_sat_cosby_ssa_layer1_0pt25degree.tif")
+## r3=raster("../data/maize_planting_julian_day_mirca2000.tif") %>% crop(ext)
+r3=raster("../data-raw/sachs_crop_calendar/Maize.crop.calendar.fill.nc", varname="plant") %>% crop(ext) %>% raster::aggregate(fact=3, fun=modal, na.rm=TRUE)
+
+clone = raster(r1)
+clone[] = 1
+landmask = clone
+landmask[is.na(r9) | is.na(r2) | is.na(r3)] = 0
+
+## writeRaster(
+##     clone,
+##     "../data/africa_aquacrop_clone_0pt25degree.tif",
+##     overwrite=TRUE)
+
+## writeRaster(
+##     landmask,
+##     "../data/africa_aquacrop_landmask_0pt25degree.tif",
+##     overwrite=TRUE)
+
+## ######################################
+## 3 - make clone/landmask for Ghana only
+## ######################################
+
+ghana_ext = extent(-4,2,4,12)
+ghana_clone = crop(clone, ghana_ext)
+ghana_landmask = crop(landmask, ghana_ext)
+
+writeRaster(
+    ghana_clone,
+    "../data/ghana_aquacrop_clone_0pt25degree.tif",
+    overwrite=TRUE)
+
+writeRaster(
+    ghana_landmask,
+    "../data/ghana_aquacrop_landmask_0pt25degree.tif",
+    overwrite=TRUE)
+
+## ######################################
+## 4 - make clone/landmask for Kenya only
+## ######################################
+
+kenya_ext = extent(33.5, 42, -5, 5)
+
+## ## ######################################
+## ## 4 - make clone/landmask for one point
+## ## in Ghana (for debugging)
+## ## ######################################
+
+## ## point at which AquaCropOS was run
+## pts = SpatialPoints(
+##     coords=data.frame(x=c(-1.875), y=c(8.125)),
+##     proj4string=CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
+## )
+## ## pts = SpatialPoints(
+## ##     coords=data.frame(x=c(-1.875,-1.875), y=c(7.875,8.125)),
+## ##     proj4string=CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
+## ## )
+
+## pt_clone = ghana_clone
+## pt_landmask = ghana_landmask
+## pt_landmask[] = 0
+## pt_landmask[pts] = 1
+## pt_landmask[pts] = 1
+
+## writeRaster(
+##     pt_clone,
+##     "../data/pt_clone_0pt25degree.tif",
+##     overwrite=TRUE)
+
+## writeRaster(
+##     pt_landmask,
+##     "../data/pt_landmask_0pt25degree.tif",
+##     overwrite=TRUE)

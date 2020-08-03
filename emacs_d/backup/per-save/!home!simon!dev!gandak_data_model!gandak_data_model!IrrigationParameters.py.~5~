@@ -1,0 +1,52 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import os
+import numpy as np
+import rasterio
+import csv
+import pkgutil
+
+from hydro_model_builder.ncConverter import np2netCDF
+from hydro_model_builder import VirtualOS as vos
+
+import variable_list as variable_list
+from get_data_smart import get_data_smart
+
+class IrrigationParameters(object):
+    def __init__(self, IrrigationParameters_variable):
+        self.var = IrrigationParameters_variable
+        self.var.IrrigationParameterOutputFile = vos.getFullPath(
+            self.var._configuration.irrigationParameterOptions['outputFile'],
+            self.var._configuration.globalOptions['outputDir'])
+        
+    def initial(self):
+        self.var.irrigation_parameter_names = [
+            'IrrMethod','IrrInterval','SMT1','SMT2','SMT3','SMT4',
+            'MaxIrr','AppEff','NetIrrSMT','WetSurf']
+        arr_zeros = np.zeros((self.var.nCrop, self.var.nLat, self.var.nLon))
+        for param in self.var.irrigation_parameter_names:
+            vars(self.var)[param] = arr_zeros.copy()
+        pass
+
+    def dynamic(self):
+        
+        self.var.IrrMethod = np.array([1,0,1,0,1,0,1,0])[:,None,None] * np.ones((self.var.nLat, self.var.nLon))
+        self.var.IrrInterval[:] = 3
+        self.var.SMT1[:] = 70.
+        self.var.SMT2[:] = 70.
+        self.var.SMT3[:] = 70.
+        self.var.SMT4[:] = 70.
+        self.var.MaxIrr[:] = 25.
+        self.var.AppEff[:] = 90.
+        self.var.NetIrrSMT[:] = 80.5
+        self.var.WetSurf[:] = 100.
+
+        netcdf = np2netCDF(
+            self.var._configuration,
+            self.var.dimensions,
+            variable_list)
+        netcdf.create_netCDF(self.var.IrrigationParameterOutputFile, self.var.irrigation_parameter_names)
+        for param in self.var.irrigation_parameter_names:
+            netcdf.data2NetCDF(self.var.IrrigationParameterOutputFile, param, vars(self.var)[param])
+

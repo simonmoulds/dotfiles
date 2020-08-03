@@ -1,0 +1,149 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import os
+import numpy as np
+import rasterio
+import csv
+import pkgutil
+
+from hydro_model_builder.ncConverter import np2netCDF
+from hydro_model_builder import VirtualOS as vos
+
+import variable_list as variable_list
+from get_data_smart import get_data_smart
+
+class FieldManagementParameters(object):
+    def __init__(self, FieldManagementParameters_variable):
+        self.var = FieldManagementParameters_variable
+        self.var.FieldManagementParameterOutputFile = vos.getFullPath(
+            self.var._configuration.fieldManagementParameterOptions['outputFile'],
+            self.var._configuration.globalOptions['outputDir'])
+        
+    def initial(self):
+        pass
+
+    def dynamic(self):
+        mulches = np.full((self.var.nCrop, self.var.nLat, self.var.nLon), 0.)
+        mulchpctgs = np.full((self.var.nCrop, self.var.nLat, self.var.nLon), 50.)
+        mulchpctos = np.full((self.var.nCrop, self.var.nLat, self.var.nLon), 50.)
+        fmulch = np.full((self.var.nCrop, self.var.nLat, self.var.nLon), 0.5.)
+        bunds = np.full((self.var.nCrop, self.var.nLat, self.var.nLon), 0.)
+        zbund = np.full((self.var.nCrop, self.var.nLat, self.var.nLon), 0.)
+        bundwater = np.full((self.var.nCrop, self.var.nLat, self.var.nLon), 0.)
+
+        field_mgmt_parameters = {
+            'Mulches' : mulches,
+            'MulchPctGS' : mulchpctgs,
+            'MulchPctOS' : mulchpctos,
+            'fMulch' : fmulch,
+            'Bunds' : bunds,
+            'zBund' : zbund,
+            'BundWater' : bundwater}
+        
+        netcdf = np2netCDF(
+            self.var._configuration,
+            self.var.dimensions,
+            variable_list)
+        netcdf.create_netCDF(self.var.FieldManagementParameterOutputFile, field_mgmt_parameters.keys())
+        for key, value in field_mgmt_parameters.iteritems():
+            netcdf.data2NetCDF(self.var.FieldManagementParameterOutputFile, key, value)
+        
+# import numpy as np
+# import datetime
+# import time
+# import gdal
+# import scipy.interpolate as interpolate
+# import matplotlib.pyplot as plt
+
+# from netCDF4 import Dataset, date2num
+# from pandas import read_csv
+
+# ds = gdal.Open('../data/ksat_topsoil_gapfilled_5m.tif')
+# a = ds.ReadAsArray()
+# nlat,nlon = np.shape(a)
+# xres = 1./12
+# yres = 1./12
+
+# b = ds.GetGeoTransform() #bbox, interval
+# minx = b[0]
+# maxx = b[0] + nlon * xres
+# maxy = b[3] 
+# miny = b[3] + nlat * -yres
+
+# lon = np.arange(0,nlon) * xres + (minx + xres/2)
+# lat = np.arange(0,nlat) * yres + (miny + yres/2)
+# lat = lat[::-1]
+# # layer = np.array([0.3,2.])
+# # nlayer = len(layer)
+
+# # For now, let's create method using rice, wheat, sugarcane
+# crop_map_path = '/home/simon/projects/india_crop_area_2005/data/output_2005/monthly_maps'
+# crop_nms = ['irr_rice_kharif',
+#             'rain_rice_kharif',
+#             'irr_rice_rabi',
+#             'rain_rice_kharif',
+#             'irr_wheat_rabi',
+#             'rain_wheat_rabi',
+#             'irr_sugarcane_whole_year',
+#             'rain_sugarcane_whole_year']
+
+# ncrop = len(crop_nms)
+
+# # create netCDF file containing parameters
+# nco = Dataset('../data/Gandak_mgmt_params.nc','w',clobber=True)
+
+# # create dimensions, variables and attributes:
+# nco.createDimension('lon',nlon)
+# nco.createDimension('lat',nlat)
+# nco.createDimension('crop',ncrop)
+
+# lono = nco.createVariable('lon',np.float64,('lon'),zlib=True,least_significant_digit=16)
+# lono.units = 'degrees_east'
+# lono.standard_name = 'longitude'
+# lono[:]=lon
+
+# lato = nco.createVariable('lat',np.float64,('lat'),zlib=True,least_significant_digit=16)
+# lato.units = 'degrees_north'
+# lato.standard_name = 'latitude'
+# lato[:]=lat
+
+# crpo = nco.createVariable('crop','f4',('crop'))
+# crpo.units = '1'
+# crpo.standard_name = 'crop'
+# crpo.long_name = 'crop'
+# crpo[:]=np.arange(1, ncrop + 1)
+
+# # create container variable for CRS: lon/lat WGS84 datum
+# crso = nco.createVariable('crs','i4')
+# crso.long_name = 'Lon/Lat Coords in WGS84'
+# crso.grid_mapping_name='latitude_longitude'
+# crso.longitude_of_prime_meridian = 0.0
+# crso.semi_major_axis = 6378137.0
+# crso.inverse_flattening = 298.257223563
+
+# nco.Conventions='CF-1.6'
+
+# mulches = nco.createVariable('Mulches', np.int32, ('crop','lat','lon'))
+# mulches[:] = 0
+
+# mulchpctgs = nco.createVariable('MulchPctGS', np.int32, ('crop','lat','lon'))
+# mulchpctgs[:] = 50
+
+# mulchpctos = nco.createVariable('MulchPctOS', np.int32, ('crop','lat','lon'))
+# mulchpctos[:] = 50
+
+# fmulch = nco.createVariable('fMulch', np.float64, ('crop','lat','lon'))
+# fmulch[:] = 0.5
+
+# bunds = nco.createVariable('Bunds', np.int32, ('crop','lat','lon'))
+# bunds[:] = 0
+
+# zbund = nco.createVariable('zBund', np.int32, ('crop','lat','lon'))
+# zbund[:] = 0
+
+# bundwater = nco.createVariable('BundWater', np.int32, ('crop','lat','lon'))
+# bundwater[:] = 0
+
+# # close dataset
+# nco.close()

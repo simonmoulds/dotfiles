@@ -1,0 +1,12 @@
+#!/bin/bash
+
+declare -a arr=(
+    "hello"
+    "world"
+    "goodbye"
+    "world")
+
+for word in "${arr[@]}"
+do
+    echo $word
+done

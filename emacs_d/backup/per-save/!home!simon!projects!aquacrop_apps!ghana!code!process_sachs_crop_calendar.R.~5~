@@ -1,0 +1,40 @@
+## Author : Simon Moulds
+## Date   : August 2019
+
+library(raster)
+library(ncdf4)
+library(magrittr)
+
+xmin = -20
+xmax = 55
+ymin = -35
+ymax = 38
+template = raster(xmn=xmin, xmx=xmax, ymn=ymin, ymx=ymax, crs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs", resolution=0.25)
+fn = "../data/sachs_crop_calendar/Maize.crop.calendar.fill.nc"
+
+## nc = nc_open(fn)
+## names(nc$var)
+## nc_close(nc)
+
+plant_date_vals = raster(fn, varname="plant") %>% crop(ext) %>% raster::aggregate(fact=3, fun=modal) %>% getValues
+
+## plant_date_start = raster(fn, varname="plant.start") %>% crop(ext)
+## plant_date_end = raster(fn, varname="plant.end") %>% crop(ext)
+
+harvest_date = raster(fn, varname="harvest") %>% crop(ext) %>% raster::aggregate(fact=3, fun=modal)
+## harvest_date_start = raster(fn, varname="harvest.start") %>% crop(ext)
+## harvest_date_end = raster(fn, varname="harvest.end") %>% crop(ext)
+
+writeRaster(
+    plant_date,
+    "../data/maize_planting_julian_day_sachs2010.tif",
+    format="GTiff",
+    overwrite=TRUE
+)
+    
+writeRaster(
+    harvest_date,
+    "../data/maize_harvest_julian_day_sachs2010.tif",
+    format="GTiff",
+    overwrite=TRUE
+)

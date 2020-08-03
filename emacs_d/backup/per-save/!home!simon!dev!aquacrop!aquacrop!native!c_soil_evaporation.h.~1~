@@ -1,0 +1,28 @@
+extern void c_soil_evaporation( \
+			       double* prec, \
+			       double* et_ref, \
+			       double* es_act, \
+			       double* e_pot,  \
+			       double* irr, \
+			       int* irr_method \
+			       
+			       
+
+
+       /* prec, & */
+       /* et_ref, es_act, e_pot, & */
+       /* irr, irr_method, & */
+       /* infl, & */
+       /* th, th_sat, th_fc, th_wilt, th_dry, & */
+       /* surface_storage, & */
+       /* wet_surf, w_surf, w_stage_two, & */
+       /* cc, cc_adj, ccx_act, & */
+       /* evap_z, evap_z_min, evap_z_max, & */
+       /* rew, kex, ccxw, fwcc, f_evap, f_wrel_exp, & */
+       /* dz, dz_sum, & */
+       /* mulches, f_mulch, mulch_pct_gs, mulch_pct_os, & */
+       /* growing_season, senescence, premat_senes, & */
+       /* calendar_type, dap, delayed_cds, delayed_gdds, & */
+       /* time_step, evap_time_steps, & */
+       /* n_farm, n_crop, n_comp, n_cell) */
+			       

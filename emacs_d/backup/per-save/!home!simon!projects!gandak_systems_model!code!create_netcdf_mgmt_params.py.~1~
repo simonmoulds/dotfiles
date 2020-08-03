@@ -1,0 +1,44 @@
+# field management
+# ================
+
+# dims: crop, rotation, latitude, longitude
+
+mulches = dataset.createVariable('Mulches', np.int32, ('crop','lat','lon'))
+mulches[:] = 0
+
+mulchpctgs = dataset.createVariable('MulchPctGS', np.int32, ('crop','lat','lon'))
+mulchpctgs[:] = 50
+
+mulchpctos = dataset.createVariable('MulchPctOS', np.int32, ('crop','lat','lon'))
+mulchpctos[:] = 50
+
+fmulch = dataset.createVariable('fMulch', np.float64, ('crop','lat','lon'))
+fmulch[:] = 0.5
+
+# mulches = dataset.createVariable('Mulches', np.int32, ('crop','rotation','lat','lon'))
+# mulches[:] = 0
+
+# mulchpctgs = dataset.createVariable('MulchPctGS', np.int32, ('crop','rotation','lat','lon'))
+# mulchpctgs[:] = 50
+
+# mulchpctos = dataset.createVariable('MulchPctOS', np.int32, ('crop','rotation','lat','lon'))
+# mulchpctos[:] = 50
+
+# fmulch = dataset.createVariable('fMulch', np.float64, ('crop','rotation','lat','lon'))
+# fmulch[:] = 0.5
+
+# N.B. bund parameters can only vary by rotation (not crops
+# within the rotation) because the settings are relevant to
+# fallow periods as well as the growing season
+
+# in reality this makes sense - farmers will not remove bunds
+# for different crops (?)
+
+bunds = dataset.createVariable('Bunds', np.int32, ('crop','lat','lon'))
+bunds[:] = 0
+
+zbund = dataset.createVariable('zBund', np.int32, ('crop','lat','lon'))
+zbund[:] = 0
+
+bundwater = dataset.createVariable('BundWater', np.int32, ('crop','lat','lon'))
+bundwater[:] = 0

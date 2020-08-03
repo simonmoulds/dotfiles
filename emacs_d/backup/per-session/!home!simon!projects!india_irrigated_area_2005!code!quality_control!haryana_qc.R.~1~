@@ -1,0 +1,23 @@
+## Author : Simon Moulds
+## Date   : January 2018
+
+## Quality control for Haryana
+
+## Crops not grown: banana, cassava, coconut, coffee, cowpea,
+## finger millet, other cereals, other fibre crops, soybean,
+## sweet potato, tea, temperate fruit, tobacco, tropical
+## fruit, vegetables, yams
+
+## barley
+## ######
+
+if (dist_nm %in% "Rewari") {
+    xx[["apy_barley-rabi"]] %<>% linear_interp(5)
+    xx[["irr_barley-rabi"]] %<>% linear_interp(5)
+}
+
+if (dist_nm %in% "Sonepat") {
+    xx[["apy_barley-rabi"]] %<>% linear_interp(2)
+    xx[["irr_barley-rabi"]] %<>% linear_interp(2)
+}
+

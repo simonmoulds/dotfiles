@@ -1,0 +1,28 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import os
+import numpy as np
+from hm import file_handling
+
+class GridCellArea(object):
+
+    def __init__(self, land_cover, configuration):
+        self.land_cover = land_cover
+        self.configuration = configuration
+
+    def initial(self):
+        arr_zeros = np.zeros(
+            (self.land_cover.nFarm,
+             self.land_cover.nCrop,
+             self.land_cover.model.nCell)
+        )
+        
+        self.land_cover.Bunds = arr_zeros.astype(bool)
+        self.land_cover.zBund = arr_zeros
+        
+    def read(self):
+        pass
+        
+    def dynamic(self):
+        pass

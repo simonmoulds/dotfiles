@@ -1,0 +1,6 @@
+## Author : Simon Moulds
+## Date   : Nov 2018
+
+library(raster)
+
+r = raster("data-raw/channel_network_IDs.asc")

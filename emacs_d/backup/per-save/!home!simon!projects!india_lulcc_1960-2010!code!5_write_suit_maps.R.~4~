@@ -1,0 +1,65 @@
+## Author : Simon Moulds
+## Date   : Nov 2017
+
+library(raster)
+
+## save models
+agriculture_mod = readRDS("data/agriculture_mod.rds")
+forest_mod = readRDS("data/forest_mod.rds")
+grassland_mod = readRDS("data/grassland_mod.rds")
+shrubland_mod = readRDS("data/shrubland_mod.rds")
+wasteland_mod = readRDS("data/wasteland_mod.rds")
+urban_mod = readRDS("data/urban_mod.rds")
+
+models = list(agriculture=agriculture_mod,
+              forest=forest_mod,
+              grassland=grassland_mod,
+              shrubland=shrubland_mod,
+              wasteland=wasteland_mod,
+              urban=urban_mod)
+
+if (!dir.exists("data/district_suit_maps")) {
+    dir.create("data/district_suit_maps")
+}
+
+st = stack("data/elevation.tif","data/slope.tif","data/aspect.tif","data/bioclim_var1.tif","data/bioclim_var1.tif","data/bioclim_var1.tif","data/bioclim_var1.tif","data/bioclim_var1.tif","data/bioclim_var1.tif","data/bioclim_var1.tif","data/bioclim_var1.tif","data/bioclim_var1.tif","data/bioclim_var1.tif","data/bioclim_var1.tif","data/bioclim_var1.tif","data/dist2rd.tif","data/popdens.tif","data/access.tif")
+
+names(st) = c("elevation","slope","aspect","bio1","bio2","bio3","bio4","bio5","bio6","bio7","bio8","bio9","bio10","bio11","bio12","dist2rd","popdens","access")
+
+library(doParallel)
+library(foreach)
+
+UseCores = detectCores() - 1
+cl = makeCluster(UseCores, outfile="")
+registerDoParallel(cl)
+
+fs = list.files("data/district_maps", pattern="^dist_[0-9]{1,3}.tif$", full.names=TRUE)
+
+fs = fs[40]
+
+foreach(i=1:length(fs)) %dopar% {
+
+    library(raster)
+    library(randomForest)
+
+    map = raster(fs[i])
+    dist = gsub("[^\\d]+", "", basename(fs[i]), perl=TRUE)
+    pts = as(map, "SpatialPoints")
+
+    fn = rasterTmpFile()
+    st0 = crop(st, map, filename=fn)
+    newdata = st0[pts]
+    unlink(paste0(sub(".grd$", "", fn), c(".grd",".gri")))
+    
+    for (j in 1:length(models)) {
+        mod = models[[j]]
+        nm = names(models)[j]
+        prob = predict(mod, newdata=newdata, type="prob")[,2]
+        out = raster(map)
+        out[pts] = prob
+        writeRaster(out, filename=file.path("data/district_suit_maps", paste0(nm, "_suit_", dist, ".tif")), overwrite=TRUE, format="GTiff")
+    }
+}
+
+stopCluster(cl)
+

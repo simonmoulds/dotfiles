@@ -1,0 +1,87 @@
+## Author : Simon Moulds
+## Date   : August 2019
+
+library(magrittr)
+library(dplyr)
+library(topmodel)
+library(dynatopmodel)
+
+## read precipitation and pet data
+met_data_fn = file.path(
+    "data-raw",
+    "11_SWAT - Copy",
+    "05_Meteo",
+    "topmodel_hourly_met_data.csv"
+)
+
+topmodel_met_data =
+    read.csv(met_data_fn, header=TRUE) %>%
+    mutate(time=as.POSIXct(
+               time,
+               tz="GMT",
+               format="%Y-%m-%d %H:%M:%S")
+           )
+
+topmodel_met_data = as.xts(
+    topmodel_met_data,
+    order.by=topmodel_met_data$time
+)    
+
+## 1. Topographical analysis
+## =========================
+dem = raster("data-raw/11_SWAT - Copy/01_Study_area/Peatland combined/pcomb_dem.tif")
+ncell = length(which(!is.na(getValues(dem))))
+catchment_area = ncell * res(dem)[1] * res(dem)[2]
+maps = build_layers(dem, fill.sinks=TRUE, deg=0.1)
+dem = maps[[1]]
+topographic_wetness_index =
+    maps[[3]] %>%
+    as.matrix %>%
+    make.classes(16)
+
+n = 5
+delay = flowlength(as.matrix(dem)) * res(dem)[1]
+delay = make.classes(delay, n)
+delay = delay[n:1,]
+delay[,2] = c(0, cumsum(delay[1:(n-1),2]))
+
+## 2. run model
+## ============
+
+## to get something running, just use the parameter
+## values from the huagrahuma dataset
+data(huagrahuma)
+parameters = huagrahuma$parameters
+
+start_time = as.POSIXct(
+    "2016-01-01 00:00:00",
+    tz="GMT",
+    format="%Y-%m-%d %H:%M:%S"
+)
+end_time = as.POSIXct(
+    "2017-01-01 00:00:00",
+    tz="GMT",
+    format="%Y-%m-%d %H:%M:%S"
+)
+time_ix = (
+    (index(topmodel_met_data) >= start_time) &
+    (index(topmodel_met_data) <= end_time)
+)
+rain = topmodel_met_data$prec[time_ix] / 1000
+pe = topmodel_met_data$eto[time_ix] / 1000
+
+Qsim = topmodel(
+    parameters,
+    topographic_wetness_index,
+    delay,
+    rain,
+    pe
+)
+
+Qsim = Qsim * catchment_area
+Qsim = xts(data.frame(Qsim=Qsim), order.by=index(rain))
+ggplot(Qsim, aes(x=Index, y=Qsim)) +
+    geom_line() +
+    xlab("") +
+    ylab(expression(paste("Discharge (m"^"3","/hour)")))
+ggsave("data/topmodel_peatland_combined_2016.png", width=6, height=5, units="in")

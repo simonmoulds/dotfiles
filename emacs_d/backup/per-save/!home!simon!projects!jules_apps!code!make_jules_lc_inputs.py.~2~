@@ -1,0 +1,147 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import netCDF4 as nc
+import rasterio
+import rasterio.mask
+import rasterio.features
+import numpy as np
+import glob
+
+# soil properties:
+# ################
+
+# b      : exponent in soil hydraulic characteristics
+# sathh  : 
+# satcon : saturated hydraulic conductivity
+# sm_sat : saturated water content
+# sm_crit: critical water content (field capacity)
+# sm_wilt: wilting point
+# hcap   : dry heat capacity
+# hcon   : dry thermal conductivity
+# albsoil: soil albedo
+
+datadir = '../data'
+res = '0pt25degree'
+region = 'ssa'
+method = 'cosby'
+nlayer = 4
+outdir = '../data'
+
+clone_map = rasterio.open(
+    os.path.join(
+        datadir,
+        'theta_sat_cosby_igp_layer1_0pt25degree.tif'
+    )    
+)
+bbox = clone_map.bounds
+xmin,ymin,xmax,ymax = bbox[0], bbox[1], bbox[2], bbox[3]
+
+os.system('unzip -o ../data/ISLSCP_C4_1DEG_932.zip -d ../data')
+os.system('gdal_translate -a_srs EPSG:4326 ../data/ISLSCP_C4_1DEG_932/data/c4_percent_1d.asc ../data/c4_percent_1d.tif')
+os.system('gdalwarp -overwrite -te ' + str(xmin) + ' ' + str(ymin) + ' ' + str(xmax) + ' ' + str(ymax) + ' -tr 0.25 0.25 -r near ../data/c4_percent_1d.tif ../data/c4_percent_0pt25d.tif')
+
+c4_percent = rasterio.open(
+    os.path.join(
+        datadir,
+        'c4_percent_0pt25d.tif'
+    )    
+)
+c4_fraction = c4_percent.read(1) / 100
+c4_fraction = c4_fraction.clip(0,1)
+
+biomes = rasterio.open(
+    os.path.join(
+        datadir,
+        'wwf_terr_ecos.tif'
+    )
+)
+biomes_arr = biomes.read(1)
+tropical_broadleaf_forest_biomes = (
+    (biomes_arr == 1) | (biomes_arr == 2)
+)
+years = [2010]
+for year in years:    
+    filename = 'ESACCI-LC-L4-LCCS-Map-300m-P1Y-aggregated-0.250000Deg-' + str(year) + '-v2.0.7.nc'    
+    filepath = os.path.join(datadir, filename)
+    newfilename = 'ESACCI-LC-L4-LCCS-Map-300m-P1Y-aggregated-0.250000Deg-subset-' + str(year) + '-v2.0.7.nc'
+    newfilepath = os.path.join(outdir, newfilename)
+    cdo_cmd = 'cdo sellonlatbox,' + str(xmin) + ',' + str(xmax) + ',' + str(ymin) + ',' + str(ymax) + ' ' + filepath + ' ' + newfilepath
+    os.system(cdo_cmd)
+
+    nco = nc.Dataset(newfilepath, 'r+')
+
+    # current PFTs from ESA tool:
+    tree_broadleaf_evergreen = \
+        nco['Tree_Broadleaf_Evergreen'][:]
+    tree_broadleaf_deciduous = \
+        nco['Tree_Broadleaf_Deciduous'][:]
+    tree_needleleaf_evergreen = \
+        nco['Tree_Needleleaf_Evergreen'][:]
+    tree_needleleaf_deciduous = \
+        nco['Tree_Needleleaf_Deciduous'][:]
+    shrub_broadleaf_evergreen = \
+        nco['Shrub_Broadleaf_Evergreen'][:]
+    shrub_broadleaf_deciduous = \
+        nco['Shrub_Broadleaf_Deciduous'][:]
+    shrub_needleleaf_evergreen = \
+        nco['Shrub_Needleleaf_Evergreen'][:]
+    shrub_needleleaf_deciduous = \
+        nco['Shrub_Needleleaf_Deciduous'][:]
+    natural_grass = \
+        nco['Natural_Grass'][:]
+    managed_grass = \
+        nco['Managed_Grass'][:]
+    bare_soil = \
+        nco['Bare_Soil'][:]
+    water = \
+        nco['Water'][:]
+    snow_ice = \
+        nco['Snow_Ice'][:]
+    
+    # jules_5pft
+    tree_broadleaf = \
+        tree_broadleaf_evergreen \
+        + tree_broadleaf_deciduous
+    tree_needleleaf = \
+        tree_needleleaf_evergreen \
+        + tree_needleleaf_deciduous
+    shrub = \
+        shrub_broadleaf_evergreen \
+        + shrub_broadleaf_deciduous \
+        + shrub_needleleaf_evergreen \
+        + shrub_needleleaf_deciduous
+    grass = \
+        natural_grass \
+        + managed_grass
+    c4_grass = grass * c4_fraction
+    c3_grass = grass - c4_grass
+
+    # jules_9pft
+    tropical_broadleaf_evergreen_tree = \
+        tree_broadleaf_evergreen \
+        * tropical_broadleaf_forest_biomes
+    temperate_broadleaf_evergreen_tree = \
+        tree_broadleaf_evergreen \
+        * np.logical_not(tropical_broadleaf_forest_biomes)
+    tree_broadleaf_deciduous = \
+        tree_broadleaf_deciduous
+    tree_needleleaf_evergreen = \
+        tree_needleleaf_evergreen
+    tree_needleleaf_deciduous = \
+        tree_needleleaf_deciduous
+    c3_grass = c3_grass
+    c4_grass = c4_grass
+    shrub_evergreen = \
+        shrub_broadleaf_evergreen \
+        + shrub_needleleaf_evergreen
+    shrub_deciduous = \
+        shrub_broadleaf_deciduous \
+        + shrub_needleleaf_deciduous
+
+    # TODO: add variables to netCDF file
+    # Follow a naming convention?
+    # JULES_9PFT_Tree_Tropical_Broadleaf_Evergreen
+    # JULES_9PFT_Tree_Temperate_Broadleaf_Evergreen
+    # JULES_9PFT_...
+    nco.close()

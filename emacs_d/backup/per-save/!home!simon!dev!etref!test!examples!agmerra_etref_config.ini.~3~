@@ -1,0 +1,102 @@
+[FILE_PATHS]
+PathIn = /home/simon/projects/aquacrop_apps/ssa/data
+PathOut = /home/simon/projects/aquacrop_apps/ssa/data/etref_ssa
+
+[MODEL_GRID]
+# cloneMap = ${FILE_PATHS:PathIn}/africa_etref_clone_0pt25degree.tif
+# landmask = ${FILE_PATHS:PathIn}/africa_etref_landmask_0pt25degree.tif
+mask = ${FILE_PATHS:PathIn}/africa_etref_landmask_0pt25degree.tif
+
+[CLOCK]
+startTime = 2000-01-01
+endTime = 2010-12-31
+
+[NETCDF_ATTRIBUTES]
+institution = Department of Civil and Environmental Engineering, Imperial College London
+title       = etref model output
+description = 
+netcdf_y_orientation_follow_cf_convention = True
+formatNetCDF = NETCDF4
+zlib = True
+
+[ET_METHOD]
+method = PenmanMonteith
+
+[WEATHER]
+compute_daily_min_max_temperature_from_subdaily_data = False
+compute_daily_mean_temperature_from_subdaily_data = False
+
+meanDailyTemperatureNC = ${FILE_PATHS:PathIn}/AgMERRA/AgMERRA_{year:0>4}_tavg.nc4
+meanDailyTemperatureVarName = tavg
+meanDailyTemperatureTimeDimName = time
+meanDailyTemperatureOffset = -273.15
+meanDailyTemperatureFactor = 1.
+
+minDailyTemperatureNC = ${FILE_PATHS:PathIn}/AgMERRA/AgMERRA_{year:0>4}_tmin.nc4
+minDailyTemperatureVarName = tmin
+minDailyTemperatureTimeDimName = time
+minDailyTemperatureOffset = -273.15
+minDailyTemperatureFactor = 1.
+
+maxDailyTemperatureNC = ${FILE_PATHS:PathIn}/AgMERRA/AgMERRA_{year:0>4}_tmax.nc4
+maxDailyTemperatureVarName = tmax
+maxDailyTemperatureTimeDimName = time
+maxDailyTemperatureOffset = -273.15
+maxDailyTemperatureFactor = 1.
+
+subDailyTemperatureNC = None
+subDailyTemperatureVarName = None
+subDailyTemperatureTimeDimName = None
+subDailyTemperatureOffset = 0.
+subDailyTemperatureFactor = 1.
+
+downwellingLongwaveRadiationNC = None
+downwellingLongwaveRadiationVarName = None
+downwellingLongwaveRadiationTimeDimName = None
+downwellingLongwaveRadiationOffset = 0.0
+downwellingLongwaveRadiationFactor = 1.0
+
+surfaceAtmosphericPressureNC = ${FILE_PATHS:PathIn}/WFDEI/PSurf_daily_WFDEI/PSurf_daily_WFDEI_{year:0>4}{month:0>2}.nc
+surfaceAtmosphericPressureVarName = PSurf
+surfaceAtmosphericPressureTimeDimName = timestp
+surfaceAtmosphericPressureOffset = 0.0
+surfaceAtmosphericPressureFactor = 1.0
+
+specificHumidityNC = None
+specificHumidityVarName = None
+specificHumidityTimeDimName = None
+specificHumidityOffset = 0.0
+specificHumidityFactor = 1.0
+
+maxRelativeHumidityNC = ${FILE_PATHS:PathIn}/AgMERRA/AgMERRA_{year:0>4}_rhstmax.nc4
+maxRelativeHumidityVarName = rhstmax
+maxRelativeHumidityTimeDimName = time
+maxRelativeHumidityOffset = 0.0
+maxRelativeHumidityFactor = 1.
+
+minRelativeHumidityNC = None
+minRelativeHumidityVarName = None
+minRelativeHumidityTimeDimName = None
+minRelativeHumidityOffset = 0.0
+minRelativeHumidityFactor = 1.
+
+meanRelativeHumidityNC = None
+meanRelativeHumidityVarName = None
+meanRelativeHumidityTimeDimName = None
+meanRelativeHumidityOffset = 0.0
+meanRelativeHumidityFactor = 1.
+
+downwellingShortwaveRadiationNC = ${FILE_PATHS:PathIn}/AgMERRA/AgMERRA_{year:0>4}_srad.nc4
+downwellingShortwaveRadiationVarName = srad
+downwellingShortwaveRadiationTimeDimName = time
+downwellingShortwaveRadiationOffset = 0.0
+downwellingShortwaveRadiationFactor = 1.
+
+windSpeedNC = ${FILE_PATHS:PathIn}/AgMERRA/AgMERRA_{year:0>4}_wndspd.nc4
+windSpeedVarName = wndspd
+windSpeedTimeDimName = time
+windSpeedOffset = 0.0
+windSpeedFactor = 1.
+
+[REPORTING]
+outDailyTotal = ETref

@@ -1,0 +1,58 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import os
+import numpy as np
+import datetime
+import scipy.interpolate as interpolate
+import pandas
+import rasterio
+import re
+
+from hydro_model_builder.ncConverter import np2netCDF
+from hydro_model_builder import VirtualOS as vos
+
+import variable_list as variable_list
+from utils import *
+
+class RefETData(object):
+    def __init__(self, RefETData_variable):
+        self.var = RefETData_variable
+        # self.var.RefETInputPath = (
+        #     self.var._configuration.globalOptions['inputDir'] 
+        #     + '/' + self.var._configuration.refETDataOptions['dataDir'])
+        sd = str(self.var._configuration.refETDataOptions['startDate'])
+        ed = str(self.var._configuration.refETDataOptions['endDate'])
+        self.var.RefETStartDate = datetime.datetime.strptime(sd, '%Y-%m-%d')
+        self.var.RefETEndDate = datetime.datetime.strptime(ed, '%Y-%m-%d')
+        self.var.RefETDataOutputFile = vos.getFullPath(
+            self.var._configuration.refETDataOptions['outputFile'],
+            self.var._configuration.globalOptions['outputDir'])
+        self.bbox = vos.get_clone_map_extent(self.var._configuration.cloneMap)
+        
+    def initial(self):
+        pass
+
+    def dynamic(self):
+        pass
+        # self.var.RefETInputPath = get_data_smart(
+        #     'gandak_data_model',
+        #     '../data/output_evap',
+        #     as_string=False)            
+        # netcdf = np2netCDF(
+        #     self.var._configuration,
+        #     self.var.dimensions,
+        #     variable_list)
+        # netcdf.create_netCDF(self.var.RefETDataOutputFile, 'ETref')
+        # pattern = re.compile('PM[0-9]{6}\.[0-9]{3}')
+        # dt = self.var.RefETStartDate
+        # step = datetime.timedelta(days=1)
+        # for root, dirs, files in os.walk(self.var.RefETInputPath):
+        #     dirs.sort()
+        #     files.sort()
+        #     for f in files:
+        #         if re.match(pattern,f):
+        #             prc_path = os.path.join(root,f)
+        #             arr = read_gdal_raster_image(prc_path, self.bbox, 0)
+        #             netcdf.data2NetCDF(self.var.RefETDataOutputFile, 'ETref', arr, dt)
+        #             dt += step

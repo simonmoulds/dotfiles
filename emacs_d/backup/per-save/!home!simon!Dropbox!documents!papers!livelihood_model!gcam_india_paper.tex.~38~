@@ -1,0 +1,135 @@
+\documentclass[12pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{natbib}
+\usepackage{fixltx2e} % subscripts e.g. CO2
+\usepackage{multirow,amssymb,amsmath,booktabs,mathtools,longtable}
+\usepackage{gensymb}
+\usepackage{soul}
+\usepackage{lscape}
+\usepackage{caption}
+\usepackage[labelformat=simple]{subcaption}
+\usepackage{url}
+\usepackage{rotating}
+\usepackage{booktabs}
+\usepackage[flushleft]{threeparttable}
+\usepackage{amsmath}
+
+\title{A parsimonious empirical model of farmer irrigation decisions in northern India: model development}
+\author{Jimmy O'Keeffe, Simon Moulds}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+% \begin{abstract}
+% This is the paper's abstract \ldots
+% \end{abstract}
+
+\section{Model development}
+
+\subsection{Hydrology}
+
+A single cell model simulates the response of water resources to changing socioeconomic and environmental conditions. This class of hydrological model is commonly used in the field of water resources economics and there is an extensive body of literature describing their application \citep{}. The aquifer is represented as a ``bath-tub'' with spatially homogeneous hydrogeological characteristics, including groundwater level. Variations in groundwater level through recharge or abstraction, for example, are instantaneously applied across the entire cell. % Changes in groundwater level are based on irrigation water demand, water source and its availability, rainfall and irrigation method. In addition to precipitation, the model considers recharge from canal leakage, rivers and return flow from irrigation, as well as losses from evaporation. The model is designed to reflect the different irrigation options available to farmers in northern India. 
+
+
+\subsection{Root zone}
+The soil column is represented in terms of the \textit{Total Availale Water} (TAW), which describes the maximum amount of water that is available to plants at field capacity:
+
+\begin{equation}
+TAW = (\theta_{FC} - \theta_{WP})Z_{r}
+\end{equation}
+
+\noindent where $\theta_{FC}$ and $\theta_{WP}$ are respectively the field capacity and wilting point and $Z_{r}$ is the maximum root depth of the overlying crop. The proportion of TAW that can easily be extracted before water shortage impedes plant growth is termed the \textit{readily available water},
+
+\begin{equation}
+RAW = (1-p)TAW
+\end{equation}
+
+\noindent where $p$ is the depletion factor. \\
+
+The daily water balance equation expressed in terms of root zone depletion, $D_{r}$, is written
+
+\begin{equation}
+\frac{dD_{r}}{dt} = ET_{c,t} + R_{t} - (P_{t}-RO_{t}) - I_{t}
+\end{equation}
+
+\noindent where $ET_{c,t}$ is actual crop evapotranspiration, $R_{t}$ is recharge, $P$ is precipitation, $RO$ is surface runoff and $I_{t}$ is irrigation. Crop evapotranspiration is determined as follows:
+
+\begin{equation}
+ET_{c} = K_{s}K_{c}ET_{0}
+\end{equation}
+
+\noindent where $K_{c}$ is a crop coefficient which varies according to the crop growth, $K_{s}$ is a water stress coefficient and $ET_{0}$ is reference evapotranspiration. We use the Hargreaves-Samani equation to estimate $ET_{0}$, as follows:
+
+\begin{equation}
+ET_{0} = 0.0135 \times 0.17 \times (T_{mean} + 17.8) \times (T_{max} - T_{min})^{0.5}
+\end{equation}
+
+\noindent where $T_{mean}$, $T_{max}$ and $T_{min}$ are daily mean, maximum and minimum temperature, respectively. Crop coefficients are obtained from the FAO (TODO: provide reference). The water stress coefficient is calculated:
+
+\begin{equation}
+K_{s} = \frac{TAW-D_{r}}{(1-p)TAW}.
+\end{equation}
+
+\subsubsection{Groundwater}
+
+Drainage to the underlying aquifer occurs when the water content of the root zone exceeds field capacity:
+
+\begin{equation}
+  R_{t}=
+    \begin{cases}
+      -D_{r}, & \text{if}\ D_{r} < 0\\
+      0, & \text{otherwise}
+    \end{cases}
+\end{equation}
+
+\noindent Irrigation is parameterised based on information collected in the field. Typically, farmers in the IGP use flood irrigation and apply water to their crops at set intervals during the growing season. We assume that farmers with a canal adjoining their property preferentially use canal water when this is available, otherwise relying on groundwater if they have access to a borehole of sufficient depth. We assume that farmers outside the canal command area use groundwater only if they have access to an operational borehole. Lastly, we assume that farmers who cannot abstract water from either source do not irrigate. We assume that canal leakage contributes to groundwater recharge. Consequently, the change in aquifer storage $H$ can be written:
+
+\begin{equation}
+  \frac{dH}{dt}=
+  \begin{cases}
+    R_{t} + (l \times V), & \text{canal}\\
+    R_{t} - I_{t},        & \text{groundwater}\\
+    R_{t},                & \text{otherwise}
+  \end{cases}
+\end{equation}
+
+\noindent where $V$ is canal volume and $l$ is a leakage coefficient. \\
+
+\subsection{Livelihood}
+
+Fundamental to the model is its conceptualization of the feedbacks which exist between farmer livelihood and irrigation behaviour. Farmer livelihood, $L$, at time $t$ is considered in terms of the difference between farm income, $m$, and farm expenditure, $z$, as follows:
+\begin{equation}
+L_{t} = m_{t} - z_{t}.
+\end{equation}
+
+\subsubsection{Income}
+
+\noindent Income is the amount of money a farmer receives at market for their crop, expressed
+
+\begin{equation}
+m(t) = \sum_{c=1}^{n} y_{c} q_{c} A_{c}
+\end{equation}
+
+\noindent where $n$ is number of crops grown in an agricultural year and $y_{c}$, $q_{c}$ and $A_{c}$ are yield, price and Area of crop $c$. Yield is calculated:
+
+\begin{equation}
+\left(1-\frac{Y_{a}}{Y_{x}}\right) = K_{y}\left(1-\frac{ET_{c}}{ET_{x}}\right)
+\end{equation}
+
+\noindent where $Y_{x}$ is maximum yield, $Y_{a}$ is actual yield, $K_{y}$ is the yield response factor, $ET_{x}$ is maximum evapotranspiration and $ET_{c}$ is actual crop evapotranspiration. Crop price data is retrieved from national statistics [TODO: provide reference], and farm area is fixed at one hectare, based on information collected in the field.
+
+\subsubsection{Expenditure}
+
+Expenditure on irrigation and fertilizer, values based on fieldwork (TODO).
+
+% \begin{equation}
+% z(t) 
+% \end{equation}
+
+\bibliographystyle{abbrv}
+\bibliography{../../Zotero_library.bib}
+
+\end{document}

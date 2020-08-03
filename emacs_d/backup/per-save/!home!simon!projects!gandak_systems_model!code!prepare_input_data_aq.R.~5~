@@ -1,0 +1,263 @@
+## Author : Simon Moulds
+## Date   : June 2018
+
+library(raster)
+library(rgdal)
+library(magrittr)
+library(dplyr)
+library(tidyr)
+library(xts)
+
+## ===========================
+## 1 define catchment boundary
+## ===========================
+
+template = raster(xmn=83.5, xmx=85.75, ymn=25.5, ymx=28, resolution=1/12)
+template[] = 0
+
+system("ogr2ogr -t_srs EPSG:4326 'data/gandak_basin_india_ll.shp' 'data/Gandak basin shapefiles/gantak_basin_india.shp' -t_srs EPSG:4326")
+
+system("ogr2ogr -t_srs EPSG:4326 'data/gandak_basin_ll.shp' 'data/Gandak basin shapefiles/gantak_basin.shp' -t_srs EPSG:4326")
+
+system("ogr2ogr -t_srs EPSG:4326 'data/gandak_rivers_ll.shp' 'data/Gandak basin shapefiles/gantak_rivers.shp' -t_srs EPSG:4326")
+
+gandak_india_poly = readOGR(dsn="data", layer="gandak_basin_india_ll")
+gandak_poly = readOGR(dsn="data", layer="gandak_basin_ll")
+gandak_rivers = readOGR(dsn="data", layer="gandak_rivers_ll")
+
+## canals
+system("unzip data-raw/Gandak_canal+nodes.zip -d data")
+gandak_canal_main = readOGR(dsn="data/Gandak_canal+nodes", layer="main_canal")
+gandak_canal_branch = readOGR(dsn="data/Gandak_canal+nodes", layer="branch_canal")
+gandak_canal_distr = readOGR(dsn="data/Gandak_canal+nodes", layer="distributary")
+gandak_canal_subbranch = readOGR(dsn="data/Gandak_canal+nodes", layer="subbranch canal")
+gandak_canal_subdistr = readOGR(dsn="data/Gandak_canal+nodes", layer="subdistributary")
+
+plot(template)
+lines(gandak_poly)
+lines(gandak_rivers)
+lines(gandak_canal_main)
+lines(gandak_canal_branch)
+lines(gandak_canal_distr)
+lines(gandak_canal_subbranch)
+lines(gandak_canal_subdistr)
+
+## ==========
+## 2 met data
+## ==========
+
+## ## extract data
+## system("unzip 'data-raw/GRIDDED RF DATA 0.25 X 0.25 (1901-2015).zip' -d data")
+## system("unzip 'data/GRIDDED RF DATA 0.25 X 0.25 (1901-2015)/ASCII_DATA_PT25/RF(1901-2015)0.25 TEXT FILES.zip' -d data")
+
+## Use a representative point, for now
+start = as.POSIXct("1979-01-01")
+end = as.POSIXct("2014-12-31")
+ts = seq.POSIXt(start, end, by="1 day")
+## pt = SpatialPoints(data.frame(x=84.62500, y=27.12500), crs(template))
+
+prec_fs = list.files("data/output_prec/Rainfall", full.names=TRUE)
+for (i in 1:length(prec_fs)):
+    r = raster(prec_fs[i]) %>% crop(template)
+## Precipitation
+if (!file.exists("data/prec_ts.rds")) {
+    prec_fs = list.files("data/output_prec/Rainfall", full.names=TRUE)
+    prec = rep(NA, length(prec_fs))
+    for (i in 1:length(prec_fs)) {
+        if (i %% 100 == 0) print(i)
+        d = system(paste0("gdallocationinfo -geoloc ", prec_fs[i], " 84.625 27.125"), intern=TRUE) %>% grep("Value:", ., value=TRUE) %>% gsub("\\s+", "", .) %>% gsub("Value:", "", .) %>% as.numeric
+        prec[i] = d
+    }
+    saveRDS(prec, "data/prec_ts.rds")
+} else {
+    prec = readRDS("data/prec_ts.rds")
+}
+
+## Reference ET
+if (!file.exists("data/et_ts.rds")) {
+    et_fs = list.files("data/output_evap/", pattern="^PM", full.names=TRUE)
+    et = rep(NA, length(et_fs))
+    for (i in 1:length(et_fs)) {
+        if (i %% 1000 == 0) print(i)
+        d = system(paste0("gdallocationinfo -geoloc ", et_fs[i], " 84.625 27.125"), intern=TRUE) %>% grep("Value:", ., value=TRUE) %>% gsub("\\s+", "", .) %>% gsub("Value:", "", .) %>% as.numeric
+        et[i] = d
+    }
+    saveRDS(et, "data/et_ts.rds")
+} else {
+    et = readRDS("data/et_ts.rds")
+}
+
+start = as.POSIXct("1979-01-01")
+end = as.POSIXct("2014-12-31")
+ts = seq.POSIXt(start, end, by="1 day")
+
+ts1 = seq.POSIXt(as.POSIXct("1979-01-01"), as.POSIXct("2010-12-31"), by="1 day")
+ix1 = ts %in% ts1
+
+prec_data = data.frame(time=1:length(ts1), prec=prec[ix1])
+et_data = data.frame(time=1:length(ts1), et=et[ix1])
+write.csv(prec_data, "~/Simile/data/prec_data.csv", row.names=FALSE)
+write.csv(et_data, "~/Simile/data/et_data.csv", row.names=FALSE)
+
+## =================
+## 3 crop parameters
+## =================
+
+## Crop factor (growth stages 1-4) (Choudhury et al, 2013)
+## #######################################################
+
+kcw = rep(0, 366)
+kcw[320:350] = 0.8
+kcw[c(1:16,351:365)] = 1.12
+kcw[17:47] = 1.25
+kcw[48:106] = 0.46
+
+kcr = rep(0,366)
+kcr[148:185] = 0.61
+kcr[186:223] = 0.80
+kcr[224:261] = 1.23
+kcr[262:296] = 0.74
+
+kcw_tab = data.frame(day=1:366, crop=1, Kc=kcw)
+kcr_tab = data.frame(day=1:366, crop=2, Kc=kcr)
+kc_tab = rbind(kcw_tab, kcr_tab) %>% arrange(day)
+write.csv(kc_tab, "~/Simile/data/kc_tab.csv", row.names=FALSE)
+
+## rooting depth
+## #############
+
+rdw = rep(0, 366)
+rdw[c(1:106,320:366)] = 1.25 * 1000
+
+rdr = rep(0, 366)
+rdr[148:296] = 0.65 * 1000
+
+rdw_tab = data.frame(day=1:366, crop=1, rd=rdw)
+rdr_tab = data.frame(day=1:366, crop=2, rd=rdr)
+rd_tab = rbind(rdw_tab, rdr_tab) %>% arrange(day)
+write.csv(rd_tab, "~/Simile/data/rd_tab.csv", row.names=FALSE)
+
+## et depletion factor
+## ###################
+
+pw = rep(0, 366)
+pw[c(1:106,320:366)] = 0.55
+
+pr = rep(0, 366)
+pr[148:296] = 0.2
+
+pw_tab = data.frame(day=1:366, crop=1, p=pw)
+pr_tab = data.frame(day=1:366, crop=2, p=pr)
+p_tab = rbind(pw_tab, pr_tab) %>% arrange(day)
+write.csv(p_tab, "~/Simile/data/p_tab.csv", row.names=FALSE)
+
+## maximum yield
+## #############
+
+yld = read.table("data/sult_pol_ln_crop_yield_sultanpur.txt", header=TRUE)
+yrs = yld[["Year"]]
+index = yrs %in% 1979:2010
+wheat_yld = yld[["wheat_th"]][index] * 2.4
+rice_yld = yld[["rice_th"]][index] * 1.7
+
+## create index showing the time step of 1 January of each
+## year in the simulation
+yrs = 1979:2010
+leap_year = (((yrs %% 4) == 0) & ((yrs %% 100) != 0)) | ((yrs %% 400) == 0)
+ndays = ifelse(leap_year, 366, 365)
+ix = (cumsum(ndays) + 1) - ndays
+ts1[ix]
+wheat_yield = data.frame(day=ix, crop=1, yield=wheat_yld)
+rice_yield = data.frame(day=ix, crop=2, yield=rice_yld)
+yield_tab = rbind(wheat_yield, rice_yield) %>% arrange(day)
+write.csv(yield_tab, "~/Simile/data/yx_tab.csv", row.names=FALSE)
+
+## canal water requirement
+## #######################
+
+## copied from Appendix II of original agreement between
+## Nepal and India
+data = read.table(header=TRUE, text="
+Month     West East   Total 
+January   6960 4540   11500
+February  6100 3900   10000
+March     5960 3690   9650
+April     5760 4340   10100
+May       8270 7980   16250
+June      11190 14000 25190
+July      15240 13980 29220
+August    14980 14000 28980
+September 14980 14000 28980
+October   16060 14110 30170
+November  11070 13240 24310
+December  10410 9290  19700
+")
+
+f = 0.028316847
+data$West %<>% `*`(f)
+data$East %<>% `*`(f)
+data$Total %<>% `*`(f)
+
+## ## discharge
+## ## #########
+
+## ## discharge data just downstream of barrage
+
+## library(readxl)
+## library(xlsx)
+
+## options(stringsAsFactors = FALSE)
+## x = read.csv("data-raw/gandakbarrage_dailyoperation_flood2017.csv") %>%
+##     dplyr::select(-units) %>%
+##     gather(key="time", value="downstream_discharge", -river, -barrage, -date) %>%
+##     mutate(time = gsub("time","", time)) %>%
+##     unite(col=date, date, time, sep=" ") %>%
+##     mutate(date = as.POSIXct(date, format="%d/%m/%Y %I%p", tz="UTC")) %>% 
+##     arrange(date) 
+
+## x = as.xts(x, order.by=x$date)
+## x = apply.daily(x$downstream_discharge, FUN=mean)
+
+## y = read.table("data-raw/Gandak hydraulic model data_CHANSE/Gandak hydraulic model data/Gandak_barrage_smrs_clean.txt",header=TRUE) %>%
+##     unite(col=date, day, time, sep=" ") %>%
+##     mutate(date = as.POSIXct(date, format="%d/%m/%y %H:%M:%S", tz="UTC"))
+
+## y = as.xts(y, order.by=y$date)
+## y = apply.daily(y$downstream_discharge, FUN=mean)
+
+## xy = rbind(x,y)
+
+## ## Nepal discharge data
+
+## system("tar -xvf data-raw/UNESCO_Data.tar")
+## system("7z x data-raw/UNESCO_Data.7z -odata/")
+
+## ## step 1: look at where the gauging stations are located
+
+## x = read.table("data/nepal_gauging_stations.txt", head=TRUE, sep="\t")
+
+## ## convert to decimal degrees:
+## ## Decimal degrees = Degrees + (Minutes/60) + (Seconds/3600)
+## lat =
+##     data.frame(lat=x$Latitude) %>%
+##     separate(lat, c("Degrees","Minutes","Seconds"), sep="_") %>%
+##     mutate_all(as.numeric) %>% 
+##     mutate(Decimal_Degrees=Degrees+Minutes/60+Seconds/3600)
+
+## lon =
+##     data.frame(lat=x$Longitude) %>%
+##     separate(lat, c("Degrees","Minutes","Seconds"), sep="_") %>%
+##     mutate_all(as.numeric) %>% 
+##     mutate(Decimal_Degrees=Degrees+Minutes/60+Seconds/3600)
+
+## library(sp)
+## pts = data.frame(lon=lon$Decimal_Degrees, lat=lat$Decimal_Degrees)
+
+## d = x %>% select(-(Latitude:Longitude), -Area)
+## sp = SpatialPointsDataFrame(coords=pts, data=d, proj4string=CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
+## plot(gandak_poly)
+## points(sp)
+
+## writeOGR(sp, dsn="data", layer="nepal_gauging_stations", driver="ESRI Shapefile")
+
+

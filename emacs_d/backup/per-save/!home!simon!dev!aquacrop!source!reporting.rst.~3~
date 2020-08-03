@@ -1,0 +1,28 @@
+Reporting
+=========
+
+.. currentmodule:: aquacrop
+
+Configuration
+~~~~~~~~~~~~~
+
+.. code-block:: python
+
+    [REPORTING]
+    daily_total = TODO
+
+Options
+~~~~~~~
+
+``calendar_type``
+    TODO
+
+``switch_gdd``
+    TODO
+
+``gdd_method``
+    TODO
+
+``filename``
+    NetCDF file containing crop parameters.
+

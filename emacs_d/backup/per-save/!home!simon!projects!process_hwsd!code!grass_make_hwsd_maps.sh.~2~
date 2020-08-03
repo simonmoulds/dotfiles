@@ -1,0 +1,27 @@
+#!/bin/bash
+
+r.in.gdal \
+    -a \
+    input="hwsd.tif" \
+    output=hwsd \
+    --overwrite
+
+g.region raster=hwsd
+
+for layer in t s
+do
+    for var in sand silt clay bulk_density cec_soil oc ph_h2o
+    do       
+	r.reclass \
+	    input=hwsd \
+	    output=${layer}_${var} \
+	    rules=${layer}_${var}_rcl.txt \
+	    --overwrite
+	r.out.gdal \
+	    input=${layer}_${var} \
+	    output=hwsd_${layer}_${var}.tif \
+	    --overwrite
+    done
+done
+
+    

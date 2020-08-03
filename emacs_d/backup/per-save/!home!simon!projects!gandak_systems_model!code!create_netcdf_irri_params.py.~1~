@@ -1,0 +1,33 @@
+# irrigation management
+# =====================
+
+irrmethod = dataset.createVariable('IrrMethod', np.int32, ('crop','lat','lon'))
+irrmethod[:] = 1   # soil moisture based
+
+# only used if irrmethod = 2
+irrinterval = dataset.createVariable('IrrInterval', np.int32, ('crop','lat','lon'))
+irrinterval[:] = 3
+
+smt1 = dataset.createVariable('SMT1', np.float64, ('crop','lat','lon'))
+smt1[:] = 70.
+
+smt2 = dataset.createVariable('SMT2', np.float64, ('crop','lat','lon'))
+smt2[:] = 70.
+
+smt3 = dataset.createVariable('SMT3', np.float64, ('crop','lat','lon'))
+smt3[:] = 70.
+
+smt4 = dataset.createVariable('SMT4', np.float64, ('crop','lat','lon'))
+smt4[:] = 70.
+
+maxirr = dataset.createVariable('MaxIrr', np.float64, ('crop','lat','lon'))
+maxirr[:] = 25.
+
+appeff = dataset.createVariable('AppEff', np.float64, ('crop','lat','lon'))
+appeff[:] = 90.
+
+netirrsmt = dataset.createVariable('NetIrrSMT', np.float64, ('crop','lat','lon'))
+netirrsmt[:] = 80.5
+
+wetsurf = dataset.createVariable('WetSurf', np.float64, ('crop','lat','lon'))
+wetsurf[:] = 100.

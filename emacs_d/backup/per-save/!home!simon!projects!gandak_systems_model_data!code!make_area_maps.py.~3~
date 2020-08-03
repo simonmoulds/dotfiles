@@ -1,0 +1,57 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import os
+import shutil
+import numpy as np
+import netCDF4 as nc
+import xarray as xr
+import rasterio
+
+datadir = os.path.join('/home','simon','projects','gandak_systems_model_data','data')
+outdir = os.path.join('/home','simon','projects','gandak_systems_model','land_surface','gandak_05min','areamaps')
+
+# clone map
+fn = os.path.join(datadir, 'Gandak05min.clone.tif')
+shutil.copy(fn, outdir)
+
+# landmask
+fn = os.path.join(datadir, 'Gandak05min.landmask.tif')
+shutil.copy(fn, outdir)
+
+# grid cell area
+fn = os.path.join(datadir, 'modelMaskCellArea.tif')
+r = rasterio.open(fn)
+arr = r.read(masked=True)[0,...]
+mask = np.ma.getmask(arr)
+arr[mask] = 0
+
+r = xr.open_rasterio(fn)
+lat_vals = r.y.values
+lon_vals = r.x.values
+nlat = lat_vals.size
+nlon = lon_vals.size
+
+netcdf = nc.Dataset('tmp.nc', 'w')
+netcdf.createDimension('lat', nlat)
+netcdf.createDimension('lon', nlon)
+
+lato = netcdf.createVariable('lat', np.float64, ('lat'), zlib=True, least_significant_digit=16)
+lato.units = 'degrees_north'
+lato.standard_name = 'latitude'
+lato.long_name = 'latitude'
+lato[:]=r.y.values 
+
+lono = netcdf.createVariable('lon', np.float64, ('lon'), zlib=True, least_significant_digit=16)
+lono.units = 'degrees_east'
+lono.standard_name = 'longitude'
+lono.long_name = 'longitude'
+lono[:]=r.x.values
+
+area = netcdf.createVariable('grid_cell_area', np.float64, ('lat','lon'), zlib=True, least_significant_digit=16)
+area.units = 'm2'
+area.standard_name = 'grid_cell_area'
+area.long_name = 'grid_cell_area'
+area[:] = arr * 1e6
+
+netcdf.close()

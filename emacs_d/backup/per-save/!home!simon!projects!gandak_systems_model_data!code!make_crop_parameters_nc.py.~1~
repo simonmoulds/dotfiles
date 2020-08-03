@@ -1,0 +1,263 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import os
+import shutil
+import csv
+import numpy as np
+import pandas as pd
+import netCDF4 as nc
+import xarray as xr
+import rasterio
+
+from pkgutil import get_loader
+
+datadir = os.path.join('/home','simon','projects','gandak_systems_model_data','data')
+outdir = os.path.join('/','home','simon','projects','gandak_systems_model','land_surface','gandak_05min','landcover','irrNonPaddy')
+
+# def get_data_smart(package, resource, as_string=True):
+#     """Rewrite of pkgutil.get_data() that actually lets the user 
+#     determine if data should be returned read into memory (aka 
+#     as_string=True) or just return the file path.
+#     """
+#     # https://stackoverflow.com/a/13773912
+
+#     loader = get_loader(package)
+#     if loader is None or not hasattr(loader, 'get_data'):
+#         return None
+
+#     mod = sys.modules.get(package) or loader.load_module(package)
+#     if mod is None or not hasattr(mod, '__file__'):
+#         return None
+
+#     # Modify the resource name to be compatible with the loader.get_data
+#     # signature - an os.path format "filename" starting with the dirname of
+#     # the package's __file__
+#     parts = resource.split('/')
+#     parts.insert(0, os.path.dirname(mod.__file__))
+#     resource_name = os.path.join(*parts)
+#     if as_string:
+#         return loader.get_data(resource_name)
+#     else:
+#         return resource_name
+
+data = [['IRR_RICE_KHARIF','RICE','RICE_IRRI','PADY_TP'],
+        ['RAIN_RICE_KHARIF','RICE','RICE_RAIN','PADY_TP'],
+        ['IRR_RICE_RABI','RICE','RICE_IRRI','PADY_TP'],
+        ['RAIN_RICE_RABI','RICE','RICE_RAIN','PADY_TP'],
+        ['IRR_WHEAT_RABI','WHEAT','WHEAT_IRRI','WHT_TP'],
+        ['RAIN_WHEAT_RABI','WHEAT','WHEAT_RAIN','WHT_TP'],
+        ['IRR_SUGARCANE_WHOLE_YEAR','SUGAR_CANE','SUGC_IRRI','SGUR_TP'],
+        ['RAIN_SUGARCANE_WHOLE_YEAR','SUGAR_CANE','SUGC_RAIN','SGUR_TP']]
+
+crop_names = pd.DataFrame(data,columns=['ID','GCWM','GAEZ','PRICE'])
+
+# def read_gdal_raster_image(filename, bbox, missing_val):
+#     vos.gdal_warp(filename, 'tmp.tif', bbox[0], bbox[1], bbox[2], bbox[3])
+#     r = rasterio.open('tmp.tif')
+#     arr = r.read(masked=True)[0,...]
+#     mask = np.ma.getmask(arr)
+#     arr[mask] = 0.
+#     # crop_area.append(arr)
+#     os.remove('tmp.tif')
+#     return arr
+
+def lookup_crop_id(crop_ref, column):
+    row_ix = [i for i,s in enumerate(crop_names['ID']) if crop_ref.upper() in s]
+    if len(row_ix) == 1:
+        row_ix = row_ix[0]
+    return crop_names[column][row_ix]
+
+def read_gcwm_crop_data():
+    # gcwm_data_filename = get_data_smart(
+    #     'gandak_wb_data_model',
+    #     '../data/gcwm_crop_data.csv',
+    #     as_string=False)
+    gcwm_data_filename = os.path.join(datadir, "gcwm_crop_data.csv")
+    with open(gcwm_data_filename, 'rt') as f:
+        reader = csv.reader(f, delimiter=',',)
+        next(reader, None)
+        crop_data = {}
+        for row in reader:
+            if row[0] not in crop_data:
+                key = row[0].upper()
+                crop_data[key] = {}
+                crop_data[key]['L_ini'] = float(row[1])
+                crop_data[key]['L_dev'] = float(row[2])
+                crop_data[key]['L_mid'] = float(row[3])
+                crop_data[key]['L_late'] = float(row[4])
+                crop_data[key]['Kc_ini'] = float(row[5])
+                crop_data[key]['Kc_mid'] = float(row[6])
+                crop_data[key]['Kc_end'] = float(row[7])
+                crop_data[key]['rd_irr'] = float(row[8])
+                crop_data[key]['rd_rain'] = float(row[9])
+                crop_data[key]['p_std'] = float(row[10])
+
+    return crop_data
+
+crop_types = ["irr_rice_kharif","irr_rice_rabi","irr_wheat_rabi","irr_sugarcane_whole_year"]
+fn = os.path.join(datadir, 'Gandak05min.clone.tif')    
+r = xr.open_rasterio(fn)
+lat_vals = r.y.values
+lon_vals = r.x.values
+nlat = lat_vals.size
+nlon = lon_vals.size
+ncrop = len(crop_types)
+
+# planting/harvest day
+map_path = '/home/simon/projects/india_crop_area_2005/data/output_2005/growing_season_maps'
+start_day = np.array([1,32,60,91,121,152,182,213,244,274,305,335])
+end_day = np.array([31,59,90,120,151,181,212,243,273,304,334,365])
+harvest_day = []
+planting_day = []
+for index, name in enumerate(crop_types):
+    # names of files containing planting and harvest dates of
+    # crop under consideration
+    x = os.path.join(map_path, 'INDIA_' + name.upper() + '_2005_SOWING.tif')
+    y = os.path.join(map_path, 'INDIA_' + name.upper() + '_2005_HARVESTING.tif')
+    if os.path.isfile(x) and os.path.isfile(y):
+        xarr = np.array(xr.open_rasterio(x)[0,...])
+        yarr = np.array(xr.open_rasterio(y)[0,...])
+        pd = np.zeros_like(xarr)
+        hd = np.zeros_like(xarr)
+        for i in range(xarr.shape[0]):
+            for j in range(xarr.shape[1]):
+                if xarr[i,j] > 0:
+                    pd_ix = int(xarr[i,j]) - 1
+                    hd_ix = int(yarr[i,j]) - 1
+                    pd[i,j] = start_day[pd_ix]
+                    hd[i,j] = end_day[hd_ix]
+                else:
+                    pd[i,j] = xarr[i,j]
+                    hd[i,j] = yarr[i,j]
+
+        planting_day.append(pd)
+        harvest_day.append(hd)
+
+# arrays with dimensions (crop,lat,lon)
+pd_arr = np.stack(planting_day, axis=0)
+hd_arr = np.stack(harvest_day, axis=0)
+
+# initialize variables
+crop_data = read_gcwm_crop_data()
+L_ini_arr = np.zeros((ncrop, nlat, nlon))
+L_dev_arr = np.zeros((ncrop, nlat, nlon))
+L_mid_arr = np.zeros((ncrop, nlat, nlon))
+L_late_arr = np.zeros((ncrop, nlat, nlon))
+Kc_ini_arr = np.zeros((ncrop, nlat, nlon))
+Kc_mid_arr = np.zeros((ncrop, nlat, nlon))
+Kc_end_arr = np.zeros((ncrop, nlat, nlon))
+Zmax_arr = np.zeros((ncrop, nlat, nlon))
+Zmin_arr = np.zeros((ncrop, nlat, nlon))
+Ky_arr = np.zeros((ncrop, nlat, nlon))
+p_std_arr = np.zeros((ncrop, nlat, nlon))
+
+# assign values from table
+for index,crop in enumerate(crop_types):
+    key = lookup_crop_id(crop, 'GCWM')            
+    L_ini_arr[index,...] = (crop_data[key]['L_ini'])
+    L_dev_arr[index,...] = (crop_data[key]['L_dev'])
+    L_mid_arr[index,...] = (crop_data[key]['L_mid'])
+    L_late_arr[index,...] = (crop_data[key]['L_late'])
+    Kc_ini_arr[index,...] = (crop_data[key]['Kc_ini'])
+    Kc_mid_arr[index,...] = (crop_data[key]['Kc_mid'])
+    Kc_end_arr[index,...] = (crop_data[key]['Kc_end'])
+    if crop.startswith('irr'):
+        Zmax_arr[index,...] = (crop_data[key]['rd_irr'])
+    elif crop.startswith('rain'):
+        Zmax_arr[index,...] = (crop_data[key]['rd_rain'])
+    p_std_arr[index,...] = (crop_data[key]['p_std'])
+
+    # TEMPORARY            
+    Zmin_arr = Zmax_arr
+    Ky_arr = np.full((ncrop, nlat, nlon), 1)
+
+netcdf = nc.Dataset('tmp.nc', 'w')
+netcdf.createDimension('lat', nlat)
+netcdf.createDimension('lon', nlon)
+netcdf.createDimension('pseudo2', ncrop)
+
+lato = netcdf.createVariable('lat', np.float64, ('lat'), zlib=True, least_significant_digit=16)
+lato.units = 'degrees_north'
+lato.standard_name = 'latitude'
+lato.long_name = 'latitude'
+lato[:]=r.y.values 
+
+lono = netcdf.createVariable('lon', np.float64, ('lon'), zlib=True, least_significant_digit=16)
+lono.units = 'degrees_east'
+lono.standard_name = 'longitude'
+lono.long_name = 'longitude'
+lono[:]=r.x.values
+
+pseu = netcdf.createVariable('pseudo2', np.int32, ('pseudo2'), zlib=True)
+pseu.units = '1'
+pseu.standard_name = 'pseudo2'
+pseu[:]=np.arange(ncrop)
+
+# TODO: crop these maps
+# var1 = netcdf.createVariable('planting_date', np.int32, ('pseudo2','lat','lon'), zlib=True)
+# var1.units = 'day'
+# var1.standard_name = 'day'
+# var1[:] = pd_arr
+
+# var2 = netcdf.createVariable('harvest_date', np.int32, ('pseudo2','lat','lon'), zlib=True)
+# var2.units = 'day'
+# var2.standard_name = 'day'
+# var2[:] = hd_arr
+
+var3 = netcdf.createVariable('L_ini', np.float64, ('pseudo2','lat','lon'), zlib=True, least_significant_digit=16)
+var3.units = '1'
+var3.standard_name = 'L_ini'
+var3[:] = L_ini_arr
+
+var4 = netcdf.createVariable('L_dev', np.float64, ('pseudo2','lat','lon'), zlib=True, least_significant_digit=16)
+var4.units = '1'
+var4.standard_name = 'L_dev'
+var4[:] = L_dev_arr
+
+var5 = netcdf.createVariable('L_mid', np.float64, ('pseudo2','lat','lon'), zlib=True, least_significant_digit=16)
+var5.units = '1'
+var5.standard_name = 'L_mid'
+var5[:] = L_mid_arr
+
+var6 = netcdf.createVariable('L_late', np.float64, ('pseudo2','lat','lon'), zlib=True, least_significant_digit=16)
+var6.units = '1'
+var6.standard_name = 'L_late'
+var6[:] = L_late_arr
+
+var7 = netcdf.createVariable('Kc_ini', np.float64, ('pseudo2','lat','lon'), zlib=True, least_significant_digit=16)
+var7.units = '1'
+var7.standard_name = 'Kc_ini'
+var7[:] = Kc_ini_arr
+
+var8 = netcdf.createVariable('Kc_mid', np.float64, ('pseudo2','lat','lon'), zlib=True, least_significant_digit=16)
+var8.units = '1'
+var8.standard_name = 'Kc_mid'
+var8[:] = Kc_mid_arr
+
+var9 = netcdf.createVariable('Kc_end', np.float64, ('pseudo2','lat','lon'), zlib=True, least_significant_digit=16)
+var9.units = '1'
+var9.standard_name = 'Kc_end'
+var9[:] = Kc_end_arr
+
+var10 = netcdf.createVariable('Zmin', np.float64, ('pseudo2','lat','lon'), zlib=True, least_significant_digit=16)
+var10.units = '1'
+var10.standard_name = 'Zmin'
+var10[:] = Zmin_arr
+
+var11 = netcdf.createVariable('Zmax', np.float64, ('pseudo2','lat','lon'), zlib=True, least_significant_digit=16)
+var11.units = '1'
+var11.standard_name = 'Zmax'
+var11[:] = Zmax_arr
+
+var12 = netcdf.createVariable('p_std', np.float64, ('pseudo2','lat','lon'), zlib=True, least_significant_digit=16)
+var12.units = '1'
+var12.standard_name = 'p_std'
+var12[:] = p_std_arr
+
+var13 = netcdf.createVariable('Ky', np.float64, ('pseudo2','lat','lon'), zlib=True, least_significant_digit=16)
+var13.units = '1'
+var13.standard_name = 'Ky'
+var13[:] = Ky_arr
+
+netcdf.close()

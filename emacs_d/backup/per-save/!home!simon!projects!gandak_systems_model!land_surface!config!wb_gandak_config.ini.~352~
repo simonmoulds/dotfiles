@@ -1,0 +1,459 @@
+[FILE_PATHS]
+PathRoot = /home/simon/projects/gandak_systems_model/land_surface
+PathIn = ${PathRoot}/gandak_05min
+PathOut = ${PathRoot}/output
+
+[MODEL_GRID]
+cloneMap = ${FILE_PATHS:PathIn}/areamaps/Gandak05min.clone_sub.tif
+landmask = ${FILE_PATHS:PathIn}/areamaps/Gandak05min.landmask_sub.tif
+gridCellAreaInputFile = ${FILE_PATHS:PathIn}/areamaps/Gandak_gridCellArea.nc
+gridCellAreaVariableName = grid_cell_area
+
+[CLOCK]
+startTime = 1980-06-01
+endTime = 1980-06-10
+
+[INITIAL_CONDITIONS]
+initialConditionInputFile = ${FILE_PATHS:PathIn}/initial/Gandak_initial_condition_data.nc
+initialConditionVariableName = th
+initialConditionType = Num
+initialConditionInterpMethod = layer
+
+# If initialConditionInterpMethod = Depth, supply depths
+initialConditionDepth = None
+
+[NETCDF_ATTRIBUTES]
+# netcdf attributes for output files:
+institution = Centre for Water Systems, University of Exeter
+title       = AquaCrop v5.0 output
+description = test version (by Simon Moulds) 
+netcdf_y_orientation_follow_cf_convention = True
+formatNetCDF = NETCDF4
+zlib = True
+
+[WEATHER]
+meteoPathIn = ${FILE_PATHS:PathIn}/meteo
+precipitationInputFile = ${meteoPathIn}/prec/IMD_GRIDDED_RF_DATA_PT5_MERGED_{year:d}.nc
+precipitationVariableName = prcp
+precipitationConstant = 0.
+precipitationFactor = 86400.
+
+minDailyTemperatureInputFile = ${meteoPathIn}/tmin/tmin_daily_{year:d}-{year:d}_gandak.nc
+minDailyTemperatureVariableName = tmin
+minDailyTemperatureConstant = -273.15
+minDailyTemperatureFactor = 1.
+
+maxDailyTemperatureInputFile = ${meteoPathIn}/tmax/tmax_daily_{year:d}-{year:d}_gandak.nc
+maxDailyTemperatureVariableName = tmax
+maxDailyTemperatureConstant = -273.15
+maxDailyTemperatureFactor = 1.
+
+avgDailyTemperatureInputFile = ${meteoPathIn}/tas/tas_daily_{year:d}-{year:d}_gandak.nc
+avgDailyTemperatureVariableName = tas
+avgDailyTemperatureConstant = -273.15
+avgDailyTemperatureFactor = 1.
+
+refETPotInputFile = ${meteoPathIn}/etref/ETref_Hargreaves_dailyTot_output.nc
+refETPotVariableName = reference_crop_evapotranspiration
+refETPotConstant = 0.
+refETPotFactor = 1.
+
+[SNOW]
+#-------------------------------------------------------
+
+# Number of vertical Snow layers
+numberSnowLayers = 7
+# up to which layer the ice melt is calculated with the middle temperature
+glacierTransportZone = 3
+# Temperature lapse rate with altitude [deg C / m]
+temperatureLapseRate = 0.0065 
+# Multiplier applied to precipitation that falls as snow
+snowFactor = 1.0
+# Range [m C-1 d-1] of the seasonal variation, SnowMeltCoef is the average value
+snowSeasonAdj = 0.001
+# Average temperature at which snow melts
+tempMelt = 1.0
+# Average temperature below which precipitation is snow
+tempSnow = 1.0
+# Snow melt coefficient: default: 4.0 
+# SRM: 0.0045 m/C/day ( = 4.50 mm/C/day), Kwadijk: 18 mm/C/month (= 0.59 mm/C/day)  
+# See also Martinec et al., 1998.
+# TODO: use snowMeltCoef in CALIBRATION -> copied to CALIBRATION
+snowMeltCoef = 0.004 
+iceMeltCoef  = 0.007
+
+#--------------------------------------------------------------
+# INITIAL CONDITIONS - Initial snow depth in snow zone 1-7 [mm]  - SnowCoverIni
+
+[FROST]
+
+# Snow water equivalent, (based on snow density of 450 kg/m3) (e.g. Tarboton and Luce, 1996)
+snowWaterEquivalent = 0.45
+# Daily decay coefficient, (Handbook of Hydrology, p. 7.28)
+Afrost = 0.97
+# Snow depth reduction coefficient, [cm-1], (HH, p. 7.28)
+Kfrost = 0.57
+# Degree Days Frost Threshold (stops infiltration, percolation and capillary rise)
+# Molnau and Bissel found a value 56-85 for NW USA.
+frostIndexThreshold = 56
+
+# INITIAL CONDITIONS: FrostIndex
+
+[CANAL]
+include_canal_system = 0
+variable_canal_supply = 0
+canal_input_file = canalflow_{day:d}_{month:d}_{year:d}.nc
+canal_variable_name = flow
+daily_canal_input_file = 1
+time_lag = 1
+initial_canal_supply_input_file = Gandak_initial_canal_supply.nc
+canal_input_dir = /var/data/chanse_model/GandakCanalModel/Output/NetCDF/Flows
+
+[GROUNDWATER]
+# WaterTable = 1
+# VariableWaterTable = 1
+# groundwaterNC = gwlevel_{day:d}_{month:d}_{year:d}.nc
+# groundwaterVariableName = level
+# DailyGroundwaterNC = 1
+# timeLag = 1
+# initialGroundwaterLevelNC = Gandak_initial_groundwater_level_data.nc
+# groundwaterInputDir = /var/data/chanse_model/gwlevel
+
+# static water table, for testing:
+WaterTable = 1
+VariableWaterTable = 0
+DailyGroundwaterInputFile = 0
+groundwaterInputFile = ${FILE_PATHS:PathRoot}/input/Gandak_groundwater_level_data.nc
+groundwaterVariableName = level
+timeLag = 0
+
+# [irrMgmtOptions]
+# irrMgmtParameterNC = ${FILE_PATHS:PathRoot}/input/Gandak_irrigation_parameters.nc
+# irrScheduleNC = None
+
+# [fieldMgmtOptions]
+# fieldMgmtParameterNC = ${FILE_PATHS:PathRoot}/input/Gandak_field_management_parameters.nc
+
+# [soilOptions]
+# soilAndTopoNC = ${FILE_PATHS:PathIn}/../input/Gandak_soil_data.nc
+
+[SOIL_PARAMETERS]
+minCropKc = 0.2
+soilDepthOneInputFile = ${FILE_PATHS:PathIn}/soil/soilDepth1.nc
+soilDepthOneVariableName = soil_depth
+soilDepthTwoInputFile = ${FILE_PATHS:PathIn}/soil/soilDepth2.nc
+soilDepthTwoVariableName = soil_depth
+cropGroupNumberInputFile = ${FILE_PATHS:PathIn}/soil/cropGroupNumber.nc
+cropGroupNumberVariableName = crop_group_number
+
+[LAND_COVER_PARAMETERS]
+landCoverPath = ${FILE_PATHS:PathIn}/landcover
+landCoverTypes = forest, grassland, irrPaddy, irrNonPaddy, sealed, water
+landCoverTypesShort = f, g, i, n, s, w
+
+# Should land cover fractions sum to one?
+forceCoverFractionSumToEqualOne = 1
+# Land cover can vary from year to year
+dynamicLandCover = 0
+
+# If land cover cannot vary, which year should be taken as fixed?
+staticLandCoverYear = 2009
+
+minCropKc = 0.2
+
+[forest]
+naturalLandCover = 1
+landCoverTypePath = ${LAND_COVER_PARAMETERS:landCoverPath}/forest
+landCoverFractionInputFile = ${landCoverTypePath}/Globcover_2009_forest_landCoverFraction.nc
+landCoverFractionVariableName = cover_fraction
+cropCoefficientInputFile = ${landCoverTypePath}/forest_cropCoefficient10days.nc
+cropCoefficientVariableName = kc
+rootFractionInputFile = ${landCoverTypePath}/forest_rootFraction.nc
+rootFractionVariableName = root_fraction
+maxRootDepthInputFile = ${landCoverTypePath}/forest_maxRootDepth.nc
+maxRootDepthVariableName = max_root_depth
+interceptCapInputFile = ${landCoverTypePath}/forest_interceptCap10days.nc
+interceptCapVariableName = interceptcap
+alphaInputFile = ${landCoverTypePath}/forest_alpha.nc
+alphaVariableName = alpha
+lambdaInputFile = ${landCoverTypePath}/forest_lambda.nc
+lambdaVariableName = lambda
+minInterceptCap = 0.001
+cropDeplFactor = 0.0
+
+fieldCapacityInputFile = ${landCoverTypePath}/forest_fieldCapacity.nc
+fieldCapacityVariableName = th
+wiltingPointInputFile = ${landCoverTypePath}/forest_wiltingPoint.nc
+wiltingPointVariableName = th
+saturatedWaterContentInputFile = ${landCoverTypePath}/forest_saturatedWaterContent.nc
+saturatedWaterContentVariableName = th
+residualWaterContentInputFile = ${landCoverTypePath}/forest_residualWaterContent.nc
+residualWaterContentVariableName = th
+KsatInputFile = ${landCoverTypePath}/forest_Ksat.nc
+KsatVariableName = ksat
+
+arnoBeta = 0.2
+relativeElevationInputFile = ${landCoverTypePath}/forest_relativeElevation.nc
+elevationStandardDeviationInputFile = ${landCoverTypePath}/forest_elevationStandardDeviation.nc
+tanSlopeInputFile = ${landCoverTypePath}/forest_tanSlope.nc
+slopeLengthInputFile = ${landCoverTypePath}/forest_slopeLength.nc
+
+[grassland]
+naturalLandCover = 1
+landCoverTypePath = ${LAND_COVER_PARAMETERS:landCoverPath}/grassland
+landCoverFractionInputFile = ${landCoverTypePath}/Globcover_2009_grassland_landCoverFraction.nc
+landCoverFractionVariableName = cover_fraction
+cropCoefficientInputFile = ${landCoverTypePath}/grassland_cropCoefficient10days.nc
+cropCoefficientVariableName = kc
+rootFractionInputFile = ${landCoverTypePath}/grassland_rootFraction.nc
+rootFractionVariableName = root_fraction
+maxRootDepthInputFile = ${landCoverTypePath}/grassland_maxRootDepth.nc
+maxRootDepthVariableName = max_root_depth
+interceptCapInputFile = ${landCoverTypePath}/grassland_interceptCap10days.nc
+interceptCapVariableName = interceptcap
+alphaInputFile = ${landCoverTypePath}/grassland_alpha.nc
+alphaVariableName = alpha
+lambdaInputFile = ${landCoverTypePath}/grassland_lambda.nc
+lambdaVariableName = lambda
+minInterceptCap = 0.001
+cropDeplFactor = 0.0
+
+fieldCapacityInputFile = ${landCoverTypePath}/grassland_fieldCapacity.nc
+fieldCapacityVariableName = th
+wiltingPointInputFile = ${landCoverTypePath}/grassland_wiltingPoint.nc
+wiltingPointVariableName = th
+saturatedWaterContentInputFile = ${landCoverTypePath}/grassland_saturatedWaterContent.nc
+saturatedWaterContentVariableName = th
+residualWaterContentInputFile = ${landCoverTypePath}/grassland_residualWaterContent.nc
+residualWaterContentVariableName = th
+KsatInputFile = ${landCoverTypePath}/grassland_Ksat.nc
+KsatVariableName = ksat
+
+arnoBeta = 0.0
+relativeElevationInputFile = ${landCoverTypePath}/grassland_relativeElevation.nc
+elevationStandardDeviationInputFile = ${landCoverTypePath}/grassland_elevationStandardDeviation.nc
+tanSlopeInputFile = ${landCoverTypePath}/grassland_tanSlope.nc
+slopeLengthInputFile = ${landCoverTypePath}/grassland_slopeLength.nc
+
+[irrPaddy]
+managedLandCover = 1
+landCoverTypePath = ${LAND_COVER_PARAMETERS:landCoverPath}/irrPaddy
+landCoverFractionInputFile = ${landCoverTypePath}/Globcover_2009_irrPaddy_landCoverFraction.nc
+landCoverFractionVariableName = cover_fraction
+cropCoefficientInputFile = ${landCoverTypePath}/irrPaddy_cropCoefficient10days.nc
+cropCoefficientVariableName = kc
+rootFractionInputFile = ${landCoverTypePath}/irrPaddy_rootFraction.nc
+rootFractionVariableName = root_fraction
+maxRootDepthInputFile = ${landCoverTypePath}/irrPaddy_maxRootDepth.nc
+maxRootDepthVariableName = max_root_depth
+# interceptCapInputFile = ${landCoverTypePath}/irrPaddy_interceptCap10days.nc
+# interceptCapVariableName = interceptcap
+alphaInputFile = ${landCoverTypePath}/irrPaddy_alpha.nc
+alphaVariableName = alpha
+lambdaInputFile = ${landCoverTypePath}/irrPaddy_lambda.nc
+lambdaVariableName = lambda
+minInterceptCap = 0.001
+cropDeplFactor = 0.0
+
+fieldCapacityInputFile = ${landCoverTypePath}/irrPaddy_fieldCapacity.nc
+fieldCapacityVariableName = th
+wiltingPointInputFile = ${landCoverTypePath}/irrPaddy_wiltingPoint.nc
+wiltingPointVariableName = th
+saturatedWaterContentInputFile = ${landCoverTypePath}/irrPaddy_saturatedWaterContent.nc
+saturatedWaterContentVariableName = th
+residualWaterContentInputFile = ${landCoverTypePath}/irrPaddy_residualWaterContent.nc
+residualWaterContentVariableName = th
+KsatInputFile = ${landCoverTypePath}/irrPaddy_Ksat.nc
+KsatVariableName = ksat
+
+arnoBeta = 0.2
+relativeElevationInputFile = ${landCoverTypePath}/irrPaddy_relativeElevation.nc
+elevationStandardDeviationInputFile = ${landCoverTypePath}/irrPaddy_elevationStandardDeviation.nc
+tanSlopeInputFile = ${landCoverTypePath}/irrPaddy_tanSlope.nc
+slopeLengthInputFile = ${landCoverTypePath}/irrPaddy_slopeLength.nc
+
+# field management parameters - are bunds present and, if so, what is their height (m)?
+bunds = 1
+zBund = 0.050
+
+[irrNonPaddy]
+managedLandCover = 1
+landCoverTypePath = ${LAND_COVER_PARAMETERS:landCoverPath}/irrNonPaddy
+landCoverFractionInputFile = ${landCoverTypePath}/Globcover_2009_irrNonPaddy_landCoverFraction.nc
+landCoverFractionVariableName = cover_fraction
+cropCoefficientInputFile = ${landCoverTypePath}/irrNonPaddy_cropCoefficient10days.nc
+cropCoefficientVariableName = kc
+rootFractionInputFile = ${landCoverTypePath}/irrNonPaddy_rootFraction.nc
+rootFractionVariableName = root_fraction
+maxRootDepthInputFile = ${landCoverTypePath}/irrNonPaddy_maxRootDepth.nc
+maxRootDepthVariableName = max_root_depth
+alphaInputFile = ${landCoverTypePath}/irrNonPaddy_alpha.nc
+alphaVariableName = alpha
+lambdaInputFile = ${landCoverTypePath}/irrNonPaddy_lambda.nc
+lambdaVariableName = lambda
+minInterceptCap = 0.001
+cropDeplFactor = 0.0
+
+fieldCapacityInputFile = ${landCoverTypePath}/irrNonPaddy_fieldCapacity.nc
+fieldCapacityVariableName = th
+wiltingPointInputFile = ${landCoverTypePath}/irrNonPaddy_wiltingPoint.nc
+wiltingPointVariableName = th
+saturatedWaterContentInputFile = ${landCoverTypePath}/irrNonPaddy_saturatedWaterContent.nc
+saturatedWaterContentVariableName = th
+residualWaterContentInputFile = ${landCoverTypePath}/irrNonPaddy_residualWaterContent.nc
+residualWaterContentVariableName = th
+KsatInputFile = ${landCoverTypePath}/irrNonPaddy_Ksat.nc
+KsatVariableName = ksat
+
+arnoBeta = 0.2
+relativeElevationInputFile = ${landCoverTypePath}/irrNonPaddy_relativeElevation.nc
+elevationStandardDeviationInputFile = ${landCoverTypePath}/irrNonPaddy_elevationStandardDeviation.nc
+tanSlopeInputFile = ${landCoverTypePath}/irrNonPaddy_tanSlope.nc
+slopeLengthInputFile = ${landCoverTypePath}/irrNonPaddy_slopeLength.nc
+
+bunds = 0
+zBund = 0
+
+# #####################
+# #####################
+# Crop, farm parameters
+# #####################
+# #####################
+
+# TODO: when updating to Python 3.X, implement subsections in configuration file
+
+# crop options
+# ############
+nCrop = 4
+cropTypes = kharif_rice,rabi_rice,rabi_wheat,sugarcane
+cropIrrigated = 0,1,1,1
+cropParameterInputFile = ${landCoverTypePath}/cropParameters.nc
+cropAreaInputFile = ${landCoverTypePath}/cropArea.nc
+cropAreaVariableName = crop_area
+annualChangeInCropArea = 0
+startOfAgriculturalYear = 305
+
+# croplandAreaNC = Gandak_cropland_area.nc
+# croplandAreaVariableName = cropland_area
+# AnnualChangeInCropArea = 0
+# CalendarType = 2
+# SwitchGDD = 1
+# GDDmethod = 2
+
+# potential yield
+# ###############
+potentialYieldInputFile = ${landCoverTypePath}/potentialYield.nc
+potentialYieldVariableName = Yx
+annualChangeInPotentialYield = 0
+
+# farm options
+# ############
+# nFarm = 25
+nFarm = 5
+nFarmSizeCategory = 5
+farmAreaInputFile = ${landCoverTypePath}/farmParameters.nc
+farmAreaVariableName = farm_area
+annualChangeInFarmArea = 0
+
+farmCategoryAreaInputFile = ${landCoverTypePath}/farmParameters.nc
+farmCategoryAreaVariableName = farm_category_area
+annualChangeInFarmCategoryArea = 0
+
+# farmCategoryInputFile = ${landCoverTypePath}/farmParameters.nc
+# farmCategoryVariableName = farm_category
+# annualChangeInFarmCategory = 0
+
+# Use initialTubewellOwnershipScaleFactor to control initial number of tubewells
+initialTubewellOwnershipInputFile = ${landCoverTypePath}/farmParameters.nc
+initialTubewellOwnershipVariableName = tubewell_ownership
+initialTubewellOwnershipScaleFactor = 1.
+
+initialCanalAccessInputFile = ${landCoverTypePath}/farmParameters.nc
+initialCanalAccessVariableName = canal_access
+
+# field management options
+# ########################
+# fieldMgmtParameterNC = Gandak_field_management_parameters.nc
+annualChangeInFertiliserAppRate = 0
+NitrogenApplicationRateInputFile = None
+NitrogenApplicationRateVariableName = None
+PhosphorusApplicationRateInputFile = None
+PhosphorusApplicationRateVariableName = None
+PotassiumApplicationRateInputFile = None
+PotassiumApplicationRateVariableName = None
+
+# price options
+# #############
+cropPriceInputFile = ${landCoverTypePath}/cropPriceData.nc
+cropPriceVariableName = crop_price
+NitrogenPriceInputFile = ${landCoverTypePath}/fertiliserPriceData.nc
+NitrogenPriceVariableName = nitrogen_price
+PhosphorusPriceInputFile = ${landCoverTypePath}/fertiliserPriceData.nc
+PhosphorusPriceVariableName = phosphorus_price
+PotassiumPriceInputFile = ${landCoverTypePath}/fertiliserPriceData.nc
+PotassiumPriceVariableName = potassium_price
+dieselPriceInputFile = ${landCoverTypePath}/dieselPriceData.nc
+dieselPriceVariableName = diesel_price
+
+# output options
+# ##############
+# outDailyTotNC = ETact
+outYearEndNC = tubewell_count,area_with_irrigation,SavingsAccount
+outYearMaxNC = Y,Production
+outYearTotNC = irrigation_volume,SwPumpingVol,GwPumpingVol,IrrigationCost
+
+[sealed]
+sealedLandCover = 1
+landCoverTypePath = ${LAND_COVER_PARAMETERS:landCoverPath}/sealed
+landCoverFractionInputFile = ${landCoverTypePath}/Globcover_2009_sealed_landCoverFraction.nc
+landCoverFractionVariableName = cover_fraction
+minInterceptCap = 0.001
+
+relativeElevationInputFile = ${landCoverTypePath}/sealed_relativeElevation.nc
+elevationStandardDeviationInputFile = ${landCoverTypePath}/sealed_elevationStandardDeviation.nc
+tanSlopeInputFile = ${landCoverTypePath}/sealed_tanSlope.nc
+slopeLengthInputFile = ${landCoverTypePath}/sealed_slopeLength.nc
+
+[water]
+waterLandCover = 1
+landCoverTypePath = ${LAND_COVER_PARAMETERS:landCoverPath}/water
+landCoverFractionInputFile = ${landCoverTypePath}/Globcover_2009_water_landCoverFraction.nc
+landCoverFractionVariableName = cover_fraction
+minInterceptCap = 0.
+
+relativeElevationInputFile = ${landCoverTypePath}/water_relativeElevation.nc
+elevationStandardDeviationInputFile = ${landCoverTypePath}/water_elevationStandardDeviation.nc
+tanSlopeInputFile = ${landCoverTypePath}/water_tanSlope.nc
+slopeLengthInputFile = ${landCoverTypePath}/water_slopeLength.nc
+
+[REPORTING]
+# outDailyTotNC = th
+outMonthTotNC = ETact,deep_percolation
+outYearTotNC = ETact
+
+# outDailyFarmTotNC = zGW
+# outDailyTotNC = zGW,Yx
+# outMonthAvgNC = zGW
+# outYearMaxNC = Y,YieldMean,ProductionMean
+# outYearAvgNC = zGW
+# outYearTotNC = RechargeVolMean,IrrMean
+
+# [couplingOptions]
+# netcdf_y_orientation_follow_cf_convention = False
+# formatNetCDF = NETCDF4
+# zlib = True
+
+# recharge = 1
+# rechargeVariableName = recharge
+# rechargeOutputDir = /var/data/chanse_model/gwrecharge
+# rechargeOutputNC = gwrecharge_{day:d}_{month:d}_{year:d}.nc
+
+# gwpumping = 1
+# gwpumpingVariableName = pumping
+# gwpumpingOutputDir = /var/data/chanse_model/gwpumping
+# gwpumpingOutputNC = gwpumping_{day:d}_{month:d}_{year:d}.nc
+
+# swpumping = 1
+# swpumpingVariableName = pumping
+# swpumpingOutputDir = /var/data/chanse_model/swpumping
+# swpumpingOutputNC = swpumping_{day:d}_{month:d}_{year:d}.nc

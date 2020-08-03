@@ -1,0 +1,231 @@
+# -------------------------------------------------------------------------
+# Name:        Configuration
+# Purpose:
+#
+# Author:      burekpe
+#
+# Created:     16/05/2016
+# Copyright:   (c) burekpe 2016
+# -------------------------------------------------------------------------
+
+from globals import *
+
+import ConfigParser
+import re
+import xml.dom.minidom
+from messages import *
+
+import optparse
+import os
+import sys
+import time
+import datetime
+import shutil
+import glob
+import difflib  # to check the closest word in settingsfile, if an error occurs
+
+class ExtParser(ConfigParser.SafeConfigParser):
+    """
+    Addition to the parser to replace placeholders
+
+    Example:
+        if
+        PathRoot = C:/work
+        and
+        MaskMap = $(FILE_PATHS:PathRoot)/data/areamaps/area.tif
+        then the 'get' method will produce:
+        C:/work/data/areamaps/area/tif
+    """
+    #implementing extended interpolation
+    def __init__(self, *args, **kwargs):
+         self.cur_depth = 0
+         ConfigParser.SafeConfigParser.__init__(self, *args, **kwargs)
+
+
+    def get(self, section, option, raw=False, vars=None):
+         """
+         placeholder replacement
+
+         :param section:
+         :param option:
+         :param raw:
+         :param vars:
+         :return:
+         """
+         #h1 = sys.tracebacklimit
+         #sys.tracebacklimit = 0  # no long error message
+         try:
+            r_opt = ConfigParser.SafeConfigParser.get(self, section, option, raw=True, vars=vars)
+         except:
+             print section, option
+             closest = difflib.get_close_matches(option, binding.keys())
+             if not closest: closest = ["- no match -"]
+             #msg = "No key with the name: \"" + option +" in " + section + "\" in the settings file: \"" + sys.argv[1] + "\"\n"
+             msg = "Closest key to the required one is: \"" + closest[0] + "\""
+             raise CWATMError(msg)
+
+
+         #sys.tracebacklimit = h1   # set error message back to default
+         if raw:
+             return r_opt
+
+         ret = r_opt
+         re_newintp1 = r'\$\((\w*):(\w*)\)'  # other section
+         re_newintp2 = r'\$\((\w*)\)'  # same section
+
+         re_old1 = re.findall('\$\(\w*:\w*\)', r_opt)
+         re_old2 = re.findall('\$\(\w*\)', r_opt)
+
+         m_new1 = re.findall(re_newintp1, r_opt)
+         m_new2 = re.findall(re_newintp2, r_opt)
+
+         if m_new1:
+             i = 0
+             for f_section, f_option in m_new1:
+                 self.cur_depth = self.cur_depth + 1
+                 if self.cur_depth < ConfigParser.MAX_INTERPOLATION_DEPTH:
+                     sub = self.get(f_section,f_option, vars=vars)
+                     ret = ret.replace(re_old1[i], sub)
+                     i += 1
+                 else:
+                     raise ConfigParser.InterpolationDepthError, (option, section, r_opt)
+
+         if m_new2:
+             i = 0
+             for l_option in m_new2:
+                 self.cur_depth = self.cur_depth + 1
+                 if self.cur_depth < ConfigParser.MAX_INTERPOLATION_DEPTH:
+                     sub = self.get(section, l_option, vars=vars)
+                     ret = ret.replace(re_old2[i], sub)
+                     i =+ 1
+                 else:
+                     raise ConfigParser.InterpolationDepthError, (option, section, r_opt)
+
+         self.cur_depth = self.cur_depth - 1
+         return ret
+
+def parse_configuration(settingsFileName):
+    """
+    Parse settings file
+    
+    :param: settingsFileName, name of the settings file
+    :return: binding, list of parameters
+    :return: option,  list of options
+    """
+
+    def splitout(varin, check):
+        """
+        Split string containing several comma-separated variables
+        :param: varin
+        :param: check
+        :return: list with several variables
+        """
+
+        out = map(str.strip, varin.split(','))
+        if out[0] == "": out[0]="None"
+        if out[0] != "None": check = True
+        return out, check
+    
+    if not(os.path.isfile(settingsFileName)):
+        raise CWATMFileError(settingsFileName)
+
+    # use ConfigParser (ExtParser inherits from this class, adding a
+    # 'get' method for placeholder replacement. E.g.:
+    # From: '$(FILE_PATHS:PathMaps)/routing/cellarea.map'
+    # To:   'M:/cwatm_input/routing/cellarea.map'
+    
+    config = ExtParser()
+    config.optionxform = str
+    config.sections()
+    config.read(settingsFileName)
+
+    # config.sections() corresponds to the headings in square brackets
+    # in the *.ini file
+    for sec in config.sections():
+
+        # 'options' returns a list of option names under each heading
+        # (e.g. TemperatureInKelvin', 'gridSizeUserDefined',
+        # 'calc_evaporation'. ...)
+        options = config.options(sec)
+
+        check_section = False
+        for opt in options:
+
+            # Section 'OPTIONS' contains various switches (i.e. True/False) to
+            # control model behaviour (e.g. turning irrigation on/off)
+            if sec=="OPTIONS":
+                try:
+
+                    # 'option' is a global variable defined in globals.py
+                    option[opt] = config.getboolean(sec, opt)
+                except:
+                    msg = "Value in: \"" + sec +", " + opt + "\" is not True or False!"
+                    raise CWATMError(msg)
+
+
+            else:
+
+                # Check if config line = output line
+                # i.e. settings file follows naming convention to identify
+                # different types of settings
+                if opt.lower()[0:4] == "out_": 
+                    index = sec.lower()+"_"+opt.lower()
+
+                    if opt.lower()[-4:] =="_dir":
+                        outDir[sec] = config.get(sec, opt)
+                    else:
+                        
+                        # split into timeseries and maps
+                        if opt.lower()[4:8] == "tss_":
+                            outTss[index],check_section = splitout(config.get(sec, opt),check_section)
+                        else:
+                            outMap[index],check_section = splitout(config.get(sec, opt),check_section)
+
+                else:
+                    # binding: all the parameters which are not output
+                    # or option are collected
+                    binding[opt] = config.get(sec, opt)
+
+        if check_section:
+            k = 1
+            outsection.append(sec)
+
+    # Output directory is stored in a separate global array
+    outputDir.append(binding["PathOut"])
+
+def read_metanetcdf(metaxml,name):
+    """
+    Read the metadata for netcdf output files
+    unit, long name, standard name and additional information
+
+    :param metaxml: file mit information for netcdf files (metadata)
+    :return: metaNetcdfVar: list with metadata information
+    """
+
+    try:
+        f=open(metaxml)
+        f.close()
+    except:
+        msg = "Cannot find option file: " + metaxml
+        raise CWATMFileError(metaxml,msg, sname = name)
+    try:
+        metaparse = xml.dom.minidom.parse(metaxml)
+    except:
+        msg = "Error using option file: " + metaxml
+        raise CWATMError(msg)
+
+    # running through all output variable
+    # if an output variable is not defined here the standard metadata is used
+    # unit = "undefined", standard name = long name = variable name
+    meta = metaparse.getElementsByTagName("CWATM")[0]
+
+    for metavar in meta.getElementsByTagName("metanetcdf"):
+        d = {}
+        for key in metavar.attributes.keys():
+            if key != 'varname':
+                d[key] = metavar.attributes[key].value
+        key = metavar.attributes['varname'].value
+        metaNetcdfVar[key] = d
+
+
+

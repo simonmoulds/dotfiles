@@ -1,0 +1,22 @@
+ls
+cd ..
+ls
+cd ..
+ls
+mkvirtualenv aquacrop_apps
+which python
+pip install xarray
+pip install ipython3
+pip install ipython
+pip install netCDF4
+ls
+cd ssa
+ls
+cd data-raw
+ls
+ls AgMERRA/*/*/*
+ls AgMERRA/*/*/*/*
+ncdump AgMERRA/*/*/*/*/AgMERRA_2010_prate.nc4 | less
+ncdump -h AgMERRA/*/*/*/*/AgMERRA_2010_prate.nc4
+ncdump -h AgMERRA/*/*/*/*/AgMERRA_1980_prate.nc4
+pip install rioxarray

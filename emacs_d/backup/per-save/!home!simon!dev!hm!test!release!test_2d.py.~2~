@@ -1,0 +1,36 @@
+import datetime
+import hm.api as hm
+import xarray
+import pytest
+
+os.chdir("test/release")
+
+def test_set_domain():
+    modeltime = hm.set_modeltime(
+        datetime.datetime(2003,6,1),
+        datetime.datetime(2003,6,30),
+        datetime.timedelta(days=1)
+    )
+    hm.set_domain(
+        'test_data/ghana_landmask_0pt25degree.tif',
+        modeltime
+    )
+    
+def test_open_hmdataarray():
+    modeltime = hm.set_modeltime(
+        datetime.datetime(2003,6,1),
+        datetime.datetime(2003,6,30),
+        datetime.timedelta(days=1)
+    )
+    domain = hm.set_domain(
+        'test_data/ghana_landmask_0pt25degree.tif',
+        modeltime
+    )
+    hm.open_hmdataarray(
+        'test_data/AgMERRA_2003_tavg.nc4',
+        'tavg',
+        domain
+    )
+
+# import xarray as xr
+# da = xr.open_rasterio('test_data/ghana_landmask_0pt25degree.tif')

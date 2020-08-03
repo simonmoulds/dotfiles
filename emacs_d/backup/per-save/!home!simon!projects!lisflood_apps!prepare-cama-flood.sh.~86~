@@ -1,0 +1,88 @@
+#!/bin/bash
+
+wd=$HOME/projects/lisflood_apps
+auxdir=$wd/aux
+if [ ! -d $auxdir ]
+then
+    mkdir $auxdir
+fi
+cd $wd
+
+if [ ! -d $wd/CaMa-Flood_v396_20191225/ ]
+then
+    # rm -rf $wd/CaMa-Flood_v396_20191225/
+    tar xvf $wd/CaMa-Flood_v396_20191225.tar.gz
+fi
+
+# cd $wd/CaMa-Flood_v396_20191225/map/glb_15min/src_param
+cd $wd/CaMa-Flood_v396_20191225/map
+if [ ! -d glb_15min_orig ]
+then   
+    mv glb_15min glb_15min_orig
+fi
+
+for datadir in glb_05min glb_06min
+do    
+    cp ../../${datadir}.tar.gz .
+    tar xvf ${datadir}.tar.gz
+    cp -r glb_15min_orig/src_param ${datadir}
+    cd ${datadir}/src_param
+    sed -i 's/Mkinclude/Mkinclude_Mac_gfortran/' Makefile    
+    make clean
+    make all
+    bash s01-channel_params.sh
+    cd ..
+    cp rivlen.ctl rivman.ctl
+    sed -i 's/rivlen.bin/rivman.bin/' rivman.ctl
+    cd ..
+done
+
+sed -i 's/Mkinclude_Mac_gfortran/Mkinclude/' Makefile
+
+make clean
+make all
+bash s01-channel_params.sh
+
+cd ..
+
+cp rivlen.ctl rivman.ctl
+sed -i 's/rivlen.bin/rivman.bin/' rivman.ctl
+
+cd ..
+pwd
+
+for datadir in glb_05min glb_06min
+do    
+    cp ../../${datadir}.tar.gz .
+    tar xvf ${datadir}.tar.gz
+    cp -r glb_15min/src_param ${datadir}
+    cd ${datadir}/src_param
+    make clean
+    make all
+    bash s01-channel_params.sh
+    cd ..
+    cp rivlen.ctl rivman.ctl
+    sed -i 's/rivlen.bin/rivman.bin/' rivman.ctl
+    cd ..
+done
+
+# cd $wd/CaMa-Flood_v396_20191225/map
+# for datadir in glb_05min glb_06min glb_15min
+# do
+#     cd $datadir
+#     res=$(echo $datadir | sed 's/glb_//')
+#     # for map in rivwth_gwdlr rivhgt rivman rivlen
+#     for map in rivman
+#     do
+#     	cdo -f nc import_binary ${map}.ctl ${auxdir}/${map}_${res}.nc
+#     	gdal_translate -of GTiff ${auxdir}/${map}_${res}.nc ${auxdir}/${map}_${res}.tif
+#     done
+
+#     # cdo -f nc import_binary nextxy.ctl ${auxdir}/nextxy_${res}.nc
+#     # gdal_translate -of GTiff NETCDF:${auxdir}/nextxy_${res}.nc:varx ${auxdir}/nextxy_varx_${res}.tif
+#     # gdal_translate -of GTiff NETCDF:${auxdir}/nextxy_${res}.nc:vary ${auxdir}/nextxy_vary_${res}.tif
+#     cd ..
+# done
+
+    
+	

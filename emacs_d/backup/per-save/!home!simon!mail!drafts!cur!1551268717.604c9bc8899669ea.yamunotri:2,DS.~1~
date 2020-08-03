@@ -1,0 +1,146 @@
+References: <20C9C623-AF0F-4D2B-8C43-8BB005402BCC@ic.ac.uk> <87k1hlhb80.fsf@yamunotri.localdomain> <AB6D46B8-346C-44B3-AAF0-39F0F0314403@ic.ac.uk> <87imx5hb03.fsf@yamunotri.localdomain> <VI1PR0602MB368002F453F83E8AB39D0CAFD4740@VI1PR0602MB3680.eurprd06.prod.outlook.com> <VI1PR0602MB36805F16FD0DB074F5FD1247D4740@VI1PR0602MB3680.eurprd06.prod.outlook.com>
+User-agent: mu4e 1.0-alpha2; emacs 24.5.1
+From: Simon Moulds <s.moulds@exeter.ac.uk>
+To: "O'Keeffe, Jimmy M" <jimmy.okeeffe@imperial.ac.uk>
+Subject: Re: Delta plot
+In-reply-to: <VI1PR0602MB36805F16FD0DB074F5FD1247D4740@VI1PR0602MB3680.eurprd06.prod.outlook.com>
+
+Yes, I think that makes sense, although you will obviously lose the interannual variability which may be important. For example, if every fourth year the rains fail and there is a large shortfall which is subsequently made up in the intervening years, can we say that the system is sustainable? Perhaps from a long term perspective, but if farmers' crops are failing every fourth year because the canals aren't running and their wells are not deep enough to abstract water then they may not agree.
+
+S
+
+O'Keeffe, Jimmy M writes:
+
+> Hi Simon,
+>
+> Quick and possibly very silly question...
+>
+> When you sum up the inflows and outflows for each scenario you get the results below; bau+ NC- NI+
+>
+> Each value represents the sum of recharge-discharge and so should show that the system is sustainable or not for that year. Adding all years for the scenario should tells us whether or not over the 18 year model run whether or not the system is sustainable.
+>
+> Does that make sense?
+>
+>
+>
+>
+>         bau     nc      ni
+> 2000-12-31      1050.0677290561 -1864.2194901149        270.9781226982
+> 2001-12-31      820.7157453419  -2086.2993417067        478.3371413795
+> 2002-12-31      -1339.962015764 -4091.5582671466        -704.6058377331
+> 2003-12-31      1300.5552837864 -1277.9317739365        393.8344523671
+> 2004-12-31      -1084.6198998843        -3713.9778416329        -431.0082432457
+> 2005-12-31      -736.6611348306 -3200.7640915613        -456.9254050515
+> 2006-12-31      -1776.1378560072        -4113.8154175789        -623.277627636
+> 2007-12-31      778.352520061   -1444.123554367 137.5710790131
+> 2008-12-31      3670.1956924806 1485.8123701956 1787.0819670384
+> 2009-12-31      -875.6877606628 -3040.9730993201        -446.8478691417
+> 2010-12-31      735.4553094544  -1353.0236365638        209.9839777613
+> 2011-12-31      1923.0377301678 -128.6540734242 681.2625496102
+> 2012-12-31      378.0555348595  -1687.7524985288        266.6795421474
+> 2013-12-31      3650.6495408889 1646.4071221418 1326.9905630017
+> 2014-12-31      -268.4638690541 -2326.9080498942        177.4911254948
+> 2015-12-31      -1418.985497488 -3416.0120558461        -464.1226706485
+> 2016-12-31      -775.7974402459 -2726.4476448608        -141.5198990328
+> 2017-12-31      -1124.0992271767        -2950.9033580744        -309.4133857128
+> 2018-08-31      1801.470203998  170.4763941591  251.8094835925
+>
+>
+>
+>
+>
+>
+>         6708.1405889809 -36120.6683080606       2404.2990659022
+>
+> ________________________________
+> From: O'Keeffe, Jimmy M
+> Sent: 27 February 2019 08:52
+> To: Moulds, Simon
+> Subject: Re: Delta plot
+>
+> Here you go Simon,
+> Thanks a million - let me know if you've any problems,
+> J
+>
+>
+>
+>
+>         bau     nc      ni
+> 2000-12-31      1050.0677290561 -1864.2194901149        270.9781226982
+> 2001-12-31      820.7157453419  -2086.2993417067        478.3371413795
+> 2002-12-31      -1339.962015764 -4091.5582671466        -704.6058377331
+> 2003-12-31      1300.5552837864 -1277.9317739365        393.8344523671
+> 2004-12-31      -1084.6198998843        -3713.9778416329        -431.0082432457
+> 2005-12-31      -736.6611348306 -3200.7640915613        -456.9254050515
+> 2006-12-31      -1776.1378560072        -4113.8154175789        -623.277627636
+> 2007-12-31      778.352520061   -1444.123554367 137.5710790131
+> 2008-12-31      3670.1956924806 1485.8123701956 1787.0819670384
+> 2009-12-31      -875.6877606628 -3040.9730993201        -446.8478691417
+> 2010-12-31      735.4553094544  -1353.0236365638        209.9839777613
+> 2011-12-31      1923.0377301678 -128.6540734242 681.2625496102
+> 2012-12-31      378.0555348595  -1687.7524985288        266.6795421474
+> 2013-12-31      3650.6495408889 1646.4071221418 1326.9905630017
+> 2014-12-31      -268.4638690541 -2326.9080498942        177.4911254948
+> 2015-12-31      -1418.985497488 -3416.0120558461        -464.1226706485
+> 2016-12-31      -775.7974402459 -2726.4476448608        -141.5198990328
+> 2017-12-31      -1124.0992271767        -2950.9033580744        -309.4133857128
+> 2018-08-31      1801.470203998  170.4763941591  251.8094835925
+>
+> ________________________________
+> From: O'Keeffe, Jimmy M
+> Sent: 27 February 2019 08:50
+> To: Moulds, Simon
+> Subject: Re: Delta plot
+>
+> Yes please! That would be amazing - thanks Simon.
+>
+> I'll send you over the data now....
+>
+> ﻿On 27/02/2019, 08:49, "Moulds, Simon" <S.Moulds@exeter.ac.uk> wrote:
+>
+>     That looks really good, Jimmy.
+>
+>     Would you like me to write the plotting code so that it's consistent with the rest of the plots? Should only take a few mins...
+>
+>     S
+>
+>     O'Keeffe, Jimmy M writes:
+>
+>     > Sorry - here is it
+>     > J
+>     >
+>     > On 27/02/2019, 08:44, "Moulds, Simon" <S.Moulds@exeter.ac.uk> wrote:
+>     >
+>     >     Hi Jimmy,
+>     >
+>     >     I think the image file is corrupted - it won't open.
+>     >
+>     >     It sounds like a good approach, though.
+>     >
+>     >     S
+>     >
+>     >     O'Keeffe, Jimmy M writes:
+>     >
+>     >     > Hi Simon,
+>     >     >
+>     >     >
+>     >     >
+>     >     > After a lot of playing around with the parameters I've come up with this. It's
+>     >     > the annual deltas of the inflow - outflow. It's at least a way of directly
+>     >     > comparing the scenarios. Hopefully it will be clear to whoever is reading it.
+>     >     > Now just to figure out what to say about it.
+>     >     >
+>     >     >
+>     >     >
+>     >     > Cheers
+>     >     >
+>     >     > Jimmy
+>     >     >
+>     >     >
+>     >     >
+>     >     >
+>     >     >
+>     >     > [cid]
+>     >
+>     >
+

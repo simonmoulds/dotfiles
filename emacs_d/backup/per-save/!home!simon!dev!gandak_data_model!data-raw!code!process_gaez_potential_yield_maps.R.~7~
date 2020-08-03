@@ -1,0 +1,57 @@
+## Author : Simon Moulds
+## Date   : June 2018
+
+library(raster)
+library(rgdal)
+library(magrittr)
+library(dplyr)
+library(tidyr)
+library(xts)
+
+template = raster(xmn=83, ymn=25, xmx=86.5, ymx=28, ncols=42, nrows=36)
+template[] = 0
+
+source("code/prepare_input_data_helpers.R")
+
+options(stringsAsFactors = FALSE)
+crops = read.table(header=TRUE, sep=" ", text="
+crop_nm gaez_suit_code gaez_potyld_code
+rice rcw ricw
+wheat whe whea
+maize mze maiz
+sugc suc sugc
+bean phb bean
+pota wpo wpot
+rape rsd rape
+lent chk chck
+pige pig pigp
+toba tob toba")
+
+maps = vector(mode="list", length=nrow(crops))
+for (i in 1:nrow(crops)) {
+    crop_nm = crops$crop_nm[i]; print(crop_nm)
+    suit_code = crops$gaez_suit_code[i]
+    potyld_code = crops$gaez_potyld_code[i]
+    suit =
+        get_gaez_suit_data(suit_code,"data/gaez_data","_ll") %>%
+        lapply(FUN=function(x) crop(x,extent(template)))
+
+    potyld =
+        get_gaez_potyld_data(potyld_code,"data/gaez_data","_ll") %>%
+        lapply(FUN=function(x) crop(x,extent(template)))
+
+    mixed_potyld = get_mixed_yield(suit, potyld)
+    mixed_potyld %<>% setNames(paste0(crop_nm, "_", c("irri","rain")))
+    maps[[i]] = mixed_potyld
+}
+maps = stack(unlist(maps))
+
+## first, write maps to file -> these will be used in the
+## coupled model
+for (i in 1:nlayers(maps)) {
+    map = maps[[i]]
+    nm = names(map)
+    outfn = file.path("data", paste0("potential_yield_", nm, "_mixed_input.tif"))
+    writeRaster(map, filename=outfn, overwrite=TRUE)
+}
+

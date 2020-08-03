@@ -1,0 +1,72 @@
+References: <CANtt_hydr9Ovt_fEE+Tuv6dAQVROeU4Z4FDWWXhtV-YJmfw9mQ@mail.gmail.com>
+User-agent: mu4e 1.0-alpha2; emacs 24.5.1
+From: Simon Moulds <sim.moulds@gmail.com>
+To: "Robert J. Hijmans" <r.hijmans@gmail.com>
+Subject: Re: raster / lulcc
+In-reply-to: <CANtt_hydr9Ovt_fEE+Tuv6dAQVROeU4Z4FDWWXhtV-YJmfw9mQ@mail.gmail.com>
+
+Dear Robert,
+
+Thanks for alerting me to this, and for suggesting a fix.
+
+I'll try and do this and submit to CRAN in the next day or so - I hope that is OK.
+Robert J. Hijmans writes:
+
+> Dear Simon,
+>
+> I am writing because you are the maintainer of CRAN package "lulcc".
+>
+> There is an error when I check "lulcc" with the development version of the
+> "raster" package. The reason for this seems to be the changes that I made
+> in the raster::crosstab function. I made these changes to make it more
+> consistent. See the discussion here:
+> https://github.com/rspatial/raster/issues/24
+>
+> This is the error:
+>
+>> library(lulcc)
+>> obs <- ObsLulcRasterStack(x=pie,
+> +                    pattern="lu",
+> +                    categories=c(1,2,3),
+> +                    labels=c("forest","built","other"),
+> +                    t=c(0,6,14))
+>>
+>> crossTabulate(x=obs, times=c(0,14))
+> Error: $ operator is invalid for atomic vectors
+>
+>> traceback()
+> 7: which(ct$Var1 == cat1 & ct$Var2 == cat2)
+> 6: .local(x, y, ...)
+> 5: crossTabulate(x = x[[ix1]], y = x[[ix2]], categories = x@categories,
+>        labels = x@labels)
+> 4: crossTabulate(x = x[[ix1]], y = x[[ix2]], categories = x@categories,
+>        labels = x@labels)
+> 3: .local(x, y, ...)
+> 2: crossTabulate(x = obs, times = c(0, 14))
+> 1: crossTabulate(x = obs, times = c(0, 14))
+>
+> I think you can fix this for both the current and the future version of
+> "raster" with these changes in the the crossTabulate method:
+>
+> #replace
+> #ct <- raster::crosstab(x, y, ...)
+> #with
+> ct <- raster::crosstab(x, y, long=TRUE, ...)
+> m <- as.data.frame(matrix(data = NA, nrow = length(categories),  ncol =
+> length(categories)))
+> for (i in 1:length(categories)) {
+>     cat1 <- categories[i]
+>     for (j in 1:length(categories)) {
+>         cat2 <- categories[j]
+>         #replace
+>         #ix <- which(ct$Var1 == cat1 & ct$Var2 == cat2)
+>         #with
+>         ix <- which(ct[,1] == cat1 & ct[,2] == cat2)
+>
+>
+> Can you please update "lulcc" so that I can send the new version of
+> "raster" to CRAN?
+>
+> Thanks and sorry for the inconvenience,
+> Robert
+

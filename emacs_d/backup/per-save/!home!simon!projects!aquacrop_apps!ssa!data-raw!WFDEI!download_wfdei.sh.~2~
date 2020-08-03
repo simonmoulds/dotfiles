@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# wget -m -nH --cut-dirs=3 ftp://rfdata:forceDATA@ftp.iiasa.ac.at/../WATCH_Forcing_Data/WFDEI/LWdown_daily_WFDEI
+wget -m -nH --cut-dirs=3 ftp://rfdata:forceDATA@ftp.iiasa.ac.at/../WATCH_Forcing_Data/WFDEI/PSurf_daily_WFDEI
+# wget -m -nH --cut-dirs=3 ftp://rfdata:forceDATA@ftp.iiasa.ac.at/../WATCH_Forcing_Data/WFDEI/Qair_daily_WFDEI
+# wget -m -nH --cut-dirs=3 ftp://rfdata:forceDATA@ftp.iiasa.ac.at/../WATCH_Forcing_Data/WFDEI/Rainf_daily_WFDEI_GPCC
+# wget -m -nH --cut-dirs=3 ftp://rfdata:forceDATA@ftp.iiasa.ac.at/../WATCH_Forcing_Data/WFDEI/SWdown_daily_WFDEI
+# wget -m -nH --cut-dirs=3 ftp://rfdata:forceDATA@ftp.iiasa.ac.at/../WATCH_Forcing_Data/WFDEI/Snowf_daily_WFDEI_GPCC
+# wget -m -nH --cut-dirs=3 ftp://rfdata:forceDATA@ftp.iiasa.ac.at/../WATCH_Forcing_Data/WFDEI/Tair_WFDEI
+# wget -m -nH --cut-dirs=3 ftp://rfdata:forceDATA@ftp.iiasa.ac.at/../WATCH_Forcing_Data/WFDEI/Tair_daily_WFDEI
+# wget -m -nH --cut-dirs=3 ftp://rfdata:forceDATA@ftp.iiasa.ac.at/../WATCH_Forcing_Data/WFDEI/Wind_daily_WFDEI
+wget -m -nH --cut-dirs=3 ftp://rfdata:forceDATA@ftp.iiasa.ac.at/../WATCH_Forcing_Data/WFDEI/WFDEI-elevation.nc.gz
+

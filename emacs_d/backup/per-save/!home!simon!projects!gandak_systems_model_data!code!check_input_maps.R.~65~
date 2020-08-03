@@ -1,0 +1,190 @@
+## Author : Simon Moulds
+## Date   : January 2020
+
+library(magrittr)
+library(raster)
+
+## ############
+## 1. area maps
+## ############
+
+## make_area_maps.py
+
+clone = raster("../data/Gandak05min.clone.tif")
+landmask = raster("../data/Gandak05min.landmask.tif")
+
+plot(clone)
+plot(landmask)
+
+## ######################
+## 2. soil parameter maps
+## ######################
+
+## make_soil_parameter_nc.py
+
+area = raster("../data/modelMaskCellArea.tif")
+wcres0 = raster("../data/wcres_topsoil_gapfilled_5m.tif")
+wcres1 = raster("../data/wcres_subsoil_gapfilled_5m.tif")
+
+wcsat0 = raster("../data/wcsat_topsoil_gapfilled_5m.tif")
+wcsat1 = raster("../data/wcsat_subsoil_gapfilled_5m.tif")
+
+wcwp = raster("../data/wcpf4.2_topsoil_gapfilled_5m.tif")
+wcwp = raster("../data/wcpf4.2_subsoil_gapfilled_5m.tif")
+
+wcfc = raster("../data/wcpf2_topsoil_gapfilled_5m.tif")
+wcfc = raster("../data/wcpf2_subsoil_gapfilled_5m.tif")
+
+## #############
+## 3. gaez input
+## #############
+
+## make_potential_yield_nc.py
+
+## wheat
+yx_wheat_irr = raster("../data/potential_yield_whea_irri_intermediate_input.tif")
+yx_wheat_rain = raster("../data/potential_yield_whea_rain_intermediate_input.tif")
+
+plot(yx_wheat_irr)
+plot(yx_wheat_rain)
+
+## rice
+yx_rice_irr = raster("../data/potential_yield_ricw_irri_intermediate_input.tif")
+yx_rice_rain = raster("../data/potential_yield_ricw_rain_intermediate_input.tif")
+
+plot(yx_rice_irr)
+plot(yx_rice_rain)
+
+## ############
+## 4. Globcover
+## ############
+
+## make_land_cover_frac_nc.py
+
+cropland = raster("../data/Globcover_2009_cropland.tif")
+forest = raster("../data/Globcover_2009_forest.tif")
+grassland = raster("../data/Globcover_2009_grassland.tif")
+snow = raster("../data/Globcover_2009_permanent_snow_and_ice.tif")
+urban = raster("../data/Globcover_2009_sealed_area.tif")
+water = raster("../data/Globcover_2009_water_bodies.tif")
+
+## visually inspect
+plot(cropland)
+plot(forest)
+plot(grassland)
+plot(snow)
+plot(urban)
+plot(water)
+
+## check totals sum to one
+lc = stack(cropland, forest, grassland, snow, urban, water)
+lc_sum = stackApply(lc, indices=nlayers(lc), fun=sum)
+plot(lc_sum)
+cellStats(lc_sum, range)
+
+## ###############
+## 5. canal access
+## ###############
+
+canal_access = raster("../data/canal_access.tif")
+plot(canal_access)
+
+## ############################
+## 6. initial groundwater level
+## ############################
+
+gwini = raster("../data/initial_groundwater_level.tif")
+plot(gwini)
+
+## ###########
+## 7. met data
+## ###########
+
+## TODO
+
+## #############
+## 8. price data
+## #############
+
+## fertiliser price
+x = read.table("../data/gandak_fert_price_data.txt", header=TRUE)
+plot(x$YEAR, x$N_TP, type="l")
+plot(x$YEAR, x$P_TP, type="l")
+plot(x$YEAR, x$K_TP, type="l")
+
+## crop price
+x = read.table("../data/gandak_crop_price_data.txt", header=TRUE)
+plot(x$YEAR, x$PADY_TP, type="l")
+plot(x$YEAR, x$WHT_TP, type="l")
+plot(x$YEAR, x$SGUR_TP, type="l")
+
+## diesel price
+x = read.table("../data/gandak_diesel_price_data.txt", header=TRUE)
+plot(as.POSIXct(x$DATE), x$DIESEL_PRICE, type="l")
+
+## #################
+## 9. farm size data
+## #################
+
+size_marg = raster("../data/marg_farm_area_1980.tif")
+size_small = raster("../data/small_farm_area_1980.tif")
+size_medium = raster("../data/medium_farm_area_1980.tif")
+size_semim = raster("../data/semim_farm_area_1980.tif")
+size_large = raster("../data/large_farm_area_1980.tif")
+
+## visual inspection
+plot(size_marg)
+plot(size_small)
+plot(size_medium)
+plot(size_semim)
+plot(size_large)
+
+## ##############################
+## 10. initial tubewell ownership
+## ##############################
+
+## ownership rate (=num tubewells/farm in each category)
+tw_marg = raster("../data/marg_tw_ownership_rate.tif")
+tw_small = raster("../data/small_tw_ownership_rate.tif")
+tw_medium = raster("../data/medium_tw_ownership_rate.tif")
+tw_semim = raster("../data/semim_tw_ownership_rate.tif")
+tw_large = raster("../data/large_tw_ownership_rate.tif")
+
+## visual inspection
+plot(tw_marg)
+plot(tw_small)
+plot(tw_medium)
+plot(tw_semim)
+plot(tw_large)
+
+## mi = read.csv("../data/micensus_shallowtubewell_total_num_gandak.csv")
+## adm2_1990 = readOGR(
+##     dsn=file.path(
+##         "/home/simon/projects/gandak_systems_model/analysis",
+##         "pkg",
+##         "india_adm2_1990","data"
+##     ),
+##     layer="g1990_2_India"
+## )
+## adm2_1990$ADM2_CODE %<>% as.numeric
+## dist_names = c("Maharajganj","Gorakhpur","Deoria","Pashchim Champaran","Purba Champaran","Gopalganj","Siwan","Saran","Muzaffarpur","Vaishali","Samastipur")
+## adm2_1990 = adm2_1990[adm2_1990$ADM2_NAME %in% dist_names,]
+## ## Muzaffarpur
+## dist="Muzaffarpur"
+## poly = adm2_1990[adm2_1990$ADM2_NAME == dist,]
+## tmp = crop(tw_tot, extent(poly), snap="out")
+## plot(tmp); lines(poly)
+## ini = raster::extract(tmp, poly, fun=sum, na.rm=TRUE, df=FALSE) %>% as.numeric
+## mi[mi$dist %in% toupper(dist),]
+
+## #####################
+## 11. canal access rate
+## #####################
+
+## r = raster("../data/igp_canal_irr.tif")
+canal_marg = raster("../data/marg_canal_access_rate.tif")
+canal_small = raster("../data/small_canal_access_rate.tif")
+canal_semim = raster("../data/semim_canal_access_rate.tif")
+canal_medium = raster("../data/medium_canal_access_rate.tif")
+canal_large = raster("../data/large_canal_access_rate.tif")
+

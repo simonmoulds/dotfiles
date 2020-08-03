@@ -1,0 +1,18 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import xarray as xr
+
+ds = xr.open_dataset('soil_hydraulic_parameters.nc')
+lats = ds['lat'].values
+lons = ds['lon'].values
+lats = lats[1:3]
+lons = lons[1:10]
+ds.close()
+
+ds = xr.open_dataset('soil_hydraulic_parameters.nc')
+dsloc = ds.sel(lon=lons, lat=lats, method='nearest')
+v = dsloc['k_sat'].values
+ds.close()
+
+xr.open_rasterio('pt_clone_0pt25degree.tif')

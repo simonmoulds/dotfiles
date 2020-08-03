@@ -1,0 +1,103 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import os
+import string
+import numpy as np
+
+# import pcraster as pcr
+
+import file_handling as vos
+
+from Model import Model
+from LongwaveRadiation import LongwaveRadiation
+from ShortwaveRadiation import ShortwaveRadiation
+from ExtraterrestrialRadiation import ExtraterrestrialRadiation
+from NetRadiation import NetRadiation
+from SpecificHumidity import SpecificHumidity
+from SurfacePressure import SurfacePressure
+from Temperature import Temperature
+from VapourPressureDeficit import VapourPressureDeficit
+from Wind import Wind
+
+import logging
+logger = logging.getLogger(__name__)
+
+class PenmanMonteith(Model):
+
+    def initial(self):
+        self.temperature_module = Temperature(self)
+        self.longwave_radiation_module = LongwaveRadiation(self)
+        self.shortwave_radiation_module = ShortwaveRadiation(self)
+        self.extraterrestrial_radiation_module = ExtraterrestrialRadiation(self)
+        self.specific_humidity_module = SpecificHumidity(self)
+        self.surface_pressure_module = SurfacePressure(self)
+        self.vapour_pressure_deficit_module = VapourPressureDeficit(self)
+        self.net_radiation_module = NetRadiation(self)
+        self.wind_module = Wind(self)
+
+        self.longwave_radiation_module.initial()
+        self.shortwave_radiation_module.initial()
+        self.extraterrestrial_radiation_module.initial()
+        self.specific_humidity_module.initial()
+        self.surface_pressure_module.initial()
+        self.vapour_pressure_deficit_module.initial()        
+        self.net_radiation_module.initial()        
+        self.temperature_module.initial()
+        self.wind_module.initial()
+
+        self.get_model_dimensions()
+        
+    def get_model_dimensions(self):
+        latitudes = np.unique(pcr.pcr2numpy(pcr.ycoordinate(pcr.boolean(self.cloneMap)), vos.MV))[::-1]
+        longitudes = np.unique(pcr.pcr2numpy(pcr.xcoordinate(pcr.boolean(self.cloneMap)), vos.MV))
+        self.dimensions = {
+            'lat' : latitudes,
+            'lon' : longitudes,
+            'time': None}
+        
+    def penman_monteith(self):
+        """Function implementing the Penman-Monteith 
+        equation (*NOT* FAO version)
+        """
+        cp           = 0.001013     # specific heat of air 1013 [MJ kg-1 K-1]
+        TimeStepSecs = 86400        # timestep in seconds
+        rs           = 70           # surface resistance, 70 [s m-1]
+        R            = 287.058      # Universal gas constant [J kg-1 K-1]
+        eps          = 0.622        # ratio of water vapour/dry air molecular weights [-]
+        # g            = 9.81         # gravitational constant [m s-2]
+                
+        rho = self.surface_pressure / (self.tmean * R) # density of air [kg m-3]
+        latent_heat = (2.501 - (0.002361 * (self.tmean - 273.15))) # latent heat [MJ kg-1]
+        # slope of vapour pressure [kPa K-1]
+        deltop  = 4098. * (0.6108 * np.exp((17.27 * (self.tmean - 273.15)) / ((self.tmean - 273.15) + 237.3)))
+        delbase = ((self.tmean - 273.15) + 237.3) ** 2
+        delta   = deltop / delbase
+
+        # psychrometric constant [kPa K-1]
+        gamma   = cp * (self.surface_pressure / 1000) / (eps * latent_heat)
+
+        # aerodynamic resistance [m s-1]
+        z = 10 # height of wind speed variable (10 meters above surface)
+        Wsp_2 = self.wind * 4.87 / (np.log(67.8 * z - 5.42))
+        ra = 208. / Wsp_2
+
+        # Penman-Monteith equation (NB unit conversion)
+        PETtop  = np.maximum(((delta * 1e3) * self.net_radiation + rho * (cp * 1e6) * self.vapour_pressure_deficit / ra), 1)
+        PETbase = np.maximum(((delta * 1e3) + (gamma * 1e3) * (1 + rs/ra)), 1)
+        PET     = np.maximum(PETtop / PETbase, 0)
+        PETmm   = np.maximum((PET / (latent_heat * 1e6) * TimeStepSecs),0)        
+        self.ETref = PETmm.copy()
+    
+    def dynamic(self):
+        logger.info("Reading forcings for time %s", self._modelTime)
+        self.temperature_module.dynamic()
+        self.longwave_radiation_module.dynamic()
+        self.shortwave_radiation_module.dynamic()
+        self.extraterrestrial_radiation_module.dynamic()
+        self.specific_humidity_module.dynamic()
+        self.surface_pressure_module.dynamic()
+        self.vapour_pressure_deficit_module.dynamic()
+        self.net_radiation_module.dynamic()        
+        self.wind_module.dynamic()
+        self.penman_monteith()

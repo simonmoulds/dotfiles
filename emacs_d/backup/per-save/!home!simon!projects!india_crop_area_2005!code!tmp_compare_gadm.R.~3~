@@ -1,0 +1,18 @@
+
+library(rgdal)
+
+g2008 = readOGR(dsn="/home/simon/projects/india_adm2_2001/data", layer="g2008_2_India")
+g2010 = readOGR(dsn="/home/simon/projects/india_adm2_1990/data", layer="g2010_2_India")
+
+## Tamil Nadu
+## Nagapattinam (2010) = Nagapattinam, Thiruvarur (2008)
+
+## Madhya Pradesh
+## Burhanpur, East Nimar (2010) = East Nimar (2008)
+## Ashoknagar, Guna (2010) = Guna (2008)
+## Anuppur, Shahdol (2010) = Shahdol (2008)
+
+## Jharkhand
+## Latehar, Palamu (2010) = Palamu (2008)
+## Gumla, Simdega (2010) = Gumla (2008)
+## Pashchim Singhbhum, Saraikela Kharsewan (2010) = Pashchim Singhbhum (2008)

@@ -1,0 +1,10 @@
+## Author  : Simon Moulds
+## Date    : February 2018
+
+## initialize
+
+## AOS_Initialize()
+
+## time loop (do in Rcpp)
+
+## AOS_Finish()

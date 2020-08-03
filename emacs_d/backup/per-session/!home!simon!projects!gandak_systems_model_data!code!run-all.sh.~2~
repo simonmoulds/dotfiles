@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# create clone/landmask input files *TESTED*
+./1_grass_make_area_maps.sh
+
+# create soil parameter maps *TESTED*
+./2_grass_make_soil_parameter_maps.sh
+
+# process GAEZ maps *TESTED*
+./3_grass_process_gaez_maps.sh
+
+# process GLOBCOVER *TESTED*
+./4_grass_process_globcover.sh 
+
+# compute canal access *TESTED*
+Rscript 5_compute_canal_access.R
+
+# compute initial groundwater level *TESTED*
+Rscript 6_compute_initial_groundwater_level.R
+
+# 

@@ -1,0 +1,27 @@
+notes on irrigation module development
+
+# Model structure
+
+What is the best way of linking the various modules - some of which
+may be supplied from extenal models?
+
+-> NetCDF? i.e. coupling through i/o (loose model coupling)
+
+in this case, since the demand module is going to be coupled with
+different models, we should develop a simple hydrological model
+alongside the water demand model, but keep it as a separate model
+which writes output at each time step.
+
+data exchange:
+
+vegetation parameters
+groundwater level
+soil water content
+rooting depth
+
+it should be possible for *all* model variables to be written to
+file. User should specify which variables should be written to file
+and also provide a filename template. 
+
+# Space-time discretization
+

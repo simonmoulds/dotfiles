@@ -1,0 +1,12 @@
+initial_condition = function(n_farm,
+                             root_zone_depletion,
+                             groundwater_head,
+                             initial_savings) {
+    
+    x = list(
+        root_zone_depletion = _expand_parameter(n_farm, root_zone_depletion),
+        groundwater_head = _expand_parameter(n_farm, groundwater_head),
+        initial_savings = _expand_parameter(n_farm, initial_savings)
+    )
+    structure(x, class="initial_condition")
+}

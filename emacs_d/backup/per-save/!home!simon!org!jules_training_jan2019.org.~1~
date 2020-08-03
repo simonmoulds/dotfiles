@@ -1,0 +1,12 @@
+* Introduction to JULES
+** Need model code, namelists (parameter settings)
+** JULES = MOSES + TRIFFID
+** Initial, lower boundary condition to climate model
+** Then, stomatal conductance, big leaf representation of vegetation
+** Third-gen, photosynthesis, carbon cycle
+*** Scale from leaf to canopy dependent on canopy radiation scheme (6, but recommended 1 or 6, e.g. CanRadMod = 1, CanRadMod = 6 (more complicated)
+** main/trunk/src/control - controls things like e.g. whether offline or coupled
+** main/trunk/src/science - science code, i.e. the actual model
+** irrigation simply assumes no water stress
+** TRIFFID, NPP accumulated over the day
+*** C for spreading or C for growth

@@ -1,0 +1,31 @@
+from crop_growth_funs import *
+
+class BiomassAccumulation(object):
+
+    def __init__(self, BiomassAccumulation_variable):
+        self.var = BiomassAccumulation_variable
+
+def biomass_accumulation(self, meteo, soilwater):
+        """Function to calculate biomass accumulation"""
+
+        arr_zeros = np.zeros((self.nRotation, self.nLat, self.nLon))
+        
+        et0 = meteo.referencePotET[None,:,:] * np.ones((self.nRotation))[:,None,None]
+        self.temperature_stress(meteo)
+        WPadj = adjust_WP_for_reproductive_stage(
+            self.GrowingSeasonIndex, self.CropType, self.HIref, self.HIt, self.PctLagPhase, self.Determinant, self.YldFormCD, self.WP, self.WPy)
+        
+        # Adjust WP for CO2 effects)
+        WPadj *= self.fCO2
+
+        # Calculate biomass accumulation on current day
+        dB_NS = WPadj * (soilwater.TrPot_NS / et0) * self.Kst_Bio  # TODO: check correct TrPot is being used
+        dB = WPadj * (soilwater.TrAct / et0) * self.Kst_Bio  # TODO: check correct TrAct is being used
+
+        # Update biomass accumulation
+        self.B += dB
+        self.B_NS += dB_NS
+
+        # No biomass accumulation outside growing season
+        self.B[np.logical_not(self.GrowingSeasonIndex)] = 0
+        self.B_NS[np.logical_not(self.GrowingSeasonIndex)] = 0

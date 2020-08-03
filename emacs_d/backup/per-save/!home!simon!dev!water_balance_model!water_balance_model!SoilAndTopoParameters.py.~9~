@@ -1,0 +1,77 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import os
+import numpy as np
+import pcraster as pcr
+import hydro_model_builder.VirtualOS as vos
+import netCDF4 as nc
+
+class SoilAndTopoParameters(object):
+
+    def __init__(self, SoilAndTopoParameters_variable, config_section_name):
+        """Initialise SoilAndTopoParameters object"""
+        self.var = SoilAndTopoParameters_variable
+        config_section = getattr(self.var._configuration, config_section_name)
+        self.var.soilAndTopoFileNC = config_section['soilAndTopoNC']
+
+    def initial(self):
+        self.read()
+        
+    def read(self):
+        self.readTopo()
+        self.readSoil()
+
+    def readTopo(self):         # TODO
+        pass
+
+    def readSoil(self):
+
+        self.var.nLayer = 2
+        
+        # soil depths
+        soildepth0 = np.full((self.var.nLat, self.var.nLon), 0.05)[self.var.landmask]
+        soildepth1 = vos.netcdf2PCRobjCloneWithoutTime(
+            str(self.var._configuration.SOIL['soilDepthOneInputFile']),
+            str(self.var._configuration.SOIL['soilDepthOneVariableName']),
+            cloneMapFileName=self.var.cloneMap)[self.var.landmask]
+        soildepth1 = np.maximum(0.05, soildepth1 - soildepth0)
+
+        soildepth2 = vos.netcdf2PCRobjCloneWithoutTime(
+            str(self.var._configuration.SOIL['soilDepthTwoInputFile']),
+            str(self.var._configuration.SOIL['soilDepthTwoVariableName']),
+            cloneMapFileName=self.var.cloneMap)[self.var.landmask]
+        soildepth2 = np.maximum(0.05, soildepth2)
+        self.var.soil_depth = np.stack([soildepth0, soildepth1, soildepth2])
+
+        # CALIBRATION
+        soildepth_factor = 1.   # TODO: read from configuration
+        self.var.soil_depth[1] *= soildepth_factor
+        self.var.soil_depth[2] *= soildepth_factor
+        self.var.soil_depth12 = self.var.soil_depth[1] + self.var.soil_depth[2]
+        
+        # These parameters have dimensions depth,lat,lon
+        soilParams1 = ['ksat', 'th_s', 'th_fc', 'th_wp']
+        landmask = np.broadcast_to(self.var.landmask, (self.var.nLayer, self.var.nLat, self.var.nLon))
+        for param in soilParams1:
+            d = vos.netcdf2PCRobjCloneWithoutTime(
+                self.var.soilAndTopoFileNC,
+                param,
+                cloneMapFileName=self.var.cloneMap)
+            d = d[landmask].reshape(self.var.nLayer,self.var.nCell)
+            vars(self.var)[param] = np.broadcast_to(d[None,None,:,:], (self.var.nFarm, self.var.nLC, self.var.nLayer, self.var.nCell))
+            
+        # The following is adapted from AOS_ComputeVariables.m, lines 25
+        self.var.th_dry = self.var.th_wp / 2
+        
+    def dynamic(self):
+        pass
+
+
+
+
+
+
+
+
+

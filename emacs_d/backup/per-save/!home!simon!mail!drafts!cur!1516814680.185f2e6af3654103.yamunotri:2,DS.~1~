@@ -1,0 +1,189 @@
+References: <VI1PR06MB1582546BEA7D3DFD459F634BD4100@VI1PR06MB1582.eurprd06.prod.outlook.com> <871sir70vx.fsf@yamunotri.localdomain> <VI1PR06MB15825B6B5B974466D5E1CD32D4EB0@VI1PR06MB1582.eurprd06.prod.outlook.com> <VI1PR06MB1582FEB53BB0F1E9EF116C48D4EB0@VI1PR06MB1582.eurprd06.prod.outlook.com> <VI1PR06MB1582CFADB02B0DDDC0A328DFD4EB0@VI1PR06MB1582.eurprd06.prod.outlook.com> <87y3kz53zl.fsf@yamunotri.localdomain> <VI1PR06MB15827604B5B19B786A72CA58D4EA0@VI1PR06MB1582.eurprd06.prod.outlook.com> <87wp0i5dl5.fsf@yamunotri.localdomain> <VI1PR06MB1582C4D7BA53C3E07647C9A4D4EA0@VI1PR06MB1582.eurprd06.prod.outlook.com> <871sip51cc.fsf@yamunotri.localdomain> <VI1PR06MB158279F5D975D2A4AD2155CCD4EA0@VI1PR06MB1582.eurprd06.prod.outlook.com> <87zi5d3hn5.fsf@yamunotri.localdomain> <VI1PR06MB1582100969624F94D1D91051D4EA0@VI1PR06MB1582.eurprd06.prod.outlook.com> <87y3kw3k93.fsf@yamunotri.localdomain> <VI1PR06MB15827BC06C0850979A681602D4E30@VI1PR06MB1582.eurprd06.prod.outlook.com> <87vafs7fqs.fsf@yamunotri.localdomain> <VI1PR06MB1582D9357DDBCD069597063ED4E30@VI1PR06MB1582.eurprd06.prod.outlook.com> <VI1PR06MB1582B70BA621EE969ECD9E77D4E30@VI1PR06MB1582.eurprd06.prod.outlook.com> <VI1PR06MB1582CE0C283EE363B4376057D4E20@VI1PR06MB1582.eurprd06.prod.outlook.com> <87tvvbpqxj.fsf@yamunotri.localdomain> <VI1PR06MB1582BCE285D85980860CE942D4E20@VI1PR06MB1582.eurprd06.prod.outlook.com>
+User-agent: mu4e 1.0-alpha2; emacs 24.5.1
+From: Simon Moulds <s.moulds@exeter.ac.uk>
+To: "O'Keeffe, Jimmy M" <jimmy.okeeffe@imperial.ac.uk>
+Subject: Re: data
+In-reply-to: <VI1PR06MB1582BCE285D85980860CE942D4E20@VI1PR06MB1582.eurprd06.prod.outlook.com>
+
+Hi Jimmy,
+
+Sorry I didn't get this to you today - I got caught up in something
+else. I've put in the schedules but it now needs recalibration, because
+it's thrown out the groundwater levels. I'll try again tomorrow!
+
+Cheers,
+Simon
+
+O'Keeffe, Jimmy M writes:
+
+> That would be great. I'm sure I'll have questions
+>
+>
+> At some point soon I'm going to need another tutorial on how to use the Simon version of the code and for you to take me through the changes.
+>
+> ________________________________
+> From: Simon Moulds <S.Moulds@exeter.ac.uk>
+> Sent: 24 January 2018 09:05:44
+> To: O'Keeffe, Jimmy M
+> Subject: Re: data
+>
+> Cool - thanks Jimmy. I'll put these in the config files and then send
+> you a zipfile with everything you need to run the scenarios
+> yourself. Then it would be great if you could look over the
+> config/parameter files to check everything makes sense.
+>
+> Cheers,
+> Simon
+>
+>
+> O'Keeffe, Jimmy M writes:
+>
+>> Hi Simon,
+>>
+>>
+>> I've gone through all the scenarios for each district and here are;
+>>
+>>
+>> - The days wheat irrigation takes place
+>>
+>> - The days rice irrigation takes place (if applicable)
+>>
+>>
+>> - Out of the days irrigation takes place what days the canals are running for wheat (if applicable)
+>>
+>> - What days out of rice irrigation days the canals are running for rice (if applicable)
+>>
+>>
+>> and the sd for each of those (which is 3 days for irrigation days and 1 day for canal use)
+>>
+>>
+>> If it helps I can also look at the inputs for the scenarios to double check they make sense
+>>
+>>
+>> Free all day so let me know if I can help
+>>
+>>
+>> Cheers
+>>
+>> Jimmy
+>>
+>>
+>>
+>>
+>> ________________________________
+>> From: O'Keeffe, Jimmy M
+>> Sent: 23 January 2018 16:56
+>> To: Simon Moulds
+>> Subject: Re: data
+>>
+>>
+>> That sounds great Simon - exciting stuff
+>>
+>>
+>> Yes, I'll get you those irrigation schedules as soon as I can
+>>
+>>
+>> Cheers
+>>
+>> Jimmy
+>>
+>> ________________________________
+>> From: Simon Moulds <S.Moulds@exeter.ac.uk>
+>> Sent: 23 January 2018 16:49:57
+>> To: O'Keeffe, Jimmy M
+>> Subject: Re: data
+>>
+>> Cool - thanks Jimmy, I'll take a look.
+>>
+>> I've done a quick calibration of the wheat yield coefficient and got
+>> much better results - see attached. I can do some more refinement but
+>> we're basically there, I think.
+>>
+>> As far as the modelling is concerned, the only thing that needs doing is
+>> the irrigation schedules for baseline/policy scenarios - see email
+>> below.
+>>
+>> We're close to submission!
+>>
+>> Simon
+>>
+>> O'Keeffe, Jimmy M writes:
+>>
+>>> Thanks Simon, that sounds great.
+>>>
+>>>
+>>> Also, please find attached a paper that I'm sure you'll find interesting if you haven't seen it before.
+>>>
+>>>
+>>> They have taken a very similar approach to us but it seems to be very comprehensive, even incorporating well degradation times. It would be great to get your thoughts on it if you get a chance to read it.
+>>>
+>>>
+>>> I have to work from home tomorrow but will be fully paper focused
+>>>
+>>>
+>>> Chat soon,
+>>>
+>>> Jimmy
+>>>
+>>> ________________________________
+>>> From: Simon Moulds <S.Moulds@exeter.ac.uk>
+>>> Sent: 23 January 2018 15:32:27
+>>> To: O'Keeffe, Jimmy M
+>>> Subject: Re: data
+>>>
+>>> Hi Jimmy,
+>>>
+>>> Sorry for not replying sooner. Pleased the plots look good - I agree
+>>> they are a bit more consistent, plus they are easier to reproduce when
+>>> the data changes!
+>>>
+>>> I'm looking at the wheat yield now. I think it could be the factor with
+>>> which we multiply the mean district yield to get the maximum district
+>>> yield (e.g. in Hamirpur it's equal to 1.9). Changing this value seems to
+>>> get us closer to the observations, so I'll use this method for
+>>> calibration.
+>>>
+>>> Cheers,
+>>> Simon
+>>>
+>>> O'Keeffe, Jimmy M writes:
+>>>
+>>>> Hi Simon,
+>>>>
+>>>>
+>>>> I've the British Council work and yesterdays CHANSE stuff more or less under control so can finally get back to this.
+>>>>
+>>>>
+>>>> First off the plots themselves look great. Doing them in the code rather than both in the code and in ink scape makes them far more consistent.
+>>>>
+>>>>
+>>>> The results look pretty good too. The water levels look good, as does the rice yield and farmer income is a bit difficult to gauge as we don't really have anything to compare it with.
+>>>>
+>>>>
+>>>> The wheat yield is a bit out though so that could probably do with some further calibration. Have you any thoughts on this? Very happy to chat over the phone if you want.
+>>>>
+>>>>
+>>>> Cheers
+>>>>
+>>>> Jimmy
+>>>>
+>>>> ________________________________
+>>>> From: Simon Moulds <S.Moulds@exeter.ac.uk>
+>>>> Sent: 17 January 2018 09:30:32
+>>>> To: O'Keeffe, Jimmy M
+>>>> Subject: Re: data
+>>>>
+>>>> Hi Jimmy,
+>>>>
+>>>> Could you take a look at the attached plots and let me know if there is
+>>>> anything you would like me to change in terms of the style?
+>>>>
+>>>> Another thing I'm not 100% sure about is the irrigation schedules for
+>>>> the baseline/policy scenarios. Would you be able to send me a text file
+>>>> or something with the various schedules (inc. the mean and standard
+>>>> deviation) for rice, rice-canal, wheat, wheat-canal under the two
+>>>> scenarios?
+>>>>
+>>>> Cheers,
+>>>> Simon
+

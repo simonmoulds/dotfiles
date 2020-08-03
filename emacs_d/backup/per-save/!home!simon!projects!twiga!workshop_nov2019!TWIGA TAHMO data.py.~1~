@@ -1,0 +1,231 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# TAHMO station data
+# The following notebook elaborates on how to use the TWIGA API to retrieve and
+# work with data from TAHMO stations.
+
+#############################
+# Load some libraries       #
+#############################
+
+import requests
+import json
+import datetime
+import pandas as pd
+import matplotlib
+import numpy as np
+
+#############################
+# TWIGA API settings        #
+#############################
+
+# The HydroNET/TWIGA API endpoint
+api = 'https://hnapi.hydronet.com/api/'
+
+# The bearer token for the TWIGA user
+# this token is used to identify as a valid TWIGA user to the API
+api_token = 'eyJhbGciOiJSUzI1NiIsImtpZCI6ImIyY2I4NjU2NjNlY2RiYzEyMGZkOGViYzFkM2ExOGIwIiwidHlwIjoiSldUIn0.eyJuYmYiOjE1NzE4MzEzOTksImV4cCI6MTcyMzA2MjYyOSwiaXNzIjoiaHR0cHM6Ly9vaWRjLmh5ZHJvbmV0LmNvbSIsImF1ZCI6Imh0dHBzOi8vb2lkYy5oeWRyb25ldC5jb20vcmVzb3VyY2VzIiwiY2xpZW50X2lkIjoiaG40cy1wcm9kdWN0aW9uIiwiY2xpZW50X3Byb2ZpbGUiOiJwcm9maWxlIiwiY2xpZW50X2VtYWlsIjoiZW1haWwiLCJjbGllbnRfbmFtZSI6Im5hbWUiLCJjbGllbnRfc3RyaW5nIjoiaWRfdG9rZW4gdG9rZW4iLCJjbGllbnRfb2ZmbGluZV9hY2Nlc3MiOiJvZmZsaW5lX2FjY2VzcyIsInN1YiI6IjQzYmEwNjhjLTI3NzYtNDg1My1hYjc5LTIyMzIxMTE3NzZhMCIsImF1dGhfdGltZSI6MTU3MTgzMTM5OSwiaWRwIjoibG9jYWwiLCJqdGkiOiIyNTg1M2UwNjRjMGFhYjg2N2RmZTgyNjdjNzBmZTcyMCIsInNjb3BlIjpbIm9wZW5pZCIsInByb2ZpbGUiLCJvZmZsaW5lX2FjY2VzcyJdLCJhbXIiOlsicHdkIl19.PhkJ3SVi2ZjBEan9OlV9qpFAV3fqjsPQqQv-gk_ZtWlIuwTvoPMt5whwAa07opUNV5tO_-Jk4B8R-W9x2znMmzA_d9Bjyiwrwto3GgaUBBryXR-GIs21Dy1Hj62qUvUDpI07EQhGeq7SpxYeO0WdK_t-5U-3w3y9WNihvmcyfMsJukw9AOsSObEPUY6YUiTv71vbqKPQc55pbuPHpaDRHZITH0Nps3E_jrnwn9Aepz7B7MDVXyM_vU1Vb-MzAVZq03XvCf_YdWWxQUqPhbBVHcJjfzSQGrFl-8pGMLkHvcx1PgEnrxN9y7JS6tP_D7rZMBwA4vaiHXX5Z1XdBsvwYg'
+
+# Using the token, generate a valid header for requests to the API
+api_header = {
+    'content-type': 'application/json',
+    'Authorization': 'bearer ' + api_token
+}
+
+# Accessing the available data sources
+# The TWIGA api holds a lot of data. There are different data sources available,
+# each containing relevant data for TWIGA. Using the API one can request data of
+# any of the TWIGA data sources. If you know which datasource you are intersted
+# in, you can direct request data from iw. However, often one of the first steps
+# is to look into what data sources are available.
+# 
+# Getting an overview of the different data sources can be done by sending a
+# request to the 'datasources' endpoint of the TWIGA API.
+
+# an empty request which can be send to the TWIGA API
+datasource_metadata = {}
+
+# Send the request to the datasources endpoint of the API
+datasource_response = requests.post(
+    api + 'entity/datasources/get',
+    headers=api_header,
+    data=json.dumps(datasource_metadata)
+)
+
+# The response of the API is in JSON. Parse this with Python
+datasource_metadata = datasource_response.json()
+
+# print the result, as indented json
+print(json.dumps(datasource_metadata, indent=2))
+
+# From the response of the TWIGA API we can see that there are two TAHMO data
+# sources Tahmo.Stations.Data.Distribution.Hourly and
+# Tahmo.Stations.Data.Distribution.Measurements
+
+# the first provides hourly values, the second provides higher resolution data
+# (i.e. 5 minute intervals)
+
+# store the selected data source code
+selected_datasource_code = "Tahmo.Stations.Data.Distribution.Hourly"
+
+
+# json request to ask metadata of a single datasource
+request_metadata_tahmo = {
+     "DataSourceCodes": [selected_datasource_code]    
+}
+
+# Send the request to the datasources endpoint of the API
+datasource_tahmo_response = requests.post(
+    api + 'entity/datasources/get',
+    headers=api_header,
+    data=json.dumps(request_metadata_tahmo)
+)
+
+# The response of the API is in JSON. Parse this with Python
+datasource_tahmo_metadata = datasource_tahmo_response.json()
+
+# print the result, as indented json
+print(json.dumps(datasource_tahmo_metadata, indent=2))
+
+# TAHMO stations are spread over continental Africa
+# we can ask the available locations through the TWIGA API
+
+# again we define a JSON request which we can send the the TWIGA API
+request_locations_tahmo = {
+    "DataSourceCodes" : [selected_datasource_code]#,
+    # "StartDate" : "20170101000000",
+    # "EndDate" : "20180101000000"
+}
+
+# This time we send the request to the variables endpoint of the API
+locations_tahmo_response = requests.post(
+    api + 'entity/locations/get',
+    headers=api_header,
+    data=json.dumps(request_locations_tahmo)
+)
+
+# The response of the API is in JSON. Parse this with Python
+locations_tahmo = locations_tahmo_response.json()
+
+tahmo_x = [(locs[key]['X'], locs[key]['Y'], locs[key]['Z'], locs[key]['Code']) for key, value in locs.items()]
+df = pd.DataFrame(tahmo_x, columns=['X','Y','Z','Code'])
+
+# # print the result, as indented json
+# print(json.dumps(locations_tahmo, indent=2))
+
+len(locations_tahmo['Locations'])
+
+# TAHMO stations can measure multiple variables
+# We can ask the API what variables are available
+
+# again we define a JSON request which we can send the the TWIGA API
+request_variables_tahmo = {
+     "DataSourceCodes": [selected_datasource_code]
+}
+
+# This time we send the request to the variables endpoint of the API
+variables_tahmo_response = requests.post(
+    api + 'entity/variables/get',
+    headers=api_header,
+    data=json.dumps(request_variables_tahmo)
+)
+
+# The response of the API is in JSON. Parse this with Python
+variables_tahmo = variables_tahmo_response.json()
+
+# # print the result, as indented json
+# print(json.dumps(variables_tahmo, indent=2))
+
+len(variables_tahmo['Variables'])
+
+# Lets try and retrieve precipitation data of a TAHMO station in Nairobi
+locations_tahmo['Locations'].keys()
+# Can you find the location code of the TAHMO station situated at the Kenya Meteorological Department in Nairobi
+# tahmo_kmd_code =?
+location_codes = []
+location_names = []
+for loc in locations_tahmo['Locations'].keys():
+    location_codes.append(locations_tahmo['Locations'][loc]["Code"])
+    location_names.append(locations_tahmo['Locations'][loc]["Name"])
+
+# import re
+# possible_locs = [loc for loc in location_names if bool(re.search('KMD|Kenya|Nairobi', loc))]
+
+# tahmo_kmd_code = [index for index,name in enumerate(location_names) if location_names[index] == "Kenya Meteorological Department"][0]
+
+# tahmo_kmd_code = location_codes[tahmo_kmd_code]
+
+# locations_tahmo['Locations'][tahmo_kmd_code]
+
+# Try to retrieve data of TAHMO stations within an extent (e.g. Ghana)
+# N.B. "A spatial filter is required when requesting time series, either in the
+# form of LocationCodes or an Extent. When requesting grids, model grids or
+# ensemble grids as time series, this option cannot be used, since grid data is
+# not stored in locations as such."
+for loc in location_codes:
+    request_tahmo_data = {
+        "Readers": [{
+            "DataSourceCode": selected_datasource_code,
+            "Settings": {
+                # "LocationCodes": [tahmo_kmd_code],
+                "LocationCodes": [loc],
+                "VariableCodes": ["P"],
+                "StartDate": "20170101000000",
+                "EndDate": "20191115000000",
+                # "Extent" : {
+                #     "Xll" : 0,
+                #     "Yll" : 0,
+                #     "Xur" : 10,
+                #     "Yur" : 10,
+                #     "SpatialReference": {
+                #         "Epsg" : 4326
+                #     }
+                # },
+                "StructureType": "TimeSeries"
+            }
+        }]
+    }
+
+    # send the request to the TWIGA API, this time the modelTimeseries endpoint
+    data_response = requests.post(
+        api + 'data/get',
+        headers=api_header,
+        data=json.dumps(request_tahmo_data)
+    )
+
+    # parse response into JSON object
+    tahmo_data = data_response.json()
+
+    # # print the result, as indented json
+    # print(json.dumps(tahmo_data, indent=2))
+
+    # the result is a nested JSON object, it contains both the meta data and the
+    # actual data of interest
+    # the actual data can be found in the 'Data' part of the JSON
+    # it can be ingested into a pandas dataframe
+
+    tahmo_data_df = pd.DataFrame(tahmo_data['Data'][0]['Data'])
+    tahmo_data_df['Location'] = loc
+
+    # TODO: use this elsewhere
+    # key = 'Tahmo.Stations#' + location_codes[0]
+    # locations_tahmo['Locations'][key]['X']
+    # locations_tahmo['Locations'][key]['Y']
+    # locations_tahmo['Locations'][key]['Z']
+
+    # convert the DateTime from string into datetime objects
+    tahmo_data_df['DateTime'] = pd.to_datetime(tahmo_data_df['DateTime'])
+
+    # rename the Value column to the name of the variable
+    tahmo_data_df = tahmo_data_df.rename(columns={"Value": "P"})
+
+    # # we can use this data frame to create a plot of the data
+    # tahmo_data_df.plot(kind='line', x='DateTime', y="P", color='red')
+
+    # We can also store this data to your local computer in a csv file
+    # please adjust the path in the command below to a valid location, to a valid location on your computer
+
+    # we can now save the data to a csv file on your local computer
+    fn = "tahmo_stn_" + loc + "_prec.csv"
+    tahmo_data_df.to_csv(fn, index=False)

@@ -1,0 +1,12 @@
+farm_parameters = function(n_farm,
+                           area,
+                           initial_category,
+                           irrigation_efficiency,                           
+                           ...) {
+    x = list(
+        area = _expand_parameter(n_farm, area),
+        initial_category = _expand_parameter(n_farm, initial_category),
+        irrigation_efficiency = _expand_parameter(n_farm, irrigation_efficiency)
+    )
+    structure(x, class="farm_parameters")
+}

@@ -1,0 +1,22 @@
+import serial
+ser = serial.Serial('/dev/ttyUSB2',115200)
+ser.flushInput()
+ser.stopbits = 2
+
+while True:
+    try:
+        ser_bytes = ser.readline()
+        decoded_bytes = float(ser_bytes[0:len(ser_bytes)-2].decode("utf-8"))
+        # try:
+        #     decoded_bytes = float(ser_bytes[0:len(ser_bytes)-2].decode("utf-8"))
+        # except:
+        #     decoded_bytes = None
+        # with open("test_data.csv","a") as f:
+        #     writer = csv.writer(f,delimiter=",")
+        #     writer.writerow([time.time(),decoded_bytes])
+        #     print(decoded_bytes)
+        print(decoded_bytes)
+            
+    except:
+        print("Keyboard Interrupt")
+        break

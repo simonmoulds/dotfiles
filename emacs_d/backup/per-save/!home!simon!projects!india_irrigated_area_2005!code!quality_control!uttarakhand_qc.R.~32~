@@ -1,0 +1,161 @@
+## Author : Simon Moulds
+## Date   : January 2018
+
+## Quality control for Uttarakhand
+
+## Crops not grown: Banana, Cassava, Coconut, Coffee, Finger Millet, ...
+
+## barley
+## ######
+
+## all ok
+
+## chickpea
+## ########
+
+if (dist_nm %in% "Naini Tal") {
+    xx[["irr_chickpea-rabi"]] %<>% irr_frac_interp(xx[["apy_chickpea-rabi"]], 7, c(6,8))
+    xx[["irr_chickpea-rabi"]] %<>% irr_frac_interp(xx[["apy_chickpea-rabi"]], 11, 10)
+}
+
+if (dist_nm %in% "Rudra Prayag") {
+    xx[["apy_chickpea-rabi"]] = xx[["mapspam_atot_chickpea"]][6]
+    xx[["irr_chickpea-rabi"]] = xx[["mapspam_xirr_chickpea"]][6]
+}
+
+## groundnut
+## #########
+
+if (dist_nm %in% c("Almora","Champawat","Naini Tal","Pithoragarh","Udham Singh Nagar")) {
+    xx[["apy_groundnut-kharif"]] = xx[["mapspam_atot_groundnut"]][6]
+    xx[["irr_groundnut-kharif"]] = xx[["mapspam_xirr_groundnut"]][6]
+}
+
+## lentil
+## ######
+
+## all ok
+
+## maize
+## #####
+
+## all ok
+
+## other cereals
+## #############
+
+## all ok
+
+## other oil crops
+## ###############
+
+## all ok
+
+## other pulses
+## ############
+
+if (dist_nm %in% "Haridwar") {
+    xx[["apy_other_pulses-rabi"]] %<>% tot_frac_interp(xx[["irr_other_pulses-rabi"]], 4:11, 3)
+    xx[["apy_other_pulses-summer"]] = 0
+    xx[["irr_other_pulses-summer"]] = 0
+}
+
+if (dist_nm %in% "Udham Singh Nagar") {
+    xx[["apy_other_pulses-summer"]][3] = 0
+    xx[["irr_other_pulses-summer"]][3] = 0
+}
+
+if (dist_nm %in% "Bageshwar") {
+    xx[["apy_other_pulses-rabi"]] = xx[["irr_other_pulses-rabi"]]
+}
+
+## pearl millet
+## ############
+
+if (dist_nm %in% c("Dehra Dun","Haridwar","Udham Singh Nagar")) {
+    xx[["apy_other_pulses-summer"]] = xx[["mapspam_atot_other_pulses"]][6]
+    xx[["irr_other_pulses-summer"]] = xx[["mapspam_xirr_other_pulses"]][6]
+}
+
+## pigeonpea
+## #########
+
+## all ok
+
+## potato
+## ######
+
+if (dist_nm %in% c("Almora","Bageshwar","Champawat","Naini Tal","Rudra Prayag","Tehri Garhwal","Uttarkashi")) {
+    xx[["apy_potato-kharif"]] %<>% locf_interp(4:6, fromLast=TRUE)
+    xx[["apy_potato-rabi"]] %<>% locf_interp(4:6, fromLast=TRUE)
+}
+
+if (dist_nm %in% c("Chamoli","Dehra Dun","Haridwar","Pithoragarh","Udham Singh Nagar")) {
+    xx[["apy_potato-kharif"]] %<>% linear_interp(4:6)
+    xx[["irr_potato-kharif"]] %<>% linear_interp(4:6)
+    xx[["apy_potato-rabi"]] %<>% linear_interp(4:6)
+    xx[["irr_potato-rabi"]] %<>% linear_interp(4:6)
+}
+
+## rapeseed
+## ########
+
+## all ok
+
+## rest of crops
+## #############
+
+## all ok
+
+## rice
+## ####
+
+xx[["irr_rice-winter"]] = xx[["irr_rice-autumn"]]
+xx[["irr_rice-autumn"]] = 0
+
+## sesameseed
+## ##########
+
+## all ok
+
+## soybean
+## #######
+
+## all ok
+
+## sugarcane
+## #########
+
+if (dist_nm %in% c("Chamoli","Champawat")) {
+    xx[["apy_sugarcane-whole_year"]] = xx[["mapspam_atot_sugarcane"]]
+    xx[["irr_sugarcane-whole_year"]] = xx[["mapspam_xirr_sugarcane"]]
+}
+
+if (dist_nm %in% "Dehra Dun") {
+    xx[["apy_sugarcane-whole_year"]] %<>% tot_frac_interp(xx[["irr_sugarcane-whole_year"]], 1:2, 3)
+}
+
+if (dist_nm %in% "Haridwar") {
+    xx[["apy_sugarcane-whole_year"]] = locf_interp(1:2, fromLast=TRUE)
+    xx[["irr_sugarcane-whole_year"]] = locf_interp(1:2, fromLast=TRUE)
+}
+
+## sunflower
+## #########
+
+if (dist_nm %in% "Udham Singh Nagar") {
+    xx[["irr_sunflower-kharif"]] %<>% irr_frac_interp(xx[["apy_sunflower-kharif"]], 5, c(4,6))
+}
+
+if (!dist_nm %in% "Udham Singh Nagar") {
+    xx[["apy_sunflower-kharif"]] = xx[["mapspam_atot_sunflower"]]
+    xx[["irr_sunflower-kharif"]] = xx[["mapspam_xirr_sunflower"]]
+}    
+    
+## wheat
+## #####
+
+## all ok
+    
+
+    

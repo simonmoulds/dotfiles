@@ -1,0 +1,29 @@
+water_balance_model = function(prec, eto, kc, p_std, zr, s0, taw, gamma) {
+    ## This function implements the water balance which is
+    ## included in the Global Crop Water Model.
+    ## 
+    ## Equation numbers in comments refer to those in the
+    ## GCWM documentation: https://tinyurl.com/y4he5cmv
+    ## [accessed 21/05/2019]
+    ##
+    ## Args:
+    ##   prec  : precipitation (mm/day)
+    ##   eto   : reference ET (mm/day); e.g. computed from
+    ##           Penman-Monteith or Hargreaves
+    ##   kc    : crop coefficient (-)
+    ##   p_std : crop specific depletion fraction (-)
+    ##   zr    : rooting depth (mm)
+    ##   s0    : initial soil water storage (mm)
+    ##   taw   : total available water (mm)
+    ##   gamma : runoff exponent (?)
+    ##
+    ## Returns:
+    ##   Updated soil water storage (mm)
+    etc = kc * eto                      # eqn 28
+    p = p_std + 0.04 * (5 - etc)        # eqn 31
+    ks = min((s0 / ((1 - p) * taw)), 1) # eqn 30
+    eta = ks * etc                      # eqn 29
+    runoff = prec * (s0 / taw) ** gamma # eqn 34
+    s1 = max(s0 + prec - runoff - eta, 0) # eqn 32
+    return(list(eta=eta, runoff=runoff, s=s1))
+}

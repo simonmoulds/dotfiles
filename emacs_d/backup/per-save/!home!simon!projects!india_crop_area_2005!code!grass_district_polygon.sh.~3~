@@ -1,0 +1,16 @@
+#!/bin/bash
+
+echo 'export GRASS_MESSAGE_FORMAT=plain
+datadir=/home/simon/projects/india_crop_area_2005
+g.region e=98E w=68E n=36N s=6N res=0:05:00
+g.region -p
+v.in.ogr input="${datadir}"/data-raw/india_adm2_1990/data/g2001_2_India.shp output=adm2_2001 --overwrite
+v.to.rast input=adm2_2001 output=adm2_2001 use=attr attribute_column=ADM2_CODE --overwrite
+r.out.gdal input=adm2_2001 output=adm2_2001_coarse.tif
+done < tmp' > mygrassjob_pt1.sh
+
+chmod u+x mygrassjob_pt1.sh
+export GRASS_BATCH_JOB=$wd/mygrassjob_pt1.sh
+grass72 /home/simon/grassdata/latlong/PERMANENT
+unset GRASS_BATCH_JOB
+rm tmp mygrassjob_pt1.sh

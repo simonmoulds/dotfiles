@@ -1,0 +1,54 @@
+                         AOS_AdjustCCx.m 17  DONE
+                    AOS_AerationStress.m 27  DONE
+               AOS_BiomassAccumulation.m 54 
+                     AOS_CalculateHIGC.m 20
+                 AOS_CalculateHILinear.m 31
+                       AOS_CanopyCover.m 286 DONE
+                     AOS_CapillaryRise.m 145 DONE
+                     AOS_CCDevelopment.m 38  DONE
+                    AOS_CCRequiredTime.m 17  DONE
+             AOS_CheckGroundwaterTable.m 79  DONE
+             AOS_CheckModelTermination.m 25  
+               AOS_ComputeCropCalendar.m 207 DONE
+                  AOS_ComputeVariables.m 307 
+                          AOS_Drainage.m 277 DONE
+             AOS_EvapLayerWaterContent.m 40
+                AOS_ExtractWeatherData.m 23
+                            AOS_Finish.m 8
+                       AOS_Germination.m 58  DONE
+                 AOS_GroundwaterInflow.m 36  
+                  AOS_GrowingDegreeDay.m 36  DONE
+                       AOS_GrowthStage.m 32  DONE
+                      AOS_HarvestIndex.m 86  
+                  AOS_HIadjPollination.m 68
+                 AOS_HIadjPostAnthesis.m 53
+                  AOS_HIadjPreAnthesis.m 36
+                   AOS_HIrefCurrentDay.m 86
+                      AOS_Infiltration.m 218 DONE
+                        AOS_Initialize.m 103
+                        AOS_Irrigation.m 92  DONE
+                   AOS_PerformTimeStep.m 22
+                     AOS_PreIrrigation.m 34  DONE
+                 AOS_RainfallPartition.m 72  DONE
+               AOS_ReadClockParameters.m 51  
+               AOS_ReadFieldManagement.m 22
+                 AOS_ReadFileLocations.m 71
+              AOS_ReadGroundwaterTable.m 81
+          AOS_ReadIrrigationManagement.m 70
+        AOS_ReadModelInitialConditions.m 282
+               AOS_ReadModelParameters.m 171
+                 AOS_ReadWeatherInputs.m 44
+            AOS_ResetInitialConditions.m 169
+                   AOS_RootDevelopment.m 98  DONE
+                     AOS_RootZoneWater.m 71  DONE
+                   AOS_SoilEvaporation.m 325 DONE
+           AOS_SoilHydraulicProperties.m 63 
+                          AOS_Solution.m 188
+                 AOS_TemperatureStress.m 69
+                     AOS_Transpiration.m 337
+                      AOS_UpdateCCxCDC.m 12  DONE
+                        AOS_UpdateTime.m 60  
+                       AOS_WaterStress.m 62  DONE
+                      AOS_WriteOutputs.m 40
+                   AquaCropOS_BatchRUN.m 30
+                        AquaCropOS_RUN.m 24

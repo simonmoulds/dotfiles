@@ -1,0 +1,16 @@
+#!/bin/bash
+
+dir="${HOME}/dotfiles"
+
+# zsh/zprezto files to begin
+zdotfiles=("zlogin","zlogout","zpreztorc","zprofile","zshenv","zshrc")
+for zdotfile in "${zdotfiles[@]}"
+do
+    ln -sf "${dir}/${zdotfile}" "${dir}"/zprezto/runcoms
+done
+
+dotfiles=("zprezto","zlogin","zlogout","zpreztorc","zprofile","zshenv","zshrc","emacs.d","bashrc","profile","tmux","tmux.conf","gitconfig")
+for dotfile in "${dotfiles[@]}"
+do
+    ln -sf "${HOME}/${dotfile}" "${dir}"
+done

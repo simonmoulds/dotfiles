@@ -1,0 +1,29 @@
+## Author : Simon Moulds
+## Date   : Dec 2019
+
+library(magrittr)
+library(lubridate)
+library(dplyr)
+
+datadir = "../data/pt_met_data/"
+
+options(stringsAsFactors = FALSE)
+x = read.csv(
+    file.path(
+        datadir,
+        "tahmo_era5_stn_TA00339_met_2016-2019.csv"
+    )
+)
+x$DATE %<>% as.POSIXct(format="%Y-%m-%d")
+x$YEAR = year(x$DATE)
+x$MONTH = month(x$DATE)
+x$DATE %<>% as.POSIXct
+
+x_mon = x %>% group_by(YEAR, MONTH) %>% summarize(P_TAHMO_AVG=sum(P_TAHMO))
+
+x %<>% left_join(x_mon)
+
+library(ggplot2)
+p = ggplot(x, aes(x=DATE, y=P_TAHMO_AVG)) +
+    geom_bar(stat="identity") +
+    geom_point(aes(x=DATE, y=P_TAHMO)))

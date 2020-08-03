@@ -1,0 +1,9 @@
+## Author : Simon Moulds
+## Date   : June 2020
+
+library(tidyverse)
+library(raster)
+library(rgdal)
+library(sp)
+
+shp = readOGR("../data/Admin boundary shapefiles/Ghana Districts/Ghana Districts 2010 census/geo2_gh2010/geo2_gh2010.shp")

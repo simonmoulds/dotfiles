@@ -1,0 +1,437 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage{array, xcolor, lipsum, bibentry}
+\usepackage[margin=3cm,tmargin=3cm]{geometry}
+\usepackage{enumitem}
+\setlist{nolistsep}
+
+\usepackage{tabularx}
+\usepackage[numbers]{natbib}
+\usepackage{hyperref}
+\usepackage{mathtools}
+\usepackage{multicol}
+\usepackage{sectsty}
+\usepackage{longtable}
+\usepackage{fixltx2e}
+%% \usepackage[none]{hyphenat} %% no hyphenation
+\sectionfont{\normalfont}
+
+% \usepackage[showframe]{geometry}
+\usepackage{layout}
+\usepackage{doi}
+
+%% \title{\bfseries\Huge Simon Moulds}
+
+%% \title{\vspace{-2.0cm}\bf Simon Moulds}
+%% \author{texblog+cv@gmail.com}
+%% \date{}
+
+\definecolor{lightgray}{gray}{0.8}
+\newcolumntype{L}{>{\raggedleft}p{0.15\textwidth}}
+%% \newcolumntype{L}{>{\raggedleft}p{0.14\textwidth}}
+\newcolumntype{R}{p{0.85\textwidth}}
+\newcommand\VRule{\color{lightgray}\vrule width 0.5pt}
+
+\usepackage{tikz}
+
+\newcommand*{\marvosymbol}[1]{{\fontfamily{mvs}\fontencoding{U}\fontseries{m}\fontshape{n}\selectfont\char#1}}
+\definecolor{color2}{rgb}{0.55,0.55,0.55}% Chose your color here.
+
+\newcommand*{\addresssymbol}       {}
+\newcommand*{\mobilephonesymbol}   {\marvosymbol{72}~}
+\newcommand*{\fixedphonesymbol}    {\marvosymbol{84}~}
+\newcommand*{\faxphonesymbol}      {\marvosymbol{117}~}
+\newcommand*{\emailsymbol}         {\marvosymbol{66}~}
+\newcommand*{\homepagesymbol}      {{\Large\marvosymbol{205}}~}
+
+\begin{document}%% \layout
+
+\begin{center}
+  \Huge Simon Moulds \\[0.3em]
+  \footnotesize 29 Horders Wood Gardens, Waltham Chase, Hampshire\\
+  \mobilephonesymbol~+44~7815~610~449 \ $\cdot$ \emailsymbol~sim.moulds@gmail.com\\
+  \end{center}
+
+%% %% \maketitle
+%% \vspace{-0.25cm}
+% \vspace{0.25cm}
+
+% \section*{Research interests}
+% My research focuses on the assessment of coupled human-environment systems in the context of social and environmental change. In particular, I am interested in developing tools and methods to quantify feedbacks between human activities on regional water resources and precipitation. I have substantial experience developing environmental models for India and possess a sound understanding of policy issues around water resources management in the country. 
+
+\section*{Employment}
+\begin{tabularx}{\textwidth}{@{}L!{\VRule}X@{}}
+  Jul 2016--&{\bf Research Fellow, University of Exeter}\\
+  &\begin{itemize}
+     \setlength\itemsep{0.2em}
+   \item Contributing to CHANSE; an international and multidisciplinary project which forms part of the Sustaining Water Resources for Food, Energy \& Ecosystem Services research programme, jointly funded by UK NERC and the Indian Ministry of Earth Sciences
+   \item Integrating data and models in a system dynamics framework to identify long-term trends in water supply and demand under various scenarios of climate change and economic growth
+     % \item Developing a suite of models at a range of spatial and temporal scales to improve the quantification and mapping of interactions and feedbacks between human activities and the hydro-meteorological system of the Indo-Gangetic Plain
+   \item Forcing an integrated assessment model (GCAM) with quantitative drivers of the Shared Socioeconomic Pathways to generate scenarios of agricultural production for India during 2020-2100
+   \item Continuing aspects of my PhD research to gain further insight into the relationship between large scale irrigation across the IGP and the formation and behaviour of the South Asian monsoon
+   % \item Developing a series of models at a range of spatial and temporal scales to assess threats to ecosystem services and livelihoods in the IGP
+   \end{itemize} \\
+
+  Jan--Jul 2016&{\bf Research Assistant, Imperial College London}\\
+  &\begin{itemize}
+     \setlength\itemsep{0.2em}
+   \item Prepared a briefing note to disseminate the scientific outcomes of Hydroflux India, the project to which my PhD contributed, to a policy audience
+   \item Developed a range of broad policy options to improve India's water and food security under climate change, population growth and economic development% . These include options such as intensifying agricultural production in north-east India, adopting more efficient irrigation practices in certain regions and... rural electrification in certain regions combined with supply and demand side measures for controlling electricity consumption in the agricultural sector
+   \item Managed competing priorities as I completed the briefing note alongside writing up my PhD thesis
+   % \item Collaborated with policy experts from the Grantham Institute for Climate Change and the Environment, British Geological Survey and UNESCO
+   \end{itemize} \\
+
+  Sep--Dec 2013&{\bf Research Assistant, Imperial College London}\\
+  &\begin{itemize}
+     \setlength\itemsep{0.2em}
+   \item Developed a spatially distributed hydrological model for the Tropical Andes to quantify the seasonal contribution of glacier melt to the water supply of agriculture and hydroelectric sectors as well as domestic users in regional centers such as Lima, Quito and La Paz
+   % \item Showed that there is strong spatial variability in glacier contribution to river flow and that, in many cases, the threat posed by accelerated glacier melt and eventual disappearance is negligible compared to other facets of environmental and social change
+     \item Showed that few users rely on water resources with a high (\textgreater25\%) long-term average glacier melt contribution but the level of dependence increases sharply under drought conditions
+   \item Prepared a UNESCO technical report to describe the scientific results and discuss the policy implications arising from modelling work% Subsequently, I co-authored a peer-reviewed journal article
+   \item Participated in a UNESCO workshop in Quito, Ecuador for scientists, practitioners and policy-makers to devise research agendas and strategies to safeguard ecosystems and livelihoods across the region
+   % \item Jointly supervised a number of MSc and MEng research projects which used the modelling framework I developed to explore specific
+   \end{itemize} \\
+
+  2011--2012&{\bf Graduate Engineer, Interserve Construction Limited}\\
+  &\begin{itemize}
+     \setlength\itemsep{0.2em}
+   \item Worked for Interserve Construction for one year following graduation to fulfill the requirements of an industrial scholarship I held during undergraduate and postgraduate study
+   % \item Managed several work packages on a \pounds17 million building project, which were delivered on time and budget
+   % \item Took charge of delivering the site safety briefing to new tradesmen
+   % \item As the main person responsible for site surveying and quality assurance I showed... attention to detail to ensure the building was built according to specification. Developed strong working relationships with the architect and structural engineer to resolve design conflicts
+   \item Worked as part of a large team to deliver a successful project which was `Highly Commended' by the Institution of Civil Engineers % (South East Region; Large Project Category)
+   \end{itemize} \\
+
+  %% 2005--2007&{\bf General Assistant, Elior UK}\\
+  %% &\begin{itemize}
+  %%    \setlength\itemsep{0.2em}
+  %%  \item Worked as part of a small team in a catering company to save money for university
+  %%  \end{itemize} \\
+\end{tabularx}
+
+\section*{Education}
+\begin{tabularx}{\textwidth}{@{}L!{\VRule}X@{}}
+  2012--2016&{\bf PhD in Civil Engineering (Hydrology), Imperial College London}\\
+  % 2012--2016&{\bf PhD in Hydrology, Imperial College London}\\
+  &\textit{Thesis:} Toward integrated modelling systems to assess vulnerability of water resources under environmental change (supervised by Dr Wouter Buytaert and Dr Ana Mijic)\\
+  &\begin{itemize}
+     \setlength\itemsep{0.2em}
+   \item Contributed to Hydroflux India, a large and multidisciplinary project which brought together scientists, engineers and policy experts from UK, Indian institutions and UNESCO
+   \item Developed a range of computer models and data products to improve the quantification of environmental change arising from India's green revolution
+   \item Applied machine learning algorithms to large spatiotemporal datasets to predict the spatial allocation of future and past land change
+   \item Demonstrated that large scale agricultural intensification across the Indo-Gangetic plain in northern India has substantial altered the hydrology of the region and identified a feedback mechanism between irrigation and the behaviour of the South Asian monsoon
+   % \item Worked extensively with large large environmental datasets and used various command line tools for data retrieval and processing
+   % \item Formed strong working relationships with researchers in UK and India
+   % \item Delivered oral and poster presentations at international conferences and published peer-reviewed journal articles
+   \item Participated in a range of other short projects alongside my PhD as well as fulfilling various teaching responsibilities
+  \end{itemize} \\
+  2010--2011&{\bf MSc in Hydrology and Water Resources Management, Imperial College London, Distinction}\\
+  &\textit{Thesis:} Optimising hydrological model complexity in the presence of noise (supervised by Dr Adrian Butler and Dr Nick Woodman)\\
+  \\
+  % &\begin{itemize}
+  %   \setlength\itemsep{0.2em}
+  % \item Developed a simple hydrogeological model based on linear reservoirs to predict leachate production from landfill which outperformed a proprietary, process-based model
+  % \end{itemize} \\
+  &\textit{Key taught modules:}\\
+  % \begin{itemize}
+  %    \setlength\itemsep{0.2em}
+  %  \item Environmental Fluid Mechanics
+  %  \item Mathematical \& Statistical Modelling
+  %  \item Environmental management in developing countries
+  %  \item Urban Hydrology \& Urban Drainage
+  %  \item Rainfall-Runoff Modelling and Flood Hydrology
+  %  \item Stochastic Hydrology
+  %  \end{itemize} \\
+  
+  &\begin{minipage}[t]{0.5\hsize}
+     \begin{itemize}
+       %% \setlength\itemsep{0.2em}
+     \item Hydrological Processes
+     \item Environmental Fluid Mechanics
+     \item Mathematical \& Statistical Modelling
+     \end{itemize}
+   \end{minipage}%
+  \begin{minipage}[t]{0.5\hsize}
+    \begin{itemize}
+      %% \setlength\itemsep{0.2em}
+    \item Urban Hydrology \& Urban Drainage 
+    \item Rainfall-runoff modelling
+    \item Stochastic Hydrology
+    \end{itemize}
+  \end{minipage} \\
+     %% \item Urban Hydrology & Urban Drainage
+     %% \item Rainfall-runoff modelling
+     %% \item Stochastic Hydrology
+     %% \end{itemize} \\
+     %% \end{multicols}
+  \\
+
+  2007--2010&{\bf BEng (Hons) in Civil Engineering, University of Birmingham, First class}\\
+  % &\begin{itemize}
+  %%    \setlength\itemsep{0.2em}
+
+  %%  %% \item Received industrial sponsorship from Interserve Construction Limited
+  %%  %% \item Tom Essery Prize for Water Engineering
+     
+  %%  \end{itemize} \\
+  %% \\
+  %% 1998--2005&{\bf Abingdon School}\\
+  %% &A-level: {Art \& Design (A), Mathematics (B), Religious Studies (B)\\
+  %% &GCSE:\hphantom{l} {10 A*--B}\\
+\end{tabularx}\\
+
+  % \newpage
+
+\section*{Teaching}
+\begin{itemize}
+  \setlength\itemsep{0.2em}
+\item Provided teaching assistance during tutorials for undergraduate and postgraduate engineering modules at Imperial College
+\item Co-supervised several MEng and MSc research projects in the area of hydrology and water resources engineering
+\item Delivered tutorials to peers on programming in R and using GIS for hydrological modelling
+\end{itemize}
+
+\section*{Awards and prizes}
+%% \begin{tabular}{L!{\VRule}R}
+\begin{itemize}
+  \setlength\itemsep{0.2em}
+\item Climate-KIC mobility award for research visit to Ecuador 2014
+\item Climate-KIC business and innovation summer school 2013
+\item Best Poster Award, British Hydrological Society Peter Wolf Symposium 2013
+\item Grantham Institute PhD studentship 2012--2015
+\item NERC Masters studentship 2010--2011
+\item Engineering Undergraduate Prize, University of Birmingham 2010
+\item Tom Essery Prize for Water Engineering, University of Birmingham 2010
+% \item Industrial scholarship for undergraduate and postgraduate study, funded by Interserve Construction Limited
+  
+\end{itemize}
+
+%% \end{tabular}
+
+% \bibliographystyle{cv-apalike.bst}
+% \bibliographystyle{agsm}
+% \bibliographystyle{apalike}
+\bibliographystyle{cv-apalike}
+\nobibliography{publication}
+
+%% \vspace{-0.1cm}
+\section*{Refereed publications}
+%% \begin{tabular}{L!{\VRule}R}
+\begin{itemize}
+  \setlength\itemsep{0.6em}
+  %% \item \bibentry{moulds2016a}
+  %% \item \bibentry{moulds2016b}
+  \item \bibentry{zogheib2018high}
+  \item \bibentry{agrawal2018effects}
+  \item \bibentry{moulds2018spatio}
+  \item \bibentry{okeeffe2018including}
+  \item \bibentry{buytaert2017low}
+  \item \bibentry{bradley2017}
+  \item \bibentry{moulds2015open}
+  \item \bibentry{tsarouchi2014historical}
+\end{itemize}
+  %% \item \bibentry{buytaert2015low}
+
+%% \end{tabular}
+
+%% \vspace{-0.
+\section*{Selected conference abstracts}
+%% \begin{tabular}{}%L!{\VRule}R}
+\begin{itemize}
+  \setlength\itemsep{0.6em}
+  \item \bibentry{moulds2017spatial}
+  \item \bibentry{agrawal2017irrigation}
+  % \item \bibentry{appel2016scalable}
+  \item \bibentry{buytaert2015developing}
+  \item \bibentry{buytaert2015facilitating}
+  \item \bibentry{moulds2014land}
+  \item \bibentry{moulds2014modelling}
+  % \item \bibentry{mijic2013hydrological}
+  % \item \bibentry{tsarouchi2013quantifying}
+\end{itemize}
+
+\newpage
+\section*{Other publications}
+\bibentry{moulds2017climate}
+
+%% \vspace{-0.1cm}
+% \section*{Publications in preparation}
+% \begin{itemize}
+%   \setlength\itemsep{0.6em}
+%   \item \bibentry{moulds2016a}
+%   % \item \bibentry{bradley2017}
+%   \item \bibentry{moulds2016b}
+%   % \item \bibentry{buytaert2015low}
+% \end{itemize}
+
+% %% \vspace{-0.1cm}
+% \section*{Software}
+% \begin{itemize}
+%   \setlength\itemsep{0.6em}
+% \item \bibentry{moulds2015a}
+% \end{itemize}
+
+%% \vspace{-0.1cm}
+\section*{Computer literacy}
+\begin{tabularx}{\textwidth}{@{}L!{\VRule}X@{}}
+  Programming& Expert in R, competent in Python, C/C++ and Bash shell script, some experience of Matlab and Fortran\\
+  Software&GRASS GIS, QGIS, \LaTeX\\ 
+  Platforms&Linux/Unix, Microsoft Windows\\
+\end{tabularx}
+
+\section*{Interests}
+% \begin{tabular}{}
+  Swimming, cycling, hill walking\\
+% \end{tabular}
+
+%% \section*{References}
+%% &\begin{minipage}{0.33\hsize}
+%%    Dr Wouter Buytaert\\
+%%    Imperial College London\\
+%%    SW7 2AZ\\
+%%    +44~20~7594~1329\\
+%%    w.buytaert@imperial.ac.uk\\
+%%      %% \begin{itemize}
+%%      %%   \setlength\itemsep{0.2em}
+%%      %% \item Hydrological Processes
+%%      %% \item Environmental Fluid Mechanics
+%%      %% \item Mathematical \& Statistical Modelling
+%%      %% \end{itemize}
+%%    \end{minipage}%
+%% \begin{minipage}{0.33\hsize}
+%%   Dr Ana Mijic\\
+%%   Imperial College London\\
+%%   SW7 2AZ\\
+%%   +44~20~7594~3796\\
+%%   ana.mijic@imperial.ac.uk\\
+
+%%     %% \begin{itemize}
+%%     %%   \setlength\itemsep{0.2em}
+%%     %% \item Urban Hydrology \& Urban Drainage
+%%     %% \item Rainfall-runoff modelling
+%%     %% \item Stochastic Hydrology
+%%     %% \end{itemize}
+    
+%%   \end{minipage}
+%% \begin{minipage}{0.33\hsize}
+%%   Dr Adrian Butler\\
+%%   Imperial College London\\
+%%   SW7 2AZ\\
+%%   +44~20~7594~6122\\
+%%   a.butler@imperial.ac.uk\\
+
+    %% \begin{itemize}
+    %%   \setlength\itemsep{0.2em}
+    %% \item Urban Hydrology \& Urban Drainage
+    %% \item Rainfall-runoff modelling
+    %% \item Stochastic Hydrology
+    %% \end{itemize}
+    
+  %% \end{minipage}
+
+
+%% \section*{Interests}
+%% \begin{tabular}{}
+%%   Cricket, running, cycling\\
+%% \end{tabular}
+
+%% \end{tabular}
+
+\end{document}
+
+%% \begin{filecontents*}{publication.bib}
+
+%% @article{tsarouchi2014historical,
+%%   title={Historical and future land-cover changes in the {Upper} {Ganges} basin of {India}},
+%%   author={Tsarouchi, G.M. and Mijic, A. and Moulds, S. and Buytaert, W.},
+%%   journal={International Journal of Remote Sensing},
+%%   volume={35},
+%%   number={9},
+%%   pages={3150--3176},
+%%   year={2014}
+%% }
+
+%% @inproceedings{moulds2014modelling,
+%%   title={Modelling land use change in the {Ganga} basin},
+%%   author={Moulds, Simon and Mijic, Ana and Buytaert, Wouter},
+%%   booktitle={EGU General Assembly Conference Abstracts},
+%%   volume={16},
+%%   pages={10374},
+%%   year={2014}
+%% }
+
+%% @inproceedings{tsarouchi2013quantifying,
+%%   title={Quantifying the impact of land use change on hydrological responses in the {Upper} {Ganga} {Basin}, {India}},
+%%   author={Tsarouchi, Georgia-Marina and Mijic, Ana and Moulds, Simon and Chawla, Ila and Mujumdar, Pradeep and Buytaert, Wouter},
+%%   booktitle={EGU General Assembly Conference Abstracts},
+%%   volume={15},
+%%   pages={236},
+%%   year={2013}
+%% }
+
+%% @inproceedings{mijic2013hydrological,
+%%   title={Hydrological feedbacks in groundwater dominated systems: approaches, challenges and projections of future change},
+%%   author={Mijic, A and Tsarouchi, G and Chawla, I and Moulds, S and O'Keeffe, J and Turner, AG and Williams, CJ and Chakraborty, A and Mackay, JD and McKenzie, A and others},
+%%   booktitle={AGU Fall Meeting Abstracts},
+%%   volume={1},
+%%   pages={04},
+%%   year={2013}
+%% }
+
+%% @inproceedings{moulds2014land,
+%%   title={Land Use Change Modelling in {R}},
+%%   author={Moulds, S and Buytaert, W},
+%%   booktitle={AGU Fall Meeting Abstracts},
+%%   volume={1},
+%%   pages={02},
+%%   year={2014}
+%% }
+
+%% @inproceedings{moulds2013modelling,
+%%   title={Modelling land use change in the {Ganga} basin},
+%%   author={Moulds, S and Tsarouchi, G and Mijic, A and Buytaert, W},
+%%   booktitle={AGU Fall Meeting Abstracts},
+%%   volume={1},
+%%   pages={1288},
+%%   year={2013}
+%% }
+
+%% @article{moulds2015open,
+%%   title={An open and extensible framework for spatially explicit land use change modelling: the lulcc R package},
+%%   author={Moulds, S and Buytaert, W and Mijic, A},
+%%   journal={Geoscientific Model Development},
+%%   volume={8},
+%%   number={10},
+%%   pages={3215--3229},
+%%   year={2015},
+%%   publisher={Copernicus GmbH}
+%% }
+
+%% @article{buytaert2015low,
+%%   title={Low contribution of tropical glaciers to human water use},
+%%   author={Buytaert, W and Moulds, S and Acosta, L and De Bi{\`{e}}vre, B and Olmos, C and Villacis, M and Tovar, C and Verbist, K},
+%%   journal={Water Resources Research},
+%%   year="in review",
+%% }
+
+%% @inproceedings{buytaert2015developing,
+%%   title={Developing hydrological monitoring networks with {Arduino}},
+%%   author={Buytaert, Wouter and Vega, Andres and Villacis, Marcos and Moulds, Simon},
+
+%%  booktitle={EGU General Assembly Conference Abstracts},
+%%   volume={17},
+%%   pages={11451},
+%%   year={2015}
+%% }
+
+%% @inproceedings{buytaert2015facilitating,
+%%   title={Facilitating hydrological data analysis workflows in {R}: the {RH}ydro package},
+%%   author={Buytaert, Wouter and Moulds, Simon and Skoien, Jon and Pebesma, Edzer and Reusser, Dominik},
+%%   booktitle={EGU General Assembly Conference Abstracts},
+%%   volume={17},
+%%   pages={11033},
+%%   year={2015}
+%% }
+
+%% \end{filecontents*}
+
+%% \setlength{\voffset}{-0.35in}
+%% \addtolength{\textheight}{0.35in}

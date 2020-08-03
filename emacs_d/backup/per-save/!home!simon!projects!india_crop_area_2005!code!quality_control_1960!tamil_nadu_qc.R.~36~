@@ -1,0 +1,168 @@
+## Author : Simon Moulds
+## Date   : Apr 2018
+
+## Quality control for Tamil Nadu
+
+## Barley
+## ######
+
+## Not grown
+
+## Chickpea
+## ########
+
+if (dist_nm %in% c("Coimbatore","Madurai","North Arcot","Salem","Tiruchchirappalli.Thanjavur","Tirunelveli")) {
+    xx[["irr_chickpea"]] %<>% irr_frac_interp(xx[["apy_chickpea"]], 44:51, 43)
+    xx[["irr_chickpea"]] %<>% locf_interp(61:62)
+    xx[["apy_chickpea"]] %<>% locf_interp(61:62)
+}
+
+## Cotton
+## ######
+
+if (is.na(xx[["irr_cotton"]][61])) {
+    xx[["irr_cotton"]] %<>% locf_interp(61)
+} else if (is.na(xx[["irr_cotton"]][62])) {
+    xx[["irr_cotton"]] %<>% linear_interp(62)
+}
+
+xx[["apy_cotton"]] %<>% tot_frac_interp(xx[["apy_cotton"]], 61:63, 60)
+
+## Finger millet
+## #############
+
+if (is.na(xx[["irr_finger_millet"]][61])) {
+    xx[["irr_finger_millet"]] %<>% locf_interp(61)
+} else if (is.na(xx[["irr_finger_millet"]][62])) {
+    xx[["irr_finger_millet"]] %<>% linear_interp(62)
+}
+
+xx[["apy_finger_millet"]] %<>% tot_frac_interp(xx[["apy_finger_millet"]], 61:63, 60)
+
+xx[["irr_finger_millet"]] %<>% irr_frac_interp(xx[["apy_finger_millet"]], 44:50, 43)
+
+## Groundnut
+## #########
+
+if (is.na(xx[["irr_groundnut"]][61])) {
+    xx[["irr_groundnut"]] %<>% locf_interp(61)
+} else if (is.na(xx[["irr_groundnut"]][62])) {
+    xx[["irr_groundnut"]] %<>% linear_interp(62)
+}
+
+xx[["apy_groundnut"]] %<>% tot_frac_interp(xx[["apy_groundnut"]], 61:63, 60)
+
+## xx[["irr_groundnut"]] %<>% irr_frac_interp(xx[["apy_groundnut"]], 44:50, 43)
+
+## Maize
+## #####
+
+if (is.na(xx[["irr_maize"]][61])) {
+    xx[["irr_maize"]] %<>% locf_interp(61)
+} else if (is.na(xx[["irr_maize"]][62])) {
+    xx[["irr_maize"]] %<>% linear_interp(62)
+}
+
+xx[["apy_maize"]] %<>% tot_frac_interp(xx[["apy_maize"]], 61:63, 60)
+
+## Pearl millet
+## ############
+
+if (is.na(xx[["irr_pearl_millet"]][61])) {
+    xx[["irr_pearl_millet"]] %<>% locf_interp(61)
+} else if (is.na(xx[["irr_pearl_millet"]][62])) {
+    xx[["irr_pearl_millet"]] %<>% linear_interp(62)
+}
+
+xx[["apy_pearl_millet"]] %<>% tot_frac_interp(xx[["apy_pearl_millet"]], 61:63, 60)
+
+xx[["irr_pearl_millet"]] %<>% irr_frac_interp(xx[["apy_pearl_millet"]], 44:50, 43)
+
+## Pigeonpea
+## #########
+
+if (is.na(xx[["irr_pigeonpea"]][61])) {
+    xx[["irr_pigeonpea"]] %<>% locf_interp(61)
+} else if (is.na(xx[["irr_pigeonpea"]][62])) {
+    xx[["irr_pigeonpea"]] %<>% linear_interp(62)
+}
+
+xx[["apy_pigeonpea"]] %<>% tot_frac_interp(xx[["apy_pigeonpea"]], 61:63, 60)
+
+xx[["irr_pigeonpea"]] %<>% irr_frac_interp(xx[["apy_pigeonpea"]], 44:50, 43)
+
+## Rapeseed
+## ########
+
+## Hardly grown in Tamil Nadu
+
+## Rice
+## ####
+
+autumn_rice = xx[["irr_rice-autumn"]]
+winter_rice = xx[["irr_rice-winter"]]
+summer_rice = xx[["irr_rice-summer"]]
+
+xx[["irr_rice-autumn"]][42:63] = winter_rice[42:63]
+xx[["irr_rice-winter"]][42:63] = autumn_rice[42:63]
+
+xx[["irr_rice-autumn"]] %<>% irr_frac_interp(xx[["apy_rice"]], 44:50, 51)
+xx[["irr_rice-winter"]] %<>% irr_frac_interp(xx[["apy_rice"]], 44:50, 51)
+xx[["irr_rice-summer"]] %<>% irr_frac_interp(xx[["apy_rice"]], 44:50, 51)
+
+xx[["irr_rice-summer"]] %<>% linear_interp(62)
+xx[["irr_rice-autumn"]] %<>% linear_interp(62)
+xx[["irr_rice-winter"]] %<>% linear_interp(62)
+
+xx[["apy_rice"]] %<>% tot_frac_interp(rowSums(data.frame(xx[["irr_rice-summer"]], xx[["irr_rice-autumn"]], xx[["irr_rice-winter"]]), na.rm=TRUE), 61:63, 60)
+
+if (dist_nm %in% c("North Arcot")) {
+    xx[["apy_rice"]] %<>% tot_frac_interp(rowSums(data.frame(xx[["irr_rice-summer"]], xx[["irr_rice-autumn"]], xx[["irr_rice-winter"]]), na.rm=TRUE), 33, 32)
+}
+
+if (dist_nm %in% c("Salem")) {
+    xx[["irr_rice-autumn"]] %<>% irr_frac_interp(xx[["apy_rice"]], 31, 30)
+}
+
+if (dist_nm %in% c("South Arcot")) {
+    xx[["irr_rice-winter"]] %<>% irr_frac_interp(xx[["apy_rice"]], 31:32, 30)
+}
+
+
+## Sesamum
+## #######
+
+xx[["irr_sesamum"]] %<>% linear_interp(62)
+xx[["apy_sesamum"]] %<>% tot_frac_interp(xx[["irr_sesamum"]], 61:63, 60)
+
+## Sorghum
+## #######
+
+if (is.na(xx[["irr_sorghum-kharif"]][61])) {
+    xx[["irr_sorghum-kharif"]] %<>% locf_interp(61)
+} else if (is.na(xx[["irr_sorghum-kharif"]][62])) {
+    xx[["irr_sorghum-kharif"]] %<>% linear_interp(62)
+}
+
+xx[["apy_sorghum-kharif"]] %<>% tot_frac_interp(xx[["apy_sorghum-kharif"]], 61:63, 60)
+
+if (is.na(xx[["irr_sorghum-rabi"]][61])) {
+    xx[["irr_sorghum-rabi"]] %<>% locf_interp(61)
+} else if (is.na(xx[["irr_sorghum-rabi"]][62])) {
+    xx[["irr_sorghum-rabi"]] %<>% linear_interp(62)
+}
+
+xx[["apy_sorghum-rabi"]] %<>% tot_frac_interp(xx[["apy_sorghum-rabi"]], 61:63, 60)
+
+## Sugarcane
+## #########
+
+xx[["irr_sugarcane-whole_year"]] %<>% linear_interp(62)
+xx[["apy_sugarcane-whole_year"]] %<>% tot_frac_interp(xx[["irr_sugarcane-whole_year"]], 61:63, 60)
+
+## Wheat
+## #####
+
+## Not grown in Tamil Nadu
+
+

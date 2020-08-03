@@ -1,0 +1,50 @@
+
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+import serial
+
+
+SERIAL = 'COM6'
+BAUD = 115200
+
+sensorin = serial.Serial(SERIAL,BAUD)
+
+fig,ax = plt.subplots()
+line, = ax.plot(np.random.rand(10)) 
+ax.set_ylim(0,300)
+ax.set_xlabel('Time',fontsize=20)
+ax.set_ylabel('Height [m]',fontsize=20)
+plt.grid(True)
+xdata = [0]*100
+ydata = [0]*100
+
+def run(data):
+    t,y = data
+    del xdata[0]
+    del ydata[0]
+    # Installed height of sensor [cm] - MODIFY as necessary
+    H = 250
+    #y_p = np.divide(np.subtract(H,int(y)),100)
+    xdata.append(t)
+    ydata.append(y)
+    print(y)
+    ax.set_xlim(0,1000) # change xaxis limits to adjust to data
+    line.set_data(xdata, ydata) # Draws an animated line (can be changed to points)
+    line.set_lw(3.0)
+    return line,
+    
+def data():
+    t = 0
+    while True:
+        t+=0.1 #check how to display UTC times
+        try:
+            sensor = sensorin.readline()
+        except:
+            sensor < 0
+        yield t, sensor
+
+ani = animation.FuncAnimation(fig, run, data, interval=0, blit=True)
+
+plt.show()
+

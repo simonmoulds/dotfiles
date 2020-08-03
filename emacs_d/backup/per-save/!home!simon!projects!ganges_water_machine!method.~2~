@@ -1,0 +1,17 @@
+Basic idea is as follows:
+
+Run JULES for irrigated and non-irrigated scenarios.
+
+For the irrigated scenario we're not concerned with the source - we just need to know the maximum area that is equipped for irrigation.
+
+Then we construct two scenarios:
+
+(i)  Irrigation source comes from groundwater + area currently irrigated with canals
+(ii) Irrigation source comes from groundwater + the maximum possible canal area
+     [q: assume canal irrigation is only during monsoon?]
+     [q: do we need to know reservoir capacities?]
+
+Then we do some analysis:
+
+(i)  Sustainabiity of groundwater resource under both scenarios
+(ii) 

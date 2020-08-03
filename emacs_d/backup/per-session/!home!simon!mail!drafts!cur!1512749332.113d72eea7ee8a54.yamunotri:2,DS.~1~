@@ -1,0 +1,64 @@
+From: Simon Moulds <s.moulds@exeter.ac.uk>
+To: "O'Keeffe, Jimmy M" <jimmy.okeeffe@imperial.ac.uk>
+Subject: Re: paper and stuff
+References: <VI1PR06MB1582C69989AD8353845E4C4DD43A0@VI1PR06MB1582.eurprd06.prod.outlook.com> <878teqh90j.fsf@yamunotri.localdomain> <VI1PR06MB15826C52FF0534523B615D98D43A0@VI1PR06MB1582.eurprd06.prod.outlook.com> <87zi6tfitd.fsf@yamunotri.localdomain> <VI1PR06MB15827D042DEF4268FEDD19D8D4300@VI1PR06MB1582.eurprd06.prod.outlook.com>
+User-agent: mu4e 1.0-alpha2; emacs 24.5.1
+In-reply-to: <VI1PR06MB15827D042DEF4268FEDD19D8D4300@VI1PR06MB1582.eurprd06.prod.outlook.com>
+
+<#part type="application/pdf" filename="~/Dropbox/documents/papers/livelihood_model/livelihood_model.pdf" disposition=attachment>
+<#/part>
+Hi Jimmy,
+
+Yes, we can talk about in the week. I've attached a document with the
+model equations. It's not complete and needs some padding, but the
+essence is there, I think. If we get some time next week we can try and
+integrate this with the most recent draft.
+
+See you tomorrow!
+
+Cheers,
+Simon
+
+O'Keeffe, Jimmy M writes:
+
+> Hi Simon,
+>
+>
+> Well done on getting that far.
+>
+>
+> The results look interesting. In the original version the 0.95 means that 5% of the rainfall was lost to run off (an additional amount would have also been lost as evap - I'm guessing it should be just as sensitive to this).
+>
+>
+> In the results when set to 0.5 (50% loss) we get a drawdown, when it's set to 0.7 (30% loss) water levels rise. This looks OK to me.
+>
+>
+> Good to see the yields are also varying a little.
+>
+>
+> Looking forward to chatting about it during the week. I'm still working away on the text...
+>
+>
+> See you tomorrow
+>
+> Jimmy
+>
+> ________________________________
+> From: Simon Moulds <S.Moulds@exeter.ac.uk>
+> Sent: 08 December 2017 13:30:38
+> To: O'Keeffe, Jimmy M
+> Subject: Re: paper and stuff
+>
+> Hi Jimmy,
+>
+> I'm going through the model code and have adjusted the root
+> zone/groundwater model as we discussed previously. I'm finding that it
+> is very sensitive to the runoff coefficient parameter ('ro' in the
+> original gw_model_daily.R script). In the original model it's set to
+> 0.95 but I'm finding that values between 0.5 and 0.7 are giving the most
+> sensible looking results. I've attached two screenshots (results1 is
+> 0.5, results2 is 0.7). What do you think?
+>
+> Cheers,
+> Simon
+

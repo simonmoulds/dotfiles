@@ -1,0 +1,11 @@
+## Author : Simon Moulds
+## Date   : June 2019
+
+library(foreign)
+
+datadir = "/home/simon/projects/pathways/data/g7spss"
+
+## aggregates
+x = read.spss(file.path(datadir, "aggregates", "aggregates", "00_GHA_BASICINFO.sav"), to.data.frame=TRUE)
+
+x = read.spss(file.path(datadir, "aggregates", "aggregates", "01_GHA_EXPFOOD.sav"), to.data.frame=TRUE)

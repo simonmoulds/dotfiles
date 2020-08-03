@@ -1,0 +1,104 @@
+## Author : Simon Moulds
+## Date   : May 2018
+
+library(maptools)
+library(rasterVis)
+library(grid)
+library(viridis)
+library(magrittr)
+library(dplyr)
+library(tidyr)
+library(tibble)
+library(latticeExtra)
+library(raster)
+
+options(stringsAsFactors = FALSE)
+if (!dir.exists("data/output_2005/growing_season_maps")) {
+    dir.create("data/output_2005/growing_season_maps")
+}
+
+india_template = raster("/home/simon/projects/india_crop_area_2005/data/output_2005/seasonal_maps/INDIA_RAIN_RICE_KHARIF_2005.tif")
+india_template[!is.na(india_template)] = 1
+
+fs = list.files("data/output_2005/seasonal_maps", pattern="2005.tif")
+crop_calendar = read.csv("data/crop_calendar_interp.csv", sep="\t")
+names(crop_calendar) %<>% gsub("\\.", "_", .)
+crop_calendar[["CROP"]] %<>% gsub(" ", "_", .)
+crop_calendar[["SEASON"]] %<>% gsub(" ", "_", .)
+crop_calendar[["WATER"]] %<>% gsub("IRRIGATED", "IRR", .)
+crop_calendar[["WATER"]] %<>% gsub("RAINFED", "RAIN", .)
+
+rgn_map = raster("data/g2008_rgn_India_2001_rast_interp.tif")
+rgn_map = crop(rgn_map, extent(x=68, 98, 6, 36))
+
+## TODO: interpolate
+
+rgn_pts = as(rgn_map, "SpatialPointsDataFrame")
+names(rgn_pts) = "region"
+rgn1_pts = rgn_pts[rgn_pts$region == 1,]
+rgn2_pts = rgn_pts[rgn_pts$region == 2,]
+rgn3_pts = rgn_pts[rgn_pts$region == 3,]
+rgn4_pts = rgn_pts[rgn_pts$region == 4,]
+
+myfun = function(start, end) {
+    index = rep(FALSE, 12)
+    if (is.na(start) | is.na(end)) {
+        return(index)
+    } else {
+        if (start <= end) {
+            index[start:end] = TRUE
+        } else {
+            index[start:12] = TRUE
+            index[1:end] = TRUE
+        }
+    }    
+    index
+}
+        
+for (i in 1:length(fs)) {
+    water = gsub("^INDIA_(RAIN|IRR)_(.*)_(KHARIF|RABI|WHOLE_YEAR|SUMMER)_2005.tif$", "\\1", fs[i])
+    crop = gsub("^INDIA_(RAIN|IRR)_(.*)_(KHARIF|RABI|WHOLE_YEAR|SUMMER)_2005.tif$", "\\2", fs[i])
+    season = gsub("^INDIA_(RAIN|IRR)_(.*)_(KHARIF|RABI|WHOLE_YEAR|SUMMER)_2005.tif$", "\\3", fs[i])
+    r = raster(paste0("data/output_2005/seasonal_maps/", fs[i]))
+    maps = stack(lapply(1:12, FUN=function(x) r))
+    row_ix = which((crop_calendar$CROP %in% crop) & (crop_calendar$WATER %in% water) & (crop_calendar$SEASON %in% season))
+    if (length(row_ix) > 1) stop()
+    if (length(row_ix) == 1) {
+
+        rgn1_index = myfun(start = crop_calendar$NORTH_SOWING[row_ix], end = crop_calendar$NORTH_HARVESTING[row_ix])
+        rgn2_index = myfun(start = crop_calendar$EAST_SOWING[row_ix], end = crop_calendar$EAST_HARVESTING[row_ix])
+        rgn3_index = myfun(start = crop_calendar$SOUTH_SOWING[row_ix], end = crop_calendar$SOUTH_HARVESTING[row_ix])
+        rgn4_index = myfun(start = crop_calendar$WEST_SOWING[row_ix], end = crop_calendar$WEST_HARVESTING[row_ix])
+        rgn_index = stack(lapply(1:12, FUN=function(x) rgn_map))
+
+        rgn_index[rgn1_pts] = matrix(data=rgn1_index, nrow=length(rgn1_pts), ncol=length(rgn1_index), byrow=TRUE)
+        rgn_index[rgn2_pts] = matrix(data=rgn2_index, nrow=length(rgn2_pts), ncol=length(rgn2_index), byrow=TRUE)
+        rgn_index[rgn3_pts] = matrix(data=rgn3_index, nrow=length(rgn3_pts), ncol=length(rgn3_index), byrow=TRUE)
+        rgn_index[rgn4_pts] = matrix(data=rgn4_index, nrow=length(rgn4_pts), ncol=length(rgn4_index), byrow=TRUE)
+
+        maps = maps * rgn_index
+
+        for (k in 1:12) {
+            mon = formatC(k, width=3, flag="0")
+            fn = file.path("data/output_2005/monthly_maps", paste0(gsub("\\.[a-z]{3}$", "_", fs[i]), mon, ".tif"))
+            writeRaster(maps[[k]], filename=fn, overwrite=TRUE)
+        }
+
+        ## create maps showing the start/end date for the crop
+        rgn_start = rgn_map
+        rgn_end = rgn_map
+        rgn_start[rgn1_pts] = crop_calendar$NORTH_SOWING[row_ix]
+        rgn_end[rgn1_pts] = crop_calendar$NORTH_HARVESTING[row_ix]
+        rgn_start[rgn2_pts] = crop_calendar$EAST_SOWING[row_ix]
+        rgn_end[rgn2_pts] = crop_calendar$EAST_HARVESTING[row_ix]
+        rgn_start[rgn3_pts] = crop_calendar$SOUTH_SOWING[row_ix]
+        rgn_end[rgn3_pts] = crop_calendar$SOUTH_HARVESTING[row_ix]
+        rgn_start[rgn4_pts] = crop_calendar$WEST_SOWING[row_ix]
+        rgn_end[rgn4_pts] = crop_calendar$WEST_HARVESTING[row_ix]
+        fn1 = file.path("data/output_2005/growing_season_maps", paste0(gsub("\\.[a-z]{3}$", "_", fs[i]), "SOWING", ".tif"))
+        fn2 = file.path("data/output_2005/growing_season_maps", paste0(gsub("\\.[a-z]{3}$", "_", fs[i]), "HARVESTING", ".tif"))
+        writeRaster(rgn_start, filename=fn1, overwrite=TRUE)
+        writeRaster(rgn_end, filename=fn2, overwrite=TRUE)
+    }
+}
+

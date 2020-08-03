@@ -1,0 +1,466 @@
+# Python script to make NetCDF input data for AquaCrop_Py
+
+import numpy as np
+import datetime
+import time
+import ConfigParser
+import gdal
+from netCDF4 import Dataset, date2num
+
+config = ConfigParser.ConfigParser()
+config.optionxform = str
+config.read('aquacrop_maize_crop_parameters.ini')
+crop_nms = config.get('cropParameters','CropName').split(',')
+
+ncrop = len(crop_nms)
+nlayer = 1
+ncompartment = 12
+nrotation = 1
+
+lat_vals = np.array([27.75, 27.25, 26.75, 26.25, 25.75, 25.25], dtype='f4')
+lon_vals = np.array([83.25, 83.75, 84.25, 84.75, 85.25, 85.75], dtype='f4')
+nlat = lat_vals.shape[0]
+nlon = lon_vals.shape[0]
+
+# meteorological variables
+# ========================
+
+# with open('AquaCropOS_input_data/Weather_tmp.txt','r') as f:
+#     reader=csv.reader(f,delimiter='\t')
+#     fieldnames=next(reader)
+#     print fieldnames
+#     d = list(reader)
+from pandas import read_csv
+d = read_csv('AquaCropOS_input_data/Weather.txt', delimiter="\t", header=1)
+col_nms = d.columns.str.replace('%%','')
+col_nms = col_nms.str.strip()
+d.columns = col_nms
+
+years = d['Year'].values
+months = d['Month'].values
+days = d['Day'].values
+
+ntime = len(years)
+dates = []
+for i in range(ntime):
+    dates.append(datetime.datetime(years[i], months[i], days[i]))
+
+prec_vals = d['Precipitation'].values[:,None,None] * np.ones((nlat, nlon))[None,:,:]
+tmin_vals = d['MinTemp'].values[:,None,None] * np.ones((nlat, nlon))[None,:,:]
+tmax_vals = d['MaxTemp'].values[:,None,None] * np.ones((nlat, nlon))[None,:,:]
+etpot_vals = d['ReferenceET'].values[:,None,None] * np.ones((nlat, nlon))[None,:,:]
+
+dataset = Dataset('meteo_test.nc', 'w')
+dataset.description = 'AquaCrop meteorological input data'
+dataset.history = 'Created ' + time.ctime(time.time())
+
+# dataset dimensions
+# ==================
+
+tm = dataset.createDimension('time', None)
+lat = dataset.createDimension('lat', nlat)
+lon = dataset.createDimension('lon', nlon)
+
+# dataset variables
+# =================
+
+times = dataset.createVariable('time', 'f4', ('time',))
+times.units = "Days since 1901-01-01"
+times.calendar = 'standard'
+times[:] = date2num(dates, units=times.units, calendar=times.calendar)
+
+latitudes = dataset.createVariable('latitude', np.float32, ('lat',))
+latitudes.units = "degrees_north"
+latitudes[:] = lat_vals
+
+longitudes = dataset.createVariable('longitude', np.float32, ('lon',))
+longitudes.units = "degrees_east"
+longitudes[:] = lon_vals
+
+prec = dataset.createVariable('precipitation', np.float32, ('time','lat','lon'))
+prec.setncattr('standard_name', 'precipitation')
+prec.setncattr('long_name', 'precipitation')
+prec.setncattr('units', 'm.day-1')
+prec.setncattr('_FillValue', np.float32(1e+20))
+prec.setncattr('missing_value', np.float32(1e+20))
+prec[:] = prec_vals
+
+tmin = dataset.createVariable('Tmin', np.float32, ('time','lat','lon'))
+tmin.setncattr('standard_name', 'Tmin')
+tmin.setncattr('long_name', 'minimum_daily_temperature')
+tmin.setncattr('units', 'degrees Celcius')
+tmin.setncattr('_FillValue', np.float32(1e+20))
+tmin.setncattr('missing_value', np.float32(1e+20))
+tmin[:] = tmin_vals
+
+tmax = dataset.createVariable('Tmax', np.float32, ('time','lat','lon'))
+tmax.setncattr('standard_name', 'Tmax')
+tmax.setncattr('long_name', 'maximum_daily_temperature')
+tmax.setncattr('units', 'degrees Celcius')
+tmax.setncattr('_FillValue', np.float32(1e+20))
+tmax.setncattr('missing_value', np.float32(1e+20))
+tmax[:] = tmax_vals
+
+etpot = dataset.createVariable('referencePotET', np.float32, ('time','lat','lon'))
+etpot.setncattr('standard_name', 'referencePotET')
+etpot.setncattr('long_name', 'referencePotET')
+etpot.setncattr('units', 'm.day-1')
+etpot.setncattr('_FillValue', np.float32(1e+20))
+etpot.setncattr('missing_value', np.float32(1e+20))
+etpot[:] = etpot_vals
+
+dataset.close()
+
+# create netCDF to store parameter values
+# =======================================
+
+dataset = Dataset('params_test.nc', 'w')
+dataset.description = 'AquaCrop parameter file'
+dataset.history = 'Created ' + time.ctime(time.time())
+
+# dataset dimensions
+# ==================
+
+lat = dataset.createDimension('lat', nlat)
+lon = dataset.createDimension('lon', nlon)
+crop = dataset.createDimension('crop', ncrop)
+rotation = dataset.createDimension('rotation', nrotation)
+compartment = dataset.createDimension('compartment', ncompartment)
+layer = dataset.createDimension('layer', nlayer)
+
+# dataset variables
+# =================
+
+latitudes = dataset.createVariable('latitude', np.float32, ('lat',))
+latitudes.units = "degrees_north"
+latitudes[:] = lat_vals
+
+longitudes = dataset.createVariable('longitude', np.float32, ('lon',))
+longitudes.units = "degrees_east"
+longitudes[:] = lon_vals
+
+crops = dataset.createVariable('crop', np.int32, ('crop',))
+crops[:] = np.arange(0,ncrop,1)
+
+rotations = dataset.createVariable('rotation', np.int32, ('rotation',))
+rotations[:] = np.arange(0,nrotation,1)
+
+compartments = dataset.createVariable('compartment', np.int32, ('compartment',))
+compartments[:] = np.arange(0,ncompartment,1) 
+
+layers = dataset.createVariable('layer', np.int32, ('layer',))
+layers[:] = np.arange(0,nlayer,1)
+
+# define some variables which are useful for casting
+
+m = np.ones((nlat,nlon))
+m = m[None,:,:]
+
+p = np.ones((nrotation))
+p = p[:,None,None]
+
+# soil hydraulic properties
+# =========================
+
+ksat = dataset.createVariable('ksat', np.float32, ('layer','rotation','lat','lon'))
+ksat_vals = 500 * np.ones((nlat, nlon))
+ksat[:] = ksat_vals[None,None,:,:] * np.ones((nlayer,nrotation))[:,:,None,None]
+
+wcsat = dataset.createVariable('th_s', np.float32, ('layer','rotation','lat','lon'))
+wcsat_vals = 0.46 * np.ones((nlat, nlon))
+wcsat[:] = wcsat_vals[None,None,:,:] * np.ones((nlayer,nrotation))[:,:,None,None]
+
+wp = dataset.createVariable('th_wp', np.float32, ('layer','rotation','lat','lon'))
+wp_vals = 0.15 * np.ones((nlat, nlon))
+wp[:] = wp_vals[None,None,:,:] * np.ones((nlayer,nrotation))[:,:,None,None]
+
+fc = dataset.createVariable('th_fc', np.float32, ('layer','rotation','lat','lon'))
+fc_vals = 0.31 * np.ones((nlat, nlon))
+fc[:] = fc_vals[None,None,:,:] * np.ones((nlayer,nrotation))[:,:,None,None]
+
+# crop parameters
+# ===============
+
+def myfun(config, section_nm, item_nm, data_type):
+    x = config.get(section_nm, item_nm)
+    x = x.split(',')
+    x = map(data_type, x)
+    x = np.asarray(x)
+    return x
+
+# TODO: write each parameter individually, with appropriate
+# metadata
+
+int_vars = ['CropType','CalendarType','SwitchGDD','Emergence','MaxRooting','Senescence','Maturity','HIstart','Flowering','YldForm','GDDmethod','PolHeatStress','PolColdStress','BioTempStress','PlantPop','Determinant','ETadj','LagAer']
+
+for var in int_vars:
+    a = dataset.createVariable(var, np.int32, ('crop','lat','lon'))
+    a_vals = myfun(config, 'cropParameters', var, int)
+    a[:] = a_vals[:,None,None] * m
+
+float_vars = ['Tbase','Tupp','Tmax_up','Tmax_lo','Tmin_up','Tmin_lo','GDD_up','GDD_lo','fshape_b','PctZmin','Zmin','Zmax','fshape_r','fshape_ex','SxTopQ','SxBotQ','a_Tr','SeedSize','CCmin','CCx','CDC','CGC','Kcb','fage','WP','WPy','fsink','bsted','bface','HI0','HIini','dHI_pre','a_HI','b_HI','dHI0','exc','MaxFlowPct','p_up1','p_up2','p_up3','p_up4','p_lo1','p_lo2','p_lo3','p_lo4','fshape_w1','fshape_w2','fshape_w3','fshape_w4','Aer','beta','GermThr']
+
+for var in float_vars:
+    b = dataset.createVariable(var, np.float32, ('crop','lat','lon'))
+    b_vals = myfun(config, 'cropParameters', var, float)
+    b[:] = b_vals[:,None,None] * m
+    
+# planting/harvest date varies in space
+
+plantingdate = dataset.createVariable('PlantingDate', np.int32, ('crop','lat','lon'))
+plantingdate[:] = 121
+
+harvestdate = dataset.createVariable('HarvestDate', np.int32, ('crop','lat','lon'))
+harvestdate[:] = 303
+
+rotfrac = dataset.createVariable('RotFrac', np.float32, ('rotation','lat','lon'))
+rotfrac[:] = 1
+
+# field management
+# ================
+
+# dims: crop, rotation, latitude, longitude
+
+mulches = dataset.createVariable('Mulches', np.int32, ('crop','rotation','lat','lon'))
+mulches[:] = 0
+
+mulchpctgs = dataset.createVariable('MulchPctGS', np.int32, ('crop','rotation','lat','lon'))
+mulchpctgs[:] = 50
+
+mulchpctos = dataset.createVariable('MulchPctOS', np.int32, ('crop','rotation','lat','lon'))
+mulchpctos[:] = 50
+
+fmulch = dataset.createVariable('fMulch', np.float32, ('crop','rotation','lat','lon'))
+fmulch[:] = 0.5
+
+# N.B. bund parameters can only vary by rotation (not crops
+# within the rotation) because the settings are relevant to
+# fallow periods as well as the growing season
+
+# in reality this makes sense - farmers will not remove bunds
+# for different crops (?)
+
+bunds = dataset.createVariable('Bunds', np.int32, ('rotation','lat','lon'))
+bunds[:] = 0
+
+zbund = dataset.createVariable('zBund', np.int32, ('rotation','lat','lon'))
+zbund[:] = 0
+
+bundwater = dataset.createVariable('BundWater', np.int32, ('rotation','lat','lon'))
+bundwater[:] = 0
+
+# def linidx_take(val_arr,z_indices):
+
+#     # Get number of columns and rows in values array
+#     _,nC,nR = val_arr.shape
+
+#     # Get linear indices and thus extract elements with np.take
+#     idx = nC*nR*z_indices + nR*np.arange(nR)[:,None] + np.arange(nC)
+#     return np.take(val_arr,idx) # Or val_arr.ravel()[idx]
+                  
+# irrigation management
+# =====================
+
+irrmethod = dataset.createVariable('IrrMethod', np.int32, ('crop','rotation','lat','lon'))
+irrmethod[:] = 1   # soil moisture based
+
+# only used if irrmethod = 2
+irrinterval = dataset.createVariable('IrrInterval', np.int32, ('crop','rotation','lat','lon'))
+irrinterval[:] = 3
+
+smt1 = dataset.createVariable('SMT1', np.float32, ('crop','rotation','lat','lon'))
+smt1[:] = 70.
+
+smt2 = dataset.createVariable('SMT2', np.float32, ('crop','rotation','lat','lon'))
+smt2[:] = 70.
+
+smt3 = dataset.createVariable('SMT3', np.float32, ('crop','rotation','lat','lon'))
+smt3[:] = 70.
+
+smt4 = dataset.createVariable('SMT4', np.float32, ('crop','rotation','lat','lon'))
+smt4[:] = 70.
+
+maxirr = dataset.createVariable('MaxIrr', np.float32, ('crop','rotation','lat','lon'))
+maxirr[:] = 25.
+
+appeff = dataset.createVariable('AppEff', np.float32, ('crop','rotation','lat','lon'))
+appeff[:] = 90.
+
+netirrsmt = dataset.createVariable('NetIrrSMT', np.float32, ('crop','rotation','lat','lon'))
+netirrsmt[:] = 80.5
+
+wetsurf = dataset.createVariable('WetSurf', np.float32, ('crop','rotation','lat','lon'))
+wetsurf[:] = 100.
+
+# rotation management
+# ===================
+
+# define rotation sequence
+cropsequence = dataset.createVariable('CropSequence', np.int32, ('crop','rotation'))
+
+cropsequence[:] = 1
+
+# soil profile
+# ############
+
+# zcomp = dataset.createVariable('zComp', np.float32, ('compartment','lat','lon'))
+# zcomp_vals = np.array([0.1,0.1,0.1,0.15,0.15,0.2,0.2,0.25,0.25,0.25,0.25,0.3])[:,None,None]
+# zcomp[:] = zcomp_vals * m
+
+# zlayer = dataset.createVariable('zLayer', np.float32, ('layer','lat','lon'))
+# zlayer_vals = np.array([2.3])[:,None,None]
+# zlayer[:] = zlayer_vals * m
+
+# soil properties
+# ===============
+
+calcshp = dataset.createVariable('CalcSHP', np.int32, ('rotation','lat','lon'))
+calcshp[:] = 0
+
+# zsoil = dataset.createVariable('zSoil', np.float32, ('rotation','lat','lon'))
+# zsoil[:] = 2.3
+
+# ncomp = dataset.createVariable('nComp', np.int32, ('rotation','lat','lon'))
+# ncomp[:] = 12
+
+# nlayer = dataset.createVariable('nLayer', np.int32, ('rotation','lat','lon'))
+# nlayer[:] = 1
+
+evapzsurf = dataset.createVariable('EvapZsurf', np.float32, ('rotation','lat','lon'))
+evapzsurf[:] = 0.04
+
+evapzmin = dataset.createVariable('EvapZmin', np.float32, ('rotation','lat','lon'))
+evapzmin[:] = 0.15
+
+evapzmax = dataset.createVariable('EvapZmax', np.float32, ('rotation','lat','lon'))
+evapzmax[:] = 0.30
+
+kex = dataset.createVariable('Kex', np.float32, ('rotation','lat','lon'))
+kex[:] = 1.1
+
+fevap = dataset.createVariable('fevap', np.int32, ('rotation','lat','lon'))
+fevap[:] = 4
+
+fwrelexp = dataset.createVariable('fWrelExp', np.float32, ('rotation','lat','lon'))
+fwrelexp[:] = 0.4
+
+fwcc = dataset.createVariable('fwcc', np.float32, ('rotation','lat','lon'))
+fwcc[:] = 50
+
+adjrew = dataset.createVariable('AdjREW', np.int32, ('rotation','lat','lon'))
+adjrew[:] = 0
+
+rew = dataset.createVariable('REW', np.float32, ('rotation','lat','lon'))
+rew[:] = 9
+
+adjcn = dataset.createVariable('AdjCN', np.int32, ('rotation','lat','lon'))
+adjcn[:] = 1
+
+cn = dataset.createVariable('CN', np.float32, ('rotation','lat','lon'))
+cn[:] = 61
+
+zcn = dataset.createVariable('zCN', np.float32, ('rotation','lat','lon'))
+zcn[:] = 0.3
+
+zgerm = dataset.createVariable('zGerm', np.float32, ('rotation','lat','lon'))
+zgerm[:] = 0.3
+
+zres = dataset.createVariable('zRes', np.float32, ('rotation','lat','lon'))
+zres[:] = -999
+
+fshape_cr = dataset.createVariable('fshape_cr', np.float32, ('rotation','lat','lon'))
+fshape_cr[:] = 16
+
+dataset.close()
+
+# initial values
+# ==============
+
+dataset = Dataset('initial_conditions_test.nc', 'w')
+dataset.description = 'AquaCrop initial value file'
+dataset.history = 'Created ' + time.ctime(time.time())
+
+# dataset dimensions
+lat = dataset.createDimension('lat', nlat)
+lon = dataset.createDimension('lon', nlon)
+rotation = dataset.createDimension('rotation', nrotation)
+compartment = dataset.createDimension('compartment', ncompartment)
+
+# dataset variables
+latitudes = dataset.createVariable('latitude', np.float32, ('lat',))
+latitudes.units = "degrees_north"
+latitudes[:] = lat_vals
+
+longitudes = dataset.createVariable('longitude', np.float32, ('lon',))
+longitudes.units = "degrees_east"
+longitudes[:] = lon_vals
+
+rotations = dataset.createVariable('rotation', np.int32, ('rotation',))
+rotations[:] = np.arange(0,nrotation,1)
+
+compartments = dataset.createVariable('compartment', np.int32, ('compartment',))
+compartments[:] = np.arange(0,ncompartment,1) 
+
+# initial soil water content
+soilwatercontent = dataset.createVariable('th', np.float32, ('compartment','rotation','lat','lon'))
+soilwatercontent[:] = 0.31
+
+# initial depth of water held in bunds
+bundwater = dataset.createVariable('BundWater', np.float32, ('rotation','lat','lon'))
+bundwater[:] = 0.
+
+dataset.close()
+
+# CO2 data
+# ========
+
+import scipy.interpolate as interpolate
+import matplotlib.pyplot as plt
+
+d = read_csv('AquaCropOS_input_data/MaunaLoaCO2.txt', delimiter="\s+", header=None, skiprows=[0,1], names=['Year','CO2'])
+
+years = d['Year'].values
+data = d['CO2'].values
+f = interpolate.interp1d(years, data, kind="linear")
+newyears = np.arange(years.min(), years.max() + 1)
+newdata = f(newyears)
+
+# plt.plot(newyears, newdata)
+# plt.scatter(years, co2_vals, s=20)
+# plt.show()
+
+dataset = Dataset('annual_co2_conc_test.nc', 'w')
+dataset.description = 'Annual CO2 concentration file'
+dataset.history = 'Created ' + time.ctime(time.time())
+
+lat = dataset.createDimension('lat', nlat)
+lon = dataset.createDimension('lon', nlon)
+time = dataset.createDimension('time', None)
+
+latitudes = dataset.createVariable('latitude', np.float32, ('lat',))
+latitudes.units = "degrees_north"
+latitudes[:] = lat_vals
+
+longitudes = dataset.createVariable('longitude', np.float32, ('lon',))
+longitudes.units = "degrees_east"
+longitudes[:] = lon_vals
+
+times = dataset.createVariable('time', np.int32, ('time',))
+times.units = "days since 1901-01-01 00:00:00"
+times.calendar = "standard"
+
+dates = []
+for i in range(len(newyears)):
+    dates.append(datetime.datetime(newyears[i],1,1))
+
+times[:] = date2num(dates, units=times.units, calendar=times.calendar)
+
+co2 = dataset.createVariable('co2', np.float32, ('time','lat','lon'))
+co2.setncattr('standard_name', 'co2')
+co2.setncattr('long_name', 'CO2 concentration by volume')
+co2.setncattr('units', '1e-6')
+co2.setncattr('_FillValue', np.float32(1e+20))
+co2.setncattr('missing_value', np.float32(1e+20))
+co2[:] = newdata[:,None,None] * np.ones((nlat,nlon))[None,:,:]
+
+dataset.close()

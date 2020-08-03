@@ -1,0 +1,17 @@
+#!/bin/bash
+
+for year in 2012 2013 2014 2015
+do
+    for mon in 01 02 03 04 05 06 07 08 09 10 11 12
+    do
+	
+	wget --header 'Host: catalogue.ceh.ac.uk' --user-agent 'Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0' --header 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' --header 'Accept-Language: en-GB,en;q=0.5' --referer 'https://catalogue.ceh.ac.uk/datastore/eidchub/b745e7b1-626c-4ccc-ac27-56582e77b900/' --header 'Cookie: _ga=GA1.3.1686751405.1565019714; _gid=GA1.3.1850265024.1566285434; SSO_CEH=NZ95QyqLCUM9jWkXRLSvGbBHhCGBrglLqnphNSB8rmUM8hw32dWTGrSAgf0pMTI1qbpsRZLjBGo99h8iOKL_BqXyuf-ICLGAZRuN3lGk3SkRh6aNX9R8uu-fW5smsAgD' --header 'Upgrade-Insecure-Requests: 1' "https://catalogue.ceh.ac.uk/datastore/eidchub/b745e7b1-626c-4ccc-ac27-56582e77b900/chess_precip_${year}${mon}.nc" --output-document "chess_precip_${year}${mon}.nc"
+    done
+done
+
+for year in 2012 2013 2014 2015
+do
+    for mon in 01 02 03 04 05 06 07 08 09 10 11 12
+    do
+
+	wget --header 'Host: catalogue.ceh.ac.uk' --user-agent 'Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0' --header 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' --header 'Accept-Language: en-GB,en;q=0.5' --referer 'https://catalogue.ceh.ac.uk/datastore/eidchub/8baf805d-39ce-4dac-b224-c926ada353b7/pet/' --header 'Cookie: _ga=GA1.3.1686751405.1565019714; _gid=GA1.3.1850265024.1566285434; SSO_CEH=NZ95QyqLCUM9jWkXRLSvGbBHhCGBrglLqnphNSB8rmUM8hw32dWTGrSAgf0pMTI1qbpsRZLjBGo99h8iOKL_BqXyuf-ICLGAZRuN3lGk3SkRh6aNX9R8uu-fW5smsAgD; _gat=1' --header 'Upgrade-Insecure-Requests: 1' "https://catalogue.ceh.ac.uk/datastore/eidchub/8baf805d-39ce-4dac-b224-c926ada353b7/pet/chess_pet_wwg_${year}${mon}.nc" --output-document "chess_pet_wwg_${year}${mon}.nc'

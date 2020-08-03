@@ -1,0 +1,17 @@
+class Infiltration(object):
+
+    def __init__(self, Infiltration_variable):
+        self.var = Infiltration_variable
+
+    def dynamic(self):
+        th, DeepPerc, FluxOut = drainage(self.var.th,
+                                         self.var.th_s_comp,
+                                         self.var.th_fc_comp,
+                                         self.var.th_fc_adj,
+                                         self.var.ksat_comp,
+                                         self.var.tau_comp,
+                                         self.var.dz,
+                                         self.var.dzsum)
+        self.var.th  = th
+        self.var.DeepPerc = DeepPerc
+        self.var.FluxOut = FluxOut

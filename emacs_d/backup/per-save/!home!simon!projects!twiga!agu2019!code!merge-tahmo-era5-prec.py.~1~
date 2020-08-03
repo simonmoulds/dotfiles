@@ -1,0 +1,112 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# combine ERA5 and TAHMO precipitation data
+
+import os
+import numpy as np
+import netCDF4 as nc
+import pandas as pd
+import datetime
+import glob
+import re
+
+era5_datadir = "/data/ERA5"
+tahmo_datadir = "/data/TAHMO"
+
+tahmo_metadata = pd.read_csv('tahmo_stn_metadata.csv')
+tahmo_filenames = glob.glob(tahmo_datadir + '/tahmo_stn_TA*_prec.csv')
+start_year = 2010
+end_year = 2019
+
+def main():
+
+    for fn in tahmo_filenames:
+
+        # define complete time series
+        def datetimerange(start_time, end_time):
+            delta = datetime.timedelta(hours=1)
+            while start_time <= end_time:
+                yield start_time
+                start_time += delta
+                
+        start_time = datetime.datetime(start_year, 1, 1, 0, 0)
+        end_time = datetime.datetime(end_year, 12, 31, 23, 0)   
+        all_times = [tm for tm in datetimerange(start_time, end_time)]
+        
+        # read TAHMO data, and extract time data
+        tahmo_data = pd.read_csv(fn)
+        tahmo_times = [pd.datetime.strptime(tm_str, "%Y-%m-%d %H:%M:%S") for tm_str in tahmo_data['DateTime']]
+        tahmo_data['DateTime'] = tahmo_times
+        tahmo_data = tahmo_data.set_index('DateTime')
+        tahmo_index = [all_times.index(tm) for tm in tahmo_times if tm in all_times]
+        tahmo_prec_data = np.ones((len(all_times))) * -999.
+        tahmo_prec_data[tahmo_index] = np.array(tahmo_data['P'])
+        
+        # get the TAHMO station code, and use this to get the
+        # lat and lon coordinates of the station
+        code = tahmo_data['Location'][0]
+        idx = [index for index,value in enumerate(tahmo_metadata['Code']) if value in code]
+        lat_coord = float(tahmo_metadata['Y'][idx])
+        lon_coord = float(tahmo_metadata['X'][idx])
+        
+        years = range(start_year, end_year + 1)
+        months = range(1, 13)
+
+        # preallocate array to hold corresponding ERA5 data
+        era5_prec_data = np.ones((len(all_times))) * -999.
+
+        # loop through ERA5 files (one file per month)
+        for year in years:
+            for month in months:
+
+                yearmon = str(year) + str(month).zfill(2)
+                prc_filename = os.path.join(
+                    datadir,
+                    "era5_reanalysis_total_precipitation_" + yearmon + ".nc"
+                )
+
+                # load ERA5 precipitation data
+                nco = nc.Dataset(prc_filename, 'r')
+                lat = nco.variables['latitude'][:]
+                lon = nco.variables['longitude'][:]
+                time = nco.variables['time']
+                era5_times = list(nc.num2date(time[:], time.units, time.calendar))
+                prc = nco.variables['tp'][:]
+                nco.close()
+
+                # get the time index for ERA5 values
+                era5_time_index = [all_times.index(tm) for tm in era5_times if tm in all_times]
+
+                # get the lat and lon index from which to
+                # extract the precipitation data
+                era5_lat_index = np.argmin(np.abs(lat - y_coord))
+                era5_lon_index = np.argmin(np.abs(lon - x_coord))
+
+                slc = [slice(None)] * 3
+                # slc[0] = None
+                slc[1] = era5_lat_index
+                slc[2] = era5_lon_index
+
+                # add data to array, converting from m -> mm
+                era5_prec_data[era5_time_index] = np.array(prc[tuple(slc)]) * 1e3
+
+        # create dataframe
+        d = {
+            # 'DateTime' : all_time,
+            'TAHMO'    : tahmo_prec_data,
+            'ERA5'     : era5_prec_data
+        }
+        combined_data = pd.DataFrame(data=d, index=all_time)
+        combined_data = combined_data.replace(-999., np.nan)
+        combined_data_daily = combined_data.resample('D').apply(lambda x: x.values.sum())
+        combined_data_daily = combined_data_daily.replace(np.nan, -999.)
+        combined_data_daily['Date'] = combined_data_daily.index
+        combined_filename = 'tahmo_era5_stn_' + code + '_prec.csv'
+        combined_data_daily.to_csv(combined_filename, index=False)
+        
+if __name__ == '__main__':
+    if len(tahmo_filenames) > 0:
+        main()
+    else:
+        print("No TAHMO data available")

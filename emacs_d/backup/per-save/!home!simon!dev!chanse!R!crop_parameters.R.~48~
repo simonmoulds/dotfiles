@@ -1,0 +1,25 @@
+## Author : Simon Moulds
+## Date   : May 2020
+
+crop_parameters = function(n_crop,
+                           L_ini,
+                           L_dev,
+                           L_mid,
+                           L_late,
+                           Kc_ini,
+                           Kc_mid,
+                           Kc_end,
+                           rd) {
+    x = list(
+        L_ini = _expand_parameter(n_crop, L_ini),
+        L_dev = _expand_parameter(n_crop, L_dev),
+        L_mid = _expand_parameter(n_crop, L_mid),
+        L_late = _expand_parameter(n_crop, L_late),
+        Kc_ini = _expand_parameter(n_crop, Kc_ini),
+        Kc_mid = _expand_parameter(n_crop, Kc_mid),
+        Kc_end = _expand_parameter(n_crop, Kc_end),
+        rd = _expand_parameter(n_crop, rd)
+    )
+    structure(x, class="crop_parameters")
+}                           
+

@@ -1,0 +1,3 @@
+## Author : Simon Moulds
+
+meta = read.csv("../data/tahmo_stn_metadata.csv")

@@ -1,0 +1,9 @@
+## Author : Simon Moulds
+## Date   : August 2019
+
+library(ncdf4)
+library(raster)
+library(rasterVis)
+
+datadir="../data/netcdf"
+nc = nc_open(file.path(datadir, "Y_cropland_yearMax_output.nc"))

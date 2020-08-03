@@ -1,0 +1,11 @@
+import os
+import shutil
+import numpy as np
+import netCDF4 as nc
+import pandas as pd
+import datetime
+import time
+import glob
+import re
+
+run_dir = "../data/aquacrop_runs"

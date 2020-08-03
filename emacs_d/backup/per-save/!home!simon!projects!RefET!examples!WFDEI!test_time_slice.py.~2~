@@ -1,0 +1,9 @@
+import netCDF4 as nc
+import numpy as np
+import datetime
+
+d = nc.Dataset('input/Tair_WFDEI/Tair_WFDEI_200001.nc')
+start_index = nc.date2index(datetime.datetime(2000,1,1),d.variables['time'])
+end_index = nc.date2index(datetime.datetime(2000,1,2,0,0,0),d.variables['time'])
+idx = np.arange(start_index,end_index)
+arr = d.variables['Tair'][idx,:]

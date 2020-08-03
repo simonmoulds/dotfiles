@@ -1,0 +1,11 @@
+from setuptools import setup
+
+setup(name='etref',
+      version=0.1,
+      description='Routines to calculate reference evapotranspiration',
+      url='https://github.com/simonmoulds/etref',
+      author='Simon Moulds',
+      author_email='sim.moulds@gmail.com',
+      license='GPL',
+      packages=['etref'],
+      zip_safe=False)

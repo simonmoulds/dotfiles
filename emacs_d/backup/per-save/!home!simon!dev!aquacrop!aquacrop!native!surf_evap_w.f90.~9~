@@ -1,0 +1,52 @@
+module soil_evaporation_w
+  use iso_c_binding, only: c_double, c_int
+  use soil_evaporation
+  implicit none
+
+contains
+  
+  subroutine c_surf_evap( &
+       es_pot, &
+       es_act, &
+       surface_storage, &
+       rew, &
+       w_surf, &
+       w_stage_two, &
+       evap_z, &
+       evap_z_min, &
+       n_farm, n_crop, n_cell
+    )
+   
+    integer(c_int), intent(in) :: n_farm, n_crop, n_cell    
+    real(c_double), dimension(n_farm, n_crop, n_cell), intent(in) :: es_pot, es_act
+    real(c_double), dimension(n_farm, n_crop, n_cell), intent(in) :: surface_storage
+    real(c_double), dimension(n_farm, n_crop, n_cell), intent(in) :: rew
+    real(c_double), dimension(n_farm, n_crop, n_cell), intent(in) :: w_surf
+    real(c_double), dimension(n_farm, n_crop, n_cell), intent(in) :: w_stage_two
+    real(c_double), dimension(n_farm, n_crop, n_cell), intent(in) :: evap_z
+    real(c_double), dimension(n_farm, n_crop, n_cell), intent(in) :: evap_z_min
+    integer(c_int) :: i, j, k
+
+    do i = 1, n_farm
+       do j = 1, n_crop
+          do k = 1, n_cell
+             call surf_evap( &
+                  es_pot, &
+                  es_act, &
+                  surface_storage, &
+                  rew, &
+                  w_surf, &
+                  w_stage_two, &
+                  evap_z, &
+                  evap_z_min, &
+                  n_farm, n_crop, n_cell)
+             
+          end do
+       end do
+    end do
+    
+  end subroutine c_surf_evap
+  
+end module soil_evaporation_w
+
+    

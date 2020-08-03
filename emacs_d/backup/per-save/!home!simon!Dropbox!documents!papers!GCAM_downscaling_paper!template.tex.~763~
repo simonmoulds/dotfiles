@@ -1,0 +1,527 @@
+%% Copernicus Publications Manuscript Preparation Template for LaTeX Submissions
+%% ---------------------------------
+%% This template should be used for copernicus.cls
+%% The class file and some style files are bundled in the Copernicus Latex Package, which can be downloaded from the different journal webpages.
+%% For further assistance please contact Copernicus Publications at: production@copernicus.org
+%% https://publications.copernicus.org/for_authors/manuscript_preparation.html
+
+
+%% Please use the following documentclass and journal abbreviations for discussion papers and final revised papers.
+
+
+%% 2-column papers and discussion papers
+\documentclass[gmd, manuscript]{copernicus}
+
+%% Journal abbreviations (please use the same for discussion papers and final revised papers)
+
+% Archives Animal Breeding (aab)
+% Atmospheric Chemistry and Physics (acp)
+% Advances in Geosciences (adgeo)
+% Advances in Statistical Climatology, Meteorology and Oceanography (ascmo)
+% Annales Geophysicae (angeo)
+% ASTRA Proceedings (ap)
+% Atmospheric Measurement Techniques (amt)
+% Advances in Radio Science (ars)
+% Advances in Science and Research (asr)
+% Biogeosciences (bg)
+% Climate of the Past (cp)
+% Drinking Water Engineering and Science (dwes)
+% Earth System Dynamics (esd)
+% Earth Surface Dynamics (esurf)
+% Earth System Science Data (essd)
+% Fossil Record (fr)
+% Geographica Helvetica (gh)
+% Geoscientific Instrumentation, Methods and Data Systems (gi)
+% Geoscientific Model Development (gmd)
+% Geothermal Energy Science (gtes)
+% Hydrology and Earth System Sciences (hess)
+% History of Geo- and Space Sciences (hgss)
+% Journal of Micropalaeontology (jm)
+% Journal of Sensors and Sensor Systems (jsss)
+% Mechanical Sciences (ms)
+% Natural Hazards and Earth System Sciences (nhess)
+% Nonlinear Processes in Geophysics (npg)
+% Ocean Science (os)
+% Proceedings of the International Association of Hydrological Sciences (piahs)
+% Primate Biology (pb)
+% Scientific Drilling (sd)
+% SOIL (soil)
+% Solid Earth (se)
+% The Cryosphere (tc)
+% Web Ecology (we)
+% Wind Energy Science (wes)
+
+
+%% \usepackage commands included in the copernicus.cls:
+%\usepackage[german, english]{babel}
+%\usepackage{tabularx}
+%\usepackage{cancel}
+%\usepackage{multirow}
+%\usepackage{supertabular}
+%\usepackage{algorithmic}
+%\usepackage{algorithm}
+%\usepackage{amsthm}
+%\usepackage{float}
+%\usepackage{subfig}
+%\usepackage{rotating}
+
+\begin{document}
+
+\title{Downscaling crop production from Integrated Assessment Models}
+
+
+% \Author[affil]{given_name}{surname}
+
+\Author[1]{Simon}{Moulds}
+\Author[1]{Slobodan}{Djordjevic}
+\Author[1]{Dragan}{Savic}
+
+\affil[1]{Centre for Water Systems, University of Exeter, United Kingdom}
+%% \affil[]{ADDRESS}
+
+%% The [] brackets identify the author with the corresponding affiliation. 1, 2, 3, etc. should be inserted.
+
+
+
+\runningtitle{Downscaling crop production from Integrated Assessment Models}
+
+\runningauthor{Simon Moulds}
+
+\correspondence{Simon Moulds (s.moulds@exeter.ac.uk)}
+
+
+
+\received{}
+\pubdiscuss{} %% only important for two-stage journals
+\revised{}
+\accepted{}
+\published{}
+
+%% These dates will be inserted by Copernicus Publications during the typesetting process.
+
+
+\firstpage{1}
+
+\maketitle
+
+\begin{abstract}
+The Global Change Assessment Model, an integrated assessment model, provides insight into the the interactions and feedbacks between physical and human systems. It is used extensively to simulate the response of terrestrial systems to exogenous factors such as population growth, technological improvements and economic and environmental policies. Output from the land system component of GCAM, which simulates land use activities and the production of major crops, is at the subregional level and must be spatially downscaled in order to use with gridded impact assessment models. However, existing downscaling routines typically consider cropland as a homogeneous class and do not provide information about land use intensity or specific management practices such as irrigation and multiple cropping. This paper presents a spatial allocation model to downscale crop production data from GCAM to a spatial grid, producing a time series of maps showing the spatial distribution of specific crops (e.g. rice, wheat, maize) at four input levels (subsistence, low input rainfed, high input rainfed and high input irrigated). The model algorithm is constrained by available cropland at each time point and therefore implicitly balances extensification and intensification processes in order to meet global food demand. It utilises a stochastic approach such that an increase in production of a particular crop is more likely to occur in grid cells with a high biophysical suitability and neighbourhood influence, whereas a fall in regional production will translate to reduced area in cells with lower suitability. User-supplied rules define the order in which specific crops are downscaled as well as allowable transitions. The ability of the model to reproduce historical trends in India is evaluated by comparing the model output with an historical spatio-temporal dataset showing the change in spatial distribution of rainfed and irrigated crops between 1970--2010. Lastly, a regional case study demonstrates the ability of the model to predict the spatial distribution of crops in India under different GCAM scenarios. 
+\end{abstract}
+
+
+\copyrightstatement{TEXT}
+
+\introduction  %% \introduction[modified heading if necessary]
+
+Population growth, demographic changes and economic development are expected to cause a dramatic increase in global food demand over the coming decades \citep{}. At the same time, the area of land available for food production will be constrained by human activities such as urbanization, infrastructure development and bioenergy production, and depleted resources in previously productive regions as a result of unsustainable agricultural practices \citep{lotze-campen_global_2008}. Consequently, agricultural intensification, whereby production is increased without increasing the area of land devoted to agriculture, will play an increasingly important roles in achieving global food security \citep{}. However, the various management practices required to increase crop yield, such as irrigation, fertilizer and mechanization, are associated with environmental degradation which reduces the sustainability and resilience of the food supply system \citep[e.g.][]{}. Thus, detailed modelling of the environmental impact of future agricultural expansion and intensification is essential in order to assess the sustainability of global food security \citep{}. Since the rate of degradation is highly dependent upon local conditions and agricultural practices, there is a need to produce spatially explicit predictions about the rate and location of change. \\
+
+% In many cases GCAM may be used successfully as a standalone model \citep[e.g.][]{}. Alternatively, it may be coupled with domain-specific models to assess the impacts of change on particular sectors.
+The Global Change Assessment Model (GCAM) \citep{}, an integrated assessment model (IAM), has been developed to gain insight into coupled human-natural systems and simulate their future co-evolution with explicit representation of the various feedbacks that exist between them \citep{le_page_downscaling_2016}. The model is divided into coupled subsystems representing the global economy, energy systems, agriculture and land use. It is used extensively to simulate the response of terrestrial systems to exogenous factors such as population growth, technological improvements and economic and environmental policies \citep[e.g.][]{}. A key feature of GCAM is its detailed representation of the agricultural sector and its relationship with other sectors in the global economy \citep{}. Output from the land system component of GCAM, which simulates land use activities and the production of major crops, is at the subregional level and must be spatially downscaled in order to use with gridded impact assessment models \citep{lotze-campen_global_2008}. Coupling these two classes of models is recognised as an important technical challenge \citep{nazemi_inclusion_2015}. However, existing downscaling routines typically consider cropland as a homogeneous class and do not provide information about land use intensity or specific management practices such as irrigation and multiple cropping \citep{}. \\
+
+A recent addition to GCAM is a land use model, GCAMLU \citep{le_page_downscaling_2016}, which downscales regional predictions of land use and land cover change to a 0.5 $\times$ 0.5 degree spatial grid. The algorithm follows an ordered approach in which land use and land cover types, as well as certain crops, are spatially downscaled in order of decreasing economic value \citep{}. A feature of the model is the inclusion of a user-defined target level of intensification versus expansion of agricultural land. The model attempts to meet the specified demand while also satisfying the requirements of non-agricultural land use types. Additional parameters define transition priorities and spatial constaints. The algorithm is based on the assumption that land use and land cover expansion tends to occur in areas where the land use is already present \citep[e.g.][]{}. This effect is represented by calculating the ``kernel density'' for each land use type, which quantitatively describes the proximity and density of a given land use around a grid cell. The suitability of grid cells to agricultural land is additionally based on nutrient availability and soil workability according to the Harmonised World Soil Database \citep{}. While GCAMLU is an appropriate solution for various types of environmental change studies, it lacks the appropriate level of detail for assessing environmental impacts of agricultural intensification, particularly those associated with the consumption of resources \citep{}. For example, the model does not explicitly represent crop rotations, nor does it include important management practices such as irrigation, fertilizer application and multiple cropping. \\
+
+There have been some previous attempts to address the problem. For example, \citet{hurtt_harmonization_2011} developed a simple downscaling procedure for the IPCC 5th Assessment Report in which grid level estimates of crop area from \citep{ref} were scaled with national level estimates of change. Several impact assessment models contain inbuilt downscaling routines. However, while such methods may be suitable for hindcasting experiments in which the intensification process is reversed, they are less well suited to future simulations because they fail to account for the spatial and temporal heterogeneity of biophysical and socioeconomic constraints on future crop production. The Model of Agricultural Production and its Impact on the Environment (MAgPIE) \citep{lotze-campen_global_2008} is a global land use optimisation model which consists of a regional demand model coupled with a gridded supply model (the LPJmL model \citep{}). An inbuilt land use model determines the spatial allocation of various agricultural production activities by minimizing the total cost of production of a given regional demand \citep{lotze-campen_global_2008}. The production cost, which is defined in terms of cost per unit food energy, varies spatially as a result of differences in potential yield between grid cells \citep{lotze-campen_impacts_2014}. (TODO: find a more detailed explanation of this process - limitations may include the failure to consider sub-optimal production systems which arise for cultural reasons). \\
+
+In this paper we develop a computationally efficient algorithm to spatially downscale crop production scenarios from GCAM. The main output of the downscaling algorithm is a time series of maps showing the spatial distribution of specific crops (e.g. rice, wheat, maize) at four input levels (subsistence, low input rainfed, high input rainfed and high input irrigated). The remainder of this paper is divided into four sections. First, we provide a brief overview of the GCAM model with particular emphasis on its representation of the agricultural sector and its links and feedbacks with other system components. We then describe the downscaling algorithm and its data requirements, as well as describing the pre-processing to transform the raw input data prior to a simulation. We demonstrate the model through an example application to India; a region which provides a useful testbed for the concept and implementation of the model because of its complex agricultural systems and projected population and socioeconomic change. Lastly, we discuss the limitations of the model, highlight potential use cases and identify areas for improvement. \\
+
+% According to \citet{nazemi2014} a lack of datasets showing irrigated area has limited regional scale assessments of water resources. While recent efforts have aimed to provide historical and contemporary maps of irrigated area \citep{}, there is a lack of spatio-temporal information about agricultural production in the future. The Agricultural Model Intercomparison and Improvement Project (AgMIP) aims to address part of this problem... The models assume that future agricultural production is achieved... \\
+
+\section{Agriculture in GCAM}
+GCAM is comprehensively described elsewhere \citep[e.g.][]{}. A summary of the land system component of GCAM is provided here for the sake of completeness. The land component of GCAM divides the terrestrial system into 283 subregions based on the intersection of 32 geopolitical regions with 18 agroecological zones. The model simulates the area of five natural land cover types and 17 managed land cover types, of which several are involved in the production of 11 agricultural commodities \citep{}. The initial area of managed land cover types and associated production of commodities in each of the 32 mondel regions is obtained from the FAOSTAT database \citep{}. These values are disaggregated to the various agro-ecological zones using production and area shares from the the Global Trade Analysis Project (GTAP) model \citep{}. In future time steps GCAM simulates the area and production of managed land cover types on the basis of various drivers including food demand, costs associated with agricultural production and demand for bioenergy, amongst others. \\
+
+\section{Materials and method}
+
+\subsection{Input data}
+% Estimates of future yield are obtained from the output of GGCMs participating in the AgMIP initiative. These models predict annual crop yields for various crops at 0.5 degree spatial grid. The historical period is 1975--2005 and the future period is 2006--2099. Model output was retrieved from the GGCMI archive \citep{villoria_rapid_2016}. The models only account for yield improvement as a result of climate change and do not account for technological improvement. \\
+
+The principal model input is regional crop production values from the GCAM simulation. Initial crop area maps are provided by the MapSPAM product \citet{you_generating_2014}; a dataset which shows the spatial distribution, as well as the corresponding yield and production values, of 42 crops around the year 2005 at a spatial resolution of 5 $\times$ 5 arcminutes. A unique feature of the MapSPAM product compared to other similar datasets (e.g. MIRCA2000 \citet{portmann_mirca2000-global_2010}) is that it differentiates between irrigated and rainfed cropland and high, intermediate and subsistence input levels \citep{you_generating_2014}. GCAM explicitly models 3 single crop classes (Rice, Wheat, Maize) and 8 aggregated crop classes, each containing several subcrops. We use the MapSPAM production data to disaggregate these crop classes, initially assuming that the proportion of subcrops within the main crop class remains the same during the simulation period. This assumption is relaxed during runtime if the specified production cannot be met, allowing for the fact that at any point during the simulation certain subcrops within a GCAM region may be approaching their maximum production while others may have greater potential for upscaling. Crop calendars from AQUASTAT (irrigated crops only) and MIRCA2000 (irrigated and rainfed crops) are used to temporally disaggregate crop production maps into growing seasons. This is necessary to account for multiple cropping in regions where more than one growing season is possible during a calendar year. \\
+
+Crop suitability is calculated according to the revenue model proposed by \citet{you_generating_2014} and neighbourhood influence. Crop revenue represents the... It is calculated as follows:
+
+\begin{equation}
+Rev_{i,j,l} = Price_{j} \times Access_{i,j} \times PotYield_{i,j,l}
+\end{equation}
+
+\noindent where $Rev$ is revenue, $Access$ is market accessibility, $PotYield$ is potential yield and $i$, $j$, $l$ are indices representing pixel, crop type and input level, respectively. We obtain estimates of potential yield from the Food and Agriculture Organization Global Agro-Ecological Zones (FAO GAEZ) database \citep{fischer}. Following \citet{you_generating_2014}, we approximate market accessibility with future estimates of population density at 5 arcminute $\times$ 5 arcminute spatial resolution \citep{jones_spatially_2016}. We use an arbitrary value for the price of crops because it does not influence the relative suitability of pixels within the same crop class.\\
+
+Following \citet{le_page_downscaling_2016}, we represent neighbourhood influence using kernel density, which measures the density of a given crop around a pixel weighted by proximity. It is computed as follows: \\
+
+\begin{equation}
+  KD_{i,j,l} = \frac{1}{n} \times \sum_{i=1}^{n} \frac{F_{i,j,l}}{D_{i}^2}
+\end{equation}
+
+\noindent where $KD_{i,j,l}$ is the kernel density of crop type $j$ at input level $l$ in grid cell $i$, , $F$ is the fraction of crop type in a grid cell, $D$ is the distance of 
+
+The model algorithm is constrained by available cropland at each time point, allowing it to implicitly balance extensification and intensification processes to meet regional food demand. Future maps of cropland extent are retrieved from GCAMLU \citep{le_page_downscaling_2016}; a land use change model specifically designed to downscale land use/land cover change from GCAM. A one-way coupling mechanism is adopted whereby output from GCAMLU is used as an input to the present downscaling algorithm at each time point. \\
+
+\begin{table*}[t]
+  \centering
+  \caption{Input data}
+  \begin{tabular}{ p{4cm} p{4cm} p{4cm} }
+    \tophline
+    Variable                 & Source                       & Spatial resolution\\
+    \middlehline
+    Initial crop area        & MapSPAM                      & 5 arcminutes\\
+    Crop production/yield    & MapSPAM                      & 5 arcminutes\\
+    Crop potential yield     & FAO GAEZ                     & 5 arcminutes\\
+    Population density       & \citet{jones_spatially_2016} & 5 arcminutes\\
+    Crop production scenario & GCAM                         & Regional/AEZ\\
+    \bottomhline
+  \end{tabular}
+  \label{table:input_data}
+\end{table*}
+
+\subsection{Downscaling algorithm}
+The downscaling algorithm is based on the assumption that an increase in the production of a particular crop is more likely to happen in grid cells with a high suitability and neighbourhood influence, whereas a fall in production will tend to occur in grid cells with relatively low suitability values and/or a low neighbourhood influence. We assume that crop production can be increased either by expanding the area of land devoted to growing the crop or by intensifying agricultural production in order to increase crop yield \citep{lotze-campen_impacts_2014}. The former can be achieved by converting existing cropland previously allocated to another crop or by converting non-agricultural land to cropland, while the latter is achieved by increasing the use of the main inputs (e.g. water, fertilizer, labour, technology) that enable crop growth. These physical processes are expressed in the downscaling algorithm as three separate routines. The first of these routines simulates the \textit{conversion} of land with decreasing regional production to crops with increasing production. The second routine simulates the \textit{intensification} of existing agricultural land, and the last routine simulates the \textit{expansion} of land to unallocated cropland. \\
+
+The algorithm downscales each crop type in turn following a user-supplied hierarchy which is supposed to reflect the perceived relative economic value of the various crops. This approach, which is used in various spatially explicit land use change models \citep[e.g.][]{fuchs_high-resolution_2013,moulds_open_2015,le_page_downscaling_2016}, results in a stable and computationally efficient algorithm because it removes the need to dynamically simulate competition between crop types, which usually entails an iterative procedure \citep[e.g.][]{verburg_combining_2009}. The user is required to supply the order of the 11 GCAM crop types, rather than the 42 crops represented in the MapSPAM dataset, with the allocation order of subcrops within the aggregate GCAM classes determined endogeneously. A rotational constraint parameter is introduced to define the maximum allowable fraction of available cropland in a grid cell \citep{lotze-campen_global_2008}, which effectively forces a user-supplied proportion of cropland to be left fallow. \\
+
+\begin{table*}[t]
+  \centering
+  \caption{GCAM aggregate crop classes}
+  \begin{tabular}{ p{3cm} p{9cm} }
+    \tophline
+    GCAM          & MapSPAM\\
+    \middlehline
+    Rice          & Rice\\
+    Wheat         & Wheat\\
+    Corn          & Maize\\
+    Other cereals & Barley, Sorghum, Pearl Millet, Small Millet, Other cereals\\
+    Oils          & Soybean, Groundnut, Sesamum, Sunflower, Rapeseed, Other oils\\
+    Fibre         & Cotton, Other fibres\\
+    Palm          & Coconut, Oil palm\\
+    Sugar         & Sugarcane, Sugar beet\\
+    Root          & Potato, Sweet potato, Yams, Cassava, Other roots\\
+    Miscellaneous & Bean, Chickpea, Pigeonpea, Lentil, Cowpea, Other pulses, Tropical fruit, Temperate fruit, Banana, Plantain, Arabica coffee, Robusta coffee, Cocoa, Tea, Tobacco, Vegetables, Rest of crops\\
+    \bottomhline
+  \end{tabular}
+  \label{table:gcam_mapspam}
+\end{table*}
+
+At the beginning of the allocation procedure the area belonging to crops with decreasing regional production is converted to a holding class which retains the input level of the previous time point but discards the crop type (e.g. high-input irrigated wheat $\rightarrow$ unallocated high-input irrigated cropland). We assume that a fall in production is predominantly achieved by converting cropland to another crop category rather than through de-intensification. Conversion of crops to the holding category takes place in an ordered way such that each crop type is considered in turn, although the order itself does not influence the result. For a given crop type, each pixel/input-level combination is considered as a separate entity with a unique suitability value (i.e. pixel A, rainfed wheat is considered as separate from pixel A, irrigated wheat). Starting with the pixel/input-level combination with the lowest suitability, a small amount of land is subtracted from the area of the crop in the pixel. The quantity removed is multiplied by the corresponding yield value of pixel \textit{i}, input-level \textit{j} and subtracted from the regional total. The algorithm proceeds through pixel/input-level combinations in order of increasing suitability until the regional production target is met. If the regional demand is not met after considering each eligible pixel/input-level combination the procedure is repeated. \\
+
+Having dealt with crop types with falling regional production, the algorithm moves on to consider crops with increasing regional production. A first round of intensification is initiated in which the algorithm attempts to achieve a user supplied target. This could specify, for instance, that 25\% of the increase in wheat production should come from intensification. Crops are considered in the user-supplied order which represents the perceived economic value of the crops at the regional level. Pixels are arranged according to the suitability of the highest input level present in the pixel. The intensification module shifts a small amount of land from a lower input level to a higher input level, and the change in production is calculated and subtracted from the regional target. This process continues until the target intensification is met, or no more intensification is possible. \\
+
+The next part of the allocation routine attempts to allocate the outstanding crop production through the process of extensification. As in the opposite case, when crops with falling demand are considered, each pixel/input-level combination is treated separately and arranged in order from high suitability to low suitability, discounting pixels which do not contain unallocated cropland. In each case, a small area of unallocated cropland is assigned to the crop currently under consideration. This process continues until either the production target is met or no more suitable unallocated cropland exists. \\
+
+Lastly, a second round of intensification is applied to crops which have not met their regional production target (for this reason there may be more intensification than the target). As in the first round of intensification, pixels are selected until the regional production target is met. In cases where this is still not possible we assume that the region cannot achieve the target production. Optionally, the user may select to distribute the outstanding production between the other subcrops within the main GCAM crop type. If this has been done for any subcrop the algorithm returns to the top of the allocation routine (the first round of intensification) and repeats the allocation process. \\
+
+% Increasing productivity as a result of technological change is accounted for in GCAM by exogeneous estimates from the IMPACT modelling group \citep{}. ``The MAgPIE model, by contrast, uses an exogenously fixed trajectory of food demand, and derives an endogenous rate of agricultural productivity increase \citep{schmitz_trading_2012}'' (from \citep{lotzecampen_impacts_2014}). In the current work yield increases are downscaled from GCAM to the grid. \\
+
+% Intercropping is the practice of growing two or more crops simultaneously in the same field \citep{}. In the model, the user specifies for each crop and for each region whether or not a crop is intercropped and a list of crops with which it is typically paired. In addition, the user must supply a factor representing the yield reduction from normal conditions (i.e. when the crop is grown as a single crop). The default behaviour is to disregard intercropping. \\
+
+% Optionally, this process can be made stochastic in which case the conversion is only made if the suitability value is lower than a number between zero and one drawn from a uniform random distribution. \\
+
+\noindent Still to do in this section:
+
+\begin{itemize}
+  % \item Create a table showing the data requirements of the model
+  \item Develop a visual representation of the model - perhaps a flowchart
+  % \item Provide a stylized example of computation (see \citet{le_page_downscaling_2016} for example)
+\end{itemize}
+
+\section{Model evaluation}
+
+To evaluate the algorithm we use it to downscale historical crop production values for India during the period 1970--2010, and compared the simulated output with historical maps from a spatio-temporal dataset showing the evolution of irrigated and rainfed crops during the same period \citep{moulds2018}. The initial condition for the downscaling algorithm is provided by the crop distribution maps for 1960, with maps for subsequent time points used for comparison. We obtain regional production values for India by multiplying the crop area maps by corresponding yield maps. \\
+
+\noindent Still to do in this section:
+
+\begin{itemize}
+  % \item Complete the historical dataset
+  \item Figure showing change in crop production (aggregated to 11 GCAM crop types) in India during 1960--2010
+  \item Identify suitable metric for evaluating performance
+  \item Consider running multiple simulations with different parameter sets
+\end{itemize}
+
+\subsection{Results}
+Describe the results of the model evaluation here.
+
+\section{Example application}
+We further demonstrate the capabilities and potential applications of the allocation routine by using it to downscale two scenarios of crop production in India for the period 2005--2100. The first scenario is a reference scenario in which the human-natural system evolves in a ``business-as-usual'' way. TODO. \\
+
+\noindent Still to do in this section:
+
+\begin{itemize}
+  \item Run downscaling routine on additional GCAM scenario
+  \item Describe results
+\end{itemize}
+
+\subsection{Results}
+
+\clearpage
+\begin{figure}[tb]
+  \includegraphics[width=12.7cm]{gcam_production_output_pres.png}
+  \caption{}
+  \label{fig:gcam_output}
+\end{figure}
+
+\clearpage
+\begin{figure}[tb]
+  \includegraphics[width=15.24cm]{wheat_sim.png}
+  \caption{}
+  \label{fig:wheat_sim}
+\end{figure}
+
+\clearpage
+\begin{figure}[tb]
+  \includegraphics[width=15.24cm]{rice_sim.png}
+  \caption{}
+  \label{fig:rice_sim}
+\end{figure}
+
+\clearpage
+\section{Discussion}
+
+\noindent Discussion points:
+
+\begin{itemize}
+  \item Uncertainty arising from assumption of static biophysical constraints, and potential to couple with Earth system models
+  \item Future changes in crop yield
+  \item Data requirements
+  \item Uncertainty quantification
+  \item Importance of simplicity to enable running the model multiple times
+  \item Other points arising from model evaluation/example application
+\end{itemize}  
+
+The MapSPAM potential yield product, which informs our estimation of crop suitability and is key to the allocation process, only considers contemporary biophysical constraints. Over time, factors such as soil erosion, salinisation, waterlogging and groundwater depletion, which often arise due to unsustainable agricultural intensification, may decrease the potential crop yield in many areas and simultaneously reduce the likelihood of crop expansion as well as reducing the yield of crops currently grown in those areas. Meanwhile social constraints on production such as access to labour may also change over time, particularly in regions where there is rapid socioeconomic change. At present none of these dynamic constaints are explicitly considered in the downscaling framework, although the inclusion of dynamic population density maps may implicitly address some of the socioeconomic factors. Including the dynamic biophysical constraints in the downscaling framework will require the addition of an Earth system model which is capable of representing the various physical processes, as well as including the required meteorological data required to force these models. \\
+
+% The FAO GAEZ methodology in theory provides... However, data access to this resource is challenging. In our view, improving the interface to spatial input data would improve the ability of researchers... Moreover, opening the source code used for generating the datasest would be a... which would improve the ability of researchers to update the dataset according to their specific needs.
+
+Climate change and socioeconomic development will affect crop yield \citep{iizumi_responses_2017}. A simplistic approach is used to account for the former, while crop yield increases as a result of socioeconomic change is not currently considered. \\
+
+The model requires a large amount of data in order to provide meaningful results. As the case study demonstrates, a degree of familiarity with agriculture in the region under consideration is necessary. The required input data is based on publicly-available, global datasets. \\
+
+The model follows an ordered approach which is computationally efficient but fails to represent competition between crop classes. Thus, an important input to the model is the order in which crops are allocated (TODO: assess the sensitivity of the model to changing the allocation order). Uncertainty may be accounted for by stochastically changing the order of crop allocation over several runs in order to build up a probability distribution describing the spatial distribution of various crops. These can either be combined in some way or used in subsequent analyses as a probabilistic input. \\
+
+Separate treatment of land use constraints in GCAM and the downscaling algorithm may give rise to inconsistencies. Integrated models such as MAgPIE include representations of both the macroeconomy and land use. Coupling GCAM with a spatially-explicit land use change model would allow for more detailed consideration of the various constaints on agricultural production and the feedbacks to other parts of the macroeconomy system. Eventually, the downscaling algorithm presented here should be dynamically coupled with GCAM or another IAM to properly assess the feedback between land use change and other parts of the human-natural system. The most recent version of GCAM contains a formal mechanism with which establish a two-way coupling with other models. \\
+
+An important design feature of the algorithm is to ensure the algorithm is computationally efficient and \textit{fast}, enabling rapid generation of multiple scenarios of agricultural land use change. This design paradigm aligns with that of integrated assessment models, which are usually run multiple times [thousands - provide reference?] with varying initialisations and parameter values in order to capture uncertainty. Future developments should adhere to this philosophy to ensure its continued applicability to global change research. \\
+
+% The spatial allocation procedure has a number of important limitations. Water available for irrigation is not currently considered. Interannual variability in rainfall, which influences crop production from rainfed areas as well irrigation supply, is not considered in integrated assessment models. As work progress on downscaling output from integrated assessment models, it becomes apparent that many endogeneous processes should be modelled in in a spatially explicit way. \\
+
+% There is considerable uncertainty about the change in weather systems which are regionally important to agriculture. The South Asian monsoon, which supplies up to 80\% of India's water resources \citep{}, is one such system. \\
+
+\conclusions  %% \conclusions[modified heading if necessary]
+TODO.
+
+%% The following commands are for the statements about the availability of data sets and/or software code corresponding to the manuscript.
+%% It is strongly recommended to make use of these sections in case data sets and/or software code have been part of your research the article is based on.
+
+% \codeavailability{TEXT} %% use this section when having only software code available
+
+%% \dataavailability{TEXT} %% use this section when having only data sets available
+
+%% \codedataavailability{TEXT} %% use this section when having data sets and software code available
+
+\appendix
+\section{}    %% Appendix A
+
+\subsection{}     %% Appendix A1, A2, etc.
+
+
+\noappendix       %% use this to mark the end of the appendix section
+
+%% Regarding figures and tables in appendices, the following two options are possible depending on your general handling of figures and tables in the manuscript environment:
+
+%% Option 1: If you sorted all figures and tables into the sections of the text, please also sort the appendix figures and appendix tables into the respective appendix sections.
+%% They will be correctly named automatically.
+
+%% Option 2: If you put all figures after the reference list, please insert appendix tables and figures after the normal tables and figures.
+%% To rename them correctly to A1, A2, etc., please add the following commands in front of them:
+
+\appendixfigures  %% needs to be added in front of appendix figures
+
+\appendixtables   %% needs to be added in front of appendix tables
+
+%% Please add \clearpage between each table and/or figure. Further guidelines on figures and tables can be found below.
+
+
+
+% \authorcontribution{TEXT} %% optional section
+
+\competinginterests{TEXT} %% this section is mandatory even if you declare that no competing interests are present
+None.
+
+% \disclaimer{TEXT} %% optional section
+
+\begin{acknowledgements}
+TEXT
+\end{acknowledgements}
+
+
+
+
+%% REFERENCES
+
+%% The reference list is compiled as follows:
+
+% \begin{thebibliography}{}
+
+% \bibitem[AUTHOR(YEAR)]{LABEL}
+% REFERENCE 1
+
+% \bibitem[AUTHOR(YEAR)]{LABEL}
+% REFERENCE 2
+
+% \end{thebibliography}
+
+%% Since the Copernicus LaTeX package includes the BibTeX style file copernicus.bst,
+%% authors experienced with BibTeX only have to include the following two lines:
+%%
+\bibliographystyle{copernicus}
+\bibliography{../../Zotero_library.bib}{}
+% \bibliographystyle{copernicus}
+% \bibliography{example.bib}
+%%
+%% URLs and DOIs can be entered in your BibTeX file as:
+%%
+%% URL = {http://www.xyz.org/~jones/idx_g.htm}
+%% DOI = {10.5194/xyz}
+
+
+%% LITERATURE CITATIONS
+%%
+%% command                        & example result
+%% \citet{jones90}|               & Jones et al. (1990)
+%% \citep{jones90}|               & (Jones et al., 1990)
+%% \citep{jones90,jones93}|       & (Jones et al., 1990, 1993)
+%% \citep[p.~32]{jones90}|        & (Jones et al., 1990, p.~32)
+%% \citep[e.g.,][]{jones90}|      & (e.g., Jones et al., 1990)
+%% \citep[e.g.,][p.~32]{jones90}| & (e.g., Jones et al., 1990, p.~32)
+%% \citeauthor{jones90}|          & Jones et al.
+%% \citeyear{jones90}|            & 1990
+
+
+
+%% FIGURES
+
+%% When figures and tables are placed at the end of the MS (article in one-column style), please add \clearpage
+%% between bibliography and first table and/or figure as well as between each table and/or figure.
+
+
+%% ONE-COLUMN FIGURES
+
+%%f
+%\begin{figure}[t]
+%\includegraphics[width=8.3cm]{FILE NAME}
+%\caption{TEXT}
+%\end{figure}
+%
+%%% TWO-COLUMN FIGURES
+%
+%%f
+%\begin{figure*}[t]
+%\includegraphics[width=12cm]{FILE NAME}
+%\caption{TEXT}
+%\end{figure*}
+%
+%
+%%% TABLES
+%%%
+%%% The different columns must be seperated with a & command and should
+%%% end with \\ to identify the column brake.
+%
+%%% ONE-COLUMN TABLE
+%
+%%t
+%\begin{table}[t]
+%\caption{TEXT}
+%\begin{tabular}{column = lcr}
+%\tophline
+%
+%\middlehline
+%
+%\bottomhline
+%\end{tabular}
+%\belowtable{} % Table Footnotes
+%\end{table}
+%
+%%% TWO-COLUMN TABLE
+%
+%%t
+%\begin{table*}[t]
+%\caption{TEXT}
+%\begin{tabular}{column = lcr}
+%\tophline
+%
+%\middlehline
+%
+%\bottomhline
+%\end{tabular}
+%\belowtable{} % Table Footnotes
+%\end{table*}
+%
+%
+%%% MATHEMATICAL EXPRESSIONS
+%
+%%% All papers typeset by Copernicus Publications follow the math typesetting regulations
+%%% given by the IUPAC Green Book (IUPAC: Quantities, Units and Symbols in Physical Chemistry,
+%%% 2nd Edn., Blackwell Science, available at: http://old.iupac.org/publications/books/gbook/green_book_2ed.pdf, 1993).
+%%%
+%%% Physical quantities/variables are typeset in italic font (t for time, T for Temperature)
+%%% Indices which are not defined are typeset in italic font (x, y, z, a, b, c)
+%%% Items/objects which are defined are typeset in roman font (Car A, Car B)
+%%% Descriptions/specifications which are defined by itself are typeset in roman font (abs, rel, ref, tot, net, ice)
+%%% Abbreviations from 2 letters are typeset in roman font (RH, LAI)
+%%% Vectors are identified in bold italic font using \vec{x}
+%%% Matrices are identified in bold roman font
+%%% Multiplication signs are typeset using the LaTeX commands \times (for vector products, grids, and exponential notations) or \cdot
+%%% The character * should not be applied as mutliplication sign
+%
+%
+%%% EQUATIONS
+%
+%%% Single-row equation
+%
+%\begin{equation}
+%
+%\end{equation}
+%
+%%% Multiline equation
+%
+%\begin{align}
+%& 3 + 5 = 8\\
+%& 3 + 5 = 8\\
+%& 3 + 5 = 8
+%\end{align}
+%
+%
+%%% MATRICES
+%
+%\begin{matrix}
+%x & y & z\\
+%x & y & z\\
+%x & y & z\\
+%\end{matrix}
+%
+%
+%%% ALGORITHM
+%
+%\begin{algorithm}
+%\caption{…}
+%\label{a1}
+%\begin{algorithmic}
+%…
+%\end{algorithmic}
+%\end{algorithm}
+%
+%
+%%% CHEMICAL FORMULAS AND REACTIONS
+%
+%%% For formulas embedded in the text, please use \chem{}
+%
+%%% The reaction environment creates labels including the letter R, i.e. (R1), (R2), etc.
+%
+%\begin{reaction}
+%%% \rightarrow should be used for normal (one-way) chemical reactions
+%%% \rightleftharpoons should be used for equilibria
+%%% \leftrightarrow should be used for resonance structures
+%\end{reaction}
+%
+%
+%%% PHYSICAL UNITS
+%%%
+%%% Please use \unit{} and apply the exponential notation
+
+
+\end{document}

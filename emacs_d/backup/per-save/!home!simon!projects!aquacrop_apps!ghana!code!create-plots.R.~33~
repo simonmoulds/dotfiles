@@ -1,0 +1,82 @@
+## Author : Simon Moulds
+## Date   : June 2020
+
+library(ncdf4)
+library(tidync)
+library(ncmeta)
+library(tidyverse)
+library(magrittr)
+library(stars)
+
+get_nc_time <- function(nc) { ##NEW VERSION, with the units package
+    require(units)
+    require(ncdf4)
+    options(warn=1) #show warnings by default
+    if (is.character(nc)) nc <- nc_open(nc)
+    ncdims <- names(nc$dim) #get netcdf dimensions
+    timevar <- ncdims[which(ncdims %in% c("time", "Time", "datetime", "Datetime", "date", "Date"))] #find (first) time variable
+    if (length(timevar) > 1) {
+        warning(paste("Found more than one time var. Using the first:", timevar[1]))
+        timevar <- timevar[1]
+    }
+    if (length(timevar)!=1) stop("ERROR! Could not identify the correct time variable")
+    times <- ncvar_get(nc, timevar) #get time data
+    timeatt <- ncatt_get(nc, timevar) #get attributes
+    timeunit <- timeatt$units
+    units(times) <- as_units(timeunit)
+    as.POSIXct(times)
+}
+
+## Load canopy cover
+x = hyper_tibble("test/netcdf/hm_output_daily_total_CC.nc") %>%
+    dplyr::select(-space, -crop) %>%
+    mutate_at("farm", as.factor)
+
+time_vals = x$time %>% unique %>% sort
+time_posix = get_nc_time("test/netcdf/hm_output_daily_total_CC.nc")
+time_index = data.frame(time=time_vals, decoded_times=time_posix)
+
+x %<>% left_join(time_index, by=c("time"))
+write.table(x, "test_canopy_cover_data.csv", row.names=FALSE)
+
+x %<>% mutate_at("farm", as.factor)
+
+## Plot
+p = ggplot(data=x, aes(x=decoded_times, y=canopy_cover, color=farm)) +
+    geom_line() +
+    ylab("Canopy cover") +
+    xlab("Time") +
+    scale_color_discrete(
+        name=element_blank()
+    )        
+
+grid::grid.draw(p)
+png("~/Dropbox/plots/canopy_cover_test.png", width=5, height=5, units="in", res=320)
+grid::grid.draw(p)
+dev.off()       
+
+## p =
+##     ggplot(data=Gini_cube, aes(x=time, y=Gini, color=scenario)) +
+##     geom_line() +
+##     ylab("Gini Index") +
+##     xlab(element_blank()) +
+##     ylim(c(0,0.5)) +
+##     scale_x_continuous(breaks=seq(0,5000,1000), labels=c("0","10","20","30","40","50")) +
+##     scale_color_discrete(
+##         name=element_blank(),
+##         labels=labels
+##     ) +
+##     theme(
+##         panel.grid.major.y=element_blank(),
+##         panel.grid.minor.y=element_blank(),
+##         strip.background=element_blank(),
+##         strip.text.x=element_blank(),
+##         legend.position="bottom"
+##     ) +
+##     guides(
+##         color = guide_legend(
+##             override.aes = list(alpha = 1),
+##             ncol=2,
+##             byrow=TRUE
+##         )
+##     )

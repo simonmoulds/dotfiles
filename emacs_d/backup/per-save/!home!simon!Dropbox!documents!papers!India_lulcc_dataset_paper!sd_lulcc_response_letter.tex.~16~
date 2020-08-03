@@ -1,0 +1,104 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage{array, xcolor, lipsum, bibentry}
+\usepackage[margin=3cm,tmargin=2.8cm]{geometry}
+
+\usepackage{enumitem}
+\setlist{nolistsep}
+
+\usepackage{natbib}
+\usepackage{mathtools}
+\usepackage{multicol}
+\usepackage{sectsty}
+%% \usepackage[none]{hyphenat} %% no hyphenation
+\sectionfont{\normalfont}
+
+% \usepackage[showframe]{geometry}
+\usepackage{layout}
+\usepackage{hyperref}
+%% \title{\bfseries\Huge Simon Moulds}
+
+%% \title{\vspace{-2.0cm}\bf Simon Moulds}
+%% \author{texblog+cv@gmail.com}
+%% \date{}
+
+\definecolor{lightgray}{gray}{0.8}
+\newcolumntype{L}{>{\raggedleft}p{0.16\textwidth}}
+%% \newcolumntype{L}{>{\raggedleft}p{0.14\textwidth}}
+\newcolumntype{R}{p{0.8\textwidth}}
+\newcommand\VRule{\color{lightgray}\vrule width 0.5pt}
+
+\usepackage{tikz}
+
+\newcommand*{\marvosymbol}[1]{{\fontfamily{mvs}\fontencoding{U}\fontseries{m}\fontshape{n}\selectfont\char#1}}
+%% \definecolor{color2}{rgb}{0.55,0.55,0.55}% Chose your color here.
+
+%% define symbols
+\newcommand*{\addresssymbol}       {}
+\newcommand*{\mobilephonesymbol}   {\marvosymbol{72}~}
+\newcommand*{\fixedphonesymbol}    {\marvosymbol{84}~}
+\newcommand*{\faxphonesymbol}      {\marvosymbol{117}~}
+\newcommand*{\emailsymbol}         {\marvosymbol{66}~}
+\newcommand*{\homepagesymbol}      {{\Large\marvosymbol{205}}~}
+
+\usepackage{ragged2e}
+
+\begin{document}
+\pagenumbering{gobble}          % suppress page numbering
+
+\begin{flushright}
+  \textbf{Simon Moulds}\\
+  \textit{Kay Building}\\
+  \textit{Streatham Campus}\\
+  \textit{University of Exeter}\\
+  \textit{North Park Road}\\
+  \textit{Exeter}\\
+  \textit{United Kingdom}\\
+  \mobilephonesymbol~+44~7815~610~449\\
+  \emailsymbol~s.moulds@exeter.ac.uk\\
+  \vspace{11pt}
+  \today
+\end{flushright}
+
+\begin{flushleft}
+
+\vspace{11pt}
+\noindent To the Editor,
+
+\vspace{11pt}
+\noindent Thank you for your comments on our manuscript ``A spatio-temporal land use/land cover reconstruction for India (1960--2010)''. We believe we have addressed the issues raised by yourself, the handling Editorial Board member and the two reviewers. We attach a detailed point-by-point response to the comments of the reviewers as requested.\\
+
+\vspace{11pt}
+\noindent We have changed the title of the manuscript to ``A spatio-temporal land use and land cover reconstruction for India (1960--2010)'' in order to remove the forward-slash from the original title. We have completed the Data Citations section, providing the DOI as ``XXXXX'' for now, and reference the dataset in the Data Records section. The references have been amended to conform with the Nature style. Lastly, we have supplied production-quality figures in PDF format. \\
+
+\vspace{11pt}
+\noindent 
+% \vspace{11pt}
+% \noindent We are pleased to submit a Data Descriptor manuscript entitled ``A spatio-temporal land use/land cover reconstruction for India (1960--2010)'' for consideration for publication in \textit{Scientific Data}. The manuscript describes a new, high-resolution historical land use/land cover dataset for India, produced by combining contemporary land use/land cover maps derived from satellite data with subnational inventory data. The data has been placed in the Figshare repository during the submission process according to the guidelines on your website. \\
+
+% \vspace{11pt}
+% \noindent The manuscript has not been published and is not under consideration for publication elsewhere. We have previously submitted a draft abstract of the manuscript to a member of your Editorial Board, Katherine Homewood, to register our interest in participating in a special collection dedicated to the Ecosystem Services for Poverty Alleviation (ESPA) project. We recognise, however, that we have missed the deadline for this issue (30 November) and will therefore not benefit from the fee waiver. Nevertheless, we hope that the paper may still be considered for inclusion in the special collection. We have identified the following potential reviewers for the manuscript:
+
+% \vspace{11pt}
+% \begin{enumerate}
+% \item Dr Richard Fuchs (Karlsruhe Institute of Technology, richard.fuchs@kit.edu)
+% \item Dr Arijit Roy (Indian Institute of Remote Sensing, arijitroy@iirs.gov.in)
+% \end{enumerate}
+
+% \vspace{11pt}
+% \noindent Thank you for your help with the submission.\\
+
+\vspace{11pt}
+\noindent Yours faithfully,
+
+\vspace{11pt}
+Simon Moulds, on behalf of the authors
+
+\vspace{11pt}
+\noindent Dr Simon Moulds\\
+Research Fellow\\
+University of Exeter\\
+
+\end{flushleft}
+
+\end{document}
+

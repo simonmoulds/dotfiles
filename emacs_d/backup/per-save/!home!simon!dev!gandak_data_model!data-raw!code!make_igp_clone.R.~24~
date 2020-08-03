@@ -1,0 +1,35 @@
+## Author : Simon Moulds
+## Date   : Nov 2018
+
+library(raster)
+library(ncdf4)
+
+## get landmask
+system("unzip -o data/ANCILLARY_1200.zip -d data")
+system("unzip -o data/ANCILLARY_1200/data/land_ocean_masks_xdeg.zip -d data/ANCILLARY_1200/data")
+
+landmask_pt25 = raster("data/ANCILLARY_1200/data/land_ocean_masks_xdeg/land_ocean_mask2_qd.asc")
+fn = "/data/PRINCETON_IGP/prcp_daily_2015-2015_igp.nc"
+r = raster(fn, layer=1)
+landmask_pt25 = crop(landmask_pt25, extent(r))
+landmask_pt25[landmask_pt25 > 0] = 1
+
+clone_pt25 = raster(landmask_pt25)
+clone_pt25[] = 1
+
+outdir = "/data/PRINCETON_IGP"
+writeRaster(
+    clone_pt25,
+    file.path(outdir, "igp.clone.tif"),
+    format="GTiff",
+    overwrite=TRUE)
+
+writeRaster(
+    landmask_pt25,
+    file.path(outdir, "igp.landmask.tif"),
+    format="GTiff",
+    overwrite=TRUE)
+
+system(paste0('gdal_translate -ot Float32 -mo "PCRASTER_VALUESCALE=VS_SCALAR" -of PCRaster ', file.path(outdir, "igp.clone.tif"), ' ', file.path(outdir, "igp.clone.map")))
+
+system(paste0('gdal_translate -ot Float32 -mo "PCRASTER_VALUESCALE=VS_SCALAR" -of PCRaster ', file.path(outdir, "igp.landmask.tif"), ' ', file.path(outdir, "igp.landmask.map")))

@@ -1,0 +1,31 @@
+import os
+import subprocess
+import netCDF4 as nc
+import test_utils
+
+@pytest.fixture
+def context(tmpdir, request):
+    """Run AquaCrop model"""
+
+    # this part of the function searches for a directory with
+    # the same name of test module and, if available, moving all
+    # contents to a temporary directory so tests can use them
+    # freely.
+    filename = request.module.__file__
+    test_dir, _ = os.path.splitext(filename)
+    if os.path.isdir(test_dir):
+        dir_util.copy_tree(test_dir, bytes(tmpdir))
+    
+    yrs = os.walk(str(tmpdir)).next()[1]
+    cwd = os.getcwd()
+    aquacrop_dir = os.path.abspath("../..")
+    for yr in yrs:
+        os.chdir(os.path.join(str(tmpdir), str(yr)))
+        runner = os.path.join(aquacrop_dir, "AquaCrop_Py", "deterministic_runner.py")
+        config = "Config/aos_ch7_ex1a_tunis_wheat_" + str(yr) + "_config.ini"
+        model = "aquacrop"
+        try:
+            subprocess.check_call([runner, config, model])
+        except subprocess.CalledProcessError:
+            pass                # not sure what to do here?
+        os.chdir(cwd)

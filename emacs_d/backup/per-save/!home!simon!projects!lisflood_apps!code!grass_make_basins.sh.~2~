@@ -1,0 +1,16 @@
+#!/bin/bash
+
+echo "0 = 0
+1       = 5
+2       = 6
+3       = 7
+4       = 4
+6       = 8
+7       = 3
+8       = 2
+9       = 1" > /tmp/draindir_rcl.txt
+
+r.in.gdal input=merit_draindir_lisflood_0.250000Deg.tif output=merit_draindir_lisflood_0.250000Deg --overwrite
+r.reclass input=merit_draindir_lisflood_0.250000Deg output=merit_draindir_grass_0.250000Deg rules=/tmp/draindir_rcl.txt --overwrite
+r.stream.basins direction=merit_draindir_grass_0.250000Deg coordinates=16.375,-28.625,33.625,-25.125,36.375,-18.625 basins=south_africa_basins_0.250000Deg --overwrite
+r.out.gdal input=south_africa_basins_0.250000Deg output=merit_draindir_grass_0.250000Deg.tif --overwrite

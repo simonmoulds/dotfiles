@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# unzip raw data file
+unzip -o data-raw/dataverse_files.zip -d data
+
+unzip -o data/spam2005v3r2_global_phys_area.geotiff.zip -d data
+unzip -o data/spam2005v3r2_global_harv_area.geotiff.zip -d data

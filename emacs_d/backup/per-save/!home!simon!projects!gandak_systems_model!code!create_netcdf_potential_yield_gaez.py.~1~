@@ -1,0 +1,109 @@
+import numpy as np
+import datetime
+import time
+import gdal
+import scipy.interpolate as interpolate
+import matplotlib.pyplot as plt
+
+from netCDF4 import Dataset, date2num
+from pandas import read_csv
+
+# Spatial dimensions
+# ##################
+
+ds = gdal.Open('../data/ksat_topsoil_gapfilled_5m.tif')
+a = ds.ReadAsArray()
+nlat,nlon = np.shape(a)
+xres = 1./12
+yres = 1./12
+
+b = ds.GetGeoTransform() #bbox, interval
+minx = b[0]
+maxx = b[0] + nlon * xres
+maxy = b[3] 
+miny = b[3] + nlat * -yres
+
+lon = np.arange(0,nlon) * xres + (minx + xres/2)
+lat = np.arange(0,nlat) * yres + (miny + yres/2)
+lat = lat[::-1]
+# lon = np.linspace(minx + xres/2, maxx - xres/2, nlon)
+# lat = np.linspace(miny + yres/2, maxy - yres/2, nlat)
+
+ncrop = 8                       # TEMPORARY
+
+# Potential yield data
+# ####################
+
+# Assume time varying
+
+d = read_csv('../data/sult_pol_av_crop_yield_sultanpur.txt', delimiter="\s+", header=None, skiprows=[0,1], names=['Year','Rice','Wheat'])
+
+years = d['Year'].values
+rice_yield = d['Rice'].values
+wheat_yield = d['Wheat'].values
+# f = interpolate.interp1d(years, data, kind="linear")
+# newyears = np.arange(years.min(), years.max() + 1)
+# newdata = f(newyears)
+
+yx_rice = rice_yield[:,None,None] * np.ones((nlat,nlon))
+yx_wheat = wheat_yield[:,None,None] * np.ones((nlat,nlon))
+yx_sugc = yx_wheat              # TEMPORARY
+yx_all = np.stack([yx_rice,yx_rice,yx_rice,yx_rice,yx_wheat,yx_wheat,yx_sugc,yx_sugc], axis=1)
+
+# create netCDF
+# #############
+
+nco = Dataset('../data/Gandak_potential_crop_yield.nc', 'w')
+nco.description = 'Annual CO2 concentration file'
+nco.history = 'Created ' + time.ctime(time.time())
+
+# create dimensions, variables and attributes:
+nco.createDimension('lon',nlon)
+nco.createDimension('lat',nlat)
+nco.createDimension('crop', ncrop)
+nco.createDimension('time',None)
+
+lono = nco.createVariable('lon',np.float64,('lon'),zlib=True,least_significant_digit=16)
+lono.units = 'degrees_east'
+lono.standard_name = 'longitude'
+lono[:]=lon
+
+lato = nco.createVariable('lat',np.float64,('lat'),zlib=True,least_significant_digit=16)
+lato.units = 'degrees_north'
+lato.standard_name = 'latitude'
+lato[:]=lat
+
+crpo = nco.createVariable('crop','f4',('crop'))
+crpo.units = '1'
+crpo.standard_name = 'crop'
+crpo.long_name = 'crop'
+crpo[:]=np.arange(1, ncrop + 1)
+
+times = nco.createVariable('time', np.int32, ('time',))
+times.units = "days since 1901-01-01 00:00:00"
+times.calendar = "standard"
+dates = []
+for i in range(len(years)):
+    dates.append(datetime.datetime(years[i],1,1))
+times[:] = date2num(dates, units=times.units, calendar=times.calendar)
+
+# create container variable for CRS: lon/lat WGS84 datum
+crso = nco.createVariable('crs','i4')
+crso.long_name = 'Lon/Lat Coords in WGS84'
+crso.grid_mapping_name='latitude_longitude'
+crso.longitude_of_prime_meridian = 0.0
+crso.semi_major_axis = 6378137.0
+crso.inverse_flattening = 298.257223563
+
+yx = nco.createVariable('Yx', np.float64, ('time','crop','lat','lon'))
+yx.setncattr('standard_name', 'Yx')
+yx.setncattr('long_name', 'Potetial crop yield')
+yx.setncattr('units', '1e-1 kg.m-2')
+yx.setncattr('_FillValue', np.float64(1e+20))
+yx.setncattr('missing_value', np.float64(1e+20))
+yx[:] = rice_yield[:,None,None,None] * np.ones((ncrop,nlat,nlon))[None,:,:,:]
+yx_rice = rice_yield[:,None,None] * np.ones((nlat,nlon))
+yx_wheat = wheat_yield[:,None,None] * np.ones((nlat,nlon))
+yx_sugc = yx_wheat              # TEMPORARY
+yx[:] = yx_all
+nco.close()

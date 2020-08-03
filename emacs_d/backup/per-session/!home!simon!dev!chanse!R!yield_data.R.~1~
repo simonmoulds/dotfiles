@@ -1,0 +1,4 @@
+#' Create a yield_data object.
+#'
+#' @param crop_yield
+#' @param time

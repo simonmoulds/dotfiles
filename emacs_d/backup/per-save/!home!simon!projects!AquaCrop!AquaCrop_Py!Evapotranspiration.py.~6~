@@ -1,0 +1,66 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+# AquaCrop crop growth model
+
+import numpy as np
+
+import logging
+logger = logging.getLogger(__name__)
+
+class Evapotranspiration(object):
+    """Class to represent combined soil evaporation and plant
+    transpiration
+    """
+    def __init__(self, Evapotranspiration_variable):
+        self.var = Evapotranspiration_variable
+
+class AquaCropEvapotranspiration(Evapotranspiration):
+    
+    def initial(self):
+        self.var.ETpot = np.zeros((self.var.nRotation, self.var.nLat, self.var.nLon))
+
+    def dynamic(self):
+        self.var.ETpot = self.var.Epot + self.var.Tpot
+
+class FAO56Evapotranspiration(Evapotranspiration):
+    def initial(self):
+        self.var.ETpot = np.zeros((self.var.nRotation, self.var.nLat, self.var.nLon))
+
+    def dynamic(self):
+        """Update Evapotranspiration for current day"""
+
+        # Obtain crop coefficient for current growth stage
+        L_day = np.stack((self.var.L_ini_day,
+                          self.var.L_dev_day,
+                          self.var.L_mid_day,
+                          self.var.L_late_day), axis=0)        
+        L_day = np.cumsum(L_day, axis=0)
+        cond1 = self.var.GrowthStage == 1
+        cond2 = self.var.GrowthStage == 2
+        cond3 = self.var.GrowthStage == 3
+        cond4 = self.var.GrowthStage == 4
+        Kc = np.zeros((self.var.nRotation, self.var.nLat, self.var.nLon))
+        Kc[cond1] = self.var.Kc_ini[cond1]
+        ini_to_mid_gradient = (self.var.Kc_mid - self.var.Kc_ini) / self.var.L_dev_day
+        Kc[cond2] = (self.var.Kc_ini + (ini_to_mid_gradient * (self.var.DAP - L_day[0,:])))[cond2]
+        Kc[cond3] = self.var.Kc_mid[cond3]
+        mid_to_end_gradient = (self.var.Kc_end - self.var.Kc_mid) / self.var.L_late_day
+        Kc[cond4] = (self.var.Kc_mid + (mid_to_end_gradient * (self.var.DAP - L_day[2,:])))[cond4]
+        Kc[np.logical_not(self.var.GrowingSeasonIndex)] = 0.5  # Global Crop Water Model
+
+        # Calculate maximum crop evapotranspiration
+        self.var.ETpot = np.broadcast_to(self.var.referencePotET, (self.var.nRotation, self.var.nLat, self.var.nLon)) * Kc
+
+        # Compute actual evapotranspiration
+        p = self.var.p_std + 0.04 * (5 - self.var.ETpot)  # Equation 31
+        Ks = self.var.thRZ_Act / ((1 - p) * self.var.thRZ_Fc)  # Equation 30
+        Ks = np.clip(Ks, 0, 1)
+        self.var.ETact = self.var.ETpot * Ks  # Equation 29
+        
+        # print self.var.thRZ_Act[0,0,0]
+        # print self.var.thRZ_Fc[0,0,0]
+        # print self.var.ETpot[0,0,0]
+        # print self.var.ETact[0,0,0]
+        
+        

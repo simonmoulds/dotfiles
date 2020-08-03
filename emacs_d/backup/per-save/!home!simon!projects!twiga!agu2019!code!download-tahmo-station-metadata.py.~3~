@@ -1,0 +1,68 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# get metadata for tahmo stations
+
+import requests
+import json
+import datetime
+import pandas as pd
+import matplotlib
+import numpy as np
+
+#############################
+# TWIGA API settings        #
+#############################
+
+# The HydroNET/TWIGA API endpoint
+api = 'https://hnapi.hydronet.com/api/'
+
+# The bearer token for the TWIGA user
+# this token is used to identify as a valid TWIGA user to the API
+api_token = 'eyJhbGciOiJSUzI1NiIsImtpZCI6ImIyY2I4NjU2NjNlY2RiYzEyMGZkOGViYzFkM2ExOGIwIiwidHlwIjoiSldUIn0.eyJuYmYiOjE1NzE4MzEzOTksImV4cCI6MTcyMzA2MjYyOSwiaXNzIjoiaHR0cHM6Ly9vaWRjLmh5ZHJvbmV0LmNvbSIsImF1ZCI6Imh0dHBzOi8vb2lkYy5oeWRyb25ldC5jb20vcmVzb3VyY2VzIiwiY2xpZW50X2lkIjoiaG40cy1wcm9kdWN0aW9uIiwiY2xpZW50X3Byb2ZpbGUiOiJwcm9maWxlIiwiY2xpZW50X2VtYWlsIjoiZW1haWwiLCJjbGllbnRfbmFtZSI6Im5hbWUiLCJjbGllbnRfc3RyaW5nIjoiaWRfdG9rZW4gdG9rZW4iLCJjbGllbnRfb2ZmbGluZV9hY2Nlc3MiOiJvZmZsaW5lX2FjY2VzcyIsInN1YiI6IjQzYmEwNjhjLTI3NzYtNDg1My1hYjc5LTIyMzIxMTE3NzZhMCIsImF1dGhfdGltZSI6MTU3MTgzMTM5OSwiaWRwIjoibG9jYWwiLCJqdGkiOiIyNTg1M2UwNjRjMGFhYjg2N2RmZTgyNjdjNzBmZTcyMCIsInNjb3BlIjpbIm9wZW5pZCIsInByb2ZpbGUiLCJvZmZsaW5lX2FjY2VzcyJdLCJhbXIiOlsicHdkIl19.PhkJ3SVi2ZjBEan9OlV9qpFAV3fqjsPQqQv-gk_ZtWlIuwTvoPMt5whwAa07opUNV5tO_-Jk4B8R-W9x2znMmzA_d9Bjyiwrwto3GgaUBBryXR-GIs21Dy1Hj62qUvUDpI07EQhGeq7SpxYeO0WdK_t-5U-3w3y9WNihvmcyfMsJukw9AOsSObEPUY6YUiTv71vbqKPQc55pbuPHpaDRHZITH0Nps3E_jrnwn9Aepz7B7MDVXyM_vU1Vb-MzAVZq03XvCf_YdWWxQUqPhbBVHcJjfzSQGrFl-8pGMLkHvcx1PgEnrxN9y7JS6tP_D7rZMBwA4vaiHXX5Z1XdBsvwYg'
+
+# Using the token, generate a valid header for requests to the API
+api_header = {
+    'content-type': 'application/json',
+    'Authorization': 'bearer ' + api_token
+}
+
+# store the selected data source code
+selected_datasource_code = "Tahmo.Stations.Data.Distribution.Hourly"
+
+datadir = '../data'
+
+def main():
+    # again we define a JSON request which we can send the the TWIGA API
+    request_locations_tahmo = {
+        "DataSourceCodes" : [selected_datasource_code]
+    }
+
+    # This time we send the request to the variables endpoint of the API
+    locations_tahmo_response = requests.post(
+        api + 'entity/locations/get',
+        headers=api_header,
+        data=json.dumps(request_locations_tahmo)
+    )
+
+    # The response of the API is in JSON. Parse this with Python
+    locations_tahmo = locations_tahmo_response.json()
+    locs = locations_tahmo['Locations']
+    
+    stn_metadata = [
+        (locs[key]['LocationId'],
+         locs[key]['Name'],
+         locs[key]['Code'],
+         locs[key]['X'],
+         locs[key]['Y'],
+         locs[key]['Z'])
+        for key, value in locs.items()
+    ]
+    df = pd.DataFrame(
+        stn_metadata,
+        columns=['LocationId','Name','Code','X','Y','Z']
+    )    
+    df.to_csv(os.path.join(datadir, 'tahmo_stn_metadata.csv'), index=False)
+
+if __name__ == "__main__":
+    main()

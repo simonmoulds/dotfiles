@@ -1,0 +1,51 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# compute hourly reference et
+
+import os
+import numpy as np
+import netCDF4 as nc
+import pandas as pd
+import datetime
+datadir = "/data/ERA5"
+
+# years = range(2014, 2015)
+# months = range(12, 13)
+
+year = 2017
+month = 12
+
+yearmon = str(year) + str(month).zfill(2)
+prc_filename = os.path.join(datadir, "era5_reanalysis_total_precipitation_" + yearmon + ".nc")
+nco = nc.Dataset(prc_filename)
+lat = nco.variables['latitude'][:]
+lon = nco.variables['longitude'][:]
+time = nco.variables['time']
+times = list(nc.num2date(time[:], time.units, time.calendar))
+prc = nco.variables['tp'][:]
+nco.close()
+
+tahmo_metadata = pd.read_csv('tahmo_stn_metadata.csv')
+tahmo_filename = 'tahmo_stn_TA00192_prec.csv'
+tahmo_code = re.search('TA[0-9]+', tahmo_filename).group(0)
+idx = [index for index,value in enumerate(tahmo_metadata['Code']) if value in tahmo_code]
+x_coord = tahmo_metadata['X'][idx]
+y_coord = tahmo_metadata['Y'][idx]
+
+tahmo = pd.read_csv(tahmo_filename)
+tahmo_times = [pd.datetime.strptime(tm_str, "%Y-%m-%d %H:%M:%S") for tm_str in tahmo['DateTime']]
+tahmo_index = [tahmo_times.index(i) for i in times if i in tahmo_times]
+tahmo_times_sub = [tahmo_times[i] for i in tahmo_index]
+era5_index = [times.index(i) for i in tahmo_times_sub]
+
+
+
+# get latitude and longitude of station
+
+# ds = xr.open_dataset(prc_filename)
+# tp = ds['tp']
+# tp_daily = tp.resample(time='D').sum(dim='time')
+# tp_daily.to_netcdf('test.nc')
+# nco = nc.Dataset("test.nc")
+# nco = nc.Dataset("/data/ERA5/test.nc")

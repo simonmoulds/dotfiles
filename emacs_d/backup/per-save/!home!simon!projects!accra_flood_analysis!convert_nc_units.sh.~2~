@@ -1,0 +1,5 @@
+#!/bin/bash
+
+for mon in {01..12}
+do
+    f=era5_reanalysis_ghana_2015${mon}

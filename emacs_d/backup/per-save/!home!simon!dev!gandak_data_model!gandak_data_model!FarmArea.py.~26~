@@ -1,0 +1,107 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import os
+import numpy as np
+import rasterio
+
+from hydro_model_builder.ncConverter import np2netCDF
+from hydro_model_builder import VirtualOS as vos
+
+import variable_list as variable_list
+from utils import *
+
+class FarmArea(object):
+    def __init__(self, FarmArea_variable):
+        self.var = FarmArea_variable
+        self.var.FarmAreaOutputFile = vos.getFullPath(
+            self.var._configuration.farmAreaOptions['outputFile'],
+            self.var._configuration.globalOptions['outputDir'])
+        # self.var.nFarm = int(self.var._configuration.farmAreaOptions['nFarm'])
+        self.var.nFarmSizeCategory = int(self.var._configuration.farmAreaOptions['nFarmSizeCategory'])
+        farm_per_category = self.var._configuration.farmAreaOptions['nFarmPerCategory']
+        farm_per_category = [int(x) for x in farm_per_category.split(",")]
+        if (len(farm_per_category) == 1) and (self.var.nFarmSizeCategory > 1):
+            farm_per_category = [farm_per_category[0] for i in range(self.var.nFarmSizeCategory)]
+        self.var.nFarmPerCategory = np.array(farm_per_category)
+        self.var.nFarm = np.sum(self.var.nFarmPerCategory)
+        self.bbox = vos.get_clone_map_extent(self.var._configuration.cloneMap)
+            
+    def initial(self):
+        pass
+
+    def dynamic(self):
+        netcdf = np2netCDF(self.var._configuration, self.var.dimensions, variable_list)
+        print 'hello, world'
+        netcdf.create_netCDF(
+            self.var.FarmAreaOutputFile,
+            ['crop_area_frac','farm_category','farm_area','farm_category_area'])
+
+        # Crop area fraction (?????)
+        crop_area_frac = self.var.crop_area / self.var.cropland_area
+        crop_area_frac = np.broadcast_to(
+            crop_area_frac,
+            (self.var.nFarm, self.var.nCrop, self.var.nLat, self.var.nLon)).copy()
+        netcdf.data2NetCDF(
+            self.var.FarmAreaOutputFile,
+            'crop_area_frac',
+            crop_area_frac)
+
+        # Farm category
+        farm_category = np.arange(1, self.var.nFarmSizeCategory + 1)
+        farm_category = np.repeat(
+            farm_category,
+            np.array(self.var.nFarmPerCategory))
+        farm_category = (
+            farm_category[:,None,None]
+            * np.ones((self.var.nLat, self.var.nLon)))        
+        netcdf.data2NetCDF(
+            self.var.FarmAreaOutputFile,
+            'farm_category',
+            farm_category)
+        
+        # Farm area
+        farm_area_list = []
+        for index,suffix in enumerate(['marg','small','semim','medium','large']):
+            fn = get_data_smart(
+                'gandak_data_model',
+                '../data/' + suffix + '_farm_area_1980.tif',
+                as_string = False)
+            ar = read_gdal_raster_image(fn, self.bbox, 0)
+            farm_area_list.append(ar[None,:,:] * np.ones((self.var.nFarmPerCategory[index]))[:,None,None])
+
+        farm_area = np.concatenate(farm_area_list, axis=0)
+        farm_area *= 10000      # Ha -> m2
+        netcdf.data2NetCDF(
+            self.var.FarmAreaOutputFile,
+            'farm_area',
+            farm_area)
+        
+        farm_category_area = np.zeros((self.var.nFarmSizeCategory, self.var.nLat, self.var.nLon))
+        for index,suffix in enumerate(['marg','small','semim','medium','large']):
+            fn = get_data_smart(
+                'gandak_data_model',
+                '../data/' + suffix + '_total_area_1980.tif',
+                as_string = False)
+            ar = read_gdal_raster_image(fn, self.bbox, 0)
+            farm_category_area[index,:,:] = ar
+
+        netcdf.data2NetCDF(
+            self.var.FarmAreaOutputFile,
+            'farm_category_area',
+            farm_category_area)
+
+        # initial tubewell ownership
+        tw_ownership_list = []
+        for index,suffix in enumerate(['marg','small','semim','medium','large']):
+            fn = get_data_smart(
+                'gandak_data_model',
+                '../data/' + suffix + '_tw_ownership_rate.tif',
+                as_string = False)
+            ar = read_gdal_raster_image(fn, self.bbox, 0)
+            tw_ownership_list.append(ar[None,:,:] * np.ones((self.var.nFarmPerCategory[index]))[:,None,None])
+        tw_ownership = np.concatenate(tw_ownership_list, axis=0)
+        print tw_ownership[:,15,15]
+        tw_ownership = tw_ownership > np.random.random((self.var.nFarm, self.var.nLat, self.var.nLon))
+        print tw_ownership[:,15,15]
+        

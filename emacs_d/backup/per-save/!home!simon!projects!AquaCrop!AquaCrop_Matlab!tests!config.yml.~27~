@@ -1,0 +1,187 @@
+default:
+  aosdir: "/home/simon/projects/AquaCrop/AquaCrop_Matlab/AquaCropOS_v50a"
+  new_clock_fn: "Clock.txt"
+  new_weather_fn: "Weather.txt"
+  new_co2_fn: "MaunaLoaCO2.txt"
+  new_crop_mix_fn: "CropMix.txt"
+  new_soil_param_fn: "Soil.txt"
+  new_soil_profile_fn: "SoilProfile.txt"
+  new_soil_hydrology_fn: "SoilHydrology.txt"
+  new_crop_param_fn: "Crop.txt"
+  new_field_mgmt_fn: "FieldManagement.txt"
+  new_irri_mgmt_fn: "IrrigationManagement.txt"
+  new_initial_wc_fn: "InitialWaterContent.txt"
+  new_water_table_fn: "WaterTable.txt"
+  new_file_setup_fn: "FileSetup.txt"
+  new_write_daily_output: "Y"
+  
+Ch7_Tunis_Wheat_Ex1:
+  wd: "/home/simon/projects/AquaCrop/AquaCrop_Matlab/AquaCropOS_ModelTesting/Chapter7_Tunis_Wheat/Exercise1/Matlab"
+  inpdirnm: "Input_Ch7_Tunis_Wheat_Ex1"
+  outdirnm: "Output_Ch7_Tunis_Wheat_Ex1"
+  old_clock_fn: "Clock.txt"
+  old_weather_fn: "Weather_Tunis.txt"
+  old_co2_fn: "MaunaLoaCO2.txt"
+  old_soil_param_fn: "Soil_LocalSoilTunis.txt"
+  old_soil_profile_fn: "SoilProfile_LocalSoilTunis.txt"
+  old_soil_hydrology_fn: "SoilHydrology_LocalSoilTunis.txt"
+  old_irri_mgmt_fn: "IrrigationManagement.txt"
+  old_planting_date_fn: "PlantingDates_Tunis.txt"
+  old_crop_param_fn: "Crop_WheatGDDTunis.txt"
+  old_initial_wc_fn: "InitialWaterContent.txt"
+  new_output_fn: "Ch7_Tunis_Wheat_Ex1"
+
+Ch7_Tunis_Wheat_Ex2:
+  inherits: Ch7_Tunis_Wheat_Ex1
+  wd: "/home/simon/projects/AquaCrop/AquaCrop_Matlab/AquaCropOS_ModelTesting/Chapter7_Tunis_Wheat/Exercise2/Matlab"
+  inpdirnm: "Input_Ch7_Tunis_Wheat_Ex2"
+  outdirnm: "Output_Ch7_Tunis_Wheat_Ex2"
+  old_soil_param_fn: "Soil_SandyLoam.txt"
+  old_soil_profile_fn: "SoilProfile_SandyLoam.txt"
+  old_soil_hydrology_fn: "SoilHydrology_SandyLoam.txt"
+  old_crop_param_fn: "Crop_WheatGDDTunis.txt"
+  new_output_fn: "Ch7_Tunis_Wheat_Ex2"
+
+Ch7_Tunis_Wheat_Ex3:
+  inherits: Ch7_Tunis_Wheat_Ex2
+  wd: "/home/simon/projects/AquaCrop/AquaCrop_Matlab/AquaCropOS_ModelTesting/Chapter7_Tunis_Wheat/Exercise3/Matlab"
+  inpdirnm: "Input_Ch7_Tunis_Wheat_Ex3"
+  outdirnm: "Output_Ch7_Tunis_Wheat_Ex3"
+  old_crop_param_fn: "Crop_WheatGDDTunis (1).txt"
+  old_initial_wc_fn: "InitialWaterContent_WetDry.txt"
+  new_output_fn: "Ch7_Tunis_Wheat_Ex3"
+  
+Ch7_Tunis_Wheat_Ex4:
+  inherits: Ch7_Tunis_Wheat_Ex2
+  wd: "/home/simon/projects/AquaCrop/AquaCrop_Matlab/AquaCropOS_ModelTesting/Chapter7_Tunis_Wheat/Exercise4/Matlab"
+  inpdirnm: "Input_Ch7_Tunis_Wheat_Ex4"
+  outdirnm: "Output_Ch7_Tunis_Wheat_Ex4"
+  new_output_fn: "Ch7_Tunis_Wheat_Ex4"
+  
+Ch7_Tunis_Wheat_Ex6:
+  inherits: Ch7_Tunis_Wheat_Ex2
+  wd: !expr file.path(basedir, "AquaCropOS_ModelTesting/Chapter7_Tunis_Wheat/Exercise6/Matlab")
+  inpdirnm: "Input_Ch7_Tunis_Wheat_Ex6"
+  outdirnm: "Output_Ch7_Tunis_Wheat_Ex6"
+  new_output_fn: "Ch7_Tunis_Wheat_Ex6"
+
+Ch7_Tunis_Wheat_Ex7:
+  inherits: Ch7_Tunis_Wheat_Ex2
+  wd: !expr file.path(basedir, "AquaCropOS_ModelTesting/Chapter7_Tunis_Wheat/Exercise7/Matlab"
+  inpdirnm: "Input_Ch7_Tunis_Wheat_Ex7"
+  outdirnm: "Output_Ch7_Tunis_Wheat_Ex7"
+  new_output_fn: "Ch7_Tunis_Wheat_Ex7"
+
+Ch8_Hyderabad_Cereal_Ex2:
+  wd: !expr file.path(basedir, "AquaCropOS_ModelTesting/Chapter8_Hyderabad_Cereal/Exercise2/Matlab")
+  inpdirnm: "Input_Ch8_Hyderabad_Cereal_Ex2"
+  outdirnm: "Output_Ch8_Hyderabad_Cereal_Ex2"
+  old_clock_fn: "Clock.txt"
+  old_weather_fn: "Weather_Hyderabad.txt"
+  old_co2_fn: "MaunaLoaCO2.txt"
+  old_soil_param_fn: "Soil_Paddy.txt"
+  old_soil_profile_fn: "SoilProfile_Paddy.txt"
+  old_soil_hydrology_fn: "SoilHydrology_Paddy.txt"
+  old_irri_mgmt_fn: "IrrigationManagement.txt"
+  old_planting_date_fn: "PlantingDates_Hyderabad.txt"
+  old_crop_param_fn: "Crop_RiceGDDHyderabad.txt"
+  old_initial_wc_fn: "InitialWaterContent.txt"
+  new_output_fn: "Ch8_Hyderabad_Cereal_Ex2"
+  
+Ch8_Hyderabad_Cereal_Ex3a:
+  inherits: Ch8_Hyderabad_Cereal_Ex2
+  wd: !expr file.path(basedir, "AquaCropOS_ModelTesting/Chapter8_Hyderabad_Cereal/Exercise3/Matlab")
+  inpdirnm: "Input_Ch8_Hyderabad_Cereal_Ex3a"
+  outdirnm: "Output_Ch8_Hyderabad_Cereal_Ex3a"
+  old_initial_wc_fn: "InitialWaterContent.txt"
+  new_output_fn: "Ch8_Hyderabad_Cereal_Ex3a"
+
+Ch8_Hyderabad_Cereal_Ex3b:
+  inherits: Ch8_Hyderabad_Cereal_Ex2
+  wd: !expr file.path(basedir, "AquaCropOS_ModelTesting/Chapter8_Hyderabad_Cereal/Exercise3/Matlab")
+  inpdirnm: "Input_Ch8_Hyderabad_Cereal_Ex3b"
+  outdirnm: "Output_Ch8_Hyderabad_Cereal_Ex3b"
+  old_initial_wc_fn: "InitialWaterContent_FC.txt"
+  new_output_fn: "Ch8_Hyderabad_Cereal_Ex3b"
+
+Ch8_Hyderabad_Cereal_Ex3c:
+  inherits: Ch8_Hyderabad_Cereal_Ex2
+  wd: !expr file.path(basedir, "AquaCropOS_ModelTesting/Chapter8_Hyderabad_Cereal/Exercise3/Matlab")
+  inpdirnm: "Input_Ch8_Hyderabad_Cereal_Ex3c"
+  outdirnm: "Output_Ch8_Hyderabad_Cereal_Ex3c"
+  old_initial_wc_fn: "InitialWaterContent_TAW30.txt"
+  new_output_fn: "Ch8_Hyderabad_Cereal_Ex3c"
+
+Ch8_Hyderabad_Cereal_Ex3d:
+  inherits: Ch8_Hyderabad_Cereal_Ex2
+  wd: !expr file.path(basedir, "AquaCropOS_ModelTesting/Chapter8_Hyderabad_Cereal/Exercise3/Matlab")
+  inpdirnm: "Input_Ch8_Hyderabad_Cereal_Ex3d"
+  outdirnm: "Output_Ch8_Hyderabad_Cereal_Ex3d"
+  old_initial_wc_fn: "InitialWaterContent_TAW75.txt"
+  new_output_fn: "Ch8_Hyderabad_Cereal_Ex3d"
+
+Ch8_Hyderabad_Cereal_Ex6:
+  inherits: Ch8_Hyderabad_Cereal_Ex2
+  wd: !expr file.path(basedir, "AquaCropOS_ModelTesting/Chapter8_Hyderabad_Cereal/Exercise6/Matlab")
+  inpdirnm: "Input_Ch8_Hyderabad_Cereal_Ex6"
+  outdirnm: "Output_Ch8_Hyderabad_Cereal_Ex6"
+  old_clock_fn: "Clock.txt"
+  old_weather_fn: "Weather_Hyderabad.txt"
+  old_co2_fn: "MaunaLoaCO2.txt"
+  old_soil_param_fn: "Soil_ClayLoam.txt"
+  old_soil_profile_fn: "SoilProfile_ClayLoam.txt"
+  old_soil_hydrology_fn: "SoilHydrology_ClayLoam.txt"
+  old_crop_param_fn: "Crop_WheatGDDHyderabad.txt"
+  old_initial_wc_fn: "InitialWaterContent.txt"
+  new_output_fn: "Ch8_Hyderabad_Cereal_Ex6"
+
+Ch9_Brussels_Potato_Ex1:
+  wd: !expr file.path(basedir, "AquaCropOS_ModelTesting/Chapter9_Brussels_Potato/Exercise1/Matlab")
+  inpdirnm: "Input_Ch9_Brussels_Potato_Ex1"
+  outdirnm: "Output_Ch9_Brussels_Potato_Ex1"
+  old_clock_fn: "Clock.txt"
+  old_weather_fn: "Weather_Brussels.txt"
+  old_co2_fn: "MaunaLoaCO2.txt"
+  old_soil_param_fn: "Soil_Loam.txt"
+  old_soil_profile_fn: "SoilProfile_Loam.txt"
+  old_soil_hydrology_fn: "SoilHydrology_Loam.txt"
+  old_irri_mgmt_fn: "IrrigationManagement.txt"
+  old_planting_date_fn: "PlantingDates_Brussels.txt"
+  old_crop_param_fn: "Crop_PotatoGDDBrussels.txt"
+  old_initial_wc_fn: "InitialWaterContent.txt"
+  new_output_fn: "Ch9_Brussels_Potato_Ex1"
+
+Ch9_Brussels_Potato_Ex2:
+  inherits: Ch9_Brussels_Potato_Ex1
+  wd: !expr file.path(basedir, "AquaCropOS_ModelTesting/Chapter9_Brussels_Potato/Exercise2/Matlab")
+  inpdirnm: "Input_Ch9_Brussels_Potato_Ex2"
+  outdirnm: "Output_Ch9_Brussels_Potato_Ex2"
+  new_output_fn: "Ch9_Brussels_Potato_Ex2"
+
+Ch9_Brussels_Potato_Ex4:
+  inherits: Ch9_Brussels_Potato_Ex1
+  wd: !expr file.path(basedir, "AquaCropOS_ModelTesting/Chapter9_Brussels_Potato/Exercise4/Matlab")
+  inpdirnm: "Input_Ch9_Brussels_Potato_Ex4"
+  outdirnm: "Output_Ch9_Brussels_Potato_Ex4"
+  new_output_fn: "Ch9_Brussels_Potato_Ex4"
+
+# TODO: Ch9_Brussels_Potato_Ex5
+
+Ch9_Brussels_Potato_Ex6a:
+  inherits: Ch9_Brussels_Potato_Ex1
+  wd: !expr file.path(basedir, "AquaCropOS_ModelTesting/Chapter9_Brussels_Potato/Exercise6/Matlab")
+  inpdirnm: "Input_Ch9_Brussels_Potato_Ex6a"
+  outdirnm: "Output_Ch9_Brussels_Potato_Ex6a"
+  old_clock_fn: "Clock.txt"
+  old_weather_fn: "Weather_Brussels.txt"
+  new_output_fn: "Ch9_Brussels_Potato_Ex6a"
+
+Ch9_Brussels_Potato_Ex6b:
+  inherits: Ch9_Brussels_Potato_Ex1
+  wd: !expr file.path(basedir, "AquaCropOS_ModelTesting/Chapter9_Brussels_Potato/Exercise6/Matlab")
+  inpdirnm: "Input_Ch9_Brussels_Potato_Ex6b"
+  outdirnm: "Output_Ch9_Brussels_Potato_Ex6b"
+  old_clock_fn: "Clock.txt"
+  old_weather_fn: "Weather_BrusselsFuture.txt"
+  new_output_fn: "Ch9_Brussels_Potato_Ex6b"
+

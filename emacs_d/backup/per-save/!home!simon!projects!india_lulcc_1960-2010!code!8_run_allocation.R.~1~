@@ -1,0 +1,87 @@
+## Author : Simon Moulds
+## Date   : October 2017
+
+library(magrittr)
+library(raster)
+devtools::load_all("pkg/lulcc")
+
+## create output directory for maps
+if (!dir.exists("data/output_maps")) {
+    dir.create("data/output_maps")
+}
+
+fs = list.files("data/district_maps", pattern="^dist_[0-9]{1,3}.tif$", full.names=TRUE)
+
+lulc2005 = raster("data/lulc_2005_rcl_lcc.tif")
+categories = 1:9
+alloc_order = c(9,8,7,1,2,3,4,5,6)
+
+myfun1 = function(x, ...) {
+    dplyr::select(x, year, cultivated, forest, grassland, shrubland, wasteland, barren, urban, water, snow)
+}
+
+myfun2 = function(lu0_vals, suit_vals, dmd, time, alloc_order, categories, stochastic=TRUE, maxiter=100, map, pts, out_path, verbose=FALSE, ...) {
+
+    for (j in 2:length(time)) {
+        if (verbose) {
+            print(paste("allocating land use map for year", time[j], "..."))
+        }
+
+        dmd_ix = which(dmd[["year"]] %in% time[j])
+        dmd1 = dmd %>% `[`(,2:ncol(.)) %>% roundSum(n=length(pts)) %>% `[`(dmd_ix,) %>% as.numeric
+        
+        lu1_vals = ordered(lu0_vals, suit_vals, dmd1, alloc_order, categories, stochastic, maxiter)
+        
+        lu1 = raster(map)
+        lu1[pts] = lu1_vals
+        writeRaster(lu1, file.path(out_path, paste0("LULC_DIST_", dist, "_", time[j], ".tif")), overwrite=TRUE, format="GTiff")
+        lu0_vals = lu1_vals
+    }
+}
+
+fs = list.files("data/district_maps", pattern="^dist_[0-9]{1,3}.tif$", full.names=TRUE)
+
+## loop through demand scenarios
+for (i in 1:length(fs)) {
+    
+    dist = gsub("[^\\d]+", "", basename(fs[i]), perl=TRUE)
+    print(paste("Allocating land use for district", dist, "..."))
+
+    ## get demand scenario
+    f = list.files("data/demand_scenarios", pattern=paste0("LULC_DEMAND_", dist, "_CALIBRATED.rds$"), full.names=TRUE)
+    if (length(f) != 1) stop()
+    dmd = readRDS(f) %>% myfun1
+    
+    ## get spatial input data
+    map = raster(paste0("data/district_maps/dist_", dist, ".tif"))
+    pts = as(map, "SpatialPoints")
+    lu2005 = crop(lulc2005, map)
+    lu2005_vals = lu2005[pts]
+    ## suit0 = crop(suit, map)
+    suit_fs = c(paste0("data/district_suit_maps/agriculture_suit_", dist, ".tif"),
+                paste0("data/district_suit_maps/forest_suit_", dist, ".tif"),
+                paste0("data/district_suit_maps/grassland_suit_", dist, ".tif"),
+                paste0("data/district_suit_maps/shrubland_suit_", dist, ".tif"),
+                paste0("data/district_suit_maps/wasteland_suit_", dist, ".tif"),
+                paste0("data/district_suit_maps/urban_suit_", dist, ".tif"))
+
+    suit0 = stack(suit_fs)
+    suit_vals = suit0[pts]
+
+    ## suitability values for barren, water and snow are not used, so apply an
+    ## arbitrary value
+    suit_vals =
+        cbind(suit_vals[,c(1:5)], barren_suit=0.5, suit_vals[,6], water_suit=0.5, snow_suit=0.5) %>%
+        `colnames<-`(c("agriculture","forest","grassland","shrubland","wasteland","barren","urban","water","snow"))
+    
+    suit_vals[!is.finite(suit_vals)] = 0
+
+    ## 2004-1960
+    myfun2(lu0_vals=lu2005_vals, suit_vals=suit_vals, dmd=dmd, time=2005:1960, alloc_order=alloc_order, categories=categories, stochastic=FALSE, maxiter=1000, map=map, pts=pts, out_path=file.path("data","output_maps"), verbose=TRUE)
+    
+    ## 2006-2010
+    myfun2(lu0_vals=lu2005_vals, suit_vals=suit_vals, dmd=dmd, time=2005:2010, alloc_order=alloc_order, categories=categories, stochastic=FALSE, maxiter=500, map=map, pts=pts, out_path=file.path("data","output_maps"), verbose=TRUE)
+
+    ## also write map for 2005
+    writeRaster(lu2005, file.path("data","output_maps",paste0("LULC_DIST_", dist, "_2005.tif")), overwrite=TRUE, format="GTiff")    
+}

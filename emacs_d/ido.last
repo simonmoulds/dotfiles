@@ -1,0 +1,401 @@
+;;; -*- coding: utf-8 -*-
+
+;; ----- ido-last-directory-list -----
+(
+ ("/home/simon/projects/igp_livelihood_model/chanse/ee_s1/code/" . "config/")
+ ("/home/simon/projects/igp_livelihood_model/chanse/ee_s1/data/" . "input/")
+ ("/home/simon/projects/igp_livelihood_model/chanse/ee_s1/" . "code/")
+ ("/home/simon/projects/igp_livelihood_model/" . "chanse/")
+ ("/home/simon/dev/chanse/" . "anRpackage/")
+ ("/home/simon/dev/click/" . "docs/")
+ ("/home/simon/dev/era5toolbox/test/" . "example/")
+ ("/home/simon/dev/era5toolbox/" . "era5toolbox/")
+ ("/home/simon/dev/lisflood-lisvap/src/" . "lisvap/")
+ ("/home/simon/dev/lisflood-lisvap/" . "src/")
+ ("/home/simon/dev/lulcc/" . "demo/")
+ ("/home/simon/dev/r_lulcc/" . "lulcc/")
+ ("/home/simon/dev/aquacrop_tmp/aquacrop/" . "io/")
+ ("/home/simon/dev/aquacrop_tmp/" . "aquacrop/")
+ ("/home/simon/dev/hm_tmp/" . "hm/")
+ ("/home/simon/dev/aquacrop/data-raw/" . "code/")
+ ("/home/simon/dev/etref/" . "etref/")
+ ("/home/simon/dev/etref/etref/" . "not-used/")
+ ("/home/simon/dev/hm/hm/" . "old/")
+ ("/home/simon/projects/aquacrop_apps/" . "ssa/")
+ ("/home/simon/projects/igp_livelihood_model/chanse/farmer_livelihood_model/data/" . "config/")
+ ("/home/simon/projects/igp_livelihood_model/chanse/farmer_livelihood_model/" . "data/")
+ ("/home/simon/dev/r_indagridat/indagridat/data-raw/code/" . "utils/")
+ ("/home/simon/dev/aquacrop/test/make_tests/AquaCropOS_v50a/Input/" . "Example Crop Files/")
+ ("/home/simon/dev/aquacrop/test/make_tests/AquaCropOS_v50a/" . "Input/")
+ ("/home/simon/projects/aquacrop_apps/ssa/code/" . "AquaCropOS_v50a/")
+ ("/home/simon/dev/wbm_data_model/wbm_data_model/" . "not-used/")
+ ("/home/simon/projects/twiga/ssa_index_insurance/" . "code/")
+ ("/home/simon/projects/twiga/" . "ssa_index_insurance/")
+ ("/home/simon/dev/wbm/" . "wbm/")
+ ("/home/simon/dev/hm/" . "hm/")
+ ("/home/simon/dev/aquacrop/test/example/Ch7_Ex1b_Tunis_Wheat_1979/" . "Config/")
+ ("/home/simon/dev/aquacrop/test/example/" . "Ch7_Ex1b_Tunis_Wheat_1979/")
+ ("/home/simon/projects/pathways/s2p/" . "s2p/")
+ ("/home/simon/projects/pathways/" . "s2p/")
+ ("/home/simon/dev/py_fort_test/ver2/" . "src/")
+ ("/home/simon/dev/aquacrop/test/make_tests/" . "AquaCropOS_v50a/")
+ ("/home/simon/dev/aquacrop/test/" . "make_tests/")
+ ("/home/simon/Downloads/" . "rabacus-0.9.5/")
+ ("/home/simon/projects/consultancy/" . "code/")
+ ("/home/simon/projects/aquacrop_apps/ssa/" . "code/")
+ ("/home/simon/dev/hm_old/hm/models/" . "etref/")
+ ("/home/simon/dev/hm_old/hm/" . "models/")
+ ("/home/simon/dev/clm5.0/tools/" . "mkmapdata/")
+ ("/home/simon/projects/India_RS_MSc_project/" . "code/")
+ ("/home/simon/dev/aquacrop/tests/release/" . "test_Ch7_Ex1a_Tunis_Wheat/")
+ ("/home/simon/dev/aquacrop/aquacrop/" . "native/")
+ ("/home/simon/dev/gandak_wb_data_model/data-raw/" . "code/")
+ ("/home/simon/dev/gandak_wb_data_model/" . "gandak_wb_data_model/")
+ ("/home/simon/dev/CWatM/source/hydrological_modules/" . "routing_reservoirs/")
+ ("/home/simon/dev/water_balance_model/" . "water_balance_model/")
+ ("/home/simon/dev/aquacrop/" . "aquacrop/")
+ ("/home/simon/dev/etref/examples/WFDEI/" . "config/")
+ ("/home/simon/projects/gandak_systems_model_data/code/" . "not-used/")
+ ("/home/simon/dev/gandak_data_model/" . "gandak_data_model/")
+ ("/home/simon/dev/gandak_data_model/data-raw/" . "code/")
+ ("/home/simon/projects/gandak_systems_model/land_surface/" . "config/")
+ ("/home/simon/projects/gandak_systems_model/" . "land_surface/")
+ ("/home/simon/dev/hydro_model_builder/" . "hydro_model_builder/")
+ ("/home/simon/dev/" . "aquacrop/")
+ ("/home/simon/projects/gandak_systems_model_data/" . "code/")
+ ("/home/simon/projects/India_Irrigated_Area_dataset_1956-2010/code/helpers/" . "data-quality/")
+ ("/home/simon/projects/India_Irrigated_Area_dataset_1956-2010/code/" . "helpers/")
+ ("/home/simon/projects/India_Irrigated_Area_dataset_1956-2010/" . "code/")
+ ("/home/simon/projects/india_lulcc_1960-2010_wd/" . "code/")
+ ("/home/simon/projects/CWatM/source/" . "hydrological_modules/")
+ ("/home/simon/projects/r_indagridat/indagridat/data-raw/" . "code/")
+ ("/home/simon/projects/india_crop_area_2005/code/" . "quality_control_1960/")
+ ("/home/simon/projects/india_crop_area_2005/" . "code/")
+ ("/home/simon/projects/india_lulcc_1960-2010/" . "code/")
+ ("/home/simon/projects/AquaCrop/AquaCrop_data/" . "AquaCropOS_input_data/")
+ ("/home/simon/projects/AquaCrop/AquaCropOS_v50a/Input/" . "Example Soil Files/")
+ ("/home/simon/projects/AquaCrop/AquaCropOS_v50a/" . "Input/")
+ ("/home/simon/projects/AquaCrop/PCR-GLOBWB_model/config/" . "30min_example/")
+ ("/home/simon/projects/AquaCrop/AquaCrop_Py/" . "Input/")
+ ("/home/simon/projects/AquaCrop/PCR-GLOBWB_model/" . "model/")
+ ("/home/simon/projects/AquaCrop/" . "AquaCrop_data/")
+ ("/home/simon/projects/india_irrigated_area_2005/data/" . "gams/")
+ ("/home/simon/projects/" . "igp_livelihood_model/")
+ ("/home/simon/blog/simonmoulds.github.io/" . "_posts/")
+ ("/home/simon/blog/" . "simonmoulds.github.io/")
+ ("/home/simon/projects/andes_water_demand_topology/" . "code/")
+ ("/home/simon/projects/igp_livelihood_model/chanse/wrr_paper/data/1_Baseline/sultanpur/" . "test_run1/")
+ ("/home/simon/projects/igp_livelihood_model/chanse/wrr_paper/data/1_Baseline/jalaun/test_run1/" . "R/")
+ ("/home/simon/projects/igp_livelihood_model/chanse/wrr_paper/data/1_Baseline/jalaun/" . "test_run1/")
+ ("/home/simon/projects/igp_livelihood_model/chanse/wrr_paper/data/1_Baseline/sitapur/" . "test_run1/")
+ ("/home/simon/projects/igp_livelihood_model/chanse/wrr_paper/code/" . "config/")
+ ("/home/simon/projects/igp_livelihood_model/chanse/wrr_paper/data/1_Baseline/hamirpur/" . "test_run1_rnd_days/")
+ ("/home/simon/projects/igp_livelihood_model/chanse/wrr_paper/data/1_Baseline/" . "sultanpur/")
+ ("/home/simon/projects/igp_livelihood_model/chanse/wrr_paper/data/" . "1_Baseline/")
+ ("/home/simon/projects/igp_livelihood_model/chanse/wrr_paper/" . "data/")
+ ("/home/simon/projects/igp_livelihood_model/chanse/" . "ee_s1/")
+ ("/home/simon/projects/igp_livelihood_model/chanse/data/1_Baseline/hamirpur/" . "test_run1_rnd_days/")
+ ("/home/simon/projects/igp_livelihood_model/chanse/data/1_Baseline/" . "hamirpur/")
+ ("/home/simon/projects/igp_livelihood_model/chanse/data/" . "1_Baseline/")
+ ("/home/simon/projects/igp_livelihood_model/chanse/data/2_Climate/jalaun/test_run45_future_climate/" . "R/")
+ ("/home/simon/projects/igp_livelihood_model/chanse/data/2_Climate/jalaun/" . "test_run45_future_climate/")
+ ("/home/simon/projects/igp_livelihood_model/chanse/data/2_Climate/sultanpur/test_run45_future_climate/" . "R/")
+ ("/home/simon/projects/igp_livelihood_model/chanse/data/2_Climate/sultanpur/" . "test_run45_future_climate/")
+ ("/home/simon/projects/igp_livelihood_model/chanse/data/2_Climate/sitapur/test_run45_future_climate/" . "R/")
+ ("/home/simon/projects/igp_livelihood_model/chanse/data/2_Climate/sitapur/" . "test_run45_future_climate/")
+ ("/home/simon/projects/igp_livelihood_model/chanse/data/2_Climate/" . "jalaun/")
+ ("/home/simon/Dropbox/documents/papers/livelihood_model/" . "latex_150518_sm_mods/")
+ ("/home/simon/Dropbox/documents/papers/" . "gandak_systems_model_paper/")
+ ("/home/simon/Dropbox/documents/" . "cv/")
+ ("/home/simon/Dropbox/" . "documents/")
+ ("/home/simon/.emacs.d/" . "settings/")
+ ("/home/simon/Documents/barry/" . "Output1/")
+ ("/home/simon/projects/r_lulcc2/lulcc/" . "src/")
+ ("/home/simon/projects/india_lulcc_1956-2010/code/helpers/" . "data-quality/")
+ ("/home/simon/projects/india_lulcc_1956-2010/code/" . "helpers/")
+ ("/home/simon/projects/india_lulcc_1956-2010/" . "code/")
+ ("/home/simon/projects/crop_allocation_model/data/SSP Population Projections/SSP2/Total/" . "GeoTIFF/")
+ ("/home/simon/projects/crop_allocation_model/data/SSP Population Projections/SSP2/" . "Total/")
+ ("/home/simon/projects/crop_allocation_model/data/SSP Population Projections/" . "SSP2/")
+ ("/home/simon/projects/crop_allocation_model/data/" . "SSP Population Projections/")
+ ("/home/simon/projects/crop_allocation_model/code/" . "not-used/")
+ ("/home/simon/projects/GCAM/" . "code/")
+ ("/home/simon/projects/india_irrigated_area_2005/code/" . "quality_control/")
+ ("/home/simon/projects/india_irrigated_area_2005/" . "code/")
+ ("/home/simon/" . "projects/")
+ ("/home/simon/projects/crop_allocation_model/" . "code/")
+)
+
+;; ----- ido-work-directory-list -----
+(
+ "/home/simon/projects/flood_ineq_model/code/"
+ "/home/simon/dev/aquacrop/aquacrop/native/"
+ "/home/simon/dev/aquacrop/aquacrop/io/"
+ "/home/simon/dev/aquacrop/aquacrop/"
+ "/home/simon/dev/hm/hm/"
+ "/home/simon/dev/aquacrop/aquacrop/cli/"
+ "/home/simon/projects/chanse_apps/"
+ "/home/simon/projects/igp_livelihood_model/chanse/ee_s1/code/config/"
+ "/home/simon/dev/aquacrop/test/make_tests/AquaCropOS_v50a/Input/"
+ "/home/simon/dev/aquacrop/test/make_tests/AquaCropOS_v50a/"
+ "/home/simon/dev/aquacrop/"
+ "/home/simon/dev/chanse/anRpackage/"
+ "/home/simon/dev/chanse/"
+ "/home/simon/dev/chanse/R/"
+ "/home/simon/dev/hm/test/release/"
+ "/home/simon/dev/xarray/doc/"
+ "/home/simon/dev/click/docs/"
+ "/home/simon/dev/aquacrop/source/"
+ "/home/simon/projects/lisflood_apps/code/"
+ "/home/simon/dev/era5toolbox/era5toolbox/"
+ "/home/simon/dev/era5toolbox/test/example/"
+ "/home/simon/dev/hmet/hmet/"
+ "/home/simon/dev/etref/etref/"
+ "/home/simon/dev/lisflood-lisvap/src/lisvap/"
+ "/home/simon/dev/wbm/data-raw/code/"
+ "/home/simon/dev/wbm/wbm/"
+ "/home/simon/dev/lulcc/R/"
+ "/home/simon/dev/lulcc/demo/"
+ "/home/simon/dev/r_lulcc/lulcc/R/"
+ "/home/simon/dev/aquacrop_tmp/aquacrop/"
+ "/home/simon/dev/aquacrop_tmp/aquacrop/io/"
+ "/home/simon/dev/hm_tmp/hm/"
+ "/home/simon/dev/aquacrop/data-raw/code/"
+ "/home/simon/projects/india_village_census/code/"
+ "/home/simon/dev/etref/etref/not-used/"
+ "/home/simon/dev/hm/hm/pcraster/"
+ "/home/simon/dev/hm/hm/old/"
+ "/home/simon/projects/aquacrop_apps/ssa/code/"
+ "/home/simon/dev/xarray/xarray/core/"
+ "/home/simon/projects/igp_livelihood_model/chanse/farmer_livelihood_model/code/"
+ "/home/simon/projects/igp_livelihood_model/chanse/farmer_livelihood_model/data/config/"
+ "/home/simon/projects/gandak_systems_model_data/code/"
+ "/home/simon/projects/twiga/agu2019/code/"
+ "/home/simon/projects/gcam/gcam-core-gcam-v5.2/exe/"
+ "/home/simon/dev/r_indagridat/indagridat/data-raw/code/utils/"
+ "/home/simon/projects/twiga/workshop_nov2019/"
+ "/home/simon/dev/aquacrop/test/make_tests/"
+ "/home/simon/projects/twiga/"
+ "/home/simon/dev/aquacrop/test/release/"
+ "/home/simon/dev/aquacrop/test/make_tests/AquaCropOS_v50a/Input/Example Crop Files/"
+)
+
+;; ----- ido-work-file-list -----
+(
+ "model_funs.R"
+ "aquacrop_w.f90"
+ "crop_parameters_w.f90"
+ "CropParameters.py"
+ "InitialCondition.py"
+ "crop_parameters.f90"
+ "LandCover.py"
+ "reporting.py"
+ "SoilHydraulicParameters.py"
+ "LandCoverParameters.py"
+)
+
+;; ----- ido-dir-file-cache -----
+(
+ ("/home/simon/projects/flood_ineq_model/code/" (24318 1944 992111 293000) "model_wrr.R" "wealth_redistr_exp.R" "model_ineq_v2.R" "../" "model_ineq_v1.R" "model_funs.R" "test.pdf" "./" "model_ineq_v1_backup.R" ".Rhistory" "model_jhyd.R")
+
+ ("/home/simon/dev/aquacrop/aquacrop/native/" (24297 55011 123084 826000) "inflow_w.f90" "crop_yield.f90" "infiltration.f90" "../" "temperature_stress.f90" "soil_parameters.f90" "canopy_cover.f90" "growth_stage_w.f90" "soil_parameters_w.f90" "germination.f90" "irrigation.f90" "soil_evaporation.f90" "types.f90" "check_gw_table.f90" "root_dev.f90" "inflow.f90" "drainage.f90" "./" "biomass_accumulation_w.f90" "water_stress_w.f90" "crop_parameters_w.f90" "soil_hydraulic_parameters.f90" "growth_stage.f90" "soil_evaporation_w.f90" "gdd.f90" "water_stress.f90" "capillary_rise.f90" "root_zone_water.f90" "irrigation_w.f90" "biomass_accumulation.f90" "gdd_w.f90" "check_gw_table_w.f90" "transpiration.f90" "aquacrop_w.f90" "aquacrop.f90" "root_dev_w.f90" "soil_hydraulic_parameters_w.f90" "harvest_index_w.f90" "transpiration_w.f90" "infiltration_w.f90" "rainfall_partition_w.f90" "harvest_index.f90" "germination_w.f90" "rainfall_partition.f90" "drainage_w.f90" "pre_irr_w.f90" "capillary_rise_w.f90" "canopy_cover_w.f90" "pre_irr.f90" "crop_yield_w.f90" "crop_parameters.f90" "root_zone_water_w.f90")
+
+ ("/home/simon/dev/aquacrop/" (24297 5987 984829 189000) "../" ".empty/" "Makefile" "test/" "make.bat" "./" ".pytest_cache/" "aquacrop/" ".git/" "README.md" ".gitignore" "aquacrop_fc.cpython-38-x86_64-linux-gnu.so" "LICENSE" "aquacrop.egg-info/" "source/" "TODO" "data-raw/" "setup.py" "docs/" "build/")
+
+ ("/home/simon/dev/aquacrop/aquacrop/" (24297 6294 7513 998000) "native/" "../" "./" "AquaCrop.py" "LandCover.py" "cli/" "LandSurface.py" "not-used/" "__pycache__/" "io/")
+
+ ("/home/simon/dev/aquacrop/aquacrop/io/" (24297 51724 6388 170000) "../" "FarmParameters.py" "CropArea.py" "data/" "./" "utils.py" "SoilParameters.py" "variable_list.py" "LandCoverParameters.py" "Weather.py" "Groundwater.py" "AquaCropConfiguration.py" "CropParameters.py" "variable_list_crop.py" "CarbonDioxide.py" "SoilHydraulicParameters.py" "IrrigationManagementParameters.py" "FieldManagementParameters.py" "__pycache__/" "__init__.py" "InitialCondition.py")
+
+ ("/home/simon/dev/hm/hm/" (24296 40348 574965 109000) "dynamicmodel.py" "../" ".empty/" "./" "input.py" "modeltime.py" "utils.py" "dynamicframework.py" "reporting.py" "constants.py" "pcraster/" "model.py" "disclaimer.py" "config.py" "api.py" "__pycache__/" "dataarray.py" "__init__.py")
+
+ ("/home/simon/projects/chanse_apps/" (24295 31692 103319 283000) "test.R" "../" "model.R" "gcwm_crop_data.R" "data/" "./" "model.cpp" ".Rhistory" "model2.cpp")
+
+ ("/home/simon/dev/" (24295 34253 734784 236000) "wbm_data_model/" "aquacrop_test/" "wbm_farmer_data_model/" "../" "era5toolbox/" "networkx/" "xarray/" "wbm/" "wbm_farmer/" "aquacrop_tmp/" "r_indagridat/" "f2py_tests/" "./" "aquacrop/" "SoilEvaporation.py" "hm/" "output/" "hm_tmp/" "gandak_wb_data_model/" "sma_service/" "hmet/" "anaconda2.0/" "aquacrop_test_f2py/" "pcraster/" "etref_tmp/" "riverflow.io/" "click/" "etref/" "r_lulcc2/" "lisflood-lisvap/" "lisflood-code/" "chanse_0.0.0.9000.pdf" "clm5.0/" "chanse/" "esmf/" "ESMC_Conf.h" "lulcc/")
+
+ ("/home/simon/projects/igp_livelihood_model/chanse/ee_s1/code/config/" (23866 60422 247824 833000) "../" "gandak_bau_config.R" "gandak_no_canal_config.R" "./" "sultanpur_bau_irrigation_schedule.R" "gandak_no_irrig_params.R" "gandak_no_irrig_config.R" "gandak_no_canal_irrigation_schedule.R" ".Rhistory" "gandak_bau_params.R" "gandak_bau_irrigation_schedule.R" "sultanpur_baseline_config.R" "gandak_no_irrig_irrigation_schedule.R" "sultanpur_params.R" "gandak_no_canal_params.R")
+
+ ("/home/simon/projects/igp_livelihood_model/chanse/ee_s1/code/" (23874 50006 616686 96000) "../" "model.R" "./" "config/" "plots_espl.R" "model.cpp" "plots_esplcp.R" "run_scenarios.R" ".Rhistory")
+
+ ("/home/simon/projects/igp_livelihood_model/chanse/ee_s1/data/input/" (23866 56017 239334 366000) "sult_base_all_data_irr2.txt" "#sult_base_ln_crop_yield_sultanpur.txt#" "well_cost_long.txt" "../" "#sult_base_av_crop_yield_sult.txt#" "pumping_hrs.txt" "./" "sult_base_all.variables_yield_interp_fert_cons.txt" "sult_obs_gw.txt~" "sult_base_diesel_prices_long.txt~" "sult_base_all.variables_yield_interp_fert_cons.txt~" "sult_base_all_data_irr2.txt~" "sult_base_sult_precip_1971_2018.txt" "sult_base_diesel_prices_long.txt" "sult_obs_gw2.txt" "sult_base_ln_crop_yield_sultanpur.txt" "av_crop_yield_sultanpur.txt" "sult_base_ln_crop_yield_sultanpur.txt~" "sult_base_av_crop_yield_sult.txt" "sult_obs_gw.txt" "sult_base_av_crop_yield_sult.txt~" "av_crop_yield_sultanpur.txt~" "sult_base_sult_precip_1971_2018.txt~" "well_cost_long.txt~")
+
+ ("/home/simon/projects/igp_livelihood_model/chanse/ee_s1/data/" (23857 49539 206780 52000) "../" "./" "input/" "output/" "plots/" "plots.zip")
+
+ ("/home/simon/projects/igp_livelihood_model/chanse/ee_s1/" (23857 49560 126630 858000) "../" "code/" "data/" "./" ".RData" "espl_s1/" "Rplots.pdf" "README" ".Rhistory")
+
+ ("/home/simon/projects/igp_livelihood_model/chanse/" (24269 5374 384191 329000) "../" "code/" "farmer_livelihood_model/" "wrr_paper.zip" "data/" "./" ".git/" "README.md" "ee_s1/" "espl_s1/" "alex_msc_paper/" "Rplots.pdf" ".gitignore" "wrr_paper/" ".Rhistory")
+
+ ("/home/simon/projects/igp_livelihood_model/" (23857 49716 281481 547000) "../" "./" "plots/" "plots.zip" "__MACOSX/" "chanse/")
+
+ ("/home/simon/" (24283 48982 773962 394000) "Templates/" ".virtualenvs/" ".gitconfig" ".npm/" ".mozilla/" "Dropbox/" "sm_cv.pdf" ".cache/" "qrparm.soil_HWSD_cont_cosbyNew.nc" ".jssc/" "grassdata/" ".rstudio-desktop/" ".bashrc" ".jupyter/" ".bash_logout" ".zcompdump.zwc" "R/" ".ssh/" ".authinfo" ".octave_hist" "mirca_monthly_comparison_rice.pdf" "JULES_LCCS2PFT_LUT.csv" "Arduino/" "ghana_nasadem.tif" ".dropbox-dist/" ".tmux/" ".local/" ".dropbox/" ".ICEauthority" "dotfiles/" ".cdsapirc" ".matlab/" "Zotero/" "SWdown_WFDEI_land_200306.nc" ".profile" "tmp/" "test.gms" "virtualenvs/" ".cesm_proj" "mirca_monthly_comparison_wheat.pdf" "surface-data.128x064.clm2_soicol.nc" ".tmux.conf" ".hplip/" "Pictures/" ".zcompdump" ".gnome/" ".~lock.JULES_LCCS2PFT_LUT.csv#" "flwdir_15min.tif" ".particle/" "Music/" ".~lock.Default_LCCS2PFT_LUT.csv#" "rfm_flow_direction.tif" "upixel_15min.tif" ".snap/" ".simile/" ".zprofile" "packages/" ".lesshst" ".gissjava/" ".basex" ".zhistory" ".java/" ".gnupg/" "local/" ".python_history" "faostat_comparison.pdf" ".pki/" ".install4j" "octave/" ".vscode/" ".pylint.d/" ".emacs.d/" ".zotero/" "zotero/" ".gdal/" "Boostnote/" ".zlogout" ".oracle_jre_usage/" ".R/" ".zshenv" "Desktop/" "models/" ".grass7/" ".conda/" ".arduino15/" "DRT/" ".cortex-debug" ".wget-hsts" "dev/" "rfm_flow_direction.tif.aux.xml" ".config/" ".ipython/" ".mu/" ".astropy/" "Default_LCCS2PFT_LUT.csv" ".sane/" ".zprezto/" ".zoom/" "Public/" ".subversion/" ".zshrc" ".zpreztorc" "org/" "projects/" "jules-vn5.4.zip" "anaconda3/" ".bash_history" "Videos/" "Simile/" ".metomi/" "var/" ".gconf/" ".octave_packages" "Documents/" "core" ".zcompcache/" ".zlogin" "find" "mail/" ".qgis2/" "era5-download.py" "Downloads/" "../" "./")
+
+ ("/home/simon/projects/" (24272 55363 140688 148000) "lulcc_fix/" "ramirez/" "india_lulcc_1960-2010_v1.7z" "../" "jules_apps/" "gandak_systems_model/" "Drina/" "accra_flood_analysis/" "accra_flood_ineq_analysis/" "lisflood_data/" "./" "GAMS/" "AquaCrop_IGP/" "india_lulcc_1960-2010_wd/" "sensors/" "india_irrigated_area_2001/" "india_crop_area_2005/" "poopo/" "India_RS_MSc_project/" "india_lulcc_1960-2010.7z" "chanse_apps/" "ganges_water_machine/" "consultancy/" "fortran/" ".gitignore" "gandak_systems_model_data/" "jules_hsikai/" "flood_ineq_model/" "india_village_census/" "TestCatchment1/" "india_adm/" "hsikai/" "igp_livelihood_model/" "india_lulcc_1960-2010/" "jules/" ".Rhistory" "lisflood_apps/" "aquacrop_apps/" "process_hwsd/")
+
+ ("/home/simon/dev/chanse/R/" (24279 40390 586427 86000) "../" "model.R" "weather_data.R" "initial_condition.R" "./" "irrigation_schedule.R" "utils.R" "chanse-package.R" "crop_parameters.R" "yield_data.R" "RcppExports.R" "price_data.R" "run.R" "farm_parameters.R" ".Rhistory")
+
+ ("/home/simon/dev/chanse/" (24279 40401 346398 431000) "../" "R/" "./" ".git/" "README.md" ".github/" "src/" "man/" "NAMESPACE" ".gitignore" "DESCRIPTION" "LICENSE" ".Rhistory" ".Rbuildignore")
+
+ ("/home/simon/dev/aquacrop/test/make_tests/AquaCropOS_v50a/" (24276 44005 796115 166000) "AOS_SoilEvaporation.m" "AOS_Transpiration.m" "../" "AOS_ReadFileLocations.m" "AOS_Irrigation.m" "FileLocations.txt" "AquaCropOS_BatchRUN.m" "AOS_SoilHydraulicProperties.m" "AOS_Solution.m" "AOS_CapillaryRise.m" "AOS_CalculateHIGC.m" "AOS_CheckModelTermination.m" "AOS_ReadIrrigationManagement.m" "AOS_CCRequiredTime.m" "AOS_ResetInitialConditions.m" "AOS_GrowingDegreeDay.m" "AOS_HIadjPostAnthesis.m" "./" "AOS_ReadClockParameters.m" "AOS_WriteOutputs.m" "AOS_PerformTimeStep.m" "AOS_CheckGroundwaterTable.m" "AOS_TemperatureStress.m" "AOS_CanopyCover.m" "AOS_Germination.m" "AOS_RootZoneWater.m" "AOS_HarvestIndex.m" "AOS_ReadModelParameters.m" "AOS_Infiltration.m" "AOS_UpdateTime.m" "AOS_BiomassAccumulation.m" "AOS_UpdateCCxCDC.m" "AOS_CalculateHILinear.m" "AOS_RootDevelopment.m" "AOS_HIrefCurrentDay.m" "AOS_AdjustCCx.m" "AOS_Drainage.m" "AOS_ReadWeatherInputs.m" "AOS_Initialize.m" "AquaCropOS_RUN.m" "AOS_HIadjPreAnthesis.m" "AOS_WaterStress.m" "AOS_ReadModelInitialConditions.m" "AOS_ComputeVariables.m" "Input/" "AOS_ComputeCropCalendar.m" "AOS_EvapLayerWaterContent.m" "AOS_CCDevelopment.m" "AOS_ReadFieldManagement.m" "AOS_HIadjPollination.m" ".DS_Store" ".Rhistory" "AOS_ReadGroundwaterTable.m" "AOS_PreIrrigation.m" "AOS_ExtractWeatherData.m" "AOS_RainfallPartition.m" "AOS_GroundwaterInflow.m" "Output/" "AOS_GrowthStage.m" "AOS_AerationStress.m" "AOS_Finish.m")
+
+ ("/home/simon/dev/aquacrop/test/release/" (24262 37434 572118 799000) "../" "test_Ch8_Ex3c_Hyderabad_Cereal/" ".empty/" "test_Ch8_Ex2b_Hyderabad_Cereal/" "test_Ch7_Ex6_Tunis_Wheat/" "test_Ch9_Ex6b_Brussels_Potato/" "test_Ch8_Ex2a_Hyderabad_Cereal/" "test_Ch8_Ex6_Hyderabad_Cereal/" "test_Ch8_Ex3d_Hyderabad_Cereal/" "test_Ch9_Ex5c_Brussels_Potato/" "test_Ch9_Ex1_Brussels_Potato.py" "./" "test_Ch7_Ex2a_Tunis_Wheat.py" "test_Ch9_Ex5b_Brussels_Potato/" "test_Ch7_Ex7b_Tunis_Wheat/" "test_Ch7_Ex3a_Tunis_Wheat/" "test_Ch7_Ex3d_Tunis_Wheat/" "unused_test_AgMERRA_Ghana_Maize.py" "test_Ch7_Ex7d_Tunis_Wheat/" "test_Ch7_Ex2a_Tunis_Wheat/" "test_AgMERRA_Ghana_Maize/" "test_Ch9_Ex4_Brussels_Potato/" "test_Ch7_Ex2b_Tunis_Wheat/" "test_Ch7_Ex3b_Tunis_Wheat/" "test_Ch7_Ex3c_Tunis_Wheat/" "test_Ch7_Ex7a_Tunis_Wheat/" "test_Ch7_Ex1a_Tunis_Wheat.py" "test_Ch9_Ex6a_Brussels_Potato/" "test_Ch7_Ex1b_Tunis_Wheat.py" "test_Ch7_Ex1b_Tunis_Wheat/" "test_Ch7_Ex7e_Tunis_Wheat/" "test_Ch7_Ex1a_Tunis_Wheat/" "test_Ch9_Ex5a_Brussels_Potato/" "test_Ch8_Ex3b_Hyderabad_Cereal/" "test_utils.py" "test_Ch9_Ex1_Brussels_Potato/" "test_Ch8_Ex3a_Hyderabad_Cereal/" "conftest.py" "__pycache__/" "test_Ch7_Ex7c_Tunis_Wheat/" "__init__.py")
+
+ ("/home/simon/dev/aquacrop/test/make_tests/" (24260 57162 320561 854000) "../" "AquaCropOS_ModelTesting/" "AquaCropOS_v50a.zip" "3_run_matlab_tests.sh" "1_update_matlab_input_data_format.R" "./" "README.md" "4_make_release_tests.sh" "funs.R" "AquaCropOS_v50a/" "aquacrop_matlab_test_data/" "config.yml" "not-used/" ".Rhistory" "AquaCropOS_ModelTesting.zip" "__pycache__/" "2_convert_aos_data_to_netcdf.py")
+
+ ("/home/simon/dev/aquacrop/aquacrop/cli/" (24260 57162 300568 121000) "../" ".empty/" "./" "aquacrop.py" "__pycache__/" "run.py")
+
+ ("/home/simon/dev/aquacrop/source/" (24260 57162 304566 868000) "index.rst" "soil_hydraulic_parameters.rst" "installation.rst" "../" "crop_parameters.rst" "pseudo_coords.rst" "configuration.rst" "./" "irrigation.rst" "groundwater.rst" "clock.rst" "soil_parameters.rst" "conf.py" "reporting.rst" "model_grid.rst" "_static/" "field_parameters.rst" "_templates/" "meteorological_inputs.rst")
+
+ ("/home/simon/dev/lulcc/R/" (24259 41779 910545 881000) "summary.R" "FigureOfMerit.R" "../" "class-PerformanceList.R" "class-ObsLulcRasterStack.R" "plot.AgreementBudget.R" "allowNeighb.R" "crossTabulate.R" "class-CategoryLabel.R" "plot.FigureOfMerit.R" "names.R" "show.R" "data.R" "./" "class-ThreeMapComparison.R" "class-NeighbRasterStack.R" "plot.Performance.R" "ThreeMapComparison.R" "allow.R" "ExpVarRasterList.R" "class-ExpVarRasterList.R" "total.R" "as.data.frame.R" "class-PredictiveModelList.R" "PerformanceList.R" "approxExtrapDemand.R" "c.PredictiveModelList.R" "AgreementBudget.R" "index.R" "PredictionList.R" "class-Model.R" "coerce.R" "resample.R" "plot.R" "ObsLulcRasterStack.R" "getPredictiveModelInputData.R" "class-PredictionList.R" "NeighbRasterStack.R" "models.R" "partition.R" "Model.R" "lulcc-package.R" "allocate.R" "predict.R" "performance.rocr.R" "compareAUC.R" "subset.R" "length.R")
+
+ ("/home/simon/dev/chanse/anRpackage/" (24258 51743 452043 532000) "../" "R/" "./" "src/" "man/" "NAMESPACE" "DESCRIPTION" "Read-and-delete-me")
+
+ ("/home/simon/projects/aquacrop_apps/ssa/code/" (24241 27613 597412 772000) "convert-aos-funs.R" "../" "Rplot005.png" "Rplot004.png" "AquaCropOS_v50a.zip" "process_mirca2000.R" "write-soil-hydraulic-parameters-netcdf.py" "./" ".pytest_cache/" "Rplot002.png" "maize_rainfed_ssa_agmerra.ini" "maize_rainfed_ghana_agmerra.ini" "AquaCropOS_v50a/" "Rplot003.png" "tmp.tif" "co2_annmean_mlo.txt" "2000-12-31" "repair-agmerra.py" "Rplot001.png" "plot-results.R" "process_sachs_crop_calendar.R" "run-aos.R" "2000/" "extract-wfdei.py" "wfdei_etref_config.ini" "agmerra_etref_config.ini" "Weather.txt" "__MACOSX/" "convert-aos.R" "WaterTable.txt" ".Rhistory" "make-clone.R" "ssa_maize_yield_2005_2009.png" "tmp.tif.aux.xml" "ghana_maize_yield_1984_2004.png" "write-crop-parameters-netcdf.py" "plot-results-ssa.R" "write-carbon-dioxide-netcdf.py" "maize_rainfed_pt_agmerra.ini")
+
+ ("/home/simon/projects/india_village_census/code/" (24242 47616 903026 242000) "../" ".empty/" "convert_to_table.R" "grass_process_village_census.sh" "./" "tmp" "test.tif" "modis_max_rabi_anomaly_2001.tif" "merge_data.R" "not-used/" "grass_reproject_maps.sh" "ee-get-ndvi-anomaly.py" "grass_make_grid.sh" ".Rhistory" "run_grass_process_village_census.sh" "__pycache__/" "test.sh")
+
+ ("/home/simon/projects/lisflood_apps/code/" (24233 29838 844012 171000) "../" "check_data.R" "./" "grass_make_basins.sh")
+
+ ("/home/simon/dev/hm/test/release/" (24258 27749 802559 395000) "../" ".empty/" "test_toml.py" "test_2d.py" "./" "test_1d.py" "test_data/" "__pycache__/" "tmp.nc")
+
+ ("/home/simon/dev/hm/source/" (24258 28562 804193 611000) "index.rst" "../" ".#data-structures.rst" "configuration.rst" "./" "data-structures.rst" "conf.py" "reporting.rst" "rationale.rst" "overview.rst" "_static/" "installing.rst" "examples.rst" "_templates/")
+
+ ("/home/simon/dev/hm/" (24250 63403 493837 936000) "../" ".empty/" "Makefile" "test/" "make.bat" "./" "site/" ".pytest_cache/" ".git/" "README.md" "hm/" "hm.egg-info/" ".gitignore" "LICENSE" "source/" "setup.py" "build/")
+
+ ("/home/simon/dev/xarray/doc/" (24087 26 758184 416000) "README.rst" "index.rst" "../" "faq.rst" "gallery/" "related-projects.rst" "Makefile" "interpolation.rst" "time-series.rst" "plotting.rst" "examples/" "dask.rst" "whats-new.rst" "groupby.rst" "./" "reshaping.rst" "roadmap.rst" "why-xarray.rst" "api-hidden.rst" "indexing.rst" "contributing.rst" "quick-overview.rst" "combining.rst" "data-structures.rst" "terminology.rst" "internals.rst" "weather-climate.rst" "pandas.rst" "conf.py" "howdoi.rst" "api.rst" "_static/" "io.rst" "installing.rst" "examples.rst" "computation.rst" "_templates/")
+
+ ("/home/simon/dev/click/" (24240 18124 450147 288000) "README.rst" "../" "tests/" ".pre-commit-config.yaml" "examples/" "./" ".azure-pipelines.yml" ".git/" ".github/" "src/" "artwork/" "CODE_OF_CONDUCT.md" "tox.ini" ".gitignore" ".readthedocs.yaml" "CHANGES.rst" "setup.py" "docs/" "setup.cfg" "CONTRIBUTING.rst" "MANIFEST.in" "LICENSE.rst")
+
+ ("/home/simon/dev/click/docs/" (24240 18124 446147 307000) "complex.rst" "index.rst" "upgrading.rst" "../" "options.rst" "Makefile" "arguments.rst" "make.bat" "./" "bashcomplete.rst" "changelog.rst" "exceptions.rst" "quickstart.rst" "testing.rst" "parameters.rst" "why.rst" "setuptools.rst" "conf.py" "requirements.txt" "license.rst" "commands.rst" "api.rst" "wincmd.rst" "prompts.rst" "documentation.rst" "unicode-support.rst" "_static/" "utils.rst" "advanced.rst" "contrib.rst")
+
+ ("/home/simon/.zprezto/runcoms/" (24137 16291 36803 858000) "zshenv" "../" "./" "README.md" "zshrc" "zprofile" "zlogout" "zlogin" "zpreztorc")
+
+ ("/home/simon/dev/era5toolbox/era5toolbox/" (24228 18950 929355 693000) "../" "summarise.py" ".empty/" "download.py" "./" "etref.py" "constants.py" "regrid.py" "config.py" "specifichumidity.py" "__pycache__/" "run.py" "__init__.py")
+
+ ("/home/simon/dev/era5toolbox/" (24227 9987 52841 900000) "../" ".empty/" "era5toolbox/" "era5_reanalysis_total_precipitation_india_daysum_200008.nc" "era5_reanalysis_total_precipitation_india_daysum_200011.nc" "era5_reanalysis_total_precipitation_india_daysum_200001.nc" "test/" "era5_reanalysis_total_precipitation_india_daysum_200005.nc" "./" ".git/" "README.md" "era5_reanalysis_total_precipitation_india_daysum_200003.nc" "era5_reanalysis_total_precipitation_india_daysum_200004.nc" "era5_reanalysis_total_precipitation_india_daysum_200007.nc" "era5_reanalysis_total_precipitation_india_daysum_200012.nc" ".gitignore" "LICENSE" "requirements.txt" "era5_reanalysis_total_precipitation_india_daysum_200002.nc" "setup.py" "era5_reanalysis_total_precipitation_india_daysum_200009.nc" "era5toolbox.egg-info/" "era5_reanalysis_total_precipitation_india_daysum_200010.nc" "era5_reanalysis_total_precipitation_india_daysum_200006.nc")
+
+ ("/home/simon/dev/era5toolbox/test/tests/" (24227 10137 742257 606000) "../" "./" "test_summariser.py")
+
+ ("/home/simon/dev/era5toolbox/test/example/" (24227 5011 182405 285000) "../" "./" "config.ini")
+
+ ("/home/simon/dev/era5toolbox/test/" (24227 5504 984551 500000) "../" "tests/" "data/" "./" "example/")
+
+ ("/home/simon/projects/gandak_systems_model_data/code/" (24224 41076 317687 570000) "6_compute_initial_groundwater_level.R" "11_get_price_data.R" "make_meteo_nc.py" "make_farm_parameters_nc.py" "1_grass_make_area_maps.sh" "make_groundwater_level_nc.py" "4_make_potential_yield_maps.R" "make_area_maps.py" "utils.py" "make_canal_access_nc.py" "4_grass_process_globcover.sh" "princeton_etref_config.ini" "make_soil_parameter_nc.py" "2_grass_make_soil_parameter_maps.sh" "Rplots.pdf" "make_price_data_nc.py" "make_crop_parameters_nc.py" "13_prepare_initial_tubewell_ownership.R" "5_compute_canal_access.R" "not-used/" "3_grass_process_gaez_data.sh" "8_process_imd_prec_data.py" "run-all.sh" "14_process_cwatm_data.py" "9_merge_princeton_imd_prec_data.py" "7_copy_princeton_temp_data.py" "make_initial_condition_nc.py" "10_get_gcwm_data.R" "make_potential_yield_nc.py" ".Rhistory" "make_land_cover_frac_nc.py" "check_input_maps.R" "__pycache__/" "make_crop_area_nc.py" "12_prepare_farm_size_data.R" "../" "./")
+
+ ("/home/simon/dev/wbm/data-raw/code/" (24213 58179 654276 625000) "../" ".empty/" "process_cwatm_data.py" "make_area_maps.py" "./" "utils.py" "make_soil_parameter_nc.py" "grass_make_land_cover_fraction_maps.sh" "grass_make_soil_parameter_maps.sh" "grass_make_area_maps.sh" "not-used/" "run-all.sh" "agmerra_etref_config.ini" "make_initial_condition_nc.py" ".Rhistory" "make_land_cover_frac_nc.py" "grass_make_regions.sh" "check_input_maps.R" "__pycache__/")
+
+ ("/home/simon/dev/etref/etref/" (24212 35291 936513 413000) "penmanmonteith.py" "../" "./" "variable_list.py" "vapourpressure.py" "inputdata.py" "constants.py" "priestleytaylor.py" "netradiation.py" "extraterrestrialradiation.py" "not-used/" "hargreaves.py" "__pycache__/" "etrefconfig.py" "run.py" "__init__.py")
+
+ ("/home/simon/dev/hmet/hmet/" (24226 64783 59860 538000) "penmanmonteith.py" "../" "hmetconfig.py" "./" "variable_list.py" "inputdata.py" "__pycache__/" "run.py" "__init__.py")
+
+ ("/home/simon/dev/lisflood-lisvap/src/lisvap/" (24187 40437 499720 769000) "../" "./" "lisvapdynamic.py" "lisvapinitial.py" "hydrological/" "utils/" "__init__.py")
+
+ ("/home/simon/dev/lisflood-lisvap/src/" (24187 40437 499720 769000) "../" "lisvap1.py" "./" "lisvap/")
+
+ ("/home/simon/dev/lisflood-lisvap/" (24187 40442 35691 99000) "../" "tests/" "bin/" ".dockerignore" "./" ".git/" "README.md" "docker-entrypoint.sh" "src/" "tox.ini" ".gitignore" "build_docker.sh" "LICENSE" "requirements.txt" "basemaps/" "Dockerfile" "setup.py" "pytest.ini" "MANIFEST.in" ".gitattributes" "settings_tpl.xml")
+
+ ("/home/simon/projects/igp_livelihood_model/chanse/farmer_livelihood_model/code/" (24170 46165 391877 434000) "../" "get_gcwm_data.R" "model.R" "./" "model_new.R" "load_data.R" "plots_espl.R" "model.cpp" "plots_esplcp.R" "run_scenarios.R" ".Rhistory" "process_climate_data.R")
+
+ ("/home/simon/dev/wbm/wbm/" (24210 55303 916437 982000) "native/" "TopoParameters.py" "../" "Drainage.py" "wbm/" "./" "SoilParameters.py" "RootZoneWater.py" "variable_list.py" "WaterBalanceModel.py" "LandCoverParameters.py" "Groundwater.py" "CapillaryRise.py" "LandCover.py" "Infiltration.py" "LandSurface.py" "Irrigation.py" "Evapotranspiration.py" "Interception.py" "SnowFrost.py" "FieldManagementParameters.py" "WBMConfiguration.py" "IrrigationParameters.py" "__pycache__/" "io/" "run.py" "InitialCondition.py")
+
+ ("/home/simon/dev/wbm/" (24209 36249 540652 901000) "../" ".empty/" "wbm.egg-info/" "wbm/" "./" "README.md" "LICENSE" "setup.py")
+
+ ("/home/simon/dev/lulcc/demo/" (24205 51728 348501 631000) "../" "./" "00Index" "gmd-paper.R")
+
+ ("/home/simon/projects/lulcc_fix/KeelinHaynes/KeelinHaynesThesis_ScriptAndData/" (24205 51705 552654 1000) "../" "s1_dmd.png" "s3_dmd.png" "s2_dmd.png" "S1_dmd_stripped.csv" "./" "ag_stack_all_LAYERLABELS.txt" "S2_dmd_stripped.csv" "ag_Stack_all.tif" "S3_dmd_stripped.csv" "ag_Stack_ef.tif" "KeelinHaynesThesisScript.r" "ag_Stack_obs.tif" ".Rhistory")
+
+ ("/home/simon/dev/lulcc/" (24205 47073 813470 815000) "../" "R/" "data/" "./" "inst/" ".git/" "README.md" "README.Rmd" ".github/" "src/" "man/" "NAMESPACE" ".gitignore" "DESCRIPTION" "LICENSE" "demo/" ".Rbuildignore")
+
+ ("/home/simon/dev/r_lulcc/lulcc/R/" (24205 46036 298499 215000) "summary.R" "FigureOfMerit.R" "../" "class-PerformanceList.R" "class-ObsLulcRasterStack.R" "plot.AgreementBudget.R" "allowNeighb.R" "crossTabulate.R" "class-CategoryLabel.R" "plot.FigureOfMerit.R" "names.R" "show.R" "data.R" "./" "class-ThreeMapComparison.R" "class-NeighbRasterStack.R" "plot.Performance.R" "ThreeMapComparison.R" "allow.R" "ExpVarRasterList.R" "class-ExpVarRasterList.R" "total.R" "as.data.frame.R" "class-PredictiveModelList.R" "PerformanceList.R" "approxExtrapDemand.R" "c.PredictiveModelList.R" "AgreementBudget.R" "index.R" "PredictionList.R" "class-Model.R" "coerce.R" ".#allowNeighb.R" "resample.R" "plot.R" "ObsLulcRasterStack.R" "getPredictiveModelInputData.R" "class-PredictionList.R" "NeighbRasterStack.R" "models.R" "partition.R" "Model.R" "lulcc-package.R" "allocate.R" "predict.R" "performance.rocr.R" "compareAUC.R" "subset.R" "length.R")
+
+ ("/home/simon/dev/r_lulcc/lulcc/" (24057 15453 189220 146000) "../" "R/" "MD5" "data/" "./" "src/" "man/" "NAMESPACE" "DESCRIPTION" "demo/")
+
+ ("/home/simon/dev/r_lulcc/" (24057 15453 177220 165000) "../" "./" ".git/" "README.md" ".gitignore" "LICENSE" "lulcc/")
+
+ ("/home/simon/projects/lulcc_fix/" (24205 41806 179231 456000) "../" "./" ".RData" "JimenezMarcos/" ".Rhistory" "KeelinHaynes/")
+
+ ("/home/simon/projects/lulcc_fix/KeelinHaynes/" (24205 41812 779192 84000) "../" "./" "KeelinHaynesThesis_ScriptAndData/" "KeelinHaynesThesis_ScriptAndData.zip")
+
+ ("/home/simon/projects/pathways/" (24153 9346 333684 438000) "tiles.txt" "global_pointing_pair_1.txt" "../" "tmpzofwdjed.rpc" "image_metadata_WV02_2010-01-12.10-37-49_5.850.-0.479_C-B-G-Y-R-RE-N-N2_0.25.xml" "data/" "5.pdf" "./" "corrected-preview_WV02_2010-01-12.10-37-48_5.956.-0.479_C-B-G-Y-R-RE-N-N2_0.31.jpeg" "tmpe8j0o7ob.rpc" "glss_analysis/" "license.txt" "tiles/" "WV220100112103749M00-corrected_G.zip" "sd_model/" "corrected_WV02_2010-01-12.10-37-48_5.956.-0.479_C-B-G-Y-R-RE-N-N2_0.31.tif" "corrected-preview_WV02_2010-01-12.10-37-49_5.850.-0.479_C-B-G-Y-R-RE-N-N2_0.25.jpeg" "WV220100112103748M00-corrected_G.zip" "Digital_Terrain_Models_DTM.zip" ".~lock.income_data_3.xlsx#" "Digital Terrain Models (DTM)/" "corrected_WV02_2010-01-12.10-37-49_5.850.-0.479_C-B-G-Y-R-RE-N-N2_0.25.tif" "config.json" ".~lock.water_data_3.xlsx#" "s2p/" "literature/" "image_metadata_WV02_2010-01-12.10-37-48_5.956.-0.479_C-B-G-Y-R-RE-N-N2_0.31.xml" "readme.pdf")
+
+ ("/home/simon/dev/aquacrop_tmp/aquacrop/" (24156 10732 386441 254000) "native/" "HarvestIndex.py" "../" "WaterStress.py" "Drainage.py" "PreIrrigation.py" "Germination.py" "Transpiration.py" "Inflow.py" "data/" "./" "CanopyCover.py" "RootZoneWater.py" "SoilEvaporation.py" "CropYield.py" "WaterBalanceModel.py" "CapillaryRise.py" "GrowthStage.py" "RootDevelopment.py" "LandCover.py" "TemperatureStress.py" "CheckGroundwaterTable.py" "Infiltration.py" "LandSurface.py" "Irrigation.py" "Evapotranspiration.py" "RainfallPartition.py" "BiomassAccumulation.py" "GrowingDegreeDay.py" "__pycache__/" "io/" "run.py")
+
+ ("/home/simon/dev/aquacrop_tmp/aquacrop/io/" (23993 56403 855806 878000) "../" "FarmParameters.py" "data/" "./" "SoilParameters.py" "variable_list.py" "LandCoverParameters.py" "Weather.py" "Groundwater.py" "AquaCropConfiguration.py" "CropParameters.py" "variable_list_crop.py" "CarbonDioxide.py" "SoilHydraulicParameters.py" "IrrigationManagementParameters.py" "FieldManagementParameters.py" "__pycache__/" "__init__.py" "InitialCondition.py")
+
+ ("/home/simon/dev/aquacrop/data-raw/code/" (24040 52900 359903 858000) "../" "crop_parameter_database.sqlite3" "./" "make-crop-parameter-database.py" "make-soil-parameter-database.py" "soil_parameter_database.sqlite3")
+
+ ("/home/simon/dev/aquacrop/data-raw/" (23864 20358 808132 255000) "../" "code/" "data/" "./")
+
+ ("/home/simon/dev/hm_tmp/hm/" (24103 2256 564034 627000) "Configuration.py" "../" "OutputNetCDF.py" "dynamicPCRasterBase.py" "Messages.py" "./" "file_handling.py" "modeltime.py" "utils.py" "constants.py" "Model.py" "disclaimer.py" "Reporting.py" "ModelTime.py" "DeterministicRunner.py" "api.py" "dynamicFramework.py" "__pycache__/" "dataarray.py" "__init__.py")
+
+ ("/home/simon/dev/hm_tmp/" (24103 2276 606240 267000) ".cache/" "../" "test/" "./" "site/" ".pytest_cache/" ".git/" "README.md" "hm/" "hm.egg-info/" ".gitignore" "LICENSE" "requirements.txt" "setup.py" ".gitattributes")
+
+ ("/home/simon/dev/xarray/xarray/core/" (24134 57234 491191 596000) "../" "variable.py" "indexing.py" "rolling.py" "dtypes.py" "alignment.py" "accessor_dt.py" "common.py" "./" "merge.py" "utils.py" "resample.py" "resample_cftime.py" "indexes.py" "missing.py" "accessor_str.py" "npcompat.py" "pdcompat.py" "parallel.py" "nputils.py" "arithmetic.py" "combine.py" "pycompat.py" "computation.py" "options.py" "dask_array_ops.py" "formatting_html.py" "dataset.py" "concat.py" "extensions.py" "formatting.py" "dask_array_compat.py" "ops.py" "rolling_exp.py" "duck_array_ops.py" "nanops.py" "coordinates.py" "groupby.py" "dataarray.py" "__init__.py")
+
+ ("/home/simon/dev/etref/etref/not-used/" (24134 27770 168505 528000) "../" "longwaveradiation.py" "relativehumidity.py" "./" "wind.py" "surfacepressure.py" "temperature.py" "shortwaveradiation.py" "specifichumidity.py")
+
+ ("/home/simon/projects/consultancy/code/" (24105 45342 68972 48000) "chess-checks.R" "../" "model-netherby-topmodel.R" "load-data.R" "helper-funs.R" "./" "calculate-hourly-pet-penman-monteith.R" "not-used/" "disaggregate-wfdei-swdown.R" ".Rhistory")
+
+ ("/home/simon/dev/hm/hm/pcraster/" (24122 57791 2956 791000) "pfBase.py" "../" "pfPCRasterBase.py" "kfPCRasterBase.py" "dynamicPCRasterBase.py" "mcPCRasterBase.py" "staticFramework.py" "dynamicBase.py" "Timeoutput.py" "./" "UnitTests/" "mcFramework.py" "CMakeLists.txt" "frameworkBase.py" "kfBase.py" "aggregationfunctions.py" "kalmanFilterFramework.py" "staticPCRasterBase.py" "particleFilterFramework.py" "mcBase.py" "PCRasterPythonFramework.py" "regression.py" "dynamicFramework.py" "__pycache__/" "staticBase.py" "__init__.py" "generalfunctions.py")
+
+ ("/home/simon/dev/etref/" (24040 53082 380519 909000) "../" "test/" "./" ".git/" "README.md" ".gitignore" "LICENSE" "requirements.txt" "etref.egg-info/" "etref/" "setup.py" "docs/" "mkdocs.yml" ".gitattributes")
+
+ ("/home/simon/dev/hm/hm/old/" (24122 38369 279756 320000) "Configuration.py" "../" "OutputNetCDF.py" "Messages.py" "./" "file_handling.py" "Model.py" "Reporting.py" "ModelTime.py" "DeterministicRunner.py")
+
+ ("/home/simon/projects/igp_livelihood_model/chanse/farmer_livelihood_model/data/config/" (24088 18764 174129 96000) "../" "gandak_bau_config.R" "gandak_no_canal_config.R" "./" "sultanpur_bau_irrigation_schedule.R" "gandak_no_irrig_params.R" "gandak_no_irrig_config.R" "gandak_no_canal_irrigation_schedule.R" ".Rhistory" "gandak_bau_params.R" "gandak_bau_irrigation_schedule.R" "sultanpur_baseline_config.R" "gandak_no_irrig_irrigation_schedule.R" "sultanpur_params.R" "gandak_no_canal_params.R")
+
+ ("/home/simon/projects/igp_livelihood_model/chanse/farmer_livelihood_model/data/" (23857 49584 586454 861000) "../" "./" "input/" "output/" "config/" "plots/" "plots.zip")
+
+ ("/home/simon/projects/igp_livelihood_model/chanse/farmer_livelihood_model/" (23857 49605 430303 617000) "../" "code/" "data/" "./" ".git/" "README.md" ".gitignore" "data-raw/")
+
+ ("/home/simon/dev/r_indagridat/indagridat/data-raw/code/utils/" (24055 26893 416295 234000) "../" "process_indiastat_landuse.R" "process_agcensus_data.R" "./" "combine_icrisat.R" "data-quality/" "process_indiastat_irrigation.R" "helper_functions.R" "aggregate_icrisat_1960.R" "reproject_GAUL.R" "aggregate_indiastat_1960.R" "plots_paper.R" "spacetime_test.R" "combine_indiastat.R" "process_micensus_data.R" ".Rhistory" "aggregate_GAUL_1960.R")
+
+ ("/home/simon/projects/gcam/gcam-core-gcam-v5.2/exe/" (24057 55681 303888 802000) "../" "configuration_ref.xml" "configuration_ssp.xml" "XMLDBDriver.jar" "batch_SSP_SPA4.xml" "batch_SSP_REF.xml" "configuration.xml" "./" "log_conf.xml" "configuration_usa.xml" "batch_SSP_SPA23.xml" "debugReference.xml" "batch_SSP_SPA1.xml" "gcam.exe" ".gitignore" "logs/" "hs_err_pid8811.log" "XMLDBDriver.properties" "batch-csv-out.csv" "configuration_policy.xml" "hs_err_pid27581.log" "batch_SSP_SPA5.xml" ".gitattributes" "restart/")
+
+ ("/home/simon/projects/twiga/agu2019/code/" (24049 229 653170 821000) "../" "download-tamsat.sh" "merge-tahmo-era5-prec.py" "download-tahmo.py" "write-soil-hydraulic-parameters-netcdf.py" "read-grid-output.R" "./" "write-climate-forcing-data.py" "download-tahmo-station-metadata.py" "kenya_maize_yield_comparison.png" "write-etref-input.py" "run-grid-aquacrop.py" "make_pt_plots.R" "write-grid-aquacrop-input.py" "download-era5.py" "repair-agmerra.py" "ghana_maize_aq_faostat_comparison.png" "compute-era5-eto.py" "process_sachs_crop_calendar.R" "make-tahmo-stn-plot.R" "make-prec-comparison-plot.R" "make-clone-kenya.R" "make-grid-plots.R" "convert_tahmo_station_metadata_to_shp.R" "run-etref.py" "make-clone-ghana.R" "read-pt-output.R" "run-pt-aquacrop.py" ".Rhistory" "write-pt-aquacrop-input.py" "ghana_maize_yield_1984_2004.png" "write-crop-parameters-netcdf.py" "write-carbon-dioxide-netcdf.py")
+
+ ("/home/simon/projects/twiga/workshop_nov2019/" (24042 12701 574478 262000) "temperature.csv" "../" "tahmo_precipitation_kmd.csv" "TWIGA TAHMO data.py" "unified_model_tempetature.tif" ".ipynb_checkpoints/" "./" "TWIGA TAHMO data.ipynb" "TWIGA NWP data.py" "TWIGA NWP data.ipynb")
+
+ ("/home/simon/dev/r_indagridat/indagridat/data-raw/code/" (23935 16923 185767 654000) "../" "./" "runall.R" "utils/")
+
+ ("/home/simon/.emacs.d/" (24032 64357 560161 318000) "../" "session.10a917f03871d66718156414565626115400000009120118" "session.105729d36adf4eb278156639528982524300000012900068" "games/" "settings/" "./" "ac-comphist.dat" "init.el" ".mbsyncrc" "network-security.data" "elpa/" "session.108e0a57bd3c35c195156499779930355100000009580064" "eshell/" "snippets/" "ido.last" "backups/" "auto-save-list/" "backup/")
+
+ ("/home/simon/projects/gandak_systems_model/land_surface/config/" (23984 35836 131012 594000) "wbm_gandak_config.ini" "../" "./" "wbm_farm_gandak_config.ini")
+
+ ("/home/simon/dev/wbm_data_model/wbm_data_model/" (23984 36869 156691 827000) "Configuration.py" "../" "SoilData.py" "CropArea.py" "./" "utils.py" "LandCoverFrac.py" "variable_list.py" "LandCoverParameters.py" "WaterBalanceDataModel.py" "ModelGridData.py" "CropParameters.py" "GroundwaterData.py" "not-used/" "LandCoverData.py" "WeatherData.py" "__pycache__/" "LandSurfaceData.py" "gandak_data_config.ini" "run.py" "__init__.py" "InitialCondition.py")
+
+ ("/home/simon/projects/aquacrop_apps/ssa/code/AquaCropOS_v50a/" (23994 37080 566670 901000) "AOS_SoilEvaporation.m" "AOS_Transpiration.m" "../" "AOS_ReadFileLocations.m" "AOS_Irrigation.m" "FileLocations.txt" "AquaCropOS_BatchRUN.m" "AOS_SoilHydraulicProperties.m" "AOS_Solution.m" "AOS_CapillaryRise.m" "AOS_CalculateHIGC.m" "AOS_CheckModelTermination.m" "AOS_ReadIrrigationManagement.m" "AOS_CCRequiredTime.m" "AOS_ResetInitialConditions.m" "AOS_GrowingDegreeDay.m" "AOS_HIadjPostAnthesis.m" "./" "AOS_ReadClockParameters.m" "AOS_WriteOutputs.m" "AOS_PerformTimeStep.m" "AOS_CheckGroundwaterTable.m" "AOS_TemperatureStress.m" "AOS_CanopyCover.m" "AOS_Germination.m" "AOS_RootZoneWater.m" "AOS_HarvestIndex.m" "AOS_ReadModelParameters.m" "AOS_Infiltration.m" "AOS_UpdateTime.m" "AOS_BiomassAccumulation.m" "AOS_UpdateCCxCDC.m" "AOS_CalculateHILinear.m" "AOS_RootDevelopment.m" "AOS_HIrefCurrentDay.m" "AOS_AdjustCCx.m" "AOS_Drainage.m" "AOS_ReadWeatherInputs.m" "AOS_Initialize.m" "AquaCropOS_RUN.m" "AOS_HIadjPreAnthesis.m" "AOS_WaterStress.m" "AOS_ReadModelInitialConditions.m" "AOS_ComputeVariables.m" "Input/" "AOS_ComputeCropCalendar.m" "AOS_EvapLayerWaterContent.m" "AOS_CCDevelopment.m" "AOS_ReadFieldManagement.m" "AOS_HIadjPollination.m" ".DS_Store" "AOS_ReadGroundwaterTable.m" "AOS_PreIrrigation.m" "AOS_ExtractWeatherData.m" "AOS_RainfallPartition.m" "AOS_GroundwaterInflow.m" "Output/" "AOS_GrowthStage.m" "AOS_AerationStress.m" "AOS_Finish.m")
+
+ ("/home/simon/dev/aquacrop/test/make_tests/AquaCropOS_v50a/Input/Example Crop Files/" (24009 30588 924827 705000) "Crop_PaddyRiceGDD.txt" "../" "Crop_MaizeGDD.txt" "Crop_QuinoaCD.txt" "Crop_WheatGDD.txt" "./" "Crop_SorghumGDD.txt" "Crop_SunflowerGDD.txt" "Crop_TefCD.txt" "Crop_SoybeanGDD.txt" "Crop_BarleyGDD.txt" "Crop_SugarCaneCD.txt" "Crop_SugarBeetGDD.txt" "Crop_PotatoGDD.txt" "Crop_TomatoGDD.txt" "Crop_CottonGDD.txt")
+
+ ("/home/simon/dev/aquacrop/test/make_tests/AquaCropOS_v50a/Input/" (24009 30588 924827 705000) "Example Soil Files/" "../" "CropRotation.txt" "IrrigationManagement.txt" "MaunaLoaCO2.txt" "IrrigationSchedule.txt" "./" "Clock.txt" "SoilTexture.txt" "Example Crop Files/" "Soil.txt" "FileSetup.txt" "CropMix.txt" "InitialWaterContent.txt" "Crop.txt" "SoilHydrology.txt" "Weather.txt" "WaterTable.txt" ".DS_Store" "SoilProfile.txt" "FieldManagement.txt")
+
+ ("/home/simon/projects/aquacrop_apps/ssa/data/" (24027 53004 20251 17000) "etref_ssa/" "states/" "crop_parameters.nc" "africa_clone_0pt25degree.tif" "soil_hydraulic_parameters.nc" "../" "maize_harvest_julian_day_mirca2000.tif" "log/" ".#test.py" "unit_code.asc" "etref/" "theta_wilt_cosby_layer1-4_0pt25degree.tif" "maize_planting_julian_day_sachs2010.tif" "aquacrop_os/" "ghana_aquacrop_clone_0pt25degree.tif" "africa_etref_landmask_0pt25degree.tif" "unit_name.txt.gz" "WFDEI/" "pt_landmask_0pt25degree.tif" "cropping_calendar_irrigated.txt" "k_sat_cosby_layer1-4_0pt25degree.tif" "annual_co2_conc_aos_ch7_ex1a_tunis_wheat.nc" "./" "africa_etref_clone_0pt25degree.tif" "ghana_landmask_0pt25degree.tif" "co2_annual_mean_mlo_0pt25degree.nc" "africa_aquacrop_landmask_0pt25degree.tif" "AgMERRA/" "tmp/" "maize_planting_julian_day_mirca2000.tif" "pt_clone_0pt25degree.tif" "ETref_PenmanMonteith_dailyTot_output.nc" "mapspam/" "readme__condensed_cropping_calendars.txt" "maize_harvest_julian_day_sachs2010.tif" "output_maize_rainfed_ssa_agmerra/" "ghana_clone_0pt25degree.tif" "co2_annmean_mlo.txt" "ghana_aquacrop_landmask_0pt25degree.tif" "africa_aquacrop_clone_0pt25degree.tif" "netcdf/" "theta_crit_cosby_layer1-4_0pt25degree.tif" "africa_landmask_0pt25degree.tif" "cropping_calendar_rainfed.txt" "readme__unit_code_grid__unit_name_list.txt" "theta_sat_cosby_layer1-4_0pt25degree.tif" "output_maize_rainfed_pt_agmerra/" "sachs_crop_calendar/")
+
+ ("/home/simon/projects/twiga/" (24019 65370 603679 553000) "tahmo/" "agu2019/" "workshop_nov2019/" "weather_services/" "../" "./")
+
+ ("/home/simon/projects/twiga/agu2019/" (24020 1015 65335 721000) "../" "code/" "data/" "./" "data-raw/")
+
+ ("/home/simon/projects/gandak_systems_model_data/" (23972 15540 208481 563000) "../" "code/" "data/" "./" "pkg/" "data-raw/" ".Rhistory")
+
+ ("/home/simon/dev/aquacrop/test/" (24009 30592 752834 809000) "../" "make_tests/" "./" "example/" "performance/" "unit/" "release/")
+
+ ("/home/simon/dev/aquacrop_tmp/" (23993 21581 832478 81000) "aquacrop_fc.cpython-37m-x86_64-linux-gnu.so" "../" "test/" "./" ".pytest_cache/" "aquacrop/" ".git/" "README.md" ".gitignore" "LICENSE" "requirements.txt" "aquacrop.egg-info/" "data-raw/" "setup.py" "build/")
+
+ ("/home/simon/projects/aquacrop_apps/ssa/data/aquacrop_os/Input/" (23991 60973 365724 183000) "SoilHydrology.txt" "FileSetup.txt" "Soil.txt" "CropMix.txt" "../" "IrrigationManagement.txt" "SoilTexture.txt" "Example Soil Files/" "InitialWaterContent.txt" ".DS_Store" "MaunaLoaCO2.txt" "IrrigationSchedule.txt" "Example Crop Files/" "Clock.txt" "WaterTable.txt" "./" "Weather.txt" "FieldManagement.txt" "SoilProfile.txt" "Crop.txt" "CropRotation.txt")
+
+ ("/home/simon/projects/aquacrop_apps/ssa/data/aquacrop_os/" (23991 60661 865953 369000) "../" "Output/" "new/" "./" "Input/")
+
+ ("/home/simon/projects/aquacrop_apps/" (23911 46238 934483 851000) "../" "./" "ssa/" "requirements.txt" "igp/")
+
+ ("/home/simon/projects/gandak_systems_model/" (23983 61598 375481 801000) "../" "analysis/" "run-wb-model.sh" "data/" "./" ".git/" "wbm.prof" "README.md" "groundwater/" ".Rhistory" "land_surface/" "surfacewater_routing/")
+
+ ("/home/simon/dev/wbm_farmer/wbm_farmer/" (23984 34387 611916 412000) "../" "FarmParameters.py" "IrrigationSupply.py" "./" "CropYield.py" "variable_list.py" "WaterBalanceModel.py" "LandCoverParameters.py" "FertiliserApplication.py" "Groundwater.py" "Investment.py" "CropParameters.py" "LandCover.py" "GridCellMean.py" "variable_list_crop.py" "LandSurface.py" "PriceData.py" "Income.py" "WBMConfiguration.py" "Accounting.py" "CanalSupply.py" "__pycache__/" "run.py")
+
+ ("/home/simon/dev/wbm_data_model/wbm_data_model/not-used/" (23983 60652 207520 601000) "../" "FarmParameters.py" "./" "SoilParameters.py" "CanalAccess.py" "PriceData.py" "PotentialYield.py")
+
+ ("/home/simon/projects/twiga/ssa_index_insurance/code/" (23982 3125 59909 616000) "../" "./" "twiga-timeseries.ipynb")
+
+ ("/home/simon/projects/twiga/ssa_index_insurance/" (23958 19808 20486 949000) "../" "code/" "data/" "./")
+)
+
+;; ----- ido-unc-hosts-cache -----
+t

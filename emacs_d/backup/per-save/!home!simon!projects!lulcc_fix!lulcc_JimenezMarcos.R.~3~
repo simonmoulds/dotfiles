@@ -1,0 +1,283 @@
+#############################################################################################
+#LAND USE CHANGE SIMULATION WITH LULCC PACKAGE                                              #
+#Author original script: Simon Moulds et al. doi: 10.5194/gmd-8-3215-2015                   # 
+#Author script modification: Marcos Jiménez Martínez                                        #
+#Date: 27th November 2019                                                                   #
+#############################################################################################
+
+require(lulcc)
+require(RColorBrewer)
+require(randomForest) # necessary to introduce the argument na.action = na.roughfix. I do not really understand why this argument is necessary (see line 56): in case that any predictor variable contains NA values, randomForest package has a na.roughfix function that "imputes Missing Values by median/mode"
+
+#############################################################################################
+#USER REQUIRED INPUTS
+
+files_path <- "."
+output_folder <- "Outputs"
+
+years = c(2002, 2006, 2010)
+timepoints = c(0,4,8)
+timespan = c(0,8)
+timespan2 = 0:8
+secondtimepoint = 4
+endtimepoint = 8
+lulc_classes_names = c("Cropland","Woodland","MixVeg","NoProductive","Water")
+colors <- c("orange","darkgreen","yellow4","gray7","deepskyblue2")
+ef_names = c("Population density",
+              "Elevation above sea level",
+              "Mean Annual Precipiation",
+              "Distance to towns",
+              "Distance to roads",
+              "Distance to water streams",
+              "Geology")
+resistance_to_change = c(0.2,0.2,0.1,0.9,0.8)
+###############################################################################################
+
+###############################################################################################
+#PROGRAM
+
+obs <- ObsLulcRasterStack(
+    x=files_path,
+    pattern="lu_",
+    categories=1:length(lulc_classes_names),
+    labels=lulc_classes_names,
+    t=timepoints
+)
+
+p.obs <-  plot(
+    obs,
+    between=list(x=0,y=0),
+    par.settings=list(
+        axis.line=list(col="black"),
+        strip.background=list(col="lightgrey")),
+    par.strip.text=list(cex=0.6),
+    scales=list(cex=0.6),
+    col.regions=c(colors),
+    colorkey=FALSE,
+    layout=c(3,1),
+    key=list(
+        space="bottom",
+        cex=0.6,
+        rectangles=list(col=c(colors), size=3),
+        text=list(labels=c(lulc_classes_names))
+    )
+)
+p.obs
+
+crs(obs) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+crossTabulate(x=obs, times=timespan)
+
+ef <- ExpVarRasterList(x=files_path, pattern="ef")
+
+## fit statistical models
+part <- partition(x=obs[[1]], size=0.1, spatial=TRUE)
+train.data <- getPredictiveModelInputData(obs=obs, ef=ef, cells=part[["train"]])
+
+#chose the environmental factors influencing the location suitability of each land use class
+forms <- list(Cropland ~ ef_01+ef_02+ef_03+ef_04+ef_05+ef_06+ef_07,
+              Woodland ~ ef_01+ef_02+ef_03+ef_04+ef_05+ef_06+ef_07,
+              MixVeg ~ ef_01+ef_02+ef_03+ef_04+ef_05+ef_06+ef_07,
+              NoProductive ~ ef_01+ef_02+ef_03+ef_04+ef_05+ef_06+ef_07,
+              Water ~ ef_01+ef_02+ef_03+ef_04+ef_05+ef_06+ef_07)
+
+#rf.models <- randomForestModels(formula=forms, data=train.data, obs=obs) 
+rf.models <- randomForestModels(formula=forms, data=train.data, obs=obs, na.action = na.roughfix) # if the argument na.action = na.roughfix is not included, the randomForestModels function takes endless time to solve (so far, i tried running the function without na.roughfix, leaving the computer open for one whole day, and when i came back to office the program was still processing) 
+
+#plot variable importance
+for(i in 1:length(rf.models@models)){
+  df <- data.frame(ef_names,rf.models@models[[i]]$importance)
+  colnames(df) <- c("Variable","IncNodePurity")
+  df <- df [order(-df$IncNodePurity),]
+  png(paste0(output_folder, "VarImportance_", lulc_classes_names[i],".png"))
+  par(mar=c(5,11,5,2))
+  barplot(df$IncNodePurity, main="Variable Importance", names.arg=df$Variable,
+          horiz=TRUE,
+          las=1,
+          xlim = range(pretty(c(0, max(df$IncNodePurity))))
+  )
+  dev.off()
+}
+
+## create suitability maps
+year = years[3]
+all.data <- as.data.frame(x=ef, cells=part[['all']])
+probmaps <- predict(object=rf.models, newdata=all.data, data.frame=TRUE)
+points <- rasterToPoints(obs[[year]], spatial=TRUE)
+probmaps <- SpatialPointsDataFrame(points, probmaps)
+r <- rasterize(x=probmaps, y=obs[[year]], field=names(probmaps))
+
+writeRaster(r, paste0(output_folder,year, "_suit_", 
+                      lulc_classes_names), 
+            "GTiff", bylayer = T)
+
+## figure 4
+p <- rasterVis::levelplot(r,
+                          layout=c(4,3),
+                          margin=FALSE,
+                          par.strip.text=list(cex=0.6),
+                          par.settings=list(axis.line=list(col="black"),
+                                            strip.background=list(col="lightgrey")),
+                          between=list(x=0,y=0),
+                          col.regions=colorRampPalette(brewer.pal(9, "YlGnBu")),
+                          at=seq(0,1,length=100),
+                          scales=list(cex=0.6),
+                          colorkey=list(space="bottom",labels=list(cex=0.6),width=0.5))
+p
+
+## test ability of random forests to predict location of cropland, forest, mixveg, nonproductive, water in testing partition
+test.data  <- getPredictiveModelInputData(obs=obs, ef=ef, cells=part[["test"]])
+
+rf.pred <- PredictionList(models=rf.models, newdata=test.data)
+rf.perf <- PerformanceList(pred=rf.pred, measure="rch")
+
+## figure 6
+png(paste0(output_folder, "AUC_rf",".png"))
+p <- plot(list(rf=rf.perf),
+          aspect="iso",
+          xlab=list(label="False Alarms/(False Alarms + Correct Rejections)", cex=0.6),
+          ylab=list(label="Hits/(Hits + Misses)", cex=0.6),
+          scales=list(x=list(tck=0.6), y=list(tck=0.6), cex=0.6),
+          key.args=list(cex=0.6, size=2.5),
+          par.strip.text=list(cex=0.6),
+          par.settings=list(strip.background=list(col="lightgrey")),
+          main = "AUC for each of the land use classes")
+p
+dev.off()
+
+## obtain demand scenario
+dmd <- approxExtrapDemand(obs=obs, tout=timespan2)
+
+## plot demand scenario (figure not shown in paper)
+matplot(dmd, type="l", ylab="Demand (no. of cells)", xlab="Time point", lty=1, col=colors)
+legend("topright", legend=obs@labels, col=colors, lty=1)
+
+
+## create CLUE-S model object
+clues.rules <- matrix(data=1, nrow=length(lulc_classes_names), ncol=length(lulc_classes_names), byrow=TRUE) 
+
+clues.parms <- list(jitter.f=0.0002,
+                    scale.f=0.000001,
+                    max.iter=1000,
+                    max.diff=50, 
+                    ave.diff=50)
+
+clues.model <- CluesModel(obs=obs,
+                          ef=ef,
+                          models=rf.models,
+                          time=timespan2,
+                          demand=dmd,
+                          elas=resistance_to_change,
+                          rules=clues.rules,
+                          params=clues.parms)
+
+## Create Ordered model (Fuchs et al)
+ordered.model <- OrderedModel(obs=obs,
+                              ef=ef,
+                              models=rf.models,
+                              time=timespan2,
+                              demand=dmd,
+                              order=c(2,1,3)) 
+
+## perform allocation
+clues.model <- allocate(clues.model)
+ordered.model <- allocate(ordered.model, stochastic=TRUE)
+
+writeRaster(clues.model@output, 
+            paste0(output_folder,"CluesOutput_",1:c(length(names(clues.model@output)))), 
+            "GTiff", bylayer = T, overwrite = T)
+
+
+## validate ordered model input
+
+## CLUE-S
+clues.tabs <- ThreeMapComparison(x=clues.model,
+                                 factors=2^(1:8),
+                                 timestep=endtimepoint)
+
+## plot three dimensional tables in different ways (figures not shown in paper)
+plot(clues.tabs)
+plot(clues.tabs, category=1, factors=2^(1:8)[c(1,3,5,7)])
+
+## Ordered
+ordered.tabs <- ThreeMapComparison(x=ordered.model,
+                                   factors=2^(1:8),
+                                   timestep=endtimepoint)
+
+## as above for CLUE-S model
+plot(ordered.tabs)
+plot(ordered.tabs, category=1, factors=2^(1:9)[c(1,3,5,7)])
+
+## calculate agreement budget and plot
+
+## CLUE-S
+clues.agr <- AgreementBudget(x=clues.tabs)
+p1 <- plot(clues.agr,
+           from=1,
+           to=2,
+           par.strip.text=list(cex=0.6),
+           par.settings=list(strip.background=list(col="lightgrey")),
+           xlab=list(cex=0.6),
+           ylab=list(cex=0.6),
+           ylim=c(0,0.08),
+           scales=list(y=list(at=c(seq(from=0,to=0.08,by=0.02)), cex=0.6, tck=0.6), x=list(cex=0.6, tck=0.6)),
+           key=list(cex=0.6))
+p1
+
+## Ordered
+ordered.agr <- AgreementBudget(x=ordered.tabs)
+p2 <- plot(ordered.agr,
+           from=1,
+           to=2,
+           par.strip.text=list(cex=0.6),
+           par.settings=list(strip.background=list(col="lightgrey")),
+           xlab=list(cex=0.6),
+           ylab=list(cex=0.6),
+           ylim=c(0,0.08),
+           scales=list(y=list(at=c(seq(from=0,to=0.08,by=0.02)), cex=0.6, tck=0.6), x=list(cex=0.6, tck=0.6)),
+           key=list(cex=0.6))
+p2
+
+## figure 7
+agr.p <- c("CLUE-S"=p1, Ordered=p2, layout=c(1,2))
+agr.p
+
+## trellis.device(device="pdf", width=4.72, height=5.72, file="/home/simon/projects/lulccR_paper/RevisedDraft/f07_agreement.pdf")
+## print(agr.p)
+## dev.off()
+
+## calculate Figure of Merit and plot
+
+## CLUE-S
+clues.fom <- FigureOfMerit(x=clues.tabs)
+p1 <- plot(clues.fom,
+           from=1,
+           to=2,
+           par.strip.text=list(cex=0.6),
+           par.settings=list(strip.background=list(col="lightgrey")),
+           xlab=list(cex=0.6),
+           ylab=list(cex=0.6),
+           ylim=c(0,1),
+           scales=list(y=list(at=(seq(from=0,to=1,by=0.2)), cex=0.6), x=list(cex=0.6)),
+           key=NULL)
+p1
+
+## Ordered
+ordered.fom <- FigureOfMerit(x=ordered.tabs)
+p2 <- plot(ordered.fom,
+           from=1,
+           to=2,
+           par.strip.text=list(cex=0.6),
+           par.settings=list(strip.background=list(col="lightgrey")),
+           xlab=list(cex=0.6),
+           ylab=list(cex=0.6),
+           ylim=c(0,1),
+           scales=list(y=list(at=(seq(from=0,to=1,by=0.2)), cex=0.6), x=list(cex=0.6)),
+           key=NULL)
+p2
+
+fom.p <- c("CLUE-S"=p1, Ordered=p2, layout=c(1,2))
+fom.p
+
+## trellis.device(device="pdf", width=4.72, height=4.72, file="/home/simon/projects/lulccR_paper/RevisedDraft/f08_figure_of_merit.pdf")
+## print(fom.p)
+## dev.off()

@@ -1,0 +1,95 @@
+## Author : Simon Moulds
+## Date   : August 2019
+
+library(ncdf4)
+library(raster)
+library(rasterVis)
+library(grid)
+library(gridExtra)
+library(rworldmap)
+library(magrittr)
+library(dplyr)
+library(tidyr)
+
+datadir="../data/aquacrop_grid"
+outdir="~/Dropbox/agu2019"
+
+ghana_rgn=raster("../data/ghana_aquacrop_landmask_0pt25degree.tif")
+kenya_rgn=raster("../data/kenya_aquacrop_landmask_0pt25degree.tif")
+
+get_mapspam_phys_area = function(path, crop, region) {
+    fs = list.files(path, pattern=paste0("SPAM2005V3r2_global_[A-Z]{1}_[A-Z]{2}_", crop, "_[A-Z]{1}.tif$"), full.names=TRUE)
+    crop_area = raster(fs[5]) %>% crop(extent(region)) %>% raster::aggregate(fact=3, fun=sum)
+    crop_area
+}
+
+data(countriesCoarse)
+ghana_poly = countriesCoarse[countriesCoarse$NAME %in% "Ghana",]
+ghana_rast = rasterize(ghana_poly, ghana_rgn)
+
+ghana_maize = get_mapspam_phys_area(
+    "../data/mapspam/geotiff_global_phys_area",
+    "MAIZ",
+    ghana_rast) %>%
+    `*`(ghana_rast) 
+ghana_maize[!is.na(ghana_maize)] = TRUE
+ghana_sorghum = get_mapspam_phys_area(
+    "../data/mapspam/geotiff_global_phys_area",
+    "SORG",
+    ghana_rast) %>%
+    `*`(ghana_rast)
+ghana_sorghum[!is.na(ghana_sorghum)] = TRUE
+
+
+
+## Ghana: Maize
+## ############
+
+years = 1980:2010
+region = ghana_rgn
+mapspam_path = "../data/mapspam/geotiff_global_phys_area"
+faostat_fn = "../data/Production_Crops_E_All_Data.csv"
+aq_path = "../data/aquacrop_grid"
+
+faostat_crop = "Maize"
+faostat_country = "Ghana"
+mapspam_crop = "MAIZ"
+aq_country = "ghana"
+aq_crop = "maize"
+
+source("make-grid-plots.R")
+
+## Ghana: Sorghum
+## ##############
+
+faostat_crop = "Sorghum"
+faostat_country = "Ghana"
+mapspam_crop = "SORG"
+aq_country = "ghana"
+aq_crop = "sorghum"
+
+source("make-grid-plots.R")
+
+## Kenya: Maize
+## ############
+
+region = kenya_rgn
+faostat_crop = "Maize"
+faostat_country = "Kenya"
+mapspam_crop = "MAIZ"
+aq_country = "kenya"
+aq_crop = "maize"
+
+source("make-grid-plots.R")
+
+## Kenya: Wheat
+## ############
+
+faostat_crop = "Wheat"
+faostat_country = "Kenya"
+mapspam_crop = "WHEA"
+aq_country = "kenya"
+aq_crop = "wheat"
+
+source("make-grid-plots.R")
+

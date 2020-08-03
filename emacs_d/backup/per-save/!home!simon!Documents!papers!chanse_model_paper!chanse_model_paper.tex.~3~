@@ -1,0 +1,1211 @@
+%% 11/23/2015
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% AGUJournalTemplate.tex: this template file is for articles formatted with LaTeX
+%
+% This file includes commands and instructions
+% given in the order necessary to produce a final output that will
+% satisfy AGU requirements.
+%
+% You may copy this file and give it your
+% article name, and enter your text.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% PLEASE DO NOT USE YOUR OWN MACROS
+% DO NOT USE \newcommand, \renewcommand, or \def, etc.
+%
+% FOR FIGURES, DO NOT USE \psfrag or \subfigure.
+% DO NOT USE \psfrag or \subfigure commands.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Step 1: Set the \documentclass
+%
+% There are two options for article format:
+%
+% 1) PLEASE USE THE DRAFT OPTION TO SUBMIT YOUR PAPERS.
+% The draft option produces double spaced output.
+%
+% 2) numberline will give you line numbers.
+
+%% To submit your paper:
+\documentclass[draft,linenumbers]{agujournal}
+\draftfalse
+
+\usepackage{amsmath}
+\usepackage{nccmath}
+%% For final version.
+% \documentclass{agujournal}
+
+% Now, type in the journal name: \journalname{<Journal Name>}
+
+% ie, \journalname{Journal of Geophysical Research}
+%% Choose from this list of Journals:
+%
+% JGR-Atmospheres
+% JGR-Biogeosciences
+% JGR-Earth Surface
+% JGR-Oceans
+% JGR-Planets
+% JGR-Solid Earth
+% JGR-Space Physics
+% Global Biochemical Cycles
+% Geophysical Research Letters
+% Paleoceanography
+% Radio Science
+% Reviews of Geophysics
+% Tectonics
+% Space Weather
+% Water Resource Research
+% Geochemistry, Geophysics, Geosystems
+% Journal of Advances in Modeling Earth Systems (JAMES)
+% Earth's Future
+% Earth and Space Science
+%
+%
+
+\journalname{Water Resources Research}
+
+
+\begin{document}
+
+%% ------------------------------------------------------------------------ %%
+%  Title
+%
+% (A title should be specific, informative, and brief. Use
+% abbreviations only if they are defined in the abstract. Titles that
+% start with general keywords then specific terms are optimized in
+% searches)
+%
+%% ------------------------------------------------------------------------ %%
+
+% Example: \title{This is a test title}
+
+\title{On the inclusion of human behaviour to improve the represention of surface-groundwater interactions}
+
+%% ------------------------------------------------------------------------ %%
+%
+%  AUTHORS AND AFFILIATIONS
+%
+%% ------------------------------------------------------------------------ %%
+
+% Authors are individuals who have significantly contributed to the
+% research and preparation of the article. Group authors are allowed, if
+% each author in the group is separately identified in an appendix.)
+
+% List authors by first name or initial followed by last name and
+% separated by commas. Use \affil{} to number affiliations, and
+% \thanks{} for author notes.
+% Additional author notes should be indicated with \thanks{} (for
+% example, for current addresses).
+
+% Example: \authors{A. B. Author\affil{1}\thanks{Current address, Antartica}, B. C. Author\affil{2,3}, and D. E.
+% Author\affil{3,4}\thanks{Also funded by Monsanto.}}
+
+\authors{S. Moulds\affil{1}, J. Scheidegger\affil{2}, C. R. Jackson\affil{2}, J. O'Keeffe\affil{3}, A. Mijic\affil{3}}
+
+% \affiliation{1}{First Affiliation}
+% \affiliation{2}{Second Affiliation}
+% \affiliation{3}{Third Affiliation}
+% \affiliation{4}{Fourth Affiliation}
+
+\affiliation{1}{Department of Civil and Environmental Engineering, Imperial College London, UK}
+\affiliation{2}{British Geological Survey, Keyworth, UK}
+% \affiliation{=number=}{=Affiliation Address=}
+%(repeat as many times as is necessary)
+
+%% Corresponding Author:
+% Corresponding author mailing address and e-mail address:
+
+% (include name and email addresses of the corresponding author.  More
+% than one corresponding author is allowed in this LaTeX file and for
+% publication; but only one corresponding author is allowed in our
+% editorial system.)
+
+% Example: \correspondingauthor{First and Last Name}{email@address.edu}
+
+\correspondingauthor{Simon Moulds}{sim.moulds@gmail.com}
+
+%% Keypoints, final entry on title page.
+
+% Example:
+% \begin{keypoints}
+% \item	List up to three key points (at least one is required)
+% \item	Key Points summarize the main points and conclusions of the article
+% \item	Each must be 100 characters or less with no special characters or punctuation
+% \end{keypoints}
+
+%  List up to three key points (at least one is required)
+%  Key Points summarize the main points and conclusions of the article
+%  Each must be 100 characters or less with no special characters or punctuation
+
+\begin{keypoints}
+\item = enter point 1 here =
+\item = enter point 2 here =
+\item = enter point 3 here =
+\end{keypoints}
+
+%% ------------------------------------------------------------------------ %%
+%
+%  ABSTRACT
+%
+% A good abstract will begin with a short description of the problem
+% being addressed, briefly describe the new data or analyses, then
+% briefly states the main conclusion(s) and how they are supported and
+% uncertainties.
+%% ------------------------------------------------------------------------ %%
+
+%% \begin{abstract} starts the second page
+
+\begin{abstract}
+= enter abstract here =
+\end{abstract}
+
+
+%% ------------------------------------------------------------------------ %%
+%
+%  TEXT
+%
+%% ------------------------------------------------------------------------ %%
+
+%%% Suggested section heads:
+% \section{Introduction}
+%
+% The main text should start with an introduction. Except for short
+% manuscripts (such as comments and replies), the text should be divided
+% into sections, each with its own heading.
+
+% Headings should be sentence fragments and do not begin with a
+% lowercase letter or number. Examples of good headings are:
+
+% \section{Materials and Methods}
+% Here is text on Materials and Methods.
+%
+% \subsection{A descriptive heading about methods}
+% More about Methods.
+%
+% \section{Data} (Or section title might be a descriptive heading about data)
+%
+% \section{Results} (Or section title might be a descriptive heading about the
+% results)
+%
+% \section{Conclusions}
+
+
+\section{Introduction}
+
+% Paragraph 1: set the scene, focus on agriculture and smallholders
+
+% The pressure on global water resources is intensifying as a result of population growth and demographic changes combined with climate change and an associated increase in climate variability \citep{}. Hence, achieving the equitable provision of freshwater to support human livelihoods and well-being while ensuring the continued function of ecosystems and environment is a defining challenge of our age \citep{poff_sustainable_2016}. Water management is broadly defined as a set of activities related to the ``storage, abstraction and redistribution'' of water from various sources to meet a wide range of human resource demands \citep{nazemi_inclusion_2015}. Achieving sustainable and resilient water systems requires a systems approach \citep{kasprzyk_defining_2018}. This paper presents a novel approach to representing human processes and interactions within... \\
+
+% Paragraph 1: Context
+Agriculture covers around 40\% of the Earth's land surface and consumes around 85\% of it's freshwater resources \citep{}. Moreover, almost X\% of the global population depends on agriculture for their livelihood \citep{}. Worldwide, more than Y\% of farms are classified as smallholdings \citep{}, equating to Z\% of the total area of agricultural land. As a result, smallholders have a critical role in global food security \citep{kuil_exploring_2018}, especially in developing regions where the Food and Agriculture Organization estimates that up to 80\% of food may be produced by smallholders \citep{}. In recent decades, a rising global food demand has led to extensive land use change and agricultural intensification, with significant impacts on the hydrologial and ecological cycles \citep{gordon_managing_2010}. Developing regions... Smallholders are are often considered to be resource-constrained \citep{}, either in terms of their ability to exploit natural resources or their level of access to hard or soft infrastructure, or a combination of these \citep{}. Consequently, the livelihoods of smallholder are often precarious and vulnerable to changes \citep{}, with potential consequences for food security and economic development \citep{}. Conversely, given the ubiquity of smallholders in many parts of the world, the gross impact of farm-level adaptation measures may have severe environmental consequences and potentially threaten the sustainability of food production. Considering these interdependencies, agricultural systems are frequently viewed as coupled human-environment systems which co-evolve in time and space \citep{}. Thus, an holistic approach to water resources management is required to increase food production while ensuring the livelihoods of smallholders and the sustainable function of ecosystem services upon which farmers depend \citep{montanari_???_2013,nazemi_???_2015}. \\
+
+% Paragraph 2: Additional context + need
+Water resource management is a broad term to describe the anthropogenic activities related to ``the storage, abstraction and redistribution of available water sources'' to meet various human water demands \citep{nazemi_inclusion_2015}. While commonly associated with large scale interventions on the water cycle, it may also describe highly decentralised efforts to satisfy local demands \citep{}. Hence, water resource management plays an impportant role in determining the variability of human-water interactions in time and space, and consequently has a large effect on the livelihoods of individuals as well as the wider economy \citep{nazemi_inclusion_2015}. Modelling is an intrinsic part of water resources management which provides valuable insight to researchers, policy makers and practitioners seeking to understand and predict the behaviour of complex water systems \citep{okeeffe_including_2017}. Earth system models are one type of model used in water resource management \citep{nazemi_???_2015}. The need to represent human processes in Earth system models has long been recognised \citep[e.g.][]{falkenmark}, and several model implementations represent a subset of human activities which influence the hydrological cycle, such as irrigation, reservoir storage, and domestic water consumption \citep{nazemi_inclusion_2015}. The application of these models across a range of spatial scales has led to important advances in quantifying the impact of historical anthopogenic activities on the water cycle \citep[e.g.][]{wada_nonsustainable_2012}, as well as predicting the potential effects of various scenarios of future change \citep[e.g.][]{}. However, few Earth system models simulate the interactions and two-way feedbacks between human-water systems \citep{li_watershed_2018}. Instead, the conventional approach has been to force models with the physical manifestation of socioeconomic change (e.g. land use change, population growth). Similarly, models of human processes (e.g. land use change) typically consider physical constraints as boundary conditions \citep{li_watershed_2018}. \\
+
+% Paragraph 3: introduce socio-hydrological modelling
+Earth system models are optimised for use at the global or regional scale \citep{}. It is therefore extremely challenging to represent the full range of human-water interactions and feedbacks, both because of a lack of knowledge about the range of processes which take place, and the interactions between these, as well as large data requirements \citep{}. Recently, \citet{li_watershed_2018} set out a vision of a ``watershed system model'', which may be considered as an Earth system model at the watershed scale \citep{}. Such a model, they argue, should simulate both ``the natural and human systems of a watershed and the interactions between different components of the human-nature system''. While the representation of human-environment interactions remains a major challenge in this class of model \citep{li_watershed_2018}, the focus on watersheds puts a physical boundary on the range of behaviours and interactions which must be considered, and therefore provides a more reasonable basis for conceptualising the key feedbacks compared with the global and regional scales of Earth system models \citep{}. Implicit... is the idea that watersheds are unique and should be treated as such during the modelling process \citep{}. 
+
+The theoretical basis for modelling human-environment feedbacks has advanced considerably in recent years with the emergence of socio-hydrology; a discipline within the hydrological sciences which formally recognizes the interdependencies between social and hydrological systems and seeks to understand the complex relationships which govern their co-evolution in time and space \citep{montanari_panta_2013,savenije_evolving_2014,sivapalan_time_2015,kuil_exploring_2018}. Modelling has emerged as an important mode of inquiry in socio-hydrological research \citep{}. However, in contrast to the problem-focussed approach adopted water resource management, socio-hydrological models have tended to follow an approach which focuses on understanding the mechanisms which govern the system behaviour (commonly referred to in the literature as a positivist approach) \citep{pande_progress_2017}. Accordingly, existing quantitative socio-hydrological models have tended consist of coupled, non-linear differential equations which focus on the temporal dynamics of coupled human-water systems \citep{pande_progress_2017}. Several models consist of stylized relationships which are intended to develop hypotheses about the system and explore its behaviour under different scenarios of social and environmental change \citep[e.g.][]{van_emmerik_socio-hydrologic_2014,di_baldassarre_debates-perspectives_2015,garcia_question_2016}. The socio-hydrology of agricultural systems has proved to be a major area of research \citep{}, and a wide variety of models have been developed to gain insight into agricultural systems \citep[e.g.][]{}. For example, \citet{pande_???_2016} and \citet{okeeffe_???_2018} both focus on farm-level dynamics of human-water interactions in India, while... look at the macro-scale... The Murrumbidgee... in Australia has received... attention... \citet{van_emmerik_socio_hydrologic_2014}... \citet{kuil_exploring_2018}... \\
+% Competition for water resources between the environment and irrigated agriculture has been an area of particular interest in socio-hydrology \citep[e.g.][]{kandasamy_socio-hydrologic_2014,liu_conceptual_2015,van_emmerik_socio-hydrologic_2014}. Identifying the various factors which influence the adoption of new technologies has been the focus of much previous research \citep{kuil_exploring_2018}. Previous socio-hydrological research has examined smallholders.
+  
+Low dimensional models have proven adept at highlighting the aggregated response of a system to change \citep{}, identifying data gaps... \citep{di_baldassarre_debates-perspectives_2015}. However, in the context of agricultural systems, which are typically spatially extensive, such models are ill suited to exploring the co-evolution of agricultural sector and watershed hydrology, and may fail to capture important dynamics such as... Modelling the aggregate response of the social domain to changes in the physical domain often poorly translate to insights which are relevant to individuals, who are often overlooked...??? \citep{}. For example, canal systems... System dynamics is inherently top-down... approaches are typically poor at... bottom-up change \citep{}... unless the mechanism is known and explicitly parameterised \citep{}. Lastly, the use of empirical relationships to control the evolution of state variables means that they do not easily scale or translate to other regions \citep{}. To advance further, there is a need to develop more realistic models which are capable of providing insight into socio-hydrological systems rather than simply reinforcing what is already known \citep{troy_debates-perspectives_2015,loucks_debates-perspectives_2015,blair_socio-hydrological_2016}. This will involve more complete models of human behaviour \citep{loucks_debates-perspectives_2015}, as well as more accurate models of hydrological systems \citep{gober_debates-perspectives_2015,mount_data-driven_2016}. In order to simulate the magnitude and direction of change in system state variables it is necessary to accurately capture the underlying hydrological processes, such as river discharge, groundwater dynamics and root zone hydrology \citep{}. Models capable... Hence, there is a clear... to improve the representation of human processes in distributed hydrological models. \\
+
+% However, they are unable to model the distribution of the response in the physical and social realms \citep{srinivasan_prediction_2016}...
+
+% Task + object
+To address the identified research gaps, we have developed a farmer decision model for simulating farmer behaviour with respect to decisions about irrigation and farm investment of farmer and integrate this with a gridded regional hydrological model. The framework has been developed using a ``bottom-up'' approach, using field-level observations to define a range of plausible actions that a farmer may take in response to various biophysical and socioeconomic state variables. The regional hydrological model consists of ... modules representing surface water hydrology and crop production, river and canal routing and two-dimensional groundwater dynamics, allowing us to explore the co-evolution of the human and hydrological system in space and time. In this paper, we describe the model development... including ... in a spatially distributed framework. We use the coupled model to explore the socio-hydrology of the Indo-Gangetic Plain, a region which is representative of many of the water management challenges we face today, particularly with respect to human-environment competition for water resources. We elucidate a number... conjunctive water use. \\
+
+% Paper structure
+This paper is structured as follows. Section 2 describes our perceptual model of the system. Section 3 converts our perceptual model to a conceptual model, setting out the principle equations used in the model. Section 4 describes the model implementation. Section 5 introduces an application of the model to a basin in the Indo-Gangetic Plain. Section 6 presents the results of this application. Section 7 discusses the results, and lastly Section 8 draws brief conclusions. \\
+
+% A notable contribution was made by \citet{pande_sociohydrological_2016}, who explored the socio-hydrology of smallholder agriculture in Maharashtra, India, in relation to farmer distress. In agricultural catchments, spatial heterogeneity in access to resources is a major determinant of wellbeing \citep{}. For example, farmers situated near the headwaters of a canal system tend to have a more reliable water source for irrigation than those farmers at the tail \citep{}.\\
+
+% as well as making predictions about the co-evolution of social and hydrological systems under future conditions
+
+% The application of these ideas at a range of spatial scales has led to important advances in quantifying the effect of anthopogenic activities on the water cycle \citep[e.g.][]{wada_nonsustainable_2012}. However, for various reasons such as the inherent complexity of coupled, co-evolutionary systems as well as inadequate means of dealing with the associated epistomological uncertainties, the feedbacks between human-water systems have not traditionally been included in models which seek to make predictions or inform policy \citep{blair_socio-hydrological_2016}. Few models simulate the ``interactions and two-way feedbacks between natural and human systems'' \citep{li_watershed_2018}. Instead, the conventional approach has been to force models with the physical manifestation of socioeconomic change (e.g. changes in land use or water demand). Similarly, models of human processes usually treat physical constraints such as water availability as boundary conditions \citep{li_watershed_2018}.
+
+% A major challenge in the pursuit of a watershed systems model is to simulate the human-environment... \citep{}.
+
+% While many of the concepts which underlie socio-hydrology have existed in various guises for some decades \citep[e.g.][]{falkenmark_???_1998}, for various reasons such as the inherent complexity of coupled, co-evolutionary systems as well as inadequate means of dealing with the associated epistomological uncertainties, the feedbacks between human-water systems have not traditionally been included in models which seek to make predictions or inform policy \citep{blair_socio-hydrological_2016}. Few models simulate the ``interactions and two-way feedbacks between natural and human systems'' \citep{li_watershed_2018}. Instead, the conventional approach has been to force models with the physical manifestation of socioeconomic change (e.g. changes in land use or water demand). Similarly, models of human processes usually treat physical constraints such as water availability as boundary conditions \citep{li_watershed_2018}. \\
+
+% Understanding the two-way feedbacks between smallholders and the environment is therefore critical to ensure the livelihood of of farmers as well as local, regional and global food security \citep{}.
+% However, as the increase in food demand continues, combined with demographic changes such as urbanisation and increasing wealth, is putting additional pressure on farmers and the water resources upon which they depend \citep{de_fraiture_satisfying_2010}.
+
+% Top-down approaches examine the system outcomes and attempt to identify causal relationships which between variables in order to determine how a system responds to change \citep{blair_socio-hydrological_2016}. A common criticisim of top-down approaches is their inability to disaggregate system-level outcomes and provide information which is relevant to individuals \citep{}. On the other hand, bottom-up approaches seek to develop system behaviour through the explicit representation of process in the physical and societal domain.  Moreover, incorporating a spatially explicit modelling approach may lead to a better representation of the underlying hydrology \citep{}. At the same time, the spatial and temporal dynamics of water availability is an important boundary condition to human activities such as food and energy production \citep{}, urbanisation and the management of urban systems \citep{}. \
+
+% to explore the effect of human activities on water resourcesto the extent that human processes are included in models of physical systems, t
+
+% Hence there is a pressing need to identify and understand the interactions and feedbacks between agricultural systems and the environment. \\
+
+% However, so far there have been few attempts to explore the interactions and feedbacks which exist between smallholders and catchment hydrology. This is important to understand linkages and feedbacks between human activities and ecology...
+
+% . In addition, they can highlight data gaps, both in terms of temporal and spatial coverage of conventional variables, as well as variables which provide insight into the relationship between human-water systems but which have not previously been monitored \citep{di_baldassarre_debates-perspectives_2015}
+
+\
+% Modelling is fundamental to the hydrological sciences \citep{buytaert_why_2008}.
+
+% From an operational perspective, models provide a representation of the hydrology of a catchment in order to forecast its response to future conditions or to simulate the behaviour of catchments where no output or state variables are measured \citep{beven_modelling_2001}. Perhaps more fundamentally, models represent hypotheses about aspects of system behaviour and may be viewed as part of a learning process.
+
+% Various approaches to socio-hydrological modelling have been presented. Physical processes are usually represented in a simple way. For example, several models have explored irrigation water use... Crop yield determines farm income. Groundwater is often represented using a one-dimensional conceptual model (i.e. ignoring lateral groundwater flow). More complex aspects of the system are modelled using empirical relationships \citep{}. Society is modelled in numerous ways... \citep{mostert_alternative_2018}.
+
+% Competition for water resources between the environment and irrigated agriculture has been an area of particular interest in socio-hydrology \citep[e.g.][]{kandasamy_socio-hydrologic_2014,liu_conceptual_2015,van_emmerik_socio-hydrologic_2014}. Identifying the various factors which influence the adoption of new technologies has been the focus of much previous research \citep{kuil_exploring_2018}. Previous socio-hydrological research has examined smallholders.
+
+% Recently, ... proposed the concept of a watershed model... may be thought of as a basin-scale Earth system model \citep{li_watershed_2018}. The purpose of such models is twofold. First, they provide insight into the watershed system; second, they are used operationally to facilitate integrated river basin management \citep{}. Development of watershed models initially focused on improving the representation of physical processes. A major challenge in the development of watershed system models is to represent the co-evolution of human-water systems \citep{reid_earth_2010}.
+
+% We conduct a number of experiments to test our hypothesis that interactions between surface water and groundwater ... important control on environmental flows and the wellbeing of agrarian communities. We follow an approach which starts with the collection of primary data, involving farmer intexrviews, ..., conceptual model development... numerical modelling framework to answer specific research questions.\\
+
+% Talk about the super-individual concept in above para
+
+% In developing the model, we follow the question-driven process set out by \citet{garcia_question_2016}. This approach recognises that coupled human-environment systems can never be modelled exhaustively \citep{}, but should instead focus on the variables and processes which are necessary to answer clearly defined research questions. Bearing in mind the epistomological uncertainties associated... the approach advocates the backward-reasoning approach set out in \citet{schluter_application_2014}, whereby the research question... This approach is most suited to modelling where the epistomological uncertainty about the system is insufficient... \citep{arocha_???_1993}; furthermore, it enables the modeller to focus... We identified the interplay between the canal system, the underlying aquifer and the agricultural system as a key area of interest. Accordingly, we define the key question we wish to ask of the model as, \textit{What is the influence of the canal system on the livelihood of smallholder farmers in the Indo-Gangetic Plain, and how does this vary in time and space?}. \\
+
+% A watershed model may be thought of as a basin-scale Earth system model \citep{li_watershed_2018}. The purpose of such models is twofold. First, they provide insight into the watershed system; second, they are used operationally to facilitate integrated river basin management \citep{}. Development of watershed models initially focused on improving the representation of physical processes. A major challenge in the development of watershed system models is to represent the co-evolution of human-water systems \citep{reid_earth_2010}.
+
+% ``A typical smallholder farm can be described as a household in which mainly the family labor is used and for which the farm provides a principal source of income'' \citep{cornish_???_1998,morton_impact_2007}. ``Such farmers are assumed to practice subsistence-oriented activities (Dercon, 2009) that are a mix of farming and labor sale, where the majority of labor is provided by the smallholder's household'' \citep{pande_sociohydrological_2016}.
+
+% https://agupubs.onlinelibrary.wiley.com/doi/pdf/10.1002/2016WR020287
+% "Evaluating the impacts of farmers' behaviors on a hypothetical agricultural water market based on double auction"
+
+% Paragraph 2: introducing the concepts underlying socio-hydrology
+% See \citep{wesselink_socio-hydrology_2016} - in Zotero
+% Irrigation provides a buffer against climate variability and may allow farmers to produce crops outside of traditional growing seasons \citep{}. In tropical and sub-tropical regions especially, an adequate and dependable supply of water is a crucial input to crop production which underpins regional food security \citep{dadson_water_2017}. In such places, access to water resources is an important constraint on farmer behaviour \citep{okeeffe_???_2018}. At the same time, abstraction of water influences local and regional hydrology \citep{}. In such places access to water resources is an important determinant of farmer livelihood and decisions... \citep{okeeffe_including_2018}. At the same time the abstraction of water for irrigation influences hydrology at various spatial scales \citep{elshafei_prototype_2014}. Understanding the feedbacks... is a major reseach challenge \citep{}. \\ 
+
+% \section{Model development}
+
+% Sivapalan & Bloschl, 2015 - Seven steps of framing and modeling socio-hydrological processes
+% Step 1: Phenomenon, domain, scale
+
+\section{Model domain and scope}
+
+\subsection{Historical perspective}
+The Indian portion of the Indo-Gangetic Plain... Rainfall across the region is highly season, with around 80\% of the total annual rainfall falling during the south-west monsoon \citep{}. Water resources of the Indo-Gangetic Plain are groundwater dominated. Land use in the highly fertile alluvial plains is dominated by agriculture. This has been the case for at least 2000 years; however, a step change in agricultural productivity took place following India's green revolution, which was initiated in the mid-1960s to achieve food security for the country's growing population \citep{}. Alongside the introduction of high-yielding crop varieties the availability of irrigation water has been central to the transformation in agricultural productivity. While rainfed agriculture is possible during the rainy \textit{kharif} season, irrigation provides a valuable buffer against inter- and intra-annual variability and, furthermore, allows farmers to grow additional crops during the \textit{rabi} and \textit{zaid} seasons. Prior to the green revolution, farmers largely relied on the extensive colonial-era canal network \citep{shah}, but the influx of relatively low cost diesel pumps to the market in the mid-1970s allowed farmers to access the underlying aquifer with private tubewells, precipitating a rapid increase in the use of groundwater for irrigation \citep{}. \\
+
+Currently, irrigation accounts for more than 85\% of total water use, with up to 55\% of the net irrigated area (the area irrigated at least once during a given year) supplied from groundwater \citep{ref}. The agricultural sector continues to be an important part of India's political economy, employing more than 60\% of its working population and contributing around 18\% of the country's gross domestic product \citep{ref}.\\
+
+During the same period, the extensive canal network has suffered from a lack of investment... \citep{}.\\
+
+Water management in the Indo-Gangetic Plain is complicated by local regulations and governance structures which impede cross-sectoral cooperation and promote competition for scarce water resources \citep{tiwari_issues_2015}. The basin's groundwater resources, a primary source of irrigation and rural water supply to millions, are developed and managed independently by multiple agencies \citep{}.\\
+
+The socioeconomic heterogeneity of the Indo-Gangetic Plain has important implications both for farmer livelihood and food and water security. In the western states of Punjab and Haryana, as well as western Uttar Pradesh, substantial government subsidies for electricity combined with perverse incentives to grow water intensive crops has led to unsustainable cropping practices and falling groundwater levels \citep{rodell_satellite-based_2009,macdonald_groundwater_2016}. In contrast, groundwater levels in the eastern part of the IGP are stable \citep{macdonald_groundwater_2016}. Nevertheless, farmer's in this region tend to be more prosperous than their counterparts in the eastern states of Uttar Pradesh and Bihar, who typically rely on inefficient and comparatively expensive diesel pumps for groundwater abstraction \citep{shah_climate_2009}. As a result, the eastern part of the IGP has been characterised as one of ``low productivity but high potential'' \citep{shah_climate_2009}, and creating the conditions in which the groundwater resource can be accessed sustainably is seen as the key to alleviating rural poverty while meeting India's growing food demand \citep{}. \\
+
+The Ganga river and its tributaries provide important habitats for culturally important yet critically endangered species such as the Gharial crocodile and the Ganges river dolphin \citep{}, as well as supporting the livelihoods of inland fishing communities, which are among India's most marginalised \citep{nachiket?}. \\
+
+% Figure illustrating some salient points (e.g. growth in number of tubewells, growth in gia...)
+
+% Figure showing model extent
+
+\subsection{Selection of state variables and processes}
+% ``Socio-hydrological systems can never be modelled exhaustively, but it is important to include the most influential variables and processes (see Garcia et al. 2016)'' \citep{mostert_alternative_2018}.
+
+In developing the model, we follow the question-driven process set out by \citet{garcia_question_2016}. This approach recognises that coupled human-environment systems can never be modelled exhaustively \citep{}, but should instead focus on the variables and processes which are necessary to answer clearly defined research questions. Bearing in mind the epistomological uncertainties associated... the approach advocates the backward-reasoning approach set out in \citet{schluter_application_2014}, whereby the research question... This approach is most suited to modelling where the epistomological uncertainty about the system is insufficient... \citep{arocha_???_1993}; furthermore, it enables the modeller to focus... Considering the perceptual model, we identified the interplay between the canal system, the underlying aquifer and the agricultural system as a key area of interest. Accordingly, we define the key question we wish to ask of the model as, \textit{What is the influence of the canal system on the livelihood of smallholder farmers in the Indo-Gangetic Plain, and how does this vary in time and space?}. \\
+
+There are two key outcome metrics that will help us to answer the research question. The first metric is smallholder livelihood, which we equate to the accumulated capital of smallholders \citep{pande_socio-hydrological_2016,okeeffe_including_2018}. From our perceptual model we can identify a number of key processes which influence the outcome metric and must therefore be included in the conceptual model. The dynamics of the groundwater system influences the cost of abstracting irrigation water as well as the baseflow contribution to streamflow. Recharge to the aquifer is governed by the surface hydrological processes as well as canal leakage. Subsequently, we identify the key variables and relationships to include in our model. These are depicted graphically in Figure X. The resulting model may be considered in terms of four coupled subsystems representing the river system, the canal system, the groundwater system, and the agricultural system. The governing equations of these subsystems are set out below.
+
+While models which include human-environment feedbacks and interactions are diverse, there are some commonalities between applications which should be considered to a greater or lesser extent. According to \citet{elshafei_prototype_2014}, the important facets of a coupled human-water system to consider during conceptualisation are: catchment hydrology, population dynamics, economics, ecosystem services, societal sensitivity and behavioural response. Adapting this approach for the Indo-Gangetic Plain, we conceptualize the system in terms of four subsystems, representing the river system, the canal system, the groundwater system and the agricultural system. \\
+
+Considering the above points... Figure~X shows the spatial extent and key physical features of the study area. We have chosen to extend the model region beyond the surface catchment boundary in order to include the two canal command areas as well as to utilise physically realistic boundaries for the hydrogeological system. These boundaries consist of the Ganges river to the south, the X and Y rivers to the east and west, respectively, and the Himalaya to the north. We run the model between 1980 and 2010, covering most of the operational period of the Gandak barrage and canal system. \\
+
+The research question... From the socio-economic point of view, the phenomena we are interested in include the growth in irrigated area and the extent to which this has been driven by the number of tubewells in operation. Moreover, we are interested in the associated feedbacks with farmer livelihood in the basin. From a hydrological perspective, we are interested in the extent to which the operation of canals and tubewells for the purpose of irrigation has influenced river flows in the basin, and the potential impact this has had on the habitats of endangered species.\\
+
+Of the various facets of socio-hydrological model outlined by \citet{elshafei_???_2014}, we choose to externalize certain variables and processes. Soil fertility is a considerable problem across much of the Indo-Gangetic Plain ... Intensive agricultural practices [and crop selection] have led to declining soil fertility across the region \citep{}, forcing farmers to increase their use of chemical fertiliser (Figure X). The problem is most acute amongst smallholder farmers who cannot afford the short-term loss in productivity associated with the introduction of a fallow period \citep{}. Consequently the area of fallow land across the Indo-Gangetic Plain is in decline \citep{}, and farmers report that fertiliser costs make up a substantial portion of their annual expenditure. Further, we do not consider here the feedbacks between water availability and management in the basin and the various institutions charged with implementing policies... This is largely due to a lack of data on these processes, and uncertainty... Instead, we develop various scenarios of water management... to explore the impact of water management scenarios on... \\
+
+% The predominant water uses are for agriculture and fisheries; the rivers in this are support important populations of highly endangered and unique riverine species such as the Ganges river dolphin and the gharial crocodile. High agricultural productivity and fertile soils characterise the alluvial floodplain region \citep{singh_???_2001}.% , and smallholder farming depends strongly on seasonal flood pulses and unaltered flow regimes in these rivers \citep{junk_???_1989} and maintaining ecological flow regimes is thus crucial [...].
+% \\
+
+% % Figure showing gaining/losing streamflow; dolphin/gharial population; observed groundwater levels.
+
+\subsection{Model extent}
+% TODO: consider putting this at the end, so that we can justify a spatially-explicit approach
+Rather than attempting to model the entire Indo-Gangetic Plain, which would... Instead, we focussed our efforts on the Gandak basin, a sub-basin of the Ganges basin in northern India which is representative of many water management issues encountered in the Indo-Gangetic Plain. The Gandak river originates in the Nepalese Himalaya, entering India at Triveni near Valmiki Nagar in the Pashchim Champaran district of Bihar. A large barrage on the India-Nepal border diverts flow into two large irrigation canal systems to the east and west of the river, respectively. A third canal system, slightly upstream of the barrage, enters a smaller canal system which serves Nepal. [...] The barrage and its canal system supplies water to two irrigation command areas: the western branch canal supplies farmers in Nepal and Uttar Pradesh, while the eastern branch canal supplies farmers in Bihar. Barrage operations substantially affect boundary conditions of the Gandak basin; the release of water into the river for ecological flows and ecosystem services has a trade-off with respect to release of water into the canals.\\
+
+\section{Primary data collection}
+Data availability is a frequent barrier to the development of models which are relevant to stakeholders \citep{srinivasan_prediction_2016}, especially in data-scarce regions. The collection of primary and secondary data is identified as a crucial step in the development of socio-hydrological models \citep{}. In particular, stakeholder engagement is an essential first step to help to identify variables of interest \citep{melsen_what_2018}. Hence... the model development process was informed by several stakeholder meeting at the outset of the model development process. We identified four key stakeholders, comprising the barrage authorities, conservationists, fishing communities and farmers. Stakeholder meetings were conducted with all of these groups, and took the form of a lead facilitator... \\
+
+In addition to the stakeholder meetings we carried out... semi-structured interviews with smallholder farmers carried out during several campaigns between 2013--2017 in various locations across the eastern portion of the Indo-Gangetic Plain (see \citet{okeeffe_including_2018} and \citet{okeeffe_use_2016} for details about the fieldwork). During February 2017, we additionally carried out a number of focus group meetings with stakeholders within the Gandak basin, a subbasin of the Ganges basin. These meetings were held with managers of a large barrage which diverted water to a canal network to distribute irrigation water, representatives of the fishing community, smallholder farmers, and water managers and consultants working on large municipal water supply schemes. \\
+
+The last component of the fieldwork involved the collection of quantitative data on key physical variables. Stable isotope analysis was performed in order to... In addition, we installed a [number of] submersible water level dataloggers...\\
+
+% Figure showing location of fieldwork sites
+
+\section{Perceptual model}
+% Consider the questions posed by Mostert et al (2018):
+% 1. Which human activities have had a significant impact on the hydrology of the area?
+% 2. Who were the main actors?
+% 3. What were the main factors, hydrological and other, affecting these actors and their activities?
+Our perceptual model is informed by the primary data we collected during fieldwork, as well as a literature review and agricultural inventory data such as India's agricultural census and minor irrigation census. It builds on the perceptual model described in \citet{okeeffe_including_2018}, who focused on agricultural water use at the level of individual farms, to consider the role of agricultural water use at the basin scale, and its interactions and feedbacks with other subsystems. \\
+
+% Figure: Causal loop diagram showing key state variables
+
+Figure~\ref{} shows a causal-loop diagram that illustrates the interactions and feedbacks between the state variables considered. \\
+
+The majority of farms in the region belong to smallholders, with the average farm size estimated to be X Ha. As such, the region has one of the highest rural population densities in the world \citep{}. Decreasing farm size, an increase in food demand, and the availability of water for irrigation means that the practice of growing multiple crops over the course of the year has become a viable strategy for farmers to ensure their food security and profitability \citep{}. The rice-wheat rotation, whereby rice is grown during the \textit{kharif} season and wheat during \textit{rabi}, is most pervasive but crop selection is an important factor that farmers may employ to adapt to specific socioeconomic or biophysical conditions \citep{}.\\
+
+Farmers we interviewed perceive the canal network to be unreliable and report that it is difficult to predict when water will be available. The predominant irrigation method is flood irrigation, where a field is... at set intervals during the growing season, with the irrigation schedule informed by farmers' experience as well the recommendations of government and seed companies \citep[e.g.][]{}. Consequently the timing of canal water availability is an important constraint on a farmer's decision making process, and even farmers who nominally have access to the canal network often seek to install wells as an alternative source of irrigation water if the canal supply does not meet demand. This is particularly the case where canal water would have to be pumped to the farmers land, in which case it is usually preferable to use the pump, an expensive asset, to abstract groundwater instead. However, stable isotope analysis has shown that leakage from the mostly unlined canal system, which is estimated to be between X-Y\% \citep{}, may benefit farmers by contributing to recharge and maintaining groundwater levels. This finding is consistent with similar analyses carried out in the region \citep[e.g.][]{bonsor,joshi_tracing_2018}. This raises the interesting possibility of a feedback between the canal system and the baseflow contribution to river flow.\\
+
+% and pressure on land resources from other sectors means that multiple cropping is a viable strategy for farmers to maintain their smallholder farmers devote... , and cannot afford to introduce a fallow period to their crop rotation \citep{}. This is consistent with analysis of remote sensing data... \citep{}.
+
+\section{Conceptual model}
+
+\subsection{River and canal network}
+Description of barrage operation model, canal and river model (Chris Jackson, Laura Wignall)
+
+\subsection{Surface hydrology}
+The surface hydrology module is based on a ``leaky bucket'' model adopted in several regional hydrological models, including PCR-GLOBWB \citep{van_beek_global_2011} and the Community Water Model. The purpose of the module is to solve the surface water balance, which may be expressed as
+
+% TODO: symbols!!!
+\begin{equation}
+  \frac{dS}{dt}(t) = P(t) + Irr(t) + CR(t) - ET_{c}(t) - RO(t) - R(t) - I(t),
+\end{equation}
+
+\noindent where $\frac{dS}{dt}(t)$ is the change in storage in the root zone of an elemental area at time $t$, $P(t)$ is precipitation, $Irr(t)$ is irrigation, $ET_{c}(t)$ is actual evapotranspiration, $RO(t)$ is surface runoff, $R(t)$ is recharge from the base of the soil layer and $I$ is canopy interception ($ML^{-2}T^{-1}$).\\
+
+% See "Large-scale groundwater modeling using global datasets: a test case for the Rhine-Meuse basin" by Sutanudjaja et al 2011 for detail about the PCR-GLOBWB interception scheme
+
+% ~~~~~~~~~~~~
+% Interception
+% ~~~~~~~~~~~~
+The vegetation canopy is modelled as a single reservoir with capacity $s_{c}(t)$ ($\mathrm{M L^{-2}}$). Precipitation fills the reservoir to its maximum capacity, $s_{c,max}$, with excess water falling as throughfall,
+
+\begin{equation} \label{eq:throughfall}
+  P_{t}(t) =
+  \begin{cases}
+    P(t) - (S_{c,max} - S_{c}), & \text{if}\ P(t) + s_{c}(t-1) > s_{c,max}\\
+    0, & \text{otherwise}.
+\end{cases}
+\end{equation}
+
+% ~~~~~~~~~~~~~~
+% Surface runoff
+% ~~~~~~~~~~~~~~
+We model surface runoff using the Improved Arno scheme \citep{todini_arno_1996,hagemann_improving_2003}, in which the soil water storage of a catchment is represented as a distribution, such that for a given average soil water content $W(t)$ a proportion of the area will be at saturation and thus capable of producing runoff \citep{} (see Appendix A for a full derivation of the Improved Arno scheme). According to this procedure, which is further expanded by \citet{vanbeek_???_2009}, the saturated fraction of an area is calculated according to the average water storage as follows
+
+\begin{equation}
+  x = 1 - \left(\frac{W_{max} - W(t)}{W_{max} - W_{min}}\right)^{\frac{b}{b+1}}
+\end{equation}
+
+where $W_{max}$ and $W_{min}$ are the maximum and minimum average storage, respectively, and $b$ is a dimensionless shape parameter which defines the distribution of soil water storage. Surface runoff $q_{r}(t)$ ($\mathrm{L T^{-1}}$) is related to the average soil water content $W(t)$ according to the following scheme:
+
+\begin{enumerate}
+\item $P_{t}(t) < W_{min} - W(t)$,
+  \begin{equation}
+    q_{r}(t) = 0
+  \end{equation}
+
+\item $W_{min} - W(t) \leq P_{t}(t) < \left(b+1\right) \left(W_{max} - W_{min}\right) \left[\frac{W_{max} - W(t)}{W_{max} - W_{min}}\right]^{\frac{1}{b+1}}$,
+  \begin{multline}
+    q_{r}(t) = P_{t}(t) - (W_{max} - W(t)) \\
+    + (W_{max} - W_{min}) \left[ \left(\frac{W_{max} - W(t)}{W_{max} - W_{min}} \right)^{\frac{1}{b+1}} - \frac{P_{t}(t)}{\left(b+1\right) \left(W_{max} - W_{min}\right)} \right]^{b+1}
+  \end{multline}
+  
+\item $P_{t}(t) \geq \left(b+1\right) \left(W_{max} - W_{min}\right) \left[\frac{W_{max} - W(t)}{W_{max} - W_{min}}\right]^{\frac{1}{b+1}}$,
+  \begin{equation}
+    q_{r}(t) = P_{t}(t) - (W_{max} - W(t))
+  \end{equation}
+\end{enumerate}
+
+The effective precipitation is then computed as the difference between throughfall and surface runoff:
+
+\begin{equation}
+  P_{e}(t) = P_{t}(t) - q_{r}(t)
+\end{equation}
+
+% ~~~~~~~~~~~~
+% Infiltration
+% ~~~~~~~~~~~~
+\noindent In the saturated portion of the area we allow a proportion of net precipitation to bypass the root zone as preferential flow:
+
+\begin{equation}
+  q_{p}(t) = x \phi P_{e}(t)
+\end{equation}
+
+\noindent where $\phi$ is a dimensionless coefficient. Infiltration to the soil coloumn is then the difference between the effective precipitation and preferential flow,
+
+\begin{equation}
+  I(t) = P_{e}(t) - q_{p}(t).
+\end{equation}
+
+\noindent We represent the root zone as three layers: an upper layer with a fixed depth of $0.05m$, and two additional layers which vary in size according to the land cover type. A fourth layer represents the groundwater store. The downward fluxes from the upper three soil layers are set equal to the unsaturated hydraulic conductivity, $k(\theta_{E})$ ($\mathrm{L T^{-1}}$), such that
+
+\begin{align*}
+  q_{1 \rightarrow 2}(t) &= k_{1}(\theta_{E,1})\\
+  q_{2 \rightarrow 3}(t) &= k_{2}(\theta_{E,2})\\
+  q_{3 \rightarrow 4}(t) &= k_{3}(\theta_{E,3})
+\end{align*}
+
+\noindent where $\theta_{E}$ is the degree of saturation of a given soil layer, computed as
+
+\begin{equation}
+  \theta_{E} = \frac{W_{max} + b \left(W_{max} - W_{min}\right) \left[1 - \frac{b+1}{b} \left(\frac{W_{max} - W}{W_{max} - W_{min}}\right)^{\frac{1}{b+1}}\right]}{W_{max} + b \left(W_{max} - W_{min}\right) \left[1 - \left(\frac{W_{max} - W}{W_{max} - W_{min}}\right)^{\frac{1}{b+1}}\right]}
+\end{equation}
+
+\noindent where $\theta(t)$ is the actual water content of the soil layer, and $\theta_{r}$ and $\theta_{s}$ are respectively the residual and saturated volumetric water contents ($\mathrm{M L^{-3}}$).\\
+
+Recharge is then computed as the sum of the downward flux from the bottom soil layer and preferential flow:
+
+\begin{equation}
+  R(t) = q_{3 \rightarrow 4}(t) + q_{p}(t).
+\end{equation}
+
+% ~~~~~~~~~~~~~~~~~~
+% Evapotranspiration
+% ~~~~~~~~~~~~~~~~~~
+
+Following \citet{allen_???_1998}, we estimate potential crop evapotranspiration as
+
+\begin{equation}
+  ET_{c}(t) = k_{c}(t)ET_{0}(t)
+\end{equation}
+
+\noindent where $ET_{0}(t) $ is reference potential evapotranspiration ($\mathrm{M L^{-2}}$), and $k_{c}(t)$ is the crop coefficient (dimensionless). We first compute the evaporative flux from the canopy store ($\mathrm{M L^{-2}}$), as follows
+
+\begin{equation}
+  E_{c}(t) =
+  \begin{cases}
+    ET_{o}(t)k_{c}(t), & \text{if}\ ET_{o}(t)k_{c}(t) \leq s_{c}(t)\\
+    s_{c}(t), & \text{otherwise}.
+  \end{cases}
+\end{equation}
+
+\noindent We separate the remaining energy ($ET_{c}(t) - E_{c}(t)$) into its constituent parts in order to model separately the various limiting processes. Hence the potential soil evaporation and transpiration are calculated as
+
+\begin{equation}
+  E_{p,s}(t) = k_{c,min} \left(ET_{0}(t) - E_{c}(t)\right)
+\end{equation}
+
+\noindent and
+
+\begin{equation}
+  E_{p,T}(t) = \left(k_{c} - k_{c,min}\right) \left(ET_{0}(t) - E_{c}(t)\right),
+\end{equation}
+
+\noindent respectively, where $k_{c,min}$ is the minimum crop factor for bare soil which we assume to equal $0.20$ \citep{vanbeek_global_2011}. We assume that soil evaporation is extracted from the surface soil layer only and is limited by the hydraulic conductivity of that layer, such that the actual soil evaporation may be expressed as
+
+\begin{equation}
+  E_{a,s}(t) = x min\left(k_{s}, E_{s}\right) + \left(1 - x\right) \left[k(\theta_{E1}), E_{s}\right]
+\end{equation}
+
+\noindent where $k_{s}(t)$ and is the saturated hydraulic conductivity, $k(\theta_{E1})$ is the unsaturated hydraulic conductivity, and $\theta_{E1}$ is the effective degreee of saturation of the surface soil layer. We assume that transpiration cannot take place in saturated areas due to a lack of aeration \citep{}. In unsaturated areas potential transpiration is limited by a water stress coefficient $k_{s}(t)$ (dimensionless) \citep{allen_???_1998}, such that
+
+\begin{equation} \label{eq:tact}
+  E_{a,T} = \left(1 - x\right) k_{s}(t) E_{p,T}(t)
+\end{equation}
+
+\noindent and
+
+\begin{equation}
+  k_{s}(t) = \frac{TAW(t) - D_{r}(t)}{(1 - p) TAW(t)},
+\end{equation}
+
+\noindent where
+
+\begin{equation}
+  TAW(t) = \frac{\theta_{fc} - \theta_{wp}} Z_{r}(t),
+\end{equation}
+
+\noindent $D_{r}$ is the root zone depletion ($\mathrm{L}$), $p$ is the depletion factor (dimensionless), and $Z_{r}$ is the rooting depth ($\mathrm{L}$). In Equation~\ref{eq:tact} we use the average value of $k_{s}(t)$, which is computed for each soil compartment and weighed according to the total soil water storage and root fraction.\\
+
+\subsection{Irrigation demand}
+% The use of flood irrigation at set intervals contrasts with the soil moisture based approaches (whereby irrigation is applied whenever the soil moisture falls below some threshold, which is usually based on field capacity) commonly employed in regional water use models \citep[e.g.][]{}.
+The crop water demand is the amount of water required by a crop to ensure it is unaffected by water stress during the growing season. If precipitation is insufficient to meet this demand then crop evapotranspiration will fall below potential rate \citep{}. Hence, following \citep{wada_nonsustainable_2012}, we assume the irrigation demand to equal the difference between actual and potential evapotranspiration, as follows
+
+\begin{equation}
+  I_{d}(t) = (E_{p,T}(t) - E_{a,T}(t)) + (E_{p,s} - E_{a,s}),
+\end{equation}
+
+\noindent where the $E_{a,T}(t)$ and $E_{p,T}(t)$ are the actual evapotranspiration terms that would occur if the crop did not receive irrigation.\\
+
+\subsection{Irrigation supply}
+The reliability of the canal network is an important influence on farm-level water management decisions \citep{okeeffe_including_2018}. In general, the reliability of the canal network is related to the distance from the canal head, with farmers near the head receiving a more reliable service, and farmers near the tail receiving a less reliable service \citep{}. We assume that farmers initially attempt to meet the irrigation demand from the canal, such that the irrigation supply from the canal system is computed as
+
+\begin{equation}
+  I_{s,c}(t) =
+  \begin{cases}
+    I_{d}(t), & \text{if}\ I_{d}(t) \leq q_{c}(t)\\
+    q_{c}(t), & \text{otherwise}.
+  \end{cases}  
+\end{equation}
+
+\noindent where $q_{c}$ is the canal supply ($\mathrm{L T^{-1}}$). The irrigation water demand is subsequently removed from the canal (TODO, after Chris writes canal model section).\\
+
+If farmers do not have access to the canal network, or if the canal does not contain sufficient water to meet the irrigation demand, we assume that farmers seek to exploit the groundwater resource. The maximum quantity of water which can be abstracted from a single tubewell is governed by the empirical equation of \cite{}, expressed
+
+\begin{equation}
+  Q_{w}(t) = \frac{t_{w} \times 129574.1 \times BHP}{d + ((255.5998 \times BHP^2) / (d^2 \times D^4))}
+\end{equation}
+
+% TODO: sort out units
+\noindent where $Q_{w}(t)$ is well discharge in litres ($\mathrm{M T^{-1}}$), $t_{w}$ is the duration of the irrigation event in hours ($\mathrm{T}$), $BHP$ is the horsepower of the pump ($\mathrm{}$), $d$ is the average depth of the well in metres ($\mathrm{L}$), and $D$ is the diameter of the suction pipe in inches ($\mathrm{L}$). Hence the total supply of groundwater may be expressed as
+
+\begin{equation}
+  I_{g}(t) = I_{total}(t) - I_{c}(t)
+  \begin{cases}
+    I_{total}(t) - I_{c}(t), & \text{if}\ I_{total}(t) - I_{c}(t) \leq Q_{w}(t)\\
+    Q_{w}(t), & \text{otherwise}.
+  \end{cases}    
+\end{equation}
+
+\noindent and the total irrigation supply is
+
+\begin{equation}
+  I_{s}(t) = I_{c}(t) + I_{w}(t).
+\end{equation}
+
+\noindent The irrigation supply is added to throughfall, so that Equation~\ref{throughfall} becomes
+
+\begin{equation} \label{eq:throughfall}
+  P_{t}(t) =
+  \begin{cases}
+    P(t) - (S_{c,max} - S_{c}) + I_{s}(t), & \text{if}\ P(t) + s_{c}(t-1) > s_{c,max}\\
+    I_{s}(t), & \text{otherwise}.
+\end{cases}
+\end{equation}
+
+\noindent The daily irrigation demand deficit is computed by subtracting the irrigation supply from the irrigation demand. This is accumulated during the growing season and used in the farm economics module to inform decisions about potential investments.\\
+
+\subsection{Groundwater}
+Description of groundwater model (AMBHAS; Johanna Scheidegger)
+
+\subsection{Crop production}
+Crop yield is estimated using the equation set out by \citet{doorenbos_???_1979}:
+
+\begin{equation}
+\left(1-\frac{Y_{a}(T)}{Y_{x}(T)}\right) = K_{y}\left(1-\frac{\sum\limits_{t=d_{s}}^{d_{h}} ET_{c}(t)}{\sum\limits_{t=d_{s}}^{d_{h}} ET_{x}(t)}\right)
+\end{equation}
+
+\noindent where $Y_{x}$ is maximum yield, $Y_{a}$ is actual yield, $K_{y}$ is the yield response factor, $ET_{x}$ is maximum evapotranspiration, $ET_{c}$ is actual crop evapotranspiration, $d_{s}$ is sowing day and $d_{h}$ is harvesting day. 
+
+\subsection{Farm economics}
+The farm economics module simulates farm-level economic activity based on physical and socioeconomic constraints. The module builds on the behaviour model described in \citet{okeeffe_including_2018} to represent a wider range of farm characteristics and to include specific adaptation measures encountered in the study region. \\
+
+% TODO: introduce concept of super-individual here
+% Explain idea behind separating farmers by farm size
+
+\subsubsection{Capital}
+We use capital as a metric of the socio-economic wellbeing of the agricultural population within the study area. Following \citet{pande_sociohydrological_2016}, the change in capital of a smallholder is expressed as a function of capital depreciation, income and expenditure, and loans received, as follows
+
+\begin{equation}
+  \frac{dK}{dT}(T) = -\delta \frac{K(T)}{\Delta T} + m(T) - z(T) + w(t)
+\end{equation}
+
+\noindent where $\frac{dK}{dT}(T)$ is the change in capital $K$ during year $T$, $m(T)$ and $z(T)$ (Rs/year) are respectively the income and expenditure of the smallholder in year $T$, and $w(T)$ is the value of the loan taken in year $T$. \\
+
+Each super-farmer is assigned a current account, from which operational expenses are made, and a savings account which is used for making long-term investments. The savings account is updated at the end of the agricultural year if the current account has a positive balance. If at any point during the year the current account balance becomes negative, money stored in the savings account may be used to meet the shortfall. In the event that savings cannot meet the shortfall, farmers may take out a government loan. This option is available to the farmer up to a maximum level of debt.\\
+
+\subsubsection{Income}
+We consider the sale of crops to be the principal component of smallholder income. It is calculated as follows:
+
+\begin{equation}
+m_{a}(T) = \sum\limits_{c=1}^{n_{c}} y(T) q(T) A(T)
+\end{equation}
+
+\noindent where $m_{a}(T)$ (Rs/year) is income from crop sales in year $T$, $n_{c}$ is the number of crops grown in an agricultural year and $y(T)$, $q(T)$ and $A(T)$ are the yield, price and area of crop $c$.\\
+
+Income depends on farm area. Change in farm area over time is the result of many complex and interacting factors including population growth, urbanisation, cultural factors including how the land is divided to the next generation, and farm income and access to resources. Given a lack of information about these factors, we choose not to include farm area as an endogenous variable. Instead, we use land holding data from India's agricultural census, which shows the number of farms belonging to five size classes (0-1 Ha, 1-2 Ha, 2-4 Ha, 4-6 Ha) to upscale farm level output to the grid cell.
+
+\subsubsection{Expenditure}
+Smallholders incur a variety of expenses during the year, including the cost of agricultural production, $z_{a}(T) (Rs/year)$ and costs associated with running a household, $z_{x}(T)$ (Rs/year). The total expenditure may therefore be expressed as
+
+\begin{equation}
+  z(T) = z_{a}(T) + z_{x}(T).
+\end{equation}
+
+\noindent Expenses related to agricultural production include interest on debt, $z_{w}(T)$ (Rs/year), purchase of seeds, $z_{s}(T)$ (Rs/year), running costs of groundwater pumps, $z_{d}(T)$ (Rs/year), maintenance costs associated with tubewells and pumpsets, and purchase of fertiliser $z_{f}(T)$ (Rs/year):
+
+\begin{equation}
+  z_{a}(T) = z_{w}(T) + z_{s}(T) + z_{d}(T) + z_{m}(T) + z_{f}(T)
+\end{equation}
+
+\noindent We estimate the running cost of a tubewell pump as
+
+\begin{equation}
+  z_{d} = \sum\limits_{t=1}^{365} v_{d}(t,T) \times I_{g}(t,T) \times q_{d}(T)
+\end{equation}
+
+\noindent where $q_{d}(T)$ (Rs/litre) is the unit price of diesel and $v_{d}(t,T)$ ($\mathrm{L^{3} T^{-1}}$) is the volume of diesel in litres required to pump a unit volume of water from depth $h$ (meters). We compute $v_{d}(t,T)$ using the empirical relationship set out in \citet{Martin}, as follows:
+
+\begin{equation}
+  v_{d}(t,T) = \left(\frac{(0.1133 \times h(t,T)) + 0.7949}{102.87}\right)\eta
+\end{equation}
+
+\noindent where $\eta$ is the pump efficiency. 
+
+% Household expenses are divided into food and non-food items such as education, medical and consumer goods. Thus,
+
+% \begin{equation}
+%   z_{x}(T) =
+% \end{equation}
+
+\subsubsection{Savings and investment}
+We stipulate that farmers transfer a proportion of the remaining positive balance in the current account to their savings account. Conceptually, this allows us to distinguish between the operational costs outlined previously and longer term investments. Farmers may also use their savings to supplement income in years where the cost of production exceeds the income from crop sales. 
+
+The farm economics module is conceptualised in terms of a current account, which is used for running costs such as groundwater pumping and fertiliser application, and a savings account which is used both to buffer interannual variability of farm income and to make strategic investments towards the success of the farm, such as installing a new well. At the end of the (agricultural) year, we assume that farmers transfer the current account balance to their savings account and immediately afterwards transfer their annual income from the previous year to their current account. 
+
+Conceptually, decision-making may be considered as a stepwise process. Analytical farmers formulate quantitative goals and use calculations to assess the likely consequences of the various options in order to select the optimal decision. On the other hand, intuitive farmers set intuitive goals, which are often directional in nature (e.g. an increase in yield), based on their experience, available reference points and other types of auxillary data \citep{kuil_exploring_2018}. There are a range of theories about decision making, many of which are included in models of coupled human-environment systems \citep{kuil_exploring_2018}. However, many models are based on expected utility, and hence assume that humans make rational decisions and are ``able to choose the optimal outcome considering all possible combinations based on perfect information \citep{koelher_???_2008}''. Howver, for various reasons humans do not make perfect decisions \citep{kuil_exploring_2018}. It is therefore essential to involve decision makers during model conceptualisation in order to identify the imperatives which guide their decision-making process and the range of options they have available. \\
+
+% \subsection{Farm adaptation}
+
+% \subsubsection{Water markets}
+% Water markets provide a means for resource-limited farmers to purchase irrigation water from farmers with surplus capacity. 
+
+% \subsubsection{Labour sales}
+% Farmers may choose to sell labour rather than grow crops. Farmers make decisions based on their experience, which diminishes over time. Hence, the most recent experience is likely to have the biggest influence on their decision making [TODO: not sure what theory there is about this?].
+
+% \subsubsection{Investment in technology}
+We assume that farmers make investments in their farm in order to increase farm productivity. We focus our attention on water availability, because in both primary and secondary data this factor is reported as the most pressing concern of farmers in the Gandak basin. Assuming that farmers cannot change the canal network to increase surface-water irrigation, installing a tubewell is the only option available to farmers' wishing to increase irrigation activities beyond what the canal network and local water market can provide. To model this process, we accumulate the water deficit due to lack of irrigation infrastructure (canal or tubewell) during the growing season, and estimate for a given agricultural year the lost revenue due to lack of water. This value provides the basis for the estimated return on investment of a tubewell, taking into account the capital expenditure on well installation and purchase of pumpset, as well as the operating expenses associated with maintaining the equipment and purchasing fuel for the expected lifespan of the well. Assuming a positive return on investment, farmers may or may not elect to install a tubewell.
+
+Based on this shortfall, farmers may choose to use their savings to install a new tubewell and pumpset. According to India's Minor Irrigation Census, X\% of tubewells in Bihar are financed through farmers' own savings, with bank loans and money lenders used far less frequently.
+
+The decision of whether or not to install a tubewell is based on memory of accumulated water deficit... Which may be calculated \citep{kuil_exploring_2018}:
+
+% TODO
+
+% The principal investment option available to smallholder farmers is to install a tubewell. During each year of the simulation, the model accumulates the income from crop sales as well as the potential income if the farmer achieves the potential yield of the various crops grown on their farm. By calculating the difference in income between the potential and actual crop income, the model provides a first-order estimate of the return on investment of installing a tubewell. A positive return on investment suggests that the farmer may benefit from a tubewell.
+
+\section{Numerical model}
+% Martyn Clark: perceptual model -> conceptual model -> numerical model
+% Keith Beven:  perceptual model -> conceptual model -> procedural model
+We transferred the conceptual model to a distributed modelling framework with a spatial resolution of 5 arcminutes $\times$ 5 arcminutes. Subgrid heterogeneity is represented using the tiling approach adopted in many distributed hydrological and Earth system models \citep[e.g.][]{}. Accordingly, we represent the land surface in terms of three vegetated land covers (forest, grassland, and cropland) and two non-vegetated land covers (impervious land, water). The cropland land cover type is further divided along two dimensions. The first dimension divides cropland into a set of farms for which the livelihood model outlined above can be implemented separately, accounting for heterogeneity in the socioeconomic domain. The second dimension divides cropland into a set of specific crop types, accounting for the fact that individual crops have particular physical and socioeconomic characteristics. Figure~\ref{} illustrates the subgrid scheme. \\
+
+A number of methodological issues arise. ``...both the natural system and human dimension are reduced to fit in a quantitative model''. As \citet{wesselink_socio-hydrology_2017} point out, ``humans differ from other constituents of socio-hydrological models because they can choose how to act on their perception and preferences...''. One approach to dealing with this heterogeneity is to split populations into categories according to particular attributes which are relevant for the field of study. For example, \citet{srinivasan_hydrologic_2010}... Representing heterogeneity in populations in sufficient detail is a problem commonly encountered in computational ecology... Where possible, agent-based models are often used \citep[e.g.][]{}. However, in some situations this becomes computationally infeasible. The super-individual approach... \citep{}. \\
+
+% Somewhere we need to have some discussion of the merits of an ABM approach
+% In this way, the model therefore implements an individual-based approach within each grid square ... see \citet{blair_socio-hydrological_2016}. \\
+The inclusion of farms substantially increases the computational demands of the model. Across the Indo-Gangetic Plain the average farm size is X Ha and cropland represents X \% of the land area. For a typical grid cell, therefore, a total of XYZ farms may be present. Clearly, it is both computationally and epistemologically infeasible to model each farm in the study region. An alternative approach would be to include a random subset of farms \citep{}. However, such an approach may not produce results which reflect the mean response \citep{scheffer_super-individuals_1995}, largely because the simulation contains insufficient granularity. Potential problems include the greater influence of outliers on the overall response, the distortion of results because of changes at the level of individual farms such as the installation of a tubewell..., or because the seed value supplied to random number generators may exert significant control on the simulation outcome \citep{scheffer_super-individuals_1995}. \\
+
+To overcome these challenges while maintaining computational efficiency we adopt the notion of a ``super-individual''; a concept used in ecology to efficiently model the behaviour of very large populations. A super-individual is a model object which is broadly considered as an individual but which in fact represents a group of \textit{n} individuals \citep{scheffer_super-individuals_1995}. The selection of individuals from the population to be combined in a super-individual is based on defined characteristics of each individual \citep{scheffer_super-individuals_1995}. Here, we define the super-individuals, or super-farmers, on the basis of three key farm attributes: farm size, canal access, and number of tubewells per farm. In effect, therefore, we assume that farmers with a similar geographical location (represented by the position of the grid cell), a similar farm size, access to the same number of tubewells, and the same canal access status, may be treated as a single farm for the purpose of computing farmer livelihood using the model outlined above. \\
+
+While certain parameters may be assumed to be identical within a super-individual, others may vary as a result of differences between individuals within the super-individual. In reality, individuals... In the case of farms, there may be variability in terms of the amount of farming experience, farm management practices, family size, economic circumstances, inheritance, and so on. We account for this variability by assuming a lognormal distribution of farm savings within a super-farmer, such that $ln(S) ~ N\left(\mu, \sigma^{2}\right)$. To model the number of farmers who install a tubewell, we first estimate the probability that a farmer belonging to a given super-farm will have sufficient saings,
+
+% TODO: sort out symbols
+\begin{equation}
+  P(X \leq x) = 1 - \Sigma \frac{\left( \ln(x) - \mu\right)}{\sigma}
+\end{equation}
+
+\noindent where $\Sigma$ is the cumulative distribution function of the standard normal distribution. Subsequently, the decision to install a tubewell is influenced by the memory of water shortage during the crop season as well as a coefficient which represents the propensity of farmers belonging to a given super-farm to... We assume that memory calculated in Eq~\ref{} equates to the probability that a farmer, given sufficient resources, will install a tubewell. Thus for large soil moisture deficits the probability of installing a tubewell is high, whereas for small soil moisture deficits the probability is low. Thus, we can compute the total probability as:
+
+% TODO: sort out symbols
+\begin{equation}
+  p_{install tubewell} = P(X \leq x) \times M
+\end{equation}
+
+\noindent Assuming that tubewell installation follows a binomial distribution, such that $X ~ B(n,p)$, we compute the number of tubewells installed at time $T$ as 
+
+\begin{equation}
+  nt = \sum_{k=1}^{n}X_{k}
+\end{equation}
+
+\noindent where $X$ is a Bernoulli trial with probability of success equal to $p$ and $n$ is the number number of farmers represented by the super-farmer. Subsequently we update the population of each super-farm to account for farmers who have installed tubewells, bearing in mind that the other determinants of super-farm membership, namely farm size and canal access, are assumed to remain static. We also update the value of hydrological and socioeconomic state variables (Table X) in each super-farm, accounting for the fact that farms which have just installed a tubewell will have a different initial state to farms which have not recently changed. \\
+
+% TODO: table showing state variables
+
+\section{Model application}
+
+\subsection{Input data}
+
+\subsubsection{Climate forcing data}
+We use Indian Meteorological Deparartment (IMD) daily gridded precipitation data at 0.25 degree resolution \citep{}. For the section of the study area located in Nepal, we used precipitation data from the Princeton global meteorological forcing dataset \citep{sheffield_development_2006}. We estimated reference evapotranspiration using the Penman-Monteith equation \citep{}, with input variables retrieved from the Princeton dataset. \\
+
+\subsubsection{Barrage inflow}
+Inflow to the barrage was estimated from upstream discharge data available for the Nepalese portion of the river. We estimated inflow to the two canals according to the India-Nepal agreement which governs the barrage operation. Assuming that barrage operators prioritise irrigation supply over the downstream flow... \\
+
+\subsubsection{Observed groundwater data}
+TODO
+
+\subsubsection{Agricultural inventory data}
+Agricultural inventory data, comprising information about variables such as crop yield, irrigated area... , were obtained from Indiastat.
+
+\subsection{Parameter specification}
+
+\subsubsection{Land cover}
+Land cover in the Gandak basin has remained relatively stable during the study period. 
+
+\subsubsection{Crop characteristics}
+Although a wide variety of crops are grown in the study region, the vast majority of farms implement a rice-wheat or rice-rice crop rotation. In some parts of the basin, especially in the upper reaches, sugarcane is an important cash crop. While \textit{kharif} crops may be grown under rainfed or irrigated conditions, \textit{rabi} crops are almost always irrigated. Sugarcane, an annual crop, also tends to be grown under irrigated conditions in order to ensure an adequate supply of water during the \textit{rabi} season. The required crop parameters are shown in Table X. We used potential yield from the FAO Global Agro-Ecological Zones database. Crop calendars, which detail the approximate planting date and growing season length of the various crops, were compiled from the MIRCA2000 dataset \citep{portmann_???_2010} and national data \citep{moulds_???_20XX}. We used the relative length of crop growth stages (initial, development) and maximum rooting depth from the Global Crop Water Model \citep{siebert}. Lastly, we used crop coefficients for the X growth stages rice and wheat from \citet{}, and from GCWM for sugarcane.
+
+% Table showing crop parameters
+
+\subsubsection{Soil parameters}
+We retrieved the required soil parameters from HiHydroSoil \citep{}; a composite dataset of soil hydraulic properties derived from global and regional soil information. Specifically, we retrieved values of the resisdual water content, the water content at field capacity, wilting point and saturation point at the native resolution of 30 arcseconds and aggregated to the model resolution. All variables were retrieved for two soil layers.
+
+\subsubsection{Surface-water routing parameters}
+We derived operational rules for the Gandak barrage from the monthly releases specified in the original agreement between India and Nepal \citep{}. We assume the storage pond immediately upstream of the barrage is steady-state; hence we assume that discharge immediately upstream of the barrage must be divided between the east and west canal branches and the main river downstream of the barrage. [Further explanation from Chris Jackson].
+
+\subsubsection{Groundwater parameters}
+Describe groundwater parameters, including initial condition (Johanna Scheidegger)
+
+\subsubsection{Farm parameters}
+We set the number of representative farms in each grid cell to 100; a figure which balances our interest in representing as much as possible the socioeconomic hetereogeneity between farms with the required computational effort. The representative farms were divided into categories representing land holding size intervals. Five farm size categories were considered, representing farm sizes between 0-1 Ha, 1-2 Ha, 2-4 Ha, 4-6Ha and 6Ha and above, which correspond with those used in India's agricultural census, allowing us to straightforwardly upscale to the grid level variables which are computed at the farm level. The size of individual farms was randomly selected within the respective farm size intervals, weighted such that the average area of farms across all cells belonging to the given district equalled (approximately) the average area given in the agricultural census data for 1970-71. At each time point during the simulation we prescibe the proportion of agricultural land belonging to each farm size category, using data derived from India's agricultural census.
+
+In cases where farmers possess more than one well, the average horsepower of the pumps is used in the above equation and the resulting well discharge multiplied by the number of wells. \\
+
+\subsubsection{Economic parameters}
+Farm harvest price for the crops under consideration were obtained from district-level inventory data compiled by ICRISAT. Diesel price, fertiliser price were obtained from the same source. These prices were adjusted for inflation using the consumer price index with 2010 as a reference year. The cost of tubewell installation and purchase of a new pump were obtained from field reports. The average lifespan of a tubewell and groundwater pump were obtained from various literature estimates for the Indo-Gangetic Plain. 
+
+\subsection{Initial condition}
+We estimated the proportion of farms receiving canal water using village-level census data included in a recent geospatial socio-economic dataset for India \citep{meiyappan_dynamics_2017}, which includes the gross area irrigated from various sources including canals and private tubewells. We combined this information with district-level data from the Minor Irrigation Census detailing the number of tubewells in operation to obtain an estimate of the number of tubewells present in each village. We mapped this data to a spatial grid using... interpolation.
+
+India's Minor Irrigation Censuses details on a district-wise basis the number of tubwells commissioned in each year since 1982-83, as well as the total number comissioned prior to 1982-83, the number of tubewells according to power source (e.g. electric, diesel), and the number of tubewells in use according to land holding size. Additionally, the censuses detail the area by groundwater and surfacewater schemes during the three main growing seasons (kharif, rabi, perennial). The agricultural census data compiled by ICRISAT show the number of farms according to land holding size.
+
+\subsection{Scenario analysis}
+We develop three scenarios to explore the behaviour of the system. A baseline scenario is established using the calibrated parameterisation. The second scenario represents a policy intervention which ensures an equitable distribution of canal water within the canal command area. The third scenario represents a policy which prioritises environmental flow in the Gandak river downstream of the barrage. We specify a minimum environmental flow of X\% [could experiment with multiple percentages - 5\%, 10\% and 20\%, for example] of the discharge at the barrage must be released downstream. The remaining discharge is diverted to the east and west canal in proportion to the specified monthly requirements. For each scenario we evaluate farmer livelihood, river flow and groundwater level.
+
+% District and village-level inventory data reveals an obvious gradient in canal access between the head and tail of the canal network (Figure). Since the allocation of water to the various canal networks are subject to national and international agreements, we assume that no more water can be diverted to the canal network. Instead, we attempt to improve the distribution by reducing canal leakage and forcing farmers situated in cells nearer the canal head take no more than their entitlement.
+% % Run model assuming that water in canal is divided equally across all cells supplied by the canal network (equitable), and assuming that cells nearer the head take more than their entitlement (non-equitable).
+
+\section{Results}
+
+% \subsection{Model validation}
+% Validation of coupled models is challenging... due to lack of data about key modelled variables.
+
+% \subsubsection{Comparison with observed groundwater levels}
+% Figure~X compares the simulated and observed groundwater levels at N observational boreholes located in the study region. 
+
+% \subsubsection{Comparison with observed irrigated area}
+% Comparison of area irrigated by canals and tubewells against irrigation statistics. Does the model capture the increase (decrease) in tubewell (canal) irrigation during drought years?
+
+% \subsection{Scenario analysis}
+% TODO
+
+
+
+\section{Discussion}
+% Paragraph 1: summary of model, its aims and objectives
+In this paper we have developed a spatially distributed model to capture the co-evolutionary dynamics of a coupled human-water system. The model we have described attempts to advance socio-hydrological modelling by adapting a farm-scale model to a spatially-explicit modelling framework in which the hydrological boundary conditions are provided by a coupled model framework. A key feature of the modelling framework is its reliance on primary data collection. The model was developed from field data presented in \citet{okeeffe_???_2016} and \citet{okeeffe_???_2018}. Mention number of data points in comparison to the number of farmers. Together with space and time dimensions, we add a cross-cutting human dimension within which we can explore the effects of diverse human behaviour on water resources, and vice versa. We have focused on human activities related to agricultural water management. Highlight importance of primary data collection which is specific to the catchment under consideration. Emphasise the role of models as a conceptual representation of a system, and the need for continual dialogue between field work and model development. The development of the model has been informed by a number of farmer interviews and focus groups \citep{okeeffe}, as well as knowledge of the study region built up over several years \citep{atree}. \\
+
+% Paragraph 2+: discussion of results (TODO)
+We applied the model to the Gandak basin in northern India, which is representative of many of the water management challenges which occur across the Indo-Gangetic Plain, and performed a scenario analysis to explore the impact of the canal system on the system dynamics across space and time. \\
+
+% Paragraph 3: discussion of model development
+The emergence of socio-hydrology and the appearance of socio-hydrological models has encouraged hydrologists to reevaluate the way in which hydrological models are conceptualised, interrogated and evaluated \citep{}. Hydrological models are associated with a large amount of epistemic uncertainty arising from a lack of knowledge about the appropriate mathematical representation of hydrological processes at different spatial scales, a lack of knowledge about the physical properties and boundary conditions of catchments and a lack of knowledge about the reliability of input and validation datasets \citep{beven_changing_1989}. The various models accumulated by the hydrological modelling community may be viewed as working hypotheses about the hydrological behaviour of a place (refs). A large number of socio-hydrological models are stylized models which are used for developing hypotheses, advancing theories of co-evolutionary processes... At the same time, however, there is a need to develop models of real-world case studies, in order to identify gaps in our knowledge... This idea... Model-Data-Model paradigm elucidated by \citet{dibaldassare_???_2019} is essential in modelling efforts which seek to include human processes. The model is an attempt to apply the principles of socio-hydrology in a region where both hydrological and socioeconomic data is scarce, but where there is a clear need for improved understanding of the relationship between human and natural systems. As \citet{srinivasan_???_2018} point out, ``the basic premise of is that we stand to gain a lot more if we underpin our models on extant socio-economic and socio-ecological systems theories''. \\
+
+At least partly this may originate from the strong focus on hydrological modelling as a predictive tool... with a focus on calibration and validation against observred hydrological outputs \citep{beven_modelling_2001}. However, the notion of hydrological models representing hypotheses of the system, and of modelling itself as a learning process, has gained traction in the community... \citep[e.g.][]{hrachowitz_decade_2013}. In this light, numerical modelling has emerged as an important mode of inquiry to advance our understanding of socio-hydrological systems \citep{}. \\
+
+% Paragraph 4: discussion of super-individual concept
+A key challenge of including human-water feedbacks within a spatially distributed framework is to efficiently represent human processes. Scale... The super-individual concept adopted here overcomes some of the issues associated with each approach. Clearly, it is not applicable in all... However, we argue that it provides a conceptual framework within which to consider different types of water user, and bridge the gap between top down approaches, which tend to consider society as a homogeneous entity, and agent-based approaches which considered individuals. Accounting for variability within each super-farm is possible through the use of probability distributions. In the absence of observed data... Knowledge of the statistical properties of water users is a key research gap. Since the ... adapts the approach... There are a number of improvements that could be made to the concept in order to make it more relevant to other sectors. At present, the super-individuals are treated independently, so that, for example, emergent behaviour in one super-individual does not influence the rate at which such behaviour may emerge in another. This may be relevant when considering the adoption of new technologies. It may also be relevant in considering the different levels of influence that different parts of society have in adapting to hazards (think of the levee effect).\\
+
+% Paragraph 5: limitations, knowledge gaps and data needs
+% Developing models of these systems is challenging for various reasons [...] It requires effective collaboration between diverse research communities in order to include the state of the art in terms of the knowledge and understanding of system components \citep{blair_socio-hydrological_2016}, which is often difficult \citep{montanari_panta_2013}.
+Necessarily, the model presented here is a simplification of the actual system. For example, we have not considered the effect of irrigation practices on soil quality; an issue which is increasingly important in many parts of the Indo-Gangetic Plain and which has a dramatic effect on viability of farmland. Although we have considered population growth and demographic change as boundary conditions to the system, in reality these processes are intertwined with agricultural wellbeing and farm profitability. Running the model in historical mode has to some extent allowed us to ignore these complexities and use observed data to constrain the model. However, ultimately our intention is to run the model in predictive mode, for which it will be necessary to include some of these processes as endogenous. A basic assumption of the farmer behaviour module is that humans (farmers) will act rationally on the available information in order to promote their wellbeing. This is consistent with several other socio-hydrological models \citep[e.g.][]{}. Selection of endogenous and exogenous processes. Food production in the Indo-Gangetic Plain is intrinsically linked to the national and global economy. According to \citet{pande_progress_2017}, ``in the context of socio-hydrology, a system is open if there are fluxes that flow across system boundaries''. ``Local water resources are used to produce commodities that are consumed in distant places (Konar et al. 2011)'' \citep{srinivasan_prediction_2016}. Currently, therefore, we treat farm size as an exogenous variable to the model. Clearly, farm size is intrinsically linked to the socioeconomic system. \\
+
+The coupled model of the Gandak basin reveals several knowledge gaps. Many of these concern the physical system. The availability of river and canal discharge data in northern India is poor. Soil properties are derived from global datasets associated with a large amount of uncertainty \citep{}. Aside from uncertainty about the physical system, there are large gaps in understanding of smallholder systems. We have taken a water-centred approach, because fieldwork and reviews of the literature showed that this is an important variable. However, there are myriad other factors which influence farmer behaviour. Soil salinity is an important factor across the basin. To develop better models there is a need to identify the strengths and weaknesses of current models and highlight the processes and systems that are poorly understood in order to drive the collection of new or more accurate data and devise field studies of specific processes (refs). This is one of the main aims of uncertainty analysis (refs) and fundamental to the notion of modelling as a learning process. A lack of discourse between modellers and and field experimentalists means that that the current generation of hydrological models do not always reflect the advances in process understanding gained from field studies \citep{mcdonnell_moving_2007,clark_framework_2008}. The process of building the model has provided insight into the sort of data required to build spatially-explicit models which incorporate social processes, and highlighted gaps in current data. Some of these have started to be addressed in recent years. For example, there has been a new focus on land system maps. The IIASA-IFPRI cropland map was accompanied by a map of estimated field size, which is known to correlate with socioeconomic variables such as the degree of mechanization (refs). \\
+
+% Paragraph 6: perspective on modelling in the socio-hydrological era
+ Discuss the use of flexible modelling framework, highlight advantages/disadvantages. In particular, there has been a concerted effort to develop flexible modelling frameworks that facilitate the systematic development, evaluation and comparison of multiple model structures as hypotheses of catchment behaviour, and the inclusion of additional and alternative process representations as our perceptual understanding of the system improves. This approach recognises that each catchment is unique and that fixed model structures are incapable of handling natural variability in space and time \citep{beven_???_2000}. [...] In this way, modelling frameworks facilitate collaboration between different parts of the hydrological modelling community in order to advance the theoretical basis of hydrological models and address major research challenges \citep{archfield_accelerating_2015,clark_improving_2016}.\\
+
+% In developing the conceptual model, we follow the question-driven process set out by \citet{garcia_question_2016}. This approach recognises that coupled human-environment systems can never be modelled exhaustively \citep{}, but should instead focus on the variables and processes which are necessary to answer clearly defined research questions. Bearing in mind the epistomological uncertainties associated... the approach advocates the backward-reasoning approach set out in \citet{schluter_application_2014}, whereby the research question... This approach is most suited to modelling where the epistomological uncertainty about the system is insufficient... \citep{arocha_???_1993}; furthermore, it enables the modeller to focus... \\
+
+% Hydrological models are associated with a large amount of epistemic uncertainty arising from a lack of knowledge about the appropriate mathematical representation of hydrological processes at different spatial scales, a lack of knowledge about the physical properties and boundary conditions of catchments and a lack of knowledge about the reliability of input and validation datasets \citep{beven_changing_1989}. [...] The various models accumulated by the hydrological modelling community may be viewed as working hypotheses about the hydrological behaviour of a place (refs). Integrated models... 
+
+% While it would be possible to apply the model to the entire region of the Indo-Gangetic Plain... large uncertainty... The model is not intended as a predictive tool; rather, it is intended to explore spatial patterns which arise from heterogeneity in the quantity and source of water for irrigation. \\
+
+% The presented model presents an approach to include human behaviour in earth system models, advocated by \citet{nazemi_???_2015}. There is a need to develop a consistent approach to modelling human activities in earth system models which is applicable in various sectors. Considering data availability, process understanding and computational resources, this is a challenging task. Our intent is that this modelling framework contributes to this ultimate goal.
+
+% It is tempting to seek to apply the modelling framework at ever-larger spatial extents. We caution against this, for various reasons. Although there has been some progress, there is a lack of unifying theories of human behaviour, or even an understanding of the full range of human behaviour with respect to agricultural water use.
+
+% Top-down approaches such as are well adapted to ... From a modelling perspective, these approaches work well when the physical boundaries can be adjusted to accommodate the system. Hence models employing this approach tend to applied to a catchment or subcatchment. The imposition of a regular grid may result in discontinuities in the flow of information At the other extreme, traditional agent-based approaches require large amounts of data and computing power \citep{}. 
+ 
+\section{Conclusion}
+TEXT
+
+%Text here ===>>>
+
+%%
+
+%  Numbered lines in equations:
+%  To add line numbers to lines in equations,
+%  \begin{linenomath*}
+%  \begin{equation}
+%  \end{equation}
+%  \end{linenomath*}
+
+
+
+%% Enter Figures and Tables near as possible to where they are first mentioned:
+%
+% DO NOT USE \psfrag or \subfigure commands.
+%
+% Figure captions go below the figure.
+% Table titles go above tables;  other caption information
+%  should be placed in last line of the table, using
+% \multicolumn2l{$^a$ This is a table note.}
+%
+%----------------
+% EXAMPLE FIGURE
+%
+% \begin{figure}[h]
+% \centering
+% when using pdflatex, use pdf file:
+% \includegraphics[width=20pc]{figsamp.pdf}
+%
+% when using dvips, use .eps file:
+% \includegraphics[width=20pc]{figsamp.eps}
+%
+% \caption{Short caption}
+% \label{figone}
+%  \end{figure}
+%
+% ---------------
+% EXAMPLE TABLE
+%
+% \begin{table}
+% \caption{Time of the Transition Between Phase 1 and Phase 2$^{a}$}
+% \centering
+% \begin{tabular}{l c}
+% \hline
+%  Run  & Time (min)  \\
+% \hline
+%   $l1$  & 260   \\
+%   $l2$  & 300   \\
+%   $l3$  & 340   \\
+%   $h1$  & 270   \\
+%   $h2$  & 250   \\
+%   $h3$  & 380   \\
+%   $r1$  & 370   \\
+%   $r2$  & 390   \\
+% \hline
+% \multicolumn{2}{l}{$^{a}$Footnote text here.}
+% \end{tabular}
+% \end{table}
+
+%% SIDEWAYS FIGURE and TABLE
+% AGU prefers the use of {sidewaystable} over {landscapetable} as it causes fewer problems.
+%
+% \begin{sidewaysfigure}
+% \includegraphics[width=20pc]{figsamp}
+% \caption{caption here}
+% \label{newfig}
+% \end{sidewaysfigure}
+%
+%  \begin{sidewaystable}
+%  \caption{Caption here}
+% \label{tab:signif_gap_clos}
+%  \begin{tabular}{ccc}
+% one&two&three\\
+% four&five&six
+%  \end{tabular}
+%  \end{sidewaystable}
+
+%% If using numbered lines, please surround equations with \begin{linenomath*}...\end{linenomath*}
+%\begin{linenomath*}
+%\begin{equation}
+%y|{f} \sim g(m, \sigma),
+%\end{equation}
+%\end{linenomath*}
+
+%%% End of body of article
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Optional Appendix goes here
+%
+% The \appendix command resets counters and redefines section heads
+%
+% After typing \appendix
+%
+%\section{Here Is Appendix Title}
+% will show
+% A: Here Is Appendix Title
+%
+\appendix
+\section{Derivation of Improved Arno scheme}
+We have been unable to find a derivation of the Improved Arno scheme in the literature. For completeness, therefore, we provide here.\\
+
+The Improved Arno scheme \citep{hagemann_improving_2003} extends the original scheme of \citet{todini_arno_1996} by introducing a minimum average soil water content $W_{min}(t)$ which must be exceeded before any runoff can be produced.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Optional Glossary, Notation or Acronym section goes here:
+%
+%%%%%%%%%%%%%%
+% Glossary is only allowed in Reviews of Geophysics
+%  \begin{glossary}
+%  \term{Term}
+%   Term Definition here
+%  \term{Term}
+%   Term Definition here
+%  \term{Term}
+%   Term Definition here
+%  \end{glossary}
+
+%
+%%%%%%%%%%%%%%
+% Acronyms
+%   \begin{acronyms}
+%   \acro{Acronym}
+%   Definition here
+%   \acro{EMOS}
+%   Ensemble model output statistics
+%   \acro{ECMWF}
+%   Centre for Medium-Range Weather Forecasts
+%   \end{acronyms}
+
+%
+%%%%%%%%%%%%%%
+% Notation
+%   \begin{notation}
+%   \notation{$a+b$} Notation Definition here
+%   \notation{$e=mc^2$}
+%   Equation in German-born physicist Albert Einstein's theory of special
+%  relativity that showed that the increased relativistic mass ($m$) of a
+%  body comes from the energy of motion of the body—that is, its kinetic
+%  energy ($E$)—divided by the speed of light squared ($c^2$).
+%   \end{notation}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%  ACKNOWLEDGMENTS
+%
+% The acknowledgments must list:
+%
+% •	All funding sources related to this work from all authors
+%
+% •	Any real or perceived financial conflicts of interests for any
+%	author
+%
+% •	Other affiliations for any author that may be perceived as
+% 	having a conflict of interest with respect to the results of this
+% 	paper.
+%
+% •	A statement that indicates to the reader where the data
+% 	supporting the conclusions can be obtained (for example, in the
+% 	references, tables, supporting information, and other databases).
+%
+% It is also the appropriate place to thank colleagues and other contributors.
+% AGU does not normally allow dedications.
+
+
+\acknowledgments
+ = enter acknowledgments here =
+
+
+%% ------------------------------------------------------------------------ %%
+%% Citations
+
+% Please use ONLY \citet and \citep for reference citations.
+% DO NOT use other cite commands (e.g., \cite, \citeyear, \nocite, \citealp, etc.).
+
+
+%% Example \citet and \citep:
+%  ...as shown by \citet{Boug10}, \citet{Buiz07}, \citet{Fra10},
+%  \citet{Ghel00}, and \citet{Leit74}.
+
+%  ...as shown by \citep{Boug10}, \citep{Buiz07}, \citep{Fra10},
+%  \citep{Ghel00, Leit74}.
+
+%  ...has been shown \citep [e.g.,][]{Boug10,Buiz07,Fra10}.
+
+\bibliography{../../Zotero_library.bib}
+
+%%  REFERENCE LIST AND TEXT CITATIONS
+%
+% Either type in your references using
+%
+% \begin{thebibliography}{}
+% \bibitem[{\textit{Kobayashi et~al.}}(2003)]{R2013} Kobayashi, T.,
+% Tran, A.~H., Nishijo, H., Ono, T., and Matsumoto, G.  (2003).
+% Contribution of hippocampal place cell activity to learning and
+% formation of goal-directed navigation in rats. \textit{Neuroscience}
+% 117, 1025--1035.
+%
+% \bibitem{}
+% Text
+% \end{thebibliography}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Or, to use BibTeX:
+%
+% Follow these steps
+%
+% 1. Type in \bibliography{<name of your .bib file>}
+%    Run LaTeX on your LaTeX file.
+%
+% 2. Run BiBTeX on your LaTeX file.
+%
+% 3. Open the new .bbl file containing the reference list and
+%   copy all the contents into your LaTeX file here.
+%
+% 4. Run LaTeX on your new file which will produce the citations.
+%
+% AGU does not want a .bib or a .bbl file. Please copy in the contents of your .bbl file here.
+
+
+%% After you run BibTeX, Copy in the contents of the .bbl file here:
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Track Changes:
+% To add words, \added{<word added>}
+% To delete words, \deleted{<word deleted>}
+% To replace words, \replaced{<word to be replaced>}{<replacement word>}
+% To explain why change was made: \explain{<explanation>} This will put
+% a comment into the right margin.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% At the end of the document, use \listofchanges, which will list the
+% changes and the page and line number where the change was made.
+
+% When final version, \listofchanges will not produce anything,
+% \added{<word or words>} word will be printed, \deleted{<word or words} will take away the word,
+% \replaced{<delete this word>}{<replace with this word>} will print only the replacement word.
+%  In the final version, \explain will not print anything.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%
+\listofchanges
+%%%
+
+\end{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Supporting Information
+%% (Optional) See AGUSuppInfoSamp.tex/pdf for requirements
+%% for Supporting Information.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% More Information and Advice:
+
+%% ------------------------------------------------------------------------ %%
+%
+%  SECTION HEADS
+%
+%% ------------------------------------------------------------------------ %%
+
+% Capitalize the first letter of each word (except for
+% prepositions, conjunctions, and articles that are
+% three or fewer letters).
+
+% AGU follows standard outline style; therefore, there cannot be a section 1 without
+% a section 2, or a section 2.3.1 without a section 2.3.2.
+% Please make sure your section numbers are balanced.
+% ---------------
+% Level 1 head
+%
+% Use the \section{} command to identify level 1 heads;
+% type the appropriate head wording between the curly
+% brackets, as shown below.
+%
+%An example:
+%\section{Level 1 Head: Introduction}
+%
+% ---------------
+% Level 2 head
+%
+% Use the \subsection{} command to identify level 2 heads.
+%An example:
+%\subsection{Level 2 Head}
+%
+% ---------------
+% Level 3 head
+%
+% Use the \subsubsection{} command to identify level 3 heads
+%An example:
+%\subsubsection{Level 3 Head}
+%
+%---------------
+% Level 4 head
+%
+% Use the \subsubsubsection{} command to identify level 3 heads
+% An example:
+%\subsubsubsection{Level 4 Head} An example.
+%
+%% ------------------------------------------------------------------------ %%
+%
+%  IN-TEXT LISTS
+%
+%% ------------------------------------------------------------------------ %%
+%
+% Do not use bulleted lists; enumerated lists are okay.
+% \begin{enumerate}
+% \item
+% \item
+% \item
+% \end{enumerate}
+%
+%% ------------------------------------------------------------------------ %%
+%
+%  EQUATIONS
+%
+%% ------------------------------------------------------------------------ %%
+
+% Single-line equations are centered.
+% Equation arrays will appear left-aligned.
+
+% Math coded inside display math mode \[ ...\]
+%  will not be numbered, e.g.,:
+%  \[ x^2=y^2 + z^2\]
+
+%  Math coded inside \begin{equation} and \end{equation} will
+%  be automatically numbered, e.g.,:
+%  \begin{equation}
+%  x^2=y^2 + z^2
+%  \end{equation}
+
+
+% To create multiline equations, use the
+% \begin{eqnarray} and \end{eqnarray} environment
+% as demonstrated below.
+% \begin{eqnarray}
+%   x_{1} & = & (x - x_{0}) \cos \Theta \nonumber \\
+%         && + (y - y_{0}) \sin \Theta  \nonumber \\
+%   y_{1} & = & -(x - x_{0}) \sin \Theta \nonumber \\
+%         && + (y - y_{0}) \cos \Theta.
+% \end{eqnarray}
+
+%If you don't want an equation number, use the star form:
+%\begin{eqnarray*}...\end{eqnarray*}
+
+% Break each line at a sign of operation
+% (+, -, etc.) if possible, with the sign of operation
+% on the new line.
+
+% Indent second and subsequent lines to align with
+% the first character following the equal sign on the
+% first line.
+
+% Use an \hspace{} command to insert horizontal space
+% into your equation if necessary. Place an appropriate
+% unit of measure between the curly braces, e.g.
+% \hspace{1in}; you may have to experiment to achieve
+% the correct amount of space.
+
+
+%% ------------------------------------------------------------------------ %%
+%
+%  EQUATION NUMBERING: COUNTER
+%
+%% ------------------------------------------------------------------------ %%
+
+% You may change equation numbering by resetting
+% the equation counter or by explicitly numbering
+% an equation.
+
+% To explicitly number an equation, type \eqnum{}
+% (with the desired number between the brackets)
+% after the \begin{equation} or \begin{eqnarray}
+% command.  The \eqnum{} command will affect only
+% the equation it appears with; LaTeX will number
+% any equations appearing later in the manuscript
+% according to the equation counter.
+%
+
+% If you have a multiline equation that needs only
+% one equation number, use a \nonumber command in
+% front of the double backslashes (\\) as shown in
+% the multiline equation above.
+
+% If you are using line numbers, remember to surround
+% equations with \begin{linenomath*}...\end{linenomath*}
+
+%  To add line numbers to lines in equations:
+%  \begin{linenomath*}
+%  \begin{equation}
+%  \end{equation}
+%  \end{linenomath*}
+
+
+

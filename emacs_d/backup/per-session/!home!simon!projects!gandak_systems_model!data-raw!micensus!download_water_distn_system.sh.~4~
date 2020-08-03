@@ -1,0 +1,16 @@
+#!/bin/sh
+
+count=1
+while read line; do
+    if [[ $line == http* ]]; then
+	#url=$line
+	file=$(awk 'NR == nr' nr=$((count+1)) micensus_district_water_distn_system.txt)
+	# url=$(curl $line | grep window.location.href | sed 's/.*= //' | sed 's/"//g')
+        # echo $url > temp
+	# wget -O $file -i temp
+        grep $line
+        grep $file
+    fi
+    count=$((count+1))
+done < micensus_district_water_distn_system.txt
+

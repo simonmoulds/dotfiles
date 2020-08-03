@@ -1,0 +1,126 @@
+## Author : Simon Moulds
+## Date   : June 2018
+
+## The purpose of this script is to prepare a
+## district-level time series of tubewell
+## installation between 1982/83 - 2006/07
+
+library(readxl)
+library(raster)
+library(rgdal)
+library(magrittr)
+library(dplyr)
+library(tidyr)
+library(xts)
+
+options(stringsAsFactors = FALSE)
+
+model_mask = raster("data/modelMask.tif")
+template = raster(xmn=80, xmx=90, ymn=20, ymx=30, res=0.0833333333)
+
+## Minor Irrigation Census data
+## ############################
+
+devtools::load_all("/home/simon/dev/r_indagridat/indagridat")
+
+adm2_2010 = readOGR(dsn="pkg/india_adm2_2001/data", layer="g2008_2_India", stringsAsFactors=FALSE)
+adm2_2010$ADM2_CODE %<>% as.numeric
+adm2_2010_raster = rasterize(adm2_2010, template, "ADM2_CODE")
+
+ids = c(70272,17914,70274,17894,70097,17619,17595,17626,17632,17613,17628,17620,70103,17630,17631,17604,17618,70271,17904)
+## ids = c(17595,17604,17613,17618,17619,17620,17626,17628,17631,17632,17894,17914,70272,70274,72604,72651)
+
+index = as.numeric(adm2_2010$ADM2_CODE) %in% ids
+dist =
+    adm2_2010$ADM2_NAME %>%
+    as.character %>%
+    `[`(index)
+state =
+    adm2_2010$ADM1_NAME %>%
+    as.character %>%
+    `[`(index)
+gaul_id =
+    adm2_2010$ADM2_CODE %>%
+    as.numeric %>%
+    `[`(index)
+
+x = data.frame(state=state, dist=dist, gaul_id=gaul_id) %>% arrange(state)
+    
+## OLD:
+## ## District-wise number of tubewells
+## micensus_1986 = read_excel("data/micensus/micensus_1986-87_shallowtubewell.xls") %>%
+##     setNames(paste0("X", seq(1, ncol(.)))) %>%
+##     filter(X1 %in% c("Bihar","Uttar Pradesh")) %>%
+##     setNames(c("state","id","dist", names(.)[4:38])) %>%
+##     dplyr::select(-(id))
+
+## nms = names(micensus)
+## nms[15:20] = c("MARG_NO_TW","SMALL_NO_TW","SEMIM_NO_TW","MEDIUM_NO_TW","LARGE_NO_TW","TOTAL_NO_TW")
+## names(micensus) = nms
+
+mi1993 =
+    read.csv("data/minor_irrigation_census_1993-94_no_tubewells_installed.csv") %>%
+    filter(State %in% c("BIHAR","UTTAR PRADESH")) %>%
+    dplyr::select(-Upto.1986.87, -Total) %>%
+    setNames(c("State","District","X1987_88","X1988_89","X1989_90","X1990_91","X1991_92","X1992_93","X1993_94")) %>%
+    mutate(District = replace(District, District == "KUSHI NAGAR", "KUSHINAGAR")) %>%
+    mutate(District = replace(District, District == "MAHRAJGANJ", "MAHARAJGANJ")) %>%
+    mutate(District = replace(District, District == "CHAMPARAN WEST", "PASHCHIM CHAMPARAN")) %>%
+    mutate(District = replace(District, District == "CHAMPARAN EAST", "PURBA CHAMPARAN")) %>%
+    filter(District %in% toupper(x$dist)) %>%
+    mutate(District = replace(District, District == "SHEOHAR", "SITAMARHI")) %>%
+    mutate(District = replace(District, District == "KUSHINAGAR", "DEORIA")) %>%
+    group_by(State, District) %>%
+    summarise_all(funs(sum))    
+
+mi2000 =
+    read.csv("data/minor_irrigation_census_2000-01_no_tubewells_installed.csv") %>%
+    filter(State %in% c("BIHAR","UTTAR PRADESH")) %>%
+    dplyr::select(-starts_with("Upto"), -starts_with("Total")) %>%
+    setNames(c("State","District","X1994_95","X1995_96","X1996_97","X1997_98","X1998_99","X1999_00","X2000_01")) %>%
+    mutate(District = replace(District, District == "GOPAALGANJ", "GOPALGANJ")) %>%
+    mutate(District = replace(District, District == "MAHARAJ GANJ", "MAHARAJGANJ")) %>%
+    mutate(District = replace(District, District == "WEST CHAMPARAN", "PASHCHIM CHAMPARAN")) %>%
+    mutate(District = replace(District, District == "EAST CHAMPARAN", "PURBA CHAMPARAN")) %>%
+    filter(District %in% toupper(x$dist)) %>%
+    mutate(District = replace(District, District == "SHEOHAR", "SITAMARHI")) %>%
+    mutate(District = replace(District, District == "KUSHINAGAR", "DEORIA")) %>%
+    group_by(State, District) %>%
+    summarise_all(funs(sum))    
+
+mi2006 =
+    read.csv("data/minor_irrigation_census_2006-07_no_tubewells_installed.csv") %>%
+    filter(STATE %in% c("BIHAR","UTTAR PRADESH")) %>%
+    dplyr::select(-starts_with("UPTO"), -ends_with("COST"), -starts_with("TOTAL")) %>%
+    setNames(c("State","District","X2001_02","X2002_03","X2003_04","X2004_05","X2005_06","X2006_07")) %>%
+    mutate(District = replace(District, District == "GOPAALGANJ", "GOPALGANJ")) %>%
+    mutate(District = replace(District, District == "MAHARAJ GANJ", "MAHARAJGANJ")) %>%
+    mutate(District = replace(District, District == "WEST CHAMPARAN", "PASHCHIM CHAMPARAN")) %>%
+    mutate(District = replace(District, District == "EAST CHAMPARAN", "PURBA CHAMPARAN")) %>%
+    mutate(District = replace(District, District == "SHEOHAR", "SITAMARHI")) %>%
+    mutate(District = replace(District, District == "KUSHINAGAR", "DEORIA")) %>%
+    filter(District %in% toupper(x$dist)) %>%
+    group_by(State, District) %>%
+    summarise_all(funs(sum))
+
+mi =
+    mi1993 %>%
+    left_join(mi2000) %>%
+    left_join(mi2006) %>%
+    gather(key=date, value=value, -State, -District) %>%
+    arrange(State, District, date) %>%
+    group_by(State, District) %>%
+    mutate(value_cs=cumsum(value))
+
+## mi = mi %>% dplyr::filter(District %in% "PASHCHIM CHAMPARAN")
+## plot(mi$value_cs)
+
+tubewell_gandak =
+    mi %>%
+    ungroup() %>%
+    mutate(basin="Gandak") %>%
+    group_by(basin, date) %>%
+    summarise_at(vars(value_cs), funs(sum), na.rm=TRUE)
+plot(tubewell_gandak$value_cs)
+
+

@@ -1,0 +1,158 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import os
+import numpy as np
+import rasterio
+import csv
+import pkgutil
+
+# from ncConverter import np2netCDF
+# from hydro_model_builder import VirtualOS as vos
+from hm.OutputNetCDF import *
+from hm import file_handling
+
+import variable_list as variable_list
+from utils import *
+
+class PotentialYield(object):
+    def __init__(self, land_cover):
+        self.var = land_cover
+        self.var.PotentialYieldOutputFile = str(self.land_cover.configuration['potentialYieldOutputFile'])
+        # self.bbox = vos.get_clone_map_extent(self.var._configuration.cloneMap)
+        
+    def initial(self):
+        pass
+
+    def dynamic(self):
+        potential_yield_maps = []
+        for crop in self.land_cover.CropTypes:
+            gaez_crop = lookup_crop_id(crop, 'GAEZ')
+            fn = get_data_smart(
+                'gandak_wb_data_model',
+                '../data' + '/' + 'potential_yield_' + gaez_crop.lower() + '_mixed_input.tif',
+                as_string = False)
+            arr = read_gdal_raster_image(fn, self.bbox, 0)
+            potential_yield_maps.append(arr)
+        potential_yield = np.stack(potential_yield_maps, axis=0)
+        netcdf = OutputNetCDF(
+            self.var._configuration,
+            self.var.dimensions,
+            variable_list
+        )        
+        netcdf.create_netCDF(self.var.PotentialYieldOutputFile, 'Yx')        
+        netcdf.add_data_to_netcdf(
+            self.var.PotentialYieldOutputFile,
+            'Yx',
+            potential_yield
+        )
+
+# yx = nco.createVariable('Yx', np.float64, ('crop','lat','lon'))
+# yx.setncattr('standard_name', 'Yx')
+# yx.setncattr('long_name', 'Potetial crop yield')
+# yx.setncattr('units', '1e-1 kg.m-2')
+# yx.setncattr('_FillValue', np.float64(1e+20))
+# yx.setncattr('missing_value', np.float64(1e+20))
+# yx[:] = a
+# nco.close()
+        
+# import numpy as np
+# import datetime
+# import time
+# import gdal
+# import scipy.interpolate as interpolate
+# import matplotlib.pyplot as plt
+
+# from netCDF4 import Dataset, date2num
+# from pandas import read_csv
+
+# # Spatial dimensions
+# # ##################
+
+# def checkEqual1(iterator):
+#     iterator = iter(iterator)
+#     try:
+#         first = next(iterator)
+#     except StopIteration:
+#         return True
+#     return all(first == rest for rest in iterator)
+
+# crops = ['rice_irri','rice_rain',
+#          'rice_irri','rice_rain',
+#          'wheat_irri','wheat_rain',
+#          'sugc_irri','sugc_rain']
+
+# crop_maps = []
+# proj_info = []
+# for crop in crops:
+#     fn = 'potential_yield_' + crop + '_mixed_input.tif'
+#     ds = gdal.Open(os.path.join('../data', fn))
+#     a = ds.ReadAsArray()
+#     crop_maps.append(a)
+#     proj_info.append(ds.GetProjection())
+#     # proj_info.append(ds.GetGeoTransform())
+
+# # check maps have the same projection, then stack
+# check = checkEqual1(proj_info)  # do something if False
+# a = np.stack(crop_maps, axis=0)
+
+# # ds = gdal.Open('../data/ksat_topsoil_gapfilled_5m.tif')
+# # a = ds.ReadAsArray()
+# ncrop,nlat,nlon = np.shape(a)
+# xres = 1./12
+# yres = 1./12
+
+# b = ds.GetGeoTransform() #bbox, interval
+# minx = b[0]
+# maxx = b[0] + nlon * xres
+# maxy = b[3] 
+# miny = b[3] + nlat * -yres
+
+# lon = np.arange(0,nlon) * xres + (minx + xres/2)
+# lat = np.arange(0,nlat) * yres + (miny + yres/2)
+# lat = lat[::-1]
+
+# # create netCDF
+# # #############
+
+# nco = Dataset('../data/Gandak_potential_crop_yield_gaez.nc', 'w')
+# nco.description = 'Annual CO2 concentration file'
+# nco.history = 'Created ' + time.ctime(time.time())
+
+# # create dimensions, variables and attributes:
+# nco.createDimension('lon',nlon)
+# nco.createDimension('lat',nlat)
+# nco.createDimension('crop', ncrop)
+
+# lono = nco.createVariable('lon',np.float64,('lon'),zlib=True,least_significant_digit=16)
+# lono.units = 'degrees_east'
+# lono.standard_name = 'longitude'
+# lono[:]=lon
+
+# lato = nco.createVariable('lat',np.float64,('lat'),zlib=True,least_significant_digit=16)
+# lato.units = 'degrees_north'
+# lato.standard_name = 'latitude'
+# lato[:]=lat
+
+# crpo = nco.createVariable('crop','f4',('crop'))
+# crpo.units = '1'
+# crpo.standard_name = 'crop'
+# crpo.long_name = 'crop'
+# crpo[:]=np.arange(1, ncrop + 1)
+
+# # create container variable for CRS: lon/lat WGS84 datum
+# crso = nco.createVariable('crs','i4')
+# crso.long_name = 'Lon/Lat Coords in WGS84'
+# crso.grid_mapping_name='latitude_longitude'
+# crso.longitude_of_prime_meridian = 0.0
+# crso.semi_major_axis = 6378137.0
+# crso.inverse_flattening = 298.257223563
+
+# yx = nco.createVariable('Yx', np.float64, ('crop','lat','lon'))
+# yx.setncattr('standard_name', 'Yx')
+# yx.setncattr('long_name', 'Potetial crop yield')
+# yx.setncattr('units', '1e-1 kg.m-2')
+# yx.setncattr('_FillValue', np.float64(1e+20))
+# yx.setncattr('missing_value', np.float64(1e+20))
+# yx[:] = a
+# nco.close()

@@ -1,0 +1,20 @@
+hydrological_parameters = function(n_farm,
+                                   field_capacity,
+                                   wilting_point,
+                                   specific_yield,
+                                   runoff_coefficient,
+                                   evaporation_coefficient,
+                                   canal_volume,
+                                   canal_leakage_rate) {
+    
+    x = list(
+        field_capacity = _expand_parameter(n_farm, field_capacity),
+        wilting_point = _expand_parameter(n_farm, wilting_point),
+        specific_yield = _expand_parameter(n_farm, specific_yield),
+        runoff_coefficient = _expand_parameter(n_farm, runoff_coefficient),
+        evaporation_coefficient = _expand_parameter(n_farm, evaporation_coefficient),
+        canal_volume = _expand_parameter(n_farm, canal_volume),
+        canal_leakage_rate = _expand_parameter(n_farm, canal_leakage_rate)
+    )
+    structure(x, class="hydrological_parameters")
+}

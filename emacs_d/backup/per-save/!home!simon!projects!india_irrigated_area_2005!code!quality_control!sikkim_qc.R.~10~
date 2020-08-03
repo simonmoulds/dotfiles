@@ -1,0 +1,107 @@
+## Author : Simon Moulds
+## Date   : January 2018
+
+## Quality control for Sikkim
+
+## Crops not grown: ...
+
+## barley
+## ######
+
+## all ok
+
+## coconut
+## #######
+
+xx[["apy_coconut-whole_year"]] = xx[["mapspam_atot_coconut"]][6]
+xx[["irr_coconut-whole_year"]] = xx[["mapspam_xirr_coconut"]][6]
+
+## maize
+## #####
+
+if (dist_nm %in% c("South Sikkim")) {
+    xx[["apy_maize-kharif"]] %<>% locf_interp(6)
+}
+
+## other cereals
+## #############
+
+xx[["apy_other_cereals-kharif"]] %<>% locf_interp(2:4)
+xx[["apy_other_cereals-rabi"]] %<>% locf_interp(2:4)
+
+## other oil crops
+## ###############
+
+if (dist_nm %in% c("East")) {
+    xx[["apy_other_oil_crops-kharif"]] %<>% locf_interp(2:11)
+}
+
+if (dist_nm %in% c("South Sikkim","West Sikkim")) {
+    xx[["apy_other_oil_crops-kharif"]] %<>% locf_interp(2:4)
+    xx[["apy_other_oil_crops-kharif"]] %<>% locf_interp(7:11)
+}
+
+## other pulses
+## ############
+
+## all ok
+
+## rapeseed
+## ########
+
+## all ok
+
+## rest of crops
+## #############
+
+xx[["apy_rest_of_crops-whole_year"]] = xx[["mapspam_atot_rest_of_crops"]][6]
+xx[["irr_rest_of_crops-whole_year"]] = xx[["mapspam_xirr_rest_of_crops"]][6]
+
+## rice
+## ####
+
+f = xx[["mapspam_xirr_rice"]][6] / xx[["mapspam_atot_rice"]][6]
+xx[["irr_rice-winter"]] = f * xx[["apy_rice-winter"]]
+
+## soybean
+## #######
+
+## all ok
+
+## tea
+## ###
+
+xx[["apy_tea-whole_year"]] = xx[["mapspam_atot_tea"]][6]
+xx[["irr_tea-whole_year"]] = xx[["mapspam_xirr_tea"]][6]
+
+## temperate fruit
+## ###############
+
+xx[["apy_temperate_fruit-whole_year"]] = xx[["mapspam_atot_temperate_fruit"]][6]
+xx[["irr_temperate_fruit-whole_year"]] = xx[["mapspam_xirr_temperate_fruit"]][6]
+
+## tobacco
+## #######
+
+xx[["apy_tobacco-rabi"]] = xx[["mapspam_atot_tobacco"]][6]
+xx[["irr_tobacco-rabi"]] = xx[["mapspam_xirr_tobacco"]][6]
+
+## tropical fruit
+## ##############
+
+xx[["apy_tropical_fruit-whole_year"]] = xx[["mapspam_atot_tropical_fruit"]][6]
+xx[["irr_tropical_fruit-whole_year"]] = xx[["mapspam_xirr_tropical_fruit"]][6]
+
+## vegetables
+## ##########
+
+## TODO: work out growing season
+
+xx[["apy_vegetables-kharif"]] = xx[["mapspam_atot_vegetables"]][6]
+xx[["irr_vegetables-kharif"]] = xx[["mapspam_xirr_vegetables"]][6]
+
+## wheat
+## #####
+
+xx[["apy_wheat-rabi"]] = xx[["mapspam_atot_wheat"]][6]
+xx[["irr_wheat-rabi"]] = xx[["mapspam_xirr_wheat"]][6]

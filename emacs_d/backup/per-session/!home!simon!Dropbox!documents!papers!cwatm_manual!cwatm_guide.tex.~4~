@@ -1,0 +1,140 @@
+\documentclass[12pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{natbib}
+\usepackage{fixltx2e} % subscripts e.g. CO2
+\usepackage{multirow,amssymb,amsmath,booktabs,mathtools,longtable}
+\usepackage{gensymb}
+\usepackage{soul}
+\usepackage{lscape}
+\usepackage{caption}
+\usepackage[labelformat=simple]{subcaption}
+\usepackage{url}
+\usepackage{rotating}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage[flushleft]{threeparttable}
+
+\title{The Community Water Model}
+\author{Simon Moulds}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This is the paper's abstract \ldots
+\end{abstract}
+
+\section{Program structure}
+
+The main directory contains a number of files. The main program is contained in cwatm.py, which defines class CWATModel and a function CWATMexe(), which executes the model. Class CWATModel is a subclass of the CWATModel_ini and CWATModel_dyn base classes (Python allows multiple inheritance), which are defined in files cwatm_initial.py and cwatm_dynamic.py, respectively. Class CWATModel_ini performs non-temporal initialization procedures while CWATModel_dyn performs the time loop. When a Python file is run as the main program (i.e. >> python cwatm.py on the command line), the Python interpreter will set a number of special variables. One of these is to set the variable __name__ to ``__main__'' (in other words, the main script is interpreted by Python as a module with the name __main__). On the other hand, if the file is being imported from another module the __name__ variable will be set to the module's name (\url{https://stackoverflow.com/questions/419163/what-does-if-name-main-do}). Hence, the file cwatm.py contains the statement if __name__ == ``main'', which interprets the command line arguments and runs the function CWATMexe(). This statement is not in any function and hence the variabes defined below the if statement are global variables and all scopes (e.g. functions) have access to them (\url{https://stackoverflow.com/questions/4775579/main-and-scoping-in-python}).
+
+Subdirectory management_modules contains a number of files which define various functions to coordinate the model run. This includes functions to configure the model (configuration.py; parse_configuration), perform runtime checks (checks.py), manipulate data (data_handling.py), define global variables and check the system requirements are met (globals.py), provide runtime information (messages.py), write output (output.py), handle timestepping (timestep.py) and augment some PCRaster functionality (improvepcraster.py, replace_pcr.py). Function parse_configuration (configuration.py) returns a Subdirectory hydrological_modules contains various files which each define a class to represent specific hydrological processes (e.g. capillary rise, evaporation). Each class includes a method called 'dynamic' which is called in cwatm_dynamic.py.
+
+Class DynamicFramework is a PCRaster framework class for dynamic models.
+
+Module evaporationPot.py calculates potential evapotranspiration if this is required. In our case this will be supplied by another model. Module evaporation.py calculates reference evaportranspiration for the various land cover types using a crop factor.
+
+% \section{Materials and methods}
+\section{Modelling water demand}
+The model calculates industrial, domestic and irrigative water demands. Demand is computed as a uniform depth within a pixel. The attribute self.var.InvArea ($= 1 / self.var.cellArea$) is used in waterdemand.py to mean the minimum depth that is counted towards demand; depths below this value are rounded down to zero. In waterbalance.py, water volumes are multipled by self.var.InvArea to get a depth (i.e. effectively dividing by the cell area). 
+
+\subsection{Industrial and domestic demand}
+Gross and net industrial and domestic water demands are pre-calculated and supplied as NetCDF input files (one file for gross demand, another for net demand). 
+
+\subsection{Irrigation module}
+Irrigation demand is calculated for paddy and non-paddy crops. Following \citet{wada_global_2014}, flood irrigation over paddy is represented as a 50mm deep pond that is maintained from the start of the growing season until 20 days prior to the harvest date. The variable self.var.irrGrossDemand is an array with up to four elements, but the only indices used are 2 (paddy) and 3 (non-paddy) (N.B. I \textit{think} this may be so the indices correspond with the index when they are considered with non-irrigated land use types). Paddy irrigation water demand is calculated with the equation:
+
+\begin{verbatim}
+self.var.irrGrossDemand[No] = np.where(self.var.cropKC[No] > 0.75, np.maximum(0., (self.var.alphaDepletion * self.var.maxtopwater - (self.var.topwater + self.var.availWaterInfiltration))), 0.)
+\end{verbatim}
+
+\noindent where self.var.cropKC is the crop coefficient, self.var.alphaDepletion is..., self.var.maxtopwater is the maximum depth of flood water on a paddy field, self.var.topwater is the current depth of water and self.var.availWaterInfiltration is water available for infiltration ($= throughfall + snowmelt$).
+
+Runoff in CWatM is computed using the modified Arno scheme (TODO: look up reference - Todini, 1996). The irrigation requirement of non-paddy crops is not allowed to exceed infiltration capacity, so the model first calculates the maximum potential infiltration capacity, potInf (Lines 197-205). Next, the program calculates readily available water (readAvlWater) by multiplying the water content minus the wilting point by the root depth in the top two soil layers (Lines 212-215). 
+
+% ...
+
+The irrigation module is composed of two coupled submodules which estimate crop water demand and irrigation water use respectively. 
+
+\subsubsection{Crop water demand}
+
+Following \citet{wada_global_2014}, flood irrigation over paddy is represented as a 50mm deep pond that is maintained from the start of the growing season until 20 days prior to the harvest date. Thus, irrigation water requirement, $IWR_{paddy}$, is calculated
+
+\begin{equation}
+  IWR_{paddy}(t) = max(0,S_{max} - (S_{0}(t-1) + P_{eff}(t))
+\end{equation}
+
+\noindent where $S_{max}$ is the maximum surface water storage, $S_{0}$ is the initial storage and $P_{eff}$ is effective precipitation. The change in surface water storage, $S$, is calculated as follows:
+
+\begin{equation}
+  \frac{dS}{dt} = P_{eff}(t) + IWR_{paddy}(t) - q_{i,S_{0} \rightarrow S_{1}}(t) - E(t)
+\end{equation}
+
+\noindent where $q_{i,S_{0} \rightarrow S_{1}}$ is the infiltration from the surface soil layer to the uppermost soil layer (i.e. the root zone) according to the saturated hydraulic conductivity, reduced by a factor of 10 in order to account for compaction \citep{}, and $E$ is the open water evaporation from the paddy field. Direct runoff from paddy fields is neglected because it is assumed that farmers will not irrigate prior to expected rainfall. \\
+
+The irrigation water requirement of non-paddy crops is calculated following the procedure outlined in FAO... , In this formulation, the root zone is conceptualised as a bucket... The volume of water available to crops after the soil has drained to field capacity is called the total available water (TAW)
+
+\begin{equation}
+  TAW = (\theta_{FC} - \theta_{WP}) Z_{r}
+\end{equation}
+
+\noindent where $\theta_{FC}$ and $\theta_{WP}$ are the soil field capacity and wilting point, respectively, and $Z_{r}$ is the rooting depth, which is assumed to increase exponentially during the growing season to the maximum rooting depth. Readily available water (RAW) is the fraction of TAW that can be extracted by crops before they are subject to water stress \citep{mackay_lumped_2014}, such that
+
+\begin{align}
+  RAW &= pTAW\\
+  p   &= p_{ref} + 40 \times (0.005 - ET_{c})
+\end{align}
+
+\noindent where $p$ is the soil water depletion factor and $p_{ref}$ is a reference value which varies according to crop type. Assuming that irrigation is required when root zone depletion $D_{r}$ falls below RAW, the irrigation water demand of a non-paddy crop can be expressed as follows:
+
+\begin{equation}
+  IWR_{nonpaddy} =
+  \begin{cases}
+    D_{r}, & \text{if}\ D_{r} > RAW_{t} \\
+    0,    & \text{otherwise.}
+  \end{cases}
+\end{equation}
+
+The change in water balance of the root zone, expressed in terms of root zone depletion, can be written as:
+
+\begin{equation}
+  \frac{dD_{r}}{dt} =  ET_{c} + DP - (P-RO) - CR - I
+\end{equation}
+
+\noindent where $ET_{c}$ is actual crop evapotranspiration, $DP$ is percolation to the underlying soil layer, $P$ is precipitation, $RO$ is surface runoff, $CR$ is capillary rise and $I$ is irrigation (all in metres). Crop evapotranspiration is calculated as follows:
+
+\begin{equation}
+  ET_{c} = k_{s}k_{c}ET_{0}
+\end{equation}
+
+\noindent where $ET_{0}$ is reference evapotranspiration, $k_{c}$ is the crop coefficient and $k_{s}$ is the water stress coefficient. Reference evapotranspiration can be calculated using various methods depending on data availability. The water stress coefficient is calculated as a function of root zone depletion, as follows
+
+\begin{equation}
+  k_{s} = \frac{TAW-D_{r}}{(1-p)TAW}.
+\end{equation}
+
+\noindent The crop coefficient $k_{c}$ is a time-varying parameter which reflects changes in crop physiology during the growing season. The FAO provide a set of $k_{c}$ values for several crops for initial, ... growth stages, as well as estimates of the length of each stage in days. An alternative method for calculating $k_{c}$ at different time points is use remote sensing data. \\
+
+\subsection{Irrigation water use}
+
+\subsection{Crop growth}
+
+\subsection{Hydrology module}
+
+
+\section{Results}
+TODO
+
+\section{Discussion}
+TODO
+
+\section{Conclusions}
+TODO
+
+\bibliographystyle{abbrv}
+\bibliography{../../Zotero_library.bib}
+
+\end{document}

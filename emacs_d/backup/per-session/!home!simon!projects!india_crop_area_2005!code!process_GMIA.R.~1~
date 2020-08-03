@@ -1,0 +1,18 @@
+## Author : Simon Moulds
+## Date   : April 2018
+
+library(maptools)
+library(rasterVis)
+library(grid)
+library(viridis)
+library(magrittr)
+library(dplyr)
+library(tidyr)
+library(tibble)
+library(ggplot2)
+library(raster)
+
+load("data/input_data.RData")
+
+## extract data
+unzip("data-raw/GMIA/gmia_v5_aei_ha_asc.zip", exdir="data")

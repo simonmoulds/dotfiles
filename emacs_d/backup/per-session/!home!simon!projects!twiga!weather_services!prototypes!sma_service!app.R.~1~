@@ -1,0 +1,125 @@
+## Author : Simon Moulds
+## Date   : Apr 2019
+
+## Water balance model, based on the Global Crop Water Model
+compute_eta = function(eto, ks) {
+    eta = ks * eto
+    eta
+}
+
+compute_ks = function(s, taw, p) {
+    ks = max((s / ((1 - p) * taw)), 1)
+    ks
+}
+
+compute_p = function(p_std, eto) {
+    p = p_std + 0.04 * (5 - eto)
+}
+
+compute_runoff = function(prec, s0, taw, gamma) {
+    runoff = prec * (s0 / taw) ** gamma
+    return(runoff)
+}
+
+model = function(prec, eto, p_std, s0, taw, gamma) {
+    p = compute_p(p_std, eto)
+    ks = compute_ks(s0, taw, p)
+    eta = compute_eta(eto, ks)
+    runoff = compute_runoff(prec, s0, taw, gamma)
+    s1 = max(s0 + prec - runoff - eta, 0)
+    return(s1)
+}
+
+## import data for testing
+meteo = read.csv("princeton_data.csv")
+meteo$prcp = meteo$prcp * 24 * 60 * 60  # kg/m2/s -> mm/day
+crop_params = read.csv("gcwm_crop_data.csv")
+
+## set some parameters (assume maize, initially)
+zr = 1.6 * 1000
+fc = 0.33
+wp = 0.10
+taw = (fc - wp) * zr
+s0 = 0
+gamma = 2
+p_std = 0.55
+
+## run model
+nt = nrow(meteo)
+out = rep(NA, nt)
+for (i in seq_len(nt)) {
+    s1 = model(meteo$prcp[i], meteo$etref[i], p_std, s0, taw, gamma)
+    if (is.nan(s1)) {
+        break()
+    }
+    out[i] = s1
+    s0 = s1
+}
+
+## TODO: make a dygraph with three stacked graphs
+## 1 - temperature
+## 2 - rain
+## 3 - soil moisture
+
+library(xts)
+library(dygraphs)
+time=as.POSIXct(meteo$time, tz="GMT", format="%Y-%m-%d")
+data = data.frame(
+    temp=meteo$tas,
+    prec=meteo$prcp,
+    sm=out) %>%
+    xts(order.by=time, tzone="GMT")
+
+p <- list(
+    dygraph(data$temp, main="Temperature", group="hydrology"),
+    dygraph(data$prec, main="Precipitation", group="hydrology"),
+    dygraph(data$sm, main="Soil moisture", group="hydrology") %>% dyRangeSelector()
+)
+
+htmltools::browsable(htmltools::tagList(p))
+
+library(shiny)
+library(dygraphs)
+library(datasets)
+
+ui <- fluidPage(
+    titlePanel("Soil moisture"),
+    sidebarLayout(
+        ## sidebarPanel(
+        ##     numericInput("months", label = "Months to Predict",
+        ##                  value = 72, min = 12, max = 144, step = 12),
+        ##     selectInput("interval", label = "Prediction Interval",
+        ##                 choices = c("0.80", "0.90", "0.95", "0.99"),
+        ##                 selected = "0.95"),
+        ##     checkboxInput("showgrid", label = "Show Grid", value = TRUE)
+        ## ),
+        mainPanel(
+            dygraphOutput("dygraph")
+        )
+    )
+)
+
+server <- function(input, output) {
+    predicted <- reactive({
+        hw <- HoltWinters(ldeaths)
+        predict(hw, n.ahead = input$months,
+                prediction.interval = TRUE,
+                level = as.numeric(input$interval))
+    })
+
+    output$dygraph <- renderDygraph({
+        p = list(
+            dygraph(data$temp, main="Temperature", group="hydrology"),
+            dygraph(data$prec, main="Precipitation", group="hydrology"),
+            dygraph(data$sm, main="Soil moisture", group="hydrology") %>% dyRangeSelector()
+        )
+        tagList(p)
+        
+        ## dygraph(predicted(), main = "Predicted Deaths/Month") %>%
+        ##     dySeries(c("lwr", "fit", "upr"), label = "Deaths") %>%
+        ##     dyOptions(drawGrid = input$showgrid) %>%
+        ##     dyRangeSelector()
+    })
+}
+
+shinyApp(ui = ui, server = server)

@@ -1,0 +1,73 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import os
+import numpy as np
+from hydro_model_builder import VirtualOS as vos
+
+import logging
+logger = logging.getLogger(__name__)
+
+class Tubewells(object):
+
+    def __init__(self, Tubewells_variable):
+        self.var = Tubewells_variable
+        
+    def initial(self):
+        self.initial_tubewell_capacity()
+        self.var.TubewellOperatingHours = (
+            np.full((self.var.nFarm, self.var.nCell), 12))    # Hours
+        self.var.TubewellMaintenanceCost = (
+            np.full((self.var.nFarm, self.var.nCell), 10000)) # Rs
+        self.var.TubewellInstallationCost = (
+            np.full((self.var.nFarm, self.var.nCell), 10000)) # Rs
+        self.var.PumpCost = (
+            np.full((self.var.nFarm, self.var.nCell), 10000)) # Rs
+        self.var.PumpLifespan = (
+            np.full((self.var.nFarm, self.var.nCell), 20))    # years
+        self.var.PumpHorsePower = (
+            np.full((self.var.nFarm, self.var.nCell), 7.5))   # HP
+        self.var.TubewellLifespan = (
+            np.full((self.var.nFarm, self.var.nCell), 20))    # years
+        self.var.TubewellAge = (
+            np.zeros((self.var.nFarm, self.var.nCell)))       # counter
+
+    def reset_initial_conditions(self):
+        pass
+    
+    def maximum_operating_hours(self):
+        pass
+    
+    def maintenance_cost(self):
+        pass
+
+    def installation_cost(self):
+        pass
+
+    def pump_cost(self):
+        pass
+
+    def pump_horsepower(self):
+        pass
+        
+    def initial_tubewell_capacity(self):
+
+        # TODO - this is where initial tubewell ownership is read to the model
+
+        initialTubewellCapacityNC = str(
+            self.var._configuration.farmOptions['initialTubewellOwnershipInputFile']))
+        tubewell_capacity_varname = str(
+            self.var._configuration.farmOptions['initialTubewellOwnershipVariableName'])
+        tubewell_count = vos.netcdf2PCRobjCloneWithoutTime(
+            initialTubewellCapacityNC,
+            tubewell_capacity_varname,
+            cloneMapFileName = self.var.cloneMap,
+            LatitudeLongitude = True)
+        mask = np.broadcast_to(self.var.landmask, tubewell_count.shape)
+        tubewell_count = np.reshape(
+            tubewell_count[mask],
+            (self.var.nFarm, self.var.nCell))
+        self.var.TubewellCount = tubewell_count.copy()
+        
+    def dynamic(self):
+        pass

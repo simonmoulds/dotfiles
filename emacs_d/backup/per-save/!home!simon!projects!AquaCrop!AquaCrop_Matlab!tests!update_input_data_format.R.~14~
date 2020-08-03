@@ -1,0 +1,204 @@
+## Author : Simon Moulds
+## Date   : July 2018
+
+library(stringr)
+library(magrittr)
+source("funs.R")
+
+test_configs = c("Ch7_Tunis_Wheat_Ex1",
+                 "Ch7_Tunis_Wheat_Ex2",
+                 "Ch7_Tunis_Wheat_Ex3",
+                 "Ch7_Tunis_Wheat_Ex4",
+                 "Ch7_Tunis_Wheat_Ex6",
+                 "Ch7_Tunis_Wheat_Ex7",
+                 "Ch8_Hyderabad_Cereal_Ex2",
+                 "Ch8_Hyderabad_Cereal_Ex3a",
+                 "Ch8_Hyderabad_Cereal_Ex3b",
+                 "Ch8_Hyderabad_Cereal_Ex3c",
+                 "Ch8_Hyderabad_Cereal_Ex3d",
+                 "Ch8_Hyderabad_Cereal_Ex6",
+                 "Ch9_Brussels_Potato_Ex1",
+                 "Ch9_Brussels_Potato_Ex2",
+                 "Ch9_Brussels_Potato_Ex4",
+                 "Ch9_Brussels_Potato_Ex6a",
+                 "Ch9_Brussels_Potato_Ex6b")
+
+for (test_config in test_configs) {
+    vals = config::get(config=test_config)
+    attach(vals)
+
+    inpdir = file.path(aosdir, inpdirnm)
+    if (!dir.exists(inpdir)) {
+        dir.create(inpdir)
+    }
+
+    outdir = file.path(aosdir, outdirnm)
+    if (!dir.exists(outdir)) {
+        dir.create(outdir)
+    }
+
+    ## Clock
+    ## #####
+    fn = file.path(wd, "Input", old_clock_fn)
+    x = readLines(fn) %>% update_clock_input
+    fileCon = file(file.path(inpdir, new_clock_fn))
+    writeLines(x, fileCon)
+    close(fileCon)
+
+    ## Initial water content
+    ## #####################
+    fn = file.path(wd, "Input", old_initial_wc_fn)
+    x = readLines(fn) %>% update_initial_wc_input
+    fileCon = file(file.path(inpdir, new_initial_wc_fn))
+    writeLines(x, fileCon)
+    close(fileCon)
+
+    ## Irrigation management
+    ## #####################
+    fn = file.path(wd, "Input", old_irri_mgmt_fn)
+    x = readLines(fn) %>% update_irr_mgmt_input
+    fileCon = file(file.path(inpdir, new_irri_mgmt_fn))
+    writeLines(x, fileCon)
+    close(fileCon)
+
+    ## MaunaLoaCO2
+    ## ###########
+    fn = file.path(wd, "Input", old_co2_fn)
+    x = readLines(fn) %>% update_co2_input
+    fileCon = file(file.path(inpdir, new_co2_fn))
+    writeLines(x, fileCon)
+    close(fileCon)
+
+    ## Field management
+    ## ################
+    fn1 = file.path(wd, "Input", old_soil_param_fn)
+    fn2 = file.path(wd, "Input", old_irri_mgmt_fn)
+    x = c(readLines(fn1),readLines(fn2)) %>% update_field_mgmt_input
+    fileCon = file(file.path(inpdir, new_field_mgmt_fn))
+    writeLines(x, fileCon)
+    close(fileCon)
+
+    ## Weather data
+    ## ############
+    fn = file.path(wd, "Input", old_weather_fn)
+    x = readLines(fn) %>% update_weather_input
+
+    fn = file.path(inpdir, new_weather_fn)
+    fileCon = file(fn)
+    writeLines(x, fileCon)
+    close(fileCon)
+
+    ## Crop parameters
+    ## ###############
+
+    ## 1 - crop mix file
+    ncrop = 1
+    planting_calendar = "N"
+    crop_rotation_filename = "CropRotation.txt"
+    crop_nm = "Wheat"
+    crop_param_fn = new_crop_param_fn
+    irri_mgmt_fn = new_irri_mgmt_fn
+
+    x = update_crop_mix_input(ncrop, planting_calendar, crop_rotation_filename, crop_nm, crop_param_fn, irri_mgmt_fn)
+    fileCon = file(file.path(inpdir, new_crop_mix_fn))
+    writeLines(x, fileCon)
+    close(fileCon)
+
+    ## 2 - crop parameter file
+    fn1 = file.path(wd, "Input", old_crop_param_fn)
+    fn2 = file.path(wd, "Input", old_planting_date_fn)
+    x = c(readLines(fn1), readLines(fn2)) %>% update_crop_param_input
+    fileCon = file(file.path(inpdir, new_crop_param_fn))
+    writeLines(x, fileCon)
+    close(fileCon)
+
+    ## soil parameters
+    ## ###############
+    fn = file.path(wd, "Input", old_soil_param_fn)
+    x = readLines(fn) %>% update_soil_param_input
+    fileCon = file(file.path(inpdir, new_soil_param_fn))
+    writeLines(x, fileCon)
+    close(fileCon)
+
+    ## Soil profile
+    ## ############
+    fn = file.path(wd, "Input", old_soil_profile_fn)
+    x = readLines(fn) %>% update_soil_profile_input
+    fileCon = file(file.path(inpdir, new_soil_profile_fn))
+    writeLines(x, fileCon)
+    close(fileCon)
+
+    ## Soil texture
+    ## ############
+
+    ## NB soil texture information is not used
+
+    ## Soil hydrology
+    ## ##############
+
+    ## first, get profile thicknesses from SoilProfile.txt
+    fn = file.path(wd, "Input", old_soil_profile_fn)
+    layer_thickness = readLines(fn) %>% compute_layer_thickness
+
+    ## now read soil hydrology data
+    fn = file.path(wd, "Input", old_soil_hydrology_fn)
+    x = readLines(fn) %>% update_soil_hydrology_input(layer_thickness)
+
+    fn = file.path(inpdir, new_soil_hydrology_fn)
+    fileCon = file(fn)
+    writeLines(x, fileCon)
+    close(fileCon)
+
+    ## Water table
+    ## ###########
+
+    x = c("%% --------- Groundwater table for AquaCropOS ---------- %%",
+          "%% Water table present ('Y' or 'N') %%",
+          "N",
+          "%% Water table method ('Constant' depth; 'Variable' depth) %%",
+          "Constant",
+          "%% Date (dd/mm/yyyy)   Depth (m) %%",
+          "01/09/2000  2")
+
+    fileCon = file(file.path(inpdir, new_water_table_fn))
+    writeLines(x, fileCon)
+    close(fileCon)
+
+    ## File setup
+    ## ##########
+    x = c("%% ----------- Input filenames for AquaCropOS ----------- %%",
+          "%% Clock Filename %%",
+          new_clock_fn,
+          "%% Weather Data Filename %%",
+          new_weather_fn,
+          "%% C02 Concentration Time-Series Filename %%",
+          new_co2_fn,
+          "%% Crop Parameters Filename %%",
+          new_crop_mix_fn,
+          "%% Soil Parameters Filename %%",
+          new_soil_param_fn,
+          "%% Field Management Filename %%",
+          new_field_mgmt_fn,
+          "%% Initial Water Content Filename %%",
+          new_initial_wc_fn,
+          "%% Groundwater Table Filename %%",
+          new_water_table_fn,
+          "%% Output Filename %%",
+          new_output_fn,
+          "%% Write daily outputs ('Y' or 'N') %%",
+          new_write_daily_output)
+
+    fileCon = file(file.path(inpdir, new_file_setup_fn))
+    writeLines(x, fileCon)
+    close(fileCon)
+
+    ## original output
+    ## ###############
+    fs = list.files(file.path(wd, "Output", "Raw"), pattern="(CropGrowth|FinalOutput|WaterContents|WaterFluxes).txt$", full.names=TRUE)
+    for (f in fs) {
+        nm = sub(".(txt$)", "_orig.\\1", f)
+        file.copy(f, nm, overwrite=TRUE)
+    }    
+    detach(vals)
+}
+

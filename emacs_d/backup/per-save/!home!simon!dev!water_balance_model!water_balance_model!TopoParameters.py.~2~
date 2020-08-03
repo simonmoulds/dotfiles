@@ -1,0 +1,35 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import os
+import numpy as np
+import pcraster as pcr
+import hydro_model_builder.VirtualOS as vos
+import netCDF4 as nc
+
+class TopoParameters(object):
+
+    def __init__(self, TopoParameters_variable, config_section_name):
+        """Initialise TopoParameters object"""
+        self.var = TopoParameters_variable
+        self.lc_configuration = getattr(self.var._configuration, config_section_name)
+
+    def initial(self):
+        self.read()
+        
+    def read(self):
+        relative_elevation_var_names = [
+            ['dzRel0001','dzRel0005','dzRel0010','dzRel0020',
+             'dzRel0030','dzRel0040','dzRel0050','dzRel0060',
+             'dzRel0070','dzRel0080','dzRel0090','dzRel0100']
+        for var_name in relative_elevation_var_names:
+            d = vos.netcdf2PCRobjCloneWithoutTime(
+                str(self.lc_configuration['relativeElevationInputFile']),
+                var_name,
+                cloneMapFileName=self.var.cloneMap)
+            d = d[self.var.landmask]
+            vars(self.var)[var_name] = d
+            
+    def dynamic(self):
+        pass
+

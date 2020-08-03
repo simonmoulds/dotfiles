@@ -1,0 +1,214 @@
+From: Simon Moulds <s.moulds@exeter.ac.uk>
+To: "O'Keeffe, Jimmy M" <jimmy.okeeffe@imperial.ac.uk>
+Subject: Re: pumpset dat
+Fcc: /home/simon/mail/work/Sent Items/cur/1549444216.ab5d9209f3a721af.yamunotri:2,S
+Date: Wed, 06 Feb 2019 09:10:16 +0000
+Message-ID: <87a7j92sg7.fsf@yamunotri.localdomain>
+References: <VI1PR0602MB3680164B7303B10FCA877104D46D0@VI1PR0602MB3680.eurprd06.prod.outlook.com> <87munbgbk5.fsf@yamunotri.localdomain> <VI1PR0602MB36801B9006790321AE14D38DD46D0@VI1PR0602MB3680.eurprd06.prod.outlook.com> <LNXP265MB084405B0D7AFF109B04CD96EAC6D0@LNXP265MB0844.GBRP265.PROD.OUTLOOK.COM> <VI1PR0602MB3680FEC71C91A9DCD2DA485AD46D0@VI1PR0602MB3680.eurprd06.prod.outlook.com> <VI1PR0602MB3680E670EB81A66B814EDA21D46D0@VI1PR0602MB3680.eurprd06.prod.outlook.com> <VI1PR0602MB3680FE0C6EA8DD7F74EAA3E8D46E0@VI1PR0602MB3680.eurprd06.prod.outlook.com> <87d0o52ujy.fsf@yamunotri.localdomain> <VI1PR0602MB36802BCCA0B586403CB85473D46F0@VI1PR0602MB3680.eurprd06.prod.outlook.com> <87bm3p2tdv.fsf@yamunotri.localdomain> <VI1PR0602MB36807E6979FD0A9F9595EE98D46F0@VI1PR0602MB3680.eurprd06.prod.outlook.com>
+User-agent: mu4e 1.0-alpha2; emacs 24.5.1
+In-reply-to: <VI1PR0602MB36807E6979FD0A9F9595EE98D46F0@VI1PR0602MB3680.eurprd06.prod.outlook.com>
+
+<#part type="text/plain" filename="~/sult_obs_gw.txt" disposition=inline>
+<#/part>
+Hi Jimmy,
+
+File attached - let me know if you need anything else. You could ask Wouter to set you up on cv-hydro1 - that's how I log on.
+
+Cheers,
+Simon
+
+O'Keeffe, Jimmy M writes:
+
+> Yes, that could also be an interesting thing to highlight.
+>
+>
+> Thanks Simon - The data is in all 3 scenarios so the following should work:
+>
+>
+> espl_paper_lat1/data/inputs/sult_obs_gw.txt
+>
+>
+> ...or something similar to that. Having a log in from outside the IC network would be very useful here!
+>
+>
+> Cheers
+>
+> Jimmy
+>
+> ________________________________
+> From: Moulds, Simon <S.Moulds@exeter.ac.uk>
+> Sent: 06 February 2019 08:50:05
+> To: O'Keeffe, Jimmy M
+> Subject: Re: pumpset dat
+>
+> Yes, that makes sense - it was what I expected given the results (if canals had been running I would have expected waterlogging). Allthough now I mention it, it might be interesting to show that with canals running but no irrigation there would be waterlogging...
+>
+> Sure - where can I find it?
+>
+> S
+>
+> O'Keeffe, Jimmy M writes:
+>
+>> Morning Simon,
+>>
+>>
+>> No, I don't think so. For that scenario I've switched off all irrigation and taken the canals out of the picture  by multiplying the volume by 0 so there is basically no extra water coming into the system - although I need to double check that now that you've mentioned it
+>>
+>>
+>> Does that sound like an OK approach to you?
+>>
+>>
+>> Also, can I ask you a quick favor? I'm working from home today and can't access the server and I need to get the obs gw data that I'm using to send to Chris. Would you mind accessing it and sending it on to me when you get a chance?
+>>
+>>
+>> Cheers
+>>
+>> Jimmy
+>>
+>> ________________________________
+>> From: Moulds, Simon <S.Moulds@exeter.ac.uk>
+>> Sent: 06 February 2019 08:24:51
+>> To: O'Keeffe, Jimmy M
+>> Subject: Re: pumpset dat
+>>
+>> Hi Jimmy,
+>>
+>> This is looking good. A query - does the 'no irrigation' scenario include canal recharge or not?
+>>
+>> Cheers,
+>> Simon
+>>
+>> O'Keeffe, Jimmy M writes:
+>>
+>>> Hi Simon,
+>>>
+>>>
+>>> I did some more sensitivity analysis today and I think the results look a bit better. Particularly the no irrigation outputs. This is mostly as a result of changing the Sy from 12 to 13%
+>>>
+>>>
+>>> The last 3 slides are the most up to dates values and I've also put a table of the parameters used.
+>>>
+>>>
+>>> Any comments welcome as always
+>>>
+>>>
+>>> Cheers
+>>>
+>>> Jimmy
+>>>
+>>> ________________________________
+>>> From: O'Keeffe, Jimmy M
+>>> Sent: 04 February 2019 15:10:43
+>>> To: Moulds, Simon
+>>> Subject: Re: pumpset dat
+>>>
+>>>
+>>> I should have added this to the last email  to save you looking it up. Here's how it handles runoff and evap:
+>>>
+>>>
+>>>  // infiltration to the root zone
+>>>   double infiltration_volume = (prec / 1000) * runoff_coef * evaporation_loss_coef * farm_area;
+>>>
+>>>
+>>>
+>>> ________________________________
+>>> From: Moulds, Simon <S.Moulds@exeter.ac.uk>
+>>> Sent: 04 February 2019 14:40:41
+>>> To: O'Keeffe, Jimmy M
+>>> Subject: Re: pumpset dat
+>>>
+>>> Yep, that sounds right to me - sorry, I thought 0.95 meant that 95% was lost as runoff.
+>>>
+>>> O'Keeffe, Jimmy M writes:
+>>>
+>>>> 0.95 means that 5% is disappearing as runoff, which is at the extream end of a set of values Johanna mentioned (she said 5-15% I think) and I was thinking with bunds and flat land 5% might not be too far off.
+>>>>
+>>>> ________________________________
+>>>> From: Moulds, Simon <S.Moulds@exeter.ac.uk>
+>>>> Sent: 04 February 2019 14:34:16
+>>>> To: O'Keeffe, Jimmy M
+>>>> Subject: Re: pumpset dat
+>>>>
+>>>> First thoughts are that this looks much more realistic. The runoff coefficient seems rather high (unless its opposite, 0.95 precipitation is entering the soil column?). Also, I would like to know more about how the evap coefficient is being used - I'll have a look at the code.
+>>>>
+>>>> Cheers,
+>>>> Simon
+>>>>
+>>>> Get Outlook for Android<https://aka.ms/ghei36>
+>>>>
+>>>> ________________________________
+>>>> From: O'Keeffe, Jimmy M <jimmy.okeeffe@imperial.ac.uk>
+>>>> Sent: Monday, February 4, 2019 2:23:51 PM
+>>>> To: Moulds, Simon
+>>>> Subject: Re: pumpset dat
+>>>>
+>>>>
+>>>> Hi Simon,
+>>>>
+>>>>
+>>>> I've done some calibration and attached the results here (last 3 slides. The first 3 are the old results)
+>>>>
+>>>>
+>>>> If you could have a quick look at them and let me know your thoughts at this stage that would be great.
+>>>>
+>>>>
+>>>> Cheers
+>>>>
+>>>> JImmy
+>>>>
+>>>> ________________________________
+>>>> From: Moulds, Simon <S.Moulds@exeter.ac.uk>
+>>>> Sent: 04 February 2019 09:22:47
+>>>> To: O'Keeffe, Jimmy M
+>>>> Subject: Re: pumpset dat
+>>>>
+>>>> Ah, sorry - free any time!
+>>>>
+>>>>
+>>>> O'Keeffe, Jimmy M writes:
+>>>>
+>>>>> Great, thanks. Let me know when you're free to take a call.
+>>>>>
+>>>>>
+>>>>> I've attached some results which include lateral flow.
+>>>>>
+>>>>>
+>>>>> J
+>>>>>
+>>>>>
+>>>>>
+>>>>>
+>>>>> ________________________________
+>>>>> From: Moulds, Simon <S.Moulds@exeter.ac.uk>
+>>>>> Sent: 04 February 2019 09:14:35
+>>>>> To: O'Keeffe, Jimmy M
+>>>>> Subject: Re: pumpset dat
+>>>>>
+>>>>> Sure :)
+>>>>>
+>>>>> O'Keeffe, Jimmy M writes:
+>>>>>
+>>>>>> Morning Simon,
+>>>>>>
+>>>>>>
+>>>>>> Hope you'd a good weekend and Teddy is feeling a bit better
+>>>>>>
+>>>>>>
+>>>>>> When you have a few mins for a chat? I've an idea around pump set data which I'd like to try and it would be good to chat through it.
+>>>>>>
+>>>>>>
+>>>>>> Cheers
+>>>>>>
+>>>>>> Jimmy
+>>>>>>
+>>>>>>
+>>>>>> ————————————
+>>>>>> Dr Jimmy O'Keeffe
+>>>>>> Research Associate
+>>>>>>
+>>>>>> Department of Civil and Environmental Engineering
+>>>>>> Imperial College London
+>>>>>> London SW7 2AZ
+>>>>>> @jimmy_okeeffe
+>>>>>> https://www.imperial.ac.uk/people/jimmy.okeeffe
+

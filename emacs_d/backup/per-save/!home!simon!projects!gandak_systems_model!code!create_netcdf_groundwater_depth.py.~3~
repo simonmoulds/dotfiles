@@ -1,0 +1,141 @@
+import numpy as np
+import datetime
+import time
+import gdal
+import scipy.interpolate as interpolate
+import matplotlib.pyplot as plt
+from netCDF4 import Dataset, date2num
+import random
+
+# Space, time dimensions
+# ######################
+
+ds = gdal.Open('../data/ksat_topsoil_gapfilled_5m.tif')
+a = ds.ReadAsArray()
+nlat,nlon = np.shape(a)
+xres = 1./12
+yres = 1./12
+
+b = ds.GetGeoTransform() #bbox, interval
+minx = b[0]
+maxx = b[0] + nlon * xres
+maxy = b[3] 
+miny = b[3] + nlat * -yres
+
+lon = np.arange(0,nlon) * xres + (minx + xres/2)
+lat = np.arange(0,nlat) * yres + (miny + yres/2)
+lat = lat[::-1]
+# lon = np.linspace(minx + xres/2, maxx - xres/2, nlon)
+# lat = np.linspace(miny + yres/2, maxy - yres/2, nlat)
+
+dt = datetime.datetime(1979,1,1)
+end = datetime.datetime(2014,1,1)
+step = datetime.timedelta(days=1)
+times = []
+while dt < end:
+    times.append(dt)
+    dt += step
+
+# Groundwater
+# ===========
+
+nco = Dataset('../data/Gandak_groundwater_depth.nc', 'w')
+nco.description = 'AquaCrop depth to groundwater table input data'
+nco.history = 'Created ' + time.ctime(time.time())
+
+# create dimensions, variables and attributes:
+nco.createDimension('lon',nlon)
+nco.createDimension('lat',nlat)
+nco.createDimension('time',None)
+
+timeo = nco.createVariable('time','f4',('time'))
+timeo.units = 'days since 1901-01-01 00:00:00'
+timeo.calendar = 'standard'
+timeo.standard_name = 'time'
+timeo[:] = date2num(times, units=timeo.units, calendar=timeo.calendar)
+
+lono = nco.createVariable('lon',np.float64,('lon'),zlib=True,least_significant_digit=16)
+lono.units = 'degrees_east'
+lono.standard_name = 'longitude'
+lono[:]=lon
+
+lato = nco.createVariable('lat',np.float64,('lat'),zlib=True,least_significant_digit=16)
+lato.units = 'degrees_north'
+lato.standard_name = 'latitude'
+lato[:]=lat
+
+# create container variable for CRS: lon/lat WGS84 datum
+crso = nco.createVariable('crs','i4')
+crso.long_name = 'Lon/Lat Coords in WGS84'
+crso.grid_mapping_name='latitude_longitude'
+crso.longitude_of_prime_meridian = 0.0
+crso.semi_major_axis = 6378137.0
+crso.inverse_flattening = 298.257223563
+
+nco.Conventions='CF-1.6'
+
+gw = nco.createVariable('groundwater', np.float64, ('lat','lon'))
+gw.setncattr('standard_name', 'depth')
+gw.setncattr('long_name', 'Depth to groundwater table')
+gw.setncattr('units', 'm')
+gw.setncattr('_FillValue', np.float64(1e+20))
+gw.setncattr('missing_value', np.float64(1e+20))
+gw[:] = 10
+
+nco.close()
+
+# Groundwater - daily
+# ===================
+from random import randint
+
+outd = os.path.join('/home/simon/projects/AquaCrop/Gandak_FAO56/Input/daily_groundwater')
+os.mkdir(outd)
+for tm in times:
+    day, month, year = tm.day, tm.month, tm.year
+    fn = 'Gandak.groundwater.depth.{day:0>2d}.{month:0>2d}.{year:0>4d}.nc'.format(day=tm.day, month=tm.month, year=tm.year)
+    print fn
+    nco = Dataset(os.path.join(outd, fn), 'w')
+    nco.description = 'AquaCrop depth to groundwater table input data'
+    nco.history = 'Created ' + time.ctime(time.time())
+
+    # create dimensions, variables and attributes:
+    nco.createDimension('lon',nlon)
+    nco.createDimension('lat',nlat)
+    # nco.createDimension('time',None)
+
+    # timeo = nco.createVariable('time','f4',('time'))
+    # timeo.units = 'days since 1901-01-01 00:00:00'
+    # timeo.calendar = 'standard'
+    # timeo.standard_name = 'time'
+    # timeo[:] = date2num(times, units=timeo.units, calendar=timeo.calendar)
+
+    lono = nco.createVariable('lon',np.float64,('lon'),zlib=True,least_significant_digit=16)
+    lono.units = 'degrees_east'
+    lono.standard_name = 'longitude'
+    lono[:]=lon
+
+    lato = nco.createVariable('lat',np.float64,('lat'),zlib=True,least_significant_digit=16)
+    lato.units = 'degrees_north'
+    lato.standard_name = 'latitude'
+    lato[:]=lat
+
+    # create container variable for CRS: lon/lat WGS84 datum
+    crso = nco.createVariable('crs','i4')
+    crso.long_name = 'Lon/Lat Coords in WGS84'
+    crso.grid_mapping_name='latitude_longitude'
+    crso.longitude_of_prime_meridian = 0.0
+    crso.semi_major_axis = 6378137.0
+    crso.inverse_flattening = 298.257223563
+
+    nco.Conventions='CF-1.6'
+
+    gw = nco.createVariable('groundwater', np.float64, ('lat','lon'))
+    gw.setncattr('standard_name', 'depth')
+    gw.setncattr('long_name', 'Depth to groundwater table')
+    gw.setncattr('units', 'm')
+    gw.setncattr('_FillValue', np.float64(1e+20))
+    gw.setncattr('missing_value', np.float64(1e+20))
+    gw[:] = random.randint(1,1000) / 100.
+
+    nco.close()
+

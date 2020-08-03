@@ -1,0 +1,75 @@
+---
+layout: post
+title: Using Rose suites from the command line
+---
+As I wrote in a previous post, 
+
+    According to "Rose is a toolkit for writing, editing and running application configurations." In essence, Rose is a wrapper to Cylc which is designed to make that software more user friendly.
+
+As of version 4.X, Rose replaces the namelist... as the recommended way of running JULES. It is still possible to run JULES in this way... but using Rose has a number of advantages. In-built version control (provided by `fcm`) and so on. Rose comes with a GUI that you may want to use. However, I prefer working from the command line. I have put together a short guide on using Rose in this way. It is non-exhaustive and only covers the commands I use on a regular basis. The programs I use (`rose`, `fcm`, and `svn`) have extensive documentation so please do consult these for additional information.
+
+## Getting hold of a Rose suite
+The best way to develop a new JULES application is to modify an existing Rose suite. To download a suite from the Met Office repository use `rosie checkout <suite-name>`. In the remainder of this post I will be working from a copy of Toby Marthews' Rose suite... which we can checkout by entering the following command:
+```bash
+rosie checkout u-am539
+```
+See the `rosie checkout` [documentation](https://metomi.github.io/rose/doc/html/api/command-reference.html#command-rosie-checkout) for more information.
+
+## Editing a Rose suite
+We will modify your branch of `u-am539` (which will have a different name) to run on your machine. We will need to download the driving data from Toby's [website](https://www.tobymarthews.com/jules-short-course-2016.html). 
+
+### Change the `fcm-make` file
+The most obvious change we will need to make is to change the file paths from those which work on Toby's computer, to those which work on your computer... `grep` is useful to search for specific entries. At a minimum, you will need to modify the following files:
+
+## Version control
+As I mentioned in a previous post, `fcm` is a version control system... It is a good idea to make use of this facility when working... There are several things you can do... Here I focus on three of the most common things... Committing changes, seeing commit history, and returning to a previous commit.
+
+### Commit changes
+
+Commit changes using the following command:
+```bash
+fcm commit
+```
+
+### See commit history
+It is useful to be able to see the commit history for the current branch. There are a couple of commands which are used for this purpose. To print information about the branch, including the most recent commit message if `--verbose` is enabled, use `fcm branch-info` (http://cms.ncas.ac.uk/chrome/site/FCM/user_guide/command_ref.html#fcm-branch-info):
+
+```bash
+fcm branch-info --verbose
+```
+
+To print all the commit log messages, use `svn log` (pipe to `less` to see one screen at a time):
+
+```bash
+svn log | less
+```
+
+### Return to a previous commit
+TODO
+
+### Delete a Rose suite
+Use `rosie delete`, e.g.
+```bash
+rosie delete u-bh???
+```
+See the [documentation](https://metomi.github.io/rose/doc/html/api/command-reference.html#rosie-delete).
+
+This will delete a Rose suite if there are no uncommitted changes, or if the `--force` option is activated.
+
+## Running a Rose suite
+
+Navigate to the root directory of the Rose suite:
+```bash
+cd $HOME/roses/u-bhXXX
+rose suite-run
+```
+
+Check progress with
+```bash
+cylc scan -c
+```
+
+Kill a running process
+```bash
+cylc stop --kill u-bh???
+```

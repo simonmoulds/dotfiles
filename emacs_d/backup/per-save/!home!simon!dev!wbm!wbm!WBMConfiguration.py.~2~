@@ -1,0 +1,113 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from configparser import ConfigParser, ExtendedInterpolation
+import os
+import sys
+import string
+import time
+import datetime
+import shutil
+import glob
+import warnings
+
+from hm import file_handling
+from hm.Configuration import Configuration
+from hm.Messages import ModelError, ModelFileError, ModelWarning
+
+import logging
+logger = logging.getLogger(__name__)
+
+class WBMConfiguration(Configuration):
+    
+    def repair_ini_key_names(self):
+        """This function is used to change or modify key names of
+        options, to check the validity of options and to infill 
+        missing keys"""
+        # self.repair_global_options()
+        self.repair_landcover_options()
+        # self.repair_crop_parameters()
+        # self.repair_farm_parameters()
+        
+    def repair_timestep(self):
+        self.timeStep = 1.0
+        self.timeStepUnit = "day"
+        if ('timeStep' in list(self.globalOptions.keys())
+            and 'timeStepUnit'in list(self.globalOptions.keys())):
+
+            if (float(self.globalOptions['timeStep']) != 1.0
+                or self.globalOptions['timeStepUnit'] != "day"):
+                
+                logger.error('The model runs only on daily time step. Please check your ini/configuration file')
+                self.timeStep     = None
+                self.timeStepUnit = None
+
+
+    # AQUACROP VERSION:
+    # def repair_landcover_options(self):
+    #     if 'dynamicLandCover' not in list(self.LAND_COVER_PARAMETERS.keys()):
+    #         self.LAND_COVER_PARAMETERS['dynamicLandCover'] = 0
+    #         self.LAND_COVER_PARAMETERS['staticLandCoverYear'] = 1
+
+    def repair_landcover_options(self):
+        if 'dynamicLandCover' not in list(self.LAND_COVER_PARAMETERS.keys()):
+            self.LAND_COVER_PARAMETERS['dynamicLandCover'] = 0
+            self.LAND_COVER_PARAMETERS['staticLandCoverYear'] = 1
+        # if 'dynamicLandCover' not in list(self.LAND_COVER_PARAMETERS.keys()):
+        #     self.LAND_COVER_PARAMETERS['dynamicLandCover'] = 0
+
+        # if 'staticLandCoverYear' not in list(self.LAND_COVER_PARAMETERS.keys()):
+        #     if not bool(self.LAND_COVER_PARAMETERS['dynamicLandCover']):
+        #         logger.error('If land cover is not dynamic the year for which land cover data is used must be supplied')
+
+        lc_types = [lc.strip() for lc in self.LAND_COVER_PARAMETERS['landCoverTypes'].split(',')]
+        for lc in lc_types:
+            lc_config = getattr(self, lc)
+            if 'interceptCapInputFile' not in list(lc_config.keys()):
+                lc_config['interceptCapInputFile'] = "None"
+                lc_config['interceptCapVariableName'] = "None"
+            
+    # def repair_crop_parameters(self):
+    #     if 'cropID' not in list(self.CROP_PARAMETERS.keys()):
+    #         self.CROP_PARAMETERS['cropID'] = "None"
+            
+    #     if 'nCrop' not in list(self.CROP_PARAMETERS.keys()):
+    #         self.CROP_PARAMETERS['nCrop'] = 1
+            
+    #     if 'nRotation' not in list(self.CROP_PARAMETERS.keys()):
+    #         self.CROP_PARAMETERS['nRotation'] = 1
+
+    #     if 'landCoverFractionInputFile' not in list(self.CROP_PARAMETERS.keys()):
+    #         self.CROP_PARAMETERS['landCoverFractionInputFile'] = "None"
+            
+    #     if 'landCoverFractionVariableName' not in list(self.CROP_PARAMETERS.keys()):
+    #         self.CROP_PARAMETERS['landCoverFractionVariableName'] = "None"
+            
+    #     if 'cropAreaInputFile' not in list(self.CROP_PARAMETERS.keys()):
+    #         self.CROP_PARAMETERS['cropAreaInputFile'] = "None"
+            
+    #     if 'cropAreaVariableName' not in list(self.CROP_PARAMETERS.keys()):
+    #         self.CROP_PARAMETERS['cropAreaVariableName'] = "None"
+    #     if 'croplandAreaInputFile' not in list(self.CROP_PARAMETERS.keys()):
+    #         self.CROP_PARAMETERS['croplandAreaInputFile'] = "None"
+            
+    #     if 'croplandAreaVariableName' not in list(self.CROP_PARAMETERS.keys()):
+    #         self.CROP_PARAMETERS['croplandAreaVariableName'] = "None"
+    #     if 'AnnualChangeInCropArea' not in list(self.CROP_PARAMETERS.keys()):
+    #         self.CROP_PARAMETERS['AnnualChangeInCropArea'] = 0
+            
+    # def repair_farm_parameters(self):
+    #     if 'FARM_PARAMETERS' not in self.allSections:
+    #         self.FARM_PARAMETERS = {}
+
+    #     if 'nFarm' not in list(self.FARM_PARAMETERS.keys()):
+    #         self.FARM_PARAMETERS['nFarm'] = 1
+
+    #     if 'farmAreaInputFile' not in list(self.FARM_PARAMETERS.keys()):
+    #         self.FARM_PARAMETERS['farmAreaInputFile'] = "None"
+
+    #     if 'farmAreaVariableName' not in list(self.FARM_PARAMETERS.keys()):
+    #         self.FARM_PARAMETERS['farmAreaVariableName'] = "None"
+    #     if 'AnnualChangeInFarmArea' not in list(self.FARM_PARAMETERS.keys()):
+    #         self.FARM_PARAMETERS['AnnualChangeInFarmArea'] = 0
+            

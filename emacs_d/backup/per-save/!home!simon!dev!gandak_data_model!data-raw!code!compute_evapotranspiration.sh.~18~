@@ -1,0 +1,12 @@
+#!/bin/bash
+
+wd=$HOME/dev/gandak_data_model/data-raw
+
+# # radiation
+# e2o_radiation.py -S 1 -E 366 -D $wd/data/hydrosheds_gandak_5m.map -O $wd/data/output_rad -T 60 -f PCRaster
+
+# evapotranspiration
+python e2o_calculateEvaporation.py -I $wd/data/e2o_calculateEvaporation_gandak.ini
+
+# # precipitation
+# e2o_getvar.py -I $wd/code/e2o_downscalePrecipitation_gandak.ini

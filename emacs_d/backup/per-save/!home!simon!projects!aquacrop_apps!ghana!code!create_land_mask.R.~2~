@@ -1,0 +1,11 @@
+library(raster)
+library(ncdf4)
+library(magrittr)
+
+xmin = -20
+xmax = 55
+ymin = -35
+ymax = 38
+template = raster(xmn=xmin, xmx=xmax, ymn=ymin, ymx=ymax, crs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs", resolution=0.25)
+fn = "../data/sachs_crop_calendar/Maize.crop.calendar.fill.nc"
+

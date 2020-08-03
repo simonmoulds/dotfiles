@@ -1,0 +1,223 @@
+## Author : Simon Moulds
+## Date   : January 2018
+
+## Quality control for Maharashtra
+
+## Crops not grown: ...
+
+## chickpea
+## ########
+
+xx[["apy_chickpea-rabi"]] %<>% linear_interp(10)
+xx[["irr_chickpea-rabi"]] %<>% irr_frac_interp(xx[["apy_chickpea-rabi"]], 10:11, 9)
+
+xx[["apy_chickpea-kharif"]] = 0
+xx[["irr_chickpea-kharif"]] = 0
+
+## cotton
+## ######
+
+xx[["apy_cotton-kharif"]] = xx[["mapspam_atot_cotton"]][6]
+xx[["irr_cotton-kharif"]] = xx[["mapspam_xirr_cotton"]][6]
+
+## groundnut
+## #########
+
+xx[["apy_groundnut-rabi"]] %<>% linear_interp(2)
+xx[["irr_groundnut-rabi"]] %<>% linear_interp(2)
+
+if (dist_nm %in% c("Bagalkot","Bellary","Bidar","Bijapur","Chikmagalur","Chitradurga","Davanagere","Dharwad","Gadag","Gulbarga","Hassan","Haveri","Kolar","Koppal","Mysore","Raichur","Shimoga","Tumkur")) {
+    xx[["irr_groundnut-rabi"]][2] = xx[["irr_groundnut-kharif"]][2]
+    xx[["apy_groundnut-rabi"]] %<>% tot_frac_interp(xx[["irr_groundnut-rabi"]], 2, c(1,3))
+    xx[["irr_groundnut-kharif"]] %<>% irr_frac_interp(xx[["apy_groundnut-kharif"]], 2, c(1,3))
+}
+
+
+if (dist_nm %in% c("Udupi","Uttar Kannand")) {
+    xx[["apy_groundnut-kharif"]] %<>% linear_interp(2)
+    xx[["apy_groundnut-rabi"]] %<>% linear_interp(2)
+}
+
+## maize
+## #####
+
+if (dist_nm %in% c("Bagalkot","Belgaum")) {
+    xx[["irr_maize-kharif"]] %<>% irr_frac_interp(xx[["apy_maize-kharif"]], 4, c(3,5))
+    xx[["irr_maize-rabi"]] %<>% irr_frac_interp(xx[["apy_maize-rabi"]], 4, c(3,5))
+    xx[["irr_maize-summer"]] %<>% irr_frac_interp(xx[["apy_maize-summer"]], 4, c(3,5))
+}
+
+## other cereals
+## #############
+
+xx[["apy_other_cereals-kharif"]] %<>% linear_interp(9)
+
+if (dist_nm %in% c("Bangalore Rural")) {
+    xx[["apy_other_cereals-kharif"]] %<>% locf_interp(3:5, fromLast=TRUE)
+}
+
+if (dist_nm %in% c("Bijapur")) {
+    xx[["apy_other_cereals-kharif"]] %<>% locf_interp(6:7, fromLast=TRUE)
+    xx[["apy_other_cereals-kharif"]] %<>% locf_interp(9:11)
+}
+
+## other fibre crops
+## #################
+
+xx[["apy_other_fibre_crops-kharif"]] = xx[["mapspam_atot_other_fibre_crops"]][6]
+xx[["irr_other_fibre_crops-kharif"]] = xx[["mapspam_xirr_other_fibre_crops"]][6]
+
+## other oil crops
+## ###############
+
+if (dist_nm %in% c("Hassan","Mysore")) {
+    xx[["irr_other_oil_crops-kharif"]] %<>% irr_frac_interp(xx[["apy_other_oil_crops-kharif"]], 1, 2)
+}
+
+if (dist_nm %in% c("Kodagu")) {
+    xx[["apy_other_oil_crops-kharif"]] %<>% locf_interp(1:5, fromLast=TRUE)
+    xx[["irr_other_oil_crops-kharif"]] %<>% locf_interp(1:5, fromLast=TRUE)
+    xx[["apy_other_oil_crops-kharif"]] %<>% locf_interp(8:11)
+    xx[["irr_other_oil_crops-kharif"]] %<>% locf_interp(8:11)
+}
+
+## other pulses
+## ############
+
+if (dist_nm %in% c("Udupi")) {
+    xx[["apy_other_pulses-rabi"]][5] = xx[["apy_other_pulses-kharif"]][5]
+    xx[["apy_other_pulses-kharif"]][5] = 0
+}
+
+## pearl millet
+## ############
+
+if (dist_nm %in% c("Mysore","Shimoga")) {
+    xx[["apy_pearl_millet-summer"]] = xx[["mapspam_atot_pearl_millet"]][6]
+    xx[["irr_pearl_millet-summer"]] = xx[["mapspam_xirr_pearl_millet"]][6]
+}
+
+if (dist_nm %in% c("Raichur")) {
+    xx[["irr_pearl_millet-summer"]] %<>% irr_frac_interp(xx[["apy_pearl_millet-summer"]], 6:7, c(5,8))
+}
+
+## pigeonpea
+## #########
+
+if (dist_nm %in% c("Belgaum","Dharwad","Gadag")) {
+    xx[["irr_pigeonpea-kharif"]] %<>% irr_frac_interp(xx[["apy_pigeonpea-kharif"]], 1, 2)
+}
+
+## potato
+## ######
+
+xx[["apy_potato-kharif"]] %<>% linear_interp(7)
+xx[["irr_potato-kharif"]] %<>% linear_interp(7)    
+xx[["apy_potato-rabi"]] %<>% linear_interp(7)
+xx[["irr_potato-rabi"]] %<>% linear_interp(7)
+xx[["apy_potato-summer"]] %<>% linear_interp(7)
+xx[["irr_potato-summer"]] %<>% linear_interp(7)
+
+xx[["apy_potato-kharif"]] %<>% locf_interp(1:5, fromLast=TRUE)
+xx[["irr_potato-kharif"]] %<>% locf_interp(1:5, fromLast=TRUE)
+xx[["apy_potato-rabi"]] %<>% locf_interp(1:5, fromLast=TRUE)
+xx[["irr_potato-rabi"]] %<>% locf_interp(1:5, fromLast=TRUE)
+xx[["apy_potato-summer"]] %<>% locf_interp(1:5, fromLast=TRUE)
+xx[["irr_potato-summer"]] %<>% locf_interp(1:5, fromLast=TRUE)
+
+xx[["apy_sweet_potato-whole_year"]] %<>% linear_interp(2)
+
+## rapeseed
+## ########
+
+xx[["apy_rapeseed-rabi"]][7:8] = xx[["apy_rapeseed-kharif"]][7:8]
+xx[["irr_rapeseed-rabi"]][7:8] = xx[["irr_rapeseed-kharif"]][7:8]
+
+xx[["apy_rapeseed-kharif"]][7:8] = 0
+xx[["irr_rapeseed-kharif"]][7:8] = 0
+
+## rest of crops
+## #############
+
+if (dist_nm %in% c("Chamrajnagar")) {
+    xx[["irr_rest_of_crops-whole_year"]][1:7] = xx[["irr_rest_of_crops-summer"]][1:7]
+    xx[["irr_rest_of_crops-summer"]] = 0
+}
+
+if (dist_nm %in% c("Chikmagalur","Chitradurga","Dakshin Kannad")) {
+    xx[["irr_rest_of_crops-whole_year"]][c(1:5,7:11)] = xx[["irr_rest_of_crops-summer"]][c(1:5,7:11)]
+    xx[["irr_rest_of_crops-summer"]] = 0
+}
+
+if (dist_nm %in% c("Davanagere","Hassan","Mandya","Shimoga","Tumkur","Udupi")) {
+    xx[["irr_rest_of_crops-whole_year"]][c(1:5,7)] = xx[["irr_rest_of_crops-summer"]][c(1:5,7)]
+    xx[["irr_rest_of_crops-summer"]] = 0
+}
+
+if (dist_nm %in% c("Mysore","Uttar Kannand","Raichur")) {
+    xx[["irr_rest_of_crops-whole_year"]] = xx[["irr_rest_of_crops-summer"]]
+}
+
+if (dist_nm %in% c("Raichur")) {
+    xx[["apy_rest_of_crops-whole_year"]] %<>% locf_interp(8:11)
+    xx[["irr_rest_of_crops-whole_year"]] %<>% locf_interp(8:11)
+}
+    
+## rice
+## ####
+
+if (!dist_nm %in% c("Dakshin Kannad")) {
+    xx[["irr_rice-winter"]] = xx[["irr_rice-autumn"]]
+    xx[["irr_rice-autumn"]] = 0
+}
+
+if (dist_nm %in% c("Bagalkot","Belgaum")) {
+    xx[["irr_rice-winter"]] %<>% irr_frac_interp(xx[["apy_rice-winter"]], 4, c(3,5))
+}
+
+if (dist_nm %in% c("Bangalore Rural")) {
+    xx[["irr_rice-winter"]] %<>% irr_frac_interp(xx[["apy_rice-winter"]], 4:5, c(3,6))
+    xx[["irr_rice-summer"]] %<>% irr_frac_interp(xx[["apy_rice-summer"]], 4:5, c(3,6))
+}
+
+if (dist_nm %in% c("Chamrajnagar","Chitradurga","Hassan","Mandya")) {
+    xx[["irr_rice-summer"]] %<>% irr_frac_interp(xx[["apy_rice-summer"]], 3, c(2,4))
+}
+
+if (dist_nm %in% c("Dakshin Kannad")) {
+    xx[["irr_rice-summer"]] %<>% irr_frac_interp(xx[["apy_rice-summer"]], 3, c(2,4))
+    xx[["irr_rice-summer"]] %<>% irr_frac_interp(xx[["apy_rice-summer"]], 6:11, 5)
+    xx[["irr_rice-winter"]] %<>% irr_frac_interp(xx[["apy_rice-winter"]], 1:2, 3)
+    xx[["irr_rice-winter"]] %<>% irr_frac_interp(xx[["apy_rice-winter"]], 4:5, c(3,6))
+}
+
+if (dist_nm %in% c("Shimoga")) {
+    xx[["irr_rice-winter"]] %<>% irr_frac_interp(xx[["apy_rice-winter"]], 1, 2)
+    xx[["irr_rice-summer"]] %<>% irr_frac_interp(xx[["apy_rice-summer"]], 1, 2)
+}
+
+if (dist_nm %in% c("Udupi","Uttar Kannand")) {
+    xx[["irr_rice-summer"]] %<>% irr_frac_interp(xx[["apy_rice-summer"]], 3, c(2,4))
+    xx[["irr_rice-summer"]] %<>% irr_frac_interp(xx[["apy_rice-summer"]], 6:11, 5)
+}
+
+## sesameseed
+## ##########
+
+## all ok
+
+## sorghum
+## #######
+
+if (dist_nm %in% c("Bagalkot","Belgaum")) {
+    xx[["irr_sorghum-kharif"]] %<>% irr_frac_interp(xx[["apy_sorghum-kharif"]], 4, c(3,5))
+    xx[["irr_sorghum-rabi"]] %<>% irr_frac_interp(xx[["apy_sorghum-rabi"]], 4, c(3,5))
+}
+
+if (dist_nm %in% c("Gulbarga")) {
+    xx[["irr_sorghum-rabi"]] %<>% irr_frac_interp(xx[["apy_sorghum-rabi"]], 3, c(2,4))
+}
+
+if (dist_nm %in% c("Kolar")) {
+    xx[["apy_sorghum-kharif"]] = xx[["mapspam_atot_sorghum"]][6]
+    xx[["irr_sorghum-kharif"]] = xx[["mapspam_xirr_sorghum"]][6]

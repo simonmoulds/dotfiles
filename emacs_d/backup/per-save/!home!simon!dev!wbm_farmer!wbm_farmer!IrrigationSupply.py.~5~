@@ -1,0 +1,190 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import os
+import time
+import calendar
+import numpy as np
+
+from hm import file_handling
+from hm.Messages import *
+
+import logging
+logger = logging.getLogger(__name__)
+
+class IrrigationSupply(object):
+
+    def __init__(self, land_cover):
+        self.land_cover = land_cover
+    
+    def initial(self):
+        arr_zeros = np.zeros((self.land_cover.nFarm, self.land_cover.model.nCell))
+        self.land_cover.GwPumpingVol = arr_zeros.copy()
+        self.land_cover.SwPumpingVol = arr_zeros.copy()
+        self.land_cover.IrrigationCost = arr_zeros.copy()
+        self.land_cover.UnmetIrrigationDemand = np.zeros((self.land_cover.nFarm, self.land_cover.nCrop, self.land_cover.model.nCell))
+        self.land_cover.UnmetIrrigationDemandDays = np.zeros((self.land_cover.nFarm, self.land_cover.nCrop, self.land_cover.model.nCell))
+        
+    def reset_initial_conditions(self):
+        if self.land_cover.IsFirstDayOfYear:
+            self.land_cover.UnmetIrrigationDemand[:] = 0
+            self.land_cover.UnmetIrrigationDemandDays[:] = 0
+
+    def irrigation_expenditure(self):
+        self.diesel_pump_cost()
+        self.electric_pump_cost()
+        self.land_cover.IrrigationCost = self.land_cover.DieselPumpCost + self.land_cover.ElectricPumpCost
+        
+    def diesel_pump_cost(self):
+        fuel_efficiency = 1.
+        unit_fuel_consumption = (0.1133 * self.land_cover.model.groundwater.zGW) + 0.7949
+        unit_fuel_consumption = unit_fuel_consumption * fuel_efficiency / 102.87
+        self.land_cover.DieselPumpCost = (
+            unit_fuel_consumption
+            * self.land_cover.GwPumpingVol
+            * self.land_cover.DieselPrice
+            * 0.4)              # TODO: ask JoK the reason for multiplying by 0.4 (subsidy, efficiency?)
+        
+    def electric_pump_cost(self):
+        self.land_cover.ElectricPumpCost = 0.
+
+    def surface_water_irrigation_cost(self):
+        pass
+            
+    def irrigation_supply(self):
+
+        # Compute irrigation demand in m3 (depth -> volume)
+        irrigation_depth = self.land_cover.irrigation
+
+        irrigation_demand = np.multiply(
+            irrigation_depth,
+            self.land_cover.FarmCropArea,
+            out=np.zeros_like(self.land_cover.FarmCropArea),
+            where=self.land_cover.FarmCropArea > 0)
+        
+        # Sum along crop axis to get total irrigation demand across
+        # all crops
+        total_irrigation_demand = np.sum(irrigation_demand, axis=1)  # farm, cell
+        
+        # Compute the relative irrigation demand of each crop grown
+        # on a given farm (farm, crop, cell)
+        relative_irrigation_demand = np.divide(
+            irrigation_demand,
+            total_irrigation_demand[:,None,:],
+            out=np.zeros_like(irrigation_demand),
+            where=total_irrigation_demand[:,None,:] > 0)
+
+        # The following variables (up to total_irrigation_supply) have
+        # dimensions (farm, cell)
+        canal_supply = np.broadcast_to(
+            self.land_cover.model.canal.CanalSupply,
+            (self.land_cover.nFarm, self.land_cover.model.nCell)).copy()
+
+        # # OLD:
+        # # canal_supply[np.logical_not(self.land_cover.CanalAccess)] = 0
+        # canal_supply[:] = 0     # TEMPORARY - FIXME!!!
+        # canal_demand = np.clip(canal_supply, 0, total_irrigation_demand)
+
+        # TEMPORARY - FIXME
+        # This *should* mean that in cells with high canal access much of the
+        # irrigation demand is met from surface water, whereas in cells with
+        # low canal access the irrigation demand must be met from groundwater.
+        canal_supply = total_irrigation_demand * self.land_cover.CanalAccess[0,...]  # FIXME
+        canal_demand = np.clip(canal_supply, 0, total_irrigation_demand)
+        
+        # Attempt to meet the outstanding demand from groundwater
+        groundwater_demand = np.clip(
+            total_irrigation_demand - canal_demand,
+            0, None)
+
+        total_gw_irrigation_demand_per_farm = np.divide(
+            groundwater_demand,
+            self.land_cover.FarmArea[self.land_cover.farm_index,...],
+            out=np.zeros_like(groundwater_demand),
+            where=self.land_cover.FarmArea[self.land_cover.farm_index,...]>0
+        )
+        
+        # Compute the maximum amount of groundwater which can be
+        # extracted on a given day, based on assumptions about operating
+        # hours and pump horsepower 
+        # (http://krishikosh.egranth.ac.in/bitstream/1/65128/1/thesis.pdf)
+        max_groundwater_supply_divd = (
+            self.land_cover.TubewellOperatingHours
+            * 129574.1
+            * self.land_cover.PumpHorsePower
+        )
+        max_groundwater_supply_divs = (
+            self.land_cover.model.groundwater.zGW
+            + np.divide(
+                (255.5998 * self.land_cover.TubewellOperatingHours ** 2),
+                (self.land_cover.model.groundwater.zGW ** 2 * 4 ** 4),
+                out=np.zeros((self.land_cover.model.nCell)),
+                where=self.land_cover.model.groundwater.zGW>0)
+        )
+        # max groundwater supply per tubewell in a grid cell
+        max_groundwater_supply = np.divide(
+            max_groundwater_supply_divd,
+            max_groundwater_supply_divs,
+            out=np.zeros((self.land_cover.model.nCell)),
+            where=max_groundwater_supply_divs>0
+        )                
+        max_groundwater_supply /= 1000 # litres -> m3
+
+        # Multiply by number of tubewells per farm subcategory
+        # to get the maximum supply per farm.
+        max_groundwater_supply = (
+            max_groundwater_supply[None,:]
+            * self.land_cover.num_tubewell_per_subcategory
+        )
+        
+        groundwater_supply = np.clip(
+            groundwater_demand,
+            None,
+            max_groundwater_supply)
+
+        self.land_cover.SwPumpingVol = canal_demand.copy()  # FIXME
+        self.land_cover.GwPumpingVol = groundwater_supply.copy()
+                
+        # ***TODO: adjust according to available account balance***        
+        
+        total_irrigation_supply = (
+            self.land_cover.SwPumpingVol
+            + self.land_cover.GwPumpingVol
+        )
+
+        # Get irrigation supply per crop as a volume, and
+        # compute the unmet demand
+        irrigation_supply_vol = np.multiply(
+            total_irrigation_supply[:,None,:],
+            relative_irrigation_demand
+        )
+        unmet_irrigation_demand = np.maximum(
+            irrigation_demand - irrigation_supply_vol,
+            0
+        )
+        self.land_cover.UnmetIrrigationDemand += unmet_irrigation_demand
+        self.land_cover.UnmetIrrigationDemandDays[unmet_irrigation_demand > 0] += 1
+        
+        # Convert irrigation volume to a depth by dividing by
+        # the crop area
+        irrigation_supply = np.divide(
+            irrigation_supply_vol,
+            self.land_cover.FarmCropArea,
+            out=np.zeros_like(self.land_cover.FarmCropArea),
+            where=self.land_cover.FarmCropArea > 0)
+        
+        # Limit the estimated irrigation demand to the maximum
+        # available supply
+        self.land_cover.irrigation = self.land_cover.irrigation.clip(None, irrigation_supply)  # farm, crop, cell
+        self.land_cover.irrigation_volume = irrigation_supply_vol.copy() # farm, crop, cell
+        # self.land_cover.ETact_volume = self.land_cover.ETact * self.land_cover.FarmCropArea
+
+        # Add irrigation to the water available for infiltration
+        self.land_cover.water_available_for_infiltration += self.land_cover.irrigation
+
+        # Lastly, compute irrigation expenses
+        self.irrigation_expenditure()
+        
+    def dynamic(self):
+        self.reset_initial_conditions()
+        self.irrigation_supply()

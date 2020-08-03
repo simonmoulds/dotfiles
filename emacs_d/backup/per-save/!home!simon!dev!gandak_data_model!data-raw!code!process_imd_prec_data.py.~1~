@@ -1,0 +1,36 @@
+import numpy as np
+import pandas as pd
+import calendar
+
+startyear = 1901
+nyear = 115
+years = [startyear + i for i in range(nyear)]
+nrow=129
+
+for year in years:
+    fn = '/data' + '/' + 'IND2013_rfP25.TXT'
+    print fn
+    ndays=365
+    if calendar.isleap(year):
+        ndays+=1
+    for day in range(ndays):
+        skiprows = (day - 1) * (nrow + 1)
+        df = pd.read_table(
+            fn,
+            nrows=129,
+            skiprows=skiprows,
+            sep='\s+',
+            index_col=0)
+        arr = df.values
+        print day, arr.shape
+        
+    
+
+# x = pd.read_table(
+#     '/data/IND2013_rfP25.TXT',
+#     nrows=130,
+#     skiprows=130,
+#     sep='\s+',
+#     index_col=0)
+
+# m = x.values

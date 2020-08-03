@@ -1,0 +1,132 @@
+## Author : Simon Moulds
+## Date   : June 2018
+
+library(raster)
+library(rgdal)
+library(magrittr)
+library(dplyr)
+library(tidyr)
+library(xts)
+
+## some helper functions:
+get_gaez_suit_data = function(crop, path, suffix, type="class", ...) {
+
+    if (type=="class") {
+        type="sc"
+    } else if (type=="value") {
+        type="su"
+    } else {
+        stop("Argument 'type' must be 'class' or 'value'")
+    }
+
+    ## input levels (class)
+    input_levels = paste0(c("h","i","h","i","l"), "_", type, c("hi","ii","hr","ir","lr"))
+    out = list()
+    count = 0
+    for (i in 1:length(input_levels)) {
+        level = input_levels[i]
+        f = paste0("res03_crav6190", level, "_", crop, suffix, ".tif")
+        if (file.exists(file.path(path, f))) {
+            count = count + 1
+            r = raster(file.path(path, f))
+            out[[level]] = r
+        }
+    }
+    if (count == 0) {
+        stop("no files available for the supplied crop")
+    }
+    out
+}
+
+get_gaez_potyld_data = function(crop, path, suffix, ...) {
+
+    ## high/intermediate irrigated, high/intermediate/low rainfed
+    input_levels = paste0(c("h","i","h","i","l"), "_", crop, c("000a","000a","150b","150b","150b"))
+
+    out = list()
+    count = 0
+    for (i in 1:length(input_levels)) {
+        level = input_levels[i]
+        f = paste0("res02_crav6190", level, "_yld", suffix, ".tif")
+        if (file.exists(file.path(path, f))) {
+            count = count + 1
+            r = raster(file.path(path, f))
+            out[[level]] = r
+        }
+    }
+    if (count == 0) {
+        stop("no files available for the supplied crop")
+    }
+    out
+}
+
+get_mixed_yield = function(suit, potyld, ...) {
+    ## irrigated: high suitability (very high, high, good)
+    hs_irr_ix = suit[[1]] %in% c(1,2,3)
+    ## irrigated: moderate suitability (medium, moderate)
+    mds_irr_ix = suit[[2]] %in% c(4,5)
+    ## rainfed: high suitability
+    hs_rain_ix = suit[[3]] %in% c(1,2,3)
+    ## rainfed: moderate suitability
+    mds_rain_ix = suit[[4]] %in% c(4,5)
+    ## rainfed: marginal suitability
+    mgs_rain_ix = suit[[5]] %in% c(6,7)
+
+    mixed_irr_potyld = raster(hs_irr_ix)
+    mixed_irr_potyld[] = 0
+    mixed_irr_potyld[mds_irr_ix] = potyld[[2]][mds_irr_ix]
+    mixed_irr_potyld[hs_irr_ix] = potyld[[1]][hs_irr_ix]
+
+    mixed_rain_potyld = raster(hs_irr_ix)
+    mixed_rain_potyld[] = 0
+    mixed_rain_potyld[mgs_rain_ix] = potyld[[5]][mgs_rain_ix]
+    mixed_rain_potyld[mds_rain_ix] = potyld[[4]][mds_rain_ix]
+    mixed_rain_potyld[hs_rain_ix] = potyld[[3]][hs_rain_ix]
+    list(irr=mixed_irr_potyld, rain=mixed_rain_potyld)
+}
+
+template = raster(xmn=83, ymn=25, xmx=86.5, ymx=28, ncols=42, nrows=36)
+template[] = 0
+
+options(stringsAsFactors = FALSE)
+crops = read.table(header=TRUE, sep=" ", text="
+crop_nm gaez_suit_code gaez_potyld_code
+rice rcw ricw
+wheat whe whea
+maize mze maiz
+sugc suc sugc
+bean phb bean
+pota wpo wpot
+rape rsd rape
+lent chk chck
+pige pig pigp
+toba tob toba")
+
+maps = vector(mode="list", length=nrow(crops))
+for (i in 1:nrow(crops)) {
+    crop_nm = crops$crop_nm[i]; print(crop_nm)
+    suit_code = crops$gaez_suit_code[i]
+    potyld_code = crops$gaez_potyld_code[i]
+    suit =
+        get_gaez_suit_data(suit_code,"data/gaez_data","_ll") %>%
+        lapply(FUN=function(x) crop(x,extent(template)))
+
+    potyld =
+        get_gaez_potyld_data(potyld_code,"data/gaez_data","_ll") %>%
+        lapply(FUN=function(x) crop(x,extent(template)))
+
+    mixed_potyld = get_mixed_yield(suit, potyld)
+    mixed_potyld %<>% setNames(paste0(crop_nm, "_", c("irri","rain")))
+    maps[[i]] = mixed_potyld
+}
+maps = stack(unlist(maps))
+
+## first, write maps to file -> these will be used in the
+## coupled model
+for (i in 1:nlayers(maps)) {
+    map = maps[[i]]
+    nm = names(map)
+    outfn = file.path("data", paste0("potential_yield_", nm, "_mixed_input.tif"))
+    writeRaster(map, filename=outfn, overwrite=TRUE)
+}
+

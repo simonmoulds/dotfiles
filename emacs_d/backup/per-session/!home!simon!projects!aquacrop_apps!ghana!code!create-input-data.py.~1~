@@ -1,0 +1,10 @@
+#!/usr/bin/env python
+
+import pickle
+
+with open('TA00136_data.pkl', 'rb') as f:
+    tid, lat, lon, z, tahmo_data_df_day = pickle.load(f)
+
+with open('TA00136cluster_data.pkl', 'rb') as f:
+    cluster_data = pickle.load(f)
+

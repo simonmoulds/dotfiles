@@ -1,0 +1,14 @@
+# Author : edited by Jimmy O'Keeffe
+## Date   : 24 Jan 2019
+
+## Irrigation schedule for Sultanpur district (BAU)
+
+## mu is mean irrigation day, sd is standard deviation
+wheat_irr_schedule_mu = c(3,46,326,347)
+wheat_irr_schedule_sd = c(3,3,3,3)
+wheat_can_irr_schedule_mu = c(0)
+wheat_can_irr_schedule_sd = c(0)
+rice_irr_schedule_mu = c(168,188,218,248,268,288)
+rice_irr_schedule_sd = c(3,3,3,3,3,3)
+rice_can_irr_schedule_mu = c(268)
+rice_can_irr_schedule_sd = c(1)

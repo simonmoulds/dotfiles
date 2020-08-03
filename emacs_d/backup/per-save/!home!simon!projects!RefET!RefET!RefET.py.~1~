@@ -1,0 +1,28 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import os
+import shutil
+import sys
+import math
+import gc
+
+import pcraster as pcr
+import VirtualOS as vos
+
+from Messages import *
+from Model import Model
+from PenmanMonteith import PenmanMonteith
+
+import logging
+logger = logging.getLogger(__name__)
+        
+class RefET(Model):
+
+    def initial(self):        
+        self.meteo_module = PenmanMonteith(self)
+        self.meteo_module.initial()
+        
+    def dynamic(self):        
+        logger.info("Reading forcings for time %s", self._modelTime)
+        self.meteo_module.dynamic()

@@ -1,0 +1,357 @@
+## Author : Simon Moulds
+## Date   : August 2017
+
+library(magrittr)
+library(dplyr)
+library(tidyr)
+library(tibble)
+library(ggplot2)
+library(rgdal)
+library(raster)
+
+## x = readRDS("data/apy_indiastat_combined_data_formatted.rds")
+devtools::load_all("pkg/r_indagridat/indagridat")
+data(indiastat1960)
+data(icrisat1960)
+
+combine_data <- function(d1, d2) {
+    dists <- unique(d1$ADM2_CODE)
+    data <- list()
+    ix  <- which(names(d1) %in% names(d2))
+    ixx <- which(!names(d2) %in% names(d1))
+    for (i in 1:length(dists)) {
+        ix1 <- which(d1$ADM2_CODE %in% dists[i])
+        dd1 <- d1[ix1,]
+        
+        if (dists[i] %in% d2$ADM2_CODE) {
+            ix2 <- which(d2$ADM2_CODE %in% dists[i])
+            dd2 <- d2[ix2,]
+            for (j in 1:nrow(dd1)) {
+                for (k in ix) {
+                    if (is.na(dd1[j,k])) {
+                        dd1[j,k] <- dd2[j,k]
+                    }
+                }
+            }
+            dd1 <- cbind(dd1, dd2[,ixx])
+        } else {
+            dd2 <- as.data.frame(matrix(data=NA, nrow=nrow(dd1), ncol=ncol(d2)))
+            names(dd2) <- names(d2)
+            dd1 <- cbind(dd1, dd2[,ixx])
+        }
+        data[[i]] <- dd1
+    }
+    data <- do.call(rbind, data)
+    data
+}
+
+combined_data = combine_data(indiastat1960, icrisat1960)
+
+x = combined_data[,-(c(8:37,41,44,52:53,58:60,65,71,76:77,86,96,102:103,121,129,136:139))]
+x = x[,-(grep("_Production$", names(x)))]
+
+x1 = x %>% dplyr::select(c(State,ADM1_CODE,District,ADM2_CODE,Year,Area,Reporting_Area))
+x2 = x %>% dplyr::select(-c(State,ADM1_CODE,District,ADM2_CODE,Year,Area,Reporting_Area))
+
+names(x2) = c("irr_rice-autumn",
+              "irr_rice-winter",
+              "irr_rice-summer",
+              "irr_sorghum-kharif",
+              "irr_sorghum-rabi",
+              "irr_pearl_millet",
+              "irr_maize",
+              "irr_finger_millet",
+              "irr_wheat",
+              "irr_barley",
+              "irr_other_cereals-kharif",
+              "irr_other_cereals-rabi",
+              "irr_chickpea",
+              "irr_pigeonpea",
+              "irr_other_pulses-kharif",
+              "irr_other_pulses-rabi",
+              "irr_sugarcane-whole_year",
+              "irr_condiments_and_spices",
+              "irr_fruit_and_veg",
+              "irr_other_food_crops",
+              "irr_groundnut",
+              "irr_sesamum",
+              "irr_rapeseed",
+              "irr_linseed",
+              "irr_other_oilseed",
+              "irr_cotton",
+              "irr_tobacco",
+              "irr_fodder_crops",
+              "irr_other_nonfood_crops",
+              "apy_rice",
+              "apy_wheat",
+              "apy_sorghum-kharif",
+              "apy_sorghum-rabi",
+              "apy_pearl_millet",
+              "apy_maize",
+              "apy_finger_millet",
+              "apy_barley",
+              "apy_chickpea",
+              "apy_pigeonpea",
+              "apy_groundnut",
+              "apy_sesamum",
+              "apy_rapeseed",
+              "apy_saffron",
+              "apy_castor",
+              "apy_linseed",
+              "apy_sunflower",
+              "apy_soyabean",
+              "apy_sugarcane-whole_year",
+              "apy_cotton",
+              "apy_fruit",
+              "apy_veg",
+              "apy_potato",
+              "apy_onion",
+              "Nitrogen_Consumption",
+              "Phosphate_Consumption",
+              "Potash_Consumption",
+              "Total_NPK_Consumption")
+
+x = cbind(x1, x2)
+x$State[x$State %in% "Jammu & Kashmir"] = "Jammu_Kashmir"
+
+district1960 <- readOGR(dsn=system.file("shapes",
+                                        package="indagridat"),
+                        layer="g1960_2_India")
+
+## ======================================
+## data quality
+## ======================================
+
+check_data <- function(x, y, crop, plot_title, ...) {
+
+    ## the point of this function is create a plot
+    
+    ## get column names from data frame
+    columns = grep(crop, names(y), value=TRUE)
+    apy_columns = grep("^apy_", columns, value=TRUE) %>% sort
+    irr_columns = grep("^irr_", columns, value=TRUE) %>% sort
+    ## map_columns = grep("^mapspam_", columns, value=TRUE) %>% sort
+
+    ## test1 = length(apy_columns) == length(irr_columns)
+    ## test2 = all(gsub("^apy_", "", apy_columns) == gsub("^irr_", "", irr_columns))
+
+    ## if (!test1) stop()
+    ## if (!test2) stop()
+    
+    ## columns = c(apy_columns, irr_columns, map_columns)
+    ## n = length(apy_columns)
+    ## ix = c(seq(1, by=2, length.out=n), seq(2, by=2, length.out=n), seq(2 * n + 1, length.out=2)) %>% order
+    ## columns = c(apy_columns, irr_columns, map_columns)[ix]
+    columns = c(apy_columns, irr_columns)
+    n = length(columns)
+    
+    ix <- match(columns, names(y))
+    d  <- as.data.frame(y[,ix]) %>% setNames(columns)
+    
+    ## if all NA, set to zero
+    for (i in 1:ncol(d)) {
+        dd = as.numeric(d[,i])
+        if (all(is.na(dd))) {
+            dd[] = 0
+            d[,i] = dd
+        }
+    }
+
+    ## ## Temporary 
+    ## d = zoo::na.approx(d)
+    ## d = zoo::na.locf(d)
+    ## d = zoo::na.locf(d, fromLast=TRUE)
+    ## d %<>% as.data.frame
+    
+    d %<>%
+        add_column(time=x) %>%
+        gather(variable, value, -time) %>%
+        add_column(type=rep(NA, nrow(.)))
+
+    d$variable = factor(d$variable, levels=unique(d$variable))
+
+    p = ggplot(d, aes(x=time, y=value, colour=variable, shape=variable, size=variable, group=variable)) +
+        geom_line(size=0.5) +
+        geom_point() +
+        scale_shape_manual(values=rep(19, n)) + 
+        scale_size_manual(values=rep(1.5, n)) +
+        ## scale_shape_manual(values=rep(c(19,2), n + 1)) +
+        ## scale_size_manual(values=rep(c(1.5,3), n + 1)) +
+        scale_x_continuous(breaks=seq(1950,2010,10)) +
+        ## scale_x_continuous(breaks=2000:2010) +
+        labs(x="Time", y="Area (Ha)", colour = "", shape="", size="") +
+        ggtitle(plot_title)
+    p
+}
+
+## create directories
+
+if (!dir.exists("data/qc_plots_1960")) dir.create("data/qc_plots_1960")
+
+irr_crops =
+    grep("^irr_.*$", names(x), value=TRUE) %>%
+    gsub("irr_", "", x=.) %>%
+    gsub("-(kharif|rabi|summer|autumn|winter|whole_year)", "", x=.) %>%
+    unique
+
+apy_crops = 
+    grep("^apy_.*$", names(x), value=TRUE) %>%
+    gsub("apy_", "", x=.) %>%
+    gsub("-(kharif|rabi|summer|autumn|winter|whole_year)", "", x=.) %>%
+    unique
+
+crop_nms = irr_crops[irr_crops %in% apy_crops]
+## crop_nms = crop_nms[!crop_nms %in% "linseed"]
+crop_nms = c(crop_nms, "soyabean")
+
+## crop_nms = grep("^irr_", names(x), value=TRUE) %>% gsub("^irr_", "", .) %>% strsplit("-") %>% sapply(FUN=function(x) x[[1]]) %>% unique
+
+## state_nms = x[["State"]] %>% unique
+
+state_nms = c("Andhra Pradesh",
+              "Bihar",
+              ## "Chhattisgarh",
+              "Delhi",
+              "Gujarat",
+              "Haryana",
+              "Himachal Pradesh",
+              ## "Jharkhand",
+              "Karnataka",
+              "Kerala",
+              "Madhya Pradesh",
+              "Maharashtra",
+              "Orissa",
+              "Punjab",
+              "Rajasthan",
+              "Tamil Nadu",
+              "Uttarakhand",
+              "Uttar Pradesh",
+              "West Bengal")
+
+for (i in 1:length(state_nms)) {
+
+    state_nm = gsub(" ", "_", state_nms[i])
+    state_dir = file.path("data", "qc_plots_1960", state_nm)
+    if (!dir.exists(state_dir)) {
+        dir.create(state_dir)
+    }
+
+    for (j in 1:length(crop_nms)) {
+        crop_nm = gsub(" ", "_", crop_nms[j])
+        crop_dir = file.path(state_dir, crop_nm)
+        if (!dir.exists(crop_dir)) {
+            dir.create(crop_dir)
+        }
+    }
+}
+
+linear_interp = function(x, na_ix, ...) {
+    x[na_ix] = NA
+    x = zoo::na.approx(x, na.rm=FALSE)
+    x
+}
+locf_interp = function(x, na_ix, ...) {
+    x[na_ix] = NA
+    x = zoo::na.locf(x, na.rm=FALSE, ...)
+    x
+}
+irr_frac_interp = function(irr, tot, ix, nb_ix, ...) {
+    mean_irr_frac = mean(irr[nb_ix] / tot[nb_ix])
+    irr[ix] = tot[ix] * mean_irr_frac
+    irr
+}
+
+tot_frac_interp = function(tot, irr, ix, nb_ix, ...) {
+    mean_tot_frac = mean(tot[nb_ix] / irr[nb_ix])
+    tot[ix] = irr[ix] * mean_tot_frac
+    tot
+}
+
+## state_nms = c("Andhra Pradesh")
+## state_nms = c("Bihar")
+## state_nms = c("Delhi")
+## state_nms = c("Gujarat")
+state_nms = c("Haryana")
+## state_nms = c("Himachal Pradesh")
+## state_nms = c("Karnataka")
+## state_nms = c("Kerala")
+## state_nms = c("Madhya Pradesh")
+## state_nms = c("Maharashtra")
+## state_nms = c("Orissa")
+## state_nms = c("Punjab")
+## state_nms = c("Rajasthan")
+## state_nms = c("Tamil Nadu")
+## state_nms = c("Uttarakhand")
+## state_nms = c("Uttar Pradesh")
+## state_nms = c("West Bengal")
+
+for (i in 1:length(state_nms)) {
+    state_nm = state_nms[i]
+    
+    dists = x[["ADM2_CODE"]][x$State %in% state_nm] %>% unique
+    dist_nms = x[["District"]][match(dists, x[["ADM2_CODE"]])]
+    
+    for (j in 1:length(dists)) {
+
+        dist = dists[j]
+        dist_nm = dist_nms[j]
+        print(dist_nm)
+
+        row_ix = x[["ADM2_CODE"]] %in% dist & x[["State"]] %in% state_nm
+        xx = x[row_ix,]
+
+        ## here we set to zero all values below 10 hectares
+        ## (i.e. ~0.1% grid cell area)
+        ## threshold = 10
+        ## for (k in 1:length(crop_nms)) {
+        ##     ## ptn = paste0("^apy_", crops[k], "-.*$")
+        ##     ptn = paste0("^apy_", crop_nms[k], ".*$")
+        ##     cols = grep(ptn, names(xx))
+        ##     tot = rowSums(xx[,cols,drop=FALSE], na.rm=TRUE)
+        ##     if (max(tot) <= threshold) {
+        ##         ptn = paste0("^(apy|irr)_", crop_nms[k], ".*$")
+        ##         cols = grep(ptn, names(xx))
+        ##         xx[,cols] = 0
+        ##     }
+        ## }
+
+        ## run quality control
+        qc_file = file.path("code", "quality_control_1960", paste0(gsub(" ", "_", tolower(state_nm)), "_qc.R"))
+        ## if (!file.exists(qc_file)) stop("Quality control file does not exist")
+        ## source(qc_file)
+        if (file.exists(qc_file))
+            source(qc_file)
+
+        ## create plot for checking purposes
+        for (k in 1:length(crop_nms)) {
+            plot_title = paste0(state_nm, ", ", dist_nm, ", ", gsub("_", " ", paste0(toupper(substring(crop_nms[k], 1, 1)), substring(crop_nms[k], 2))))
+            p = check_data(x=1950:2012, y=xx, crop=crop_nms[k], plot_title=plot_title)
+            ## p = check_data(x=1950:2012, y=xx, crop=crop_nms[k], plot_title=plot_title)
+            dist_nm2 = gsub("\\.", "_", dist_nm)
+            plot_file_nm = file.path("data", "qc_plots_1960", gsub(" ", "_", state_nm), gsub(" ", "_", crop_nms[k]), paste0(tolower(gsub(" ", "_", dist_nm2)), "_", crop_nms[k], "_qc_plot.pdf"))
+            ggsave(plot_file_nm, p, width=7.5, height=5, path=".")
+            ## ggsave(plot_file_nm, p, width=7.5, height=5, device=pdf, path=".")
+        }
+
+        x[row_ix,] = xx
+        
+    }
+
+    ## after all the plots have been made for a particular
+    ## state, combine the plots into a single document (this
+    ## makes it easier to scroll between them)
+    for (k in 1:length(crop_nms)) {
+        cwd = getwd()
+        setwd(file.path("data", "qc_plots_1960", gsub(" ", "_", state_nm), gsub(" ", "_", crop_nms[k])))
+        fn = paste0("combined_plots_", crop_nms[k], ".pdf")
+        if (file.exists(fn)) {
+            unlink(fn)
+        }
+        system(paste0("pdftk `ls *.pdf | sort` output ", fn, " dont_ask"))
+        system(paste0("mv ", fn, " ", file.path(cwd, "data","qc_plots_1960", gsub(" ", "_", state_nm))))
+        setwd(cwd)
+    }
+}
+
+saveRDS(x, "data/apy_indiastat_combined_data_1960_qc.rds")
+

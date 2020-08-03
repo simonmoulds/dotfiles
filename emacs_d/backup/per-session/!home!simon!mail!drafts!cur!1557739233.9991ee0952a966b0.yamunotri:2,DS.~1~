@@ -1,0 +1,12 @@
+User-agent: mu4e 1.0-alpha2; emacs 24.5.1
+From: Simon Moulds <simon.moulds@imperial.ac.uk>
+To: 
+Subject: 
+
+Dear Corjan,
+
+At the WP4 meeting a few weeks ago I remember you mentioning the upcoming DTS campaign. One of my activities is the development of the "Crop insurance based on soil moisture index" service, which according to the document I have (attached) relies on DTS measurements (as well as satellite data) for the underlying data.
+
+What will be the spatial coverage of the DTS that will be installed at the pilot locations?
+In the vertical direction, will the sensor give a single measurement (i.e. for one depth) or a distribution?
+The soil moisture index service will just be a prototype, but clearly if it is ever to move beyond a prototype there would need to be a way to collect soil moisture data at the regional level - which I guess is where the satellite data comes in. Is the intention that high-res DTS data can be used to downscale the satellite data, and is this something you're planning to do?

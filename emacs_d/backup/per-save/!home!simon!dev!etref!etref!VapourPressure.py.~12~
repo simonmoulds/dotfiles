@@ -1,0 +1,118 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import numpy as np
+
+from hm import file_handling
+
+eps = 0.622 # ratio of water vapour/dry air molecular weights [-]
+
+class SaturationVapourPressure(object):
+    def __init__(self, VapourPressureDeficit_variable):
+        self.var = VapourPressureDeficit_variable
+
+    def initial(self):
+        self.var.es_min = np.zeros((self.var.nCell))
+        self.var.es_max = np.zeros((self.var.nCell))
+        self.var.es_mean = np.zeros((self.var.nCell))
+
+    def compute_saturation_vapour_pressure(self):        
+        es = lambda T:610.8*np.exp((17.27*T)/(T+237.3))
+        if self.var._configuration.has_min_daily_temperature:
+            self.var.es_min = es(self.var.tmin)
+        if self.var._configuration.has_max_daily_temperature:
+            self.var.es_max = es(self.var.tmax)            
+        if (self.var._configuration.has_min_daily_temperature
+            and self.var._configuration.has_max_daily_temperature):
+            self.var.es_mean = (self.var.es_min + self.var.es_max) / 2.            
+        else:
+            self.var.es_mean = es(self.var.tmean)
+
+    def dynamic(self):
+        self.compute_saturation_vapour_pressure()
+
+class ActualVapourPressure(object):
+    
+    def __init__(self, VapourPressureDeficit_variable):
+        self.var = VapourPressureDeficit_variable
+
+    def initial(self):
+        self.var.ea_mean = np.zeros((self.var.nCell))
+
+    def compute_actual_vapour_pressure_from_specific_humidity(self):
+        """Function to compute actual vapour pressure given 
+        specific humidity, using equations from Bolton (1980; 
+        https://archive.eol.ucar.edu/projects/ceop/dm/documents/refdata_report/eqns.html)
+        """
+        ea = lambda Pres, Q, eps: (Q * Pres) / ((1 - eps) * Q + eps)
+        self.var.ea_mean = ea(self.var.surface_pressure, self.var.specific_humidity, eps)
+
+    def compute_actual_vapour_pressure_from_relative_humidity_eq17(self):
+        self.var.ea_mean = (
+            (self.var.es_min * self.var.max_relative_humidity)
+            + (self.var.es_max * self.var.min_relative_humidity)
+            ) / 2
+            
+    def compute_actual_vapour_pressure_from_relative_humidity_eq18(self):
+        self.var.ea_mean = self.var.es_min * self.var.max_relative_humidity
+
+    def compute_actual_vapour_pressure_from_relative_humidity_eq19(self):
+        self.var.ea_mean = self.var.es_mean * self.var.mean_relative_humidity
+
+    def can_use_fao_equation_17(self):
+        return (
+            self.var._configuration.has_min_daily_temperature\
+            and self.var._configuration.has_max_daily_temperature
+            and self.var._configuration.has_min_relative_humidity
+            and self.var._configuration.has_max_relative_humidity
+        )
+
+    def can_use_fao_equation_18(self):
+        return (
+            self.var._configuration.has_min_daily_temperature
+            and self.var._configuration.has_max_relative_humidity
+        )
+
+    def can_use_fao_equation_19(self):
+        return (
+            self.var._configuration.has_max_daily_temperature
+            and self.var._configuration.has_min_daily_temperature
+            and self.var._configuration.has_mean_relative_humidity
+        )
+    
+    def dynamic(self):
+        if self.can_use_fao_equation_17():
+            self.compute_actual_vapour_pressure_from_relative_humidity_eq17()
+        elif self.can_use_fao_equation_18():
+            self.compute_actual_vapour_pressure_from_relative_humidity_eq18()
+        elif self.can_use_fao_equation_19():
+            self.compute_actual_vapour_pressure_from_relative_humidity_eq19()
+        elif self.var._configuration.has_specific_humidity:
+            self.compute_actual_vapour_pressure_from_specific_humidity()
+
+
+class VapourPressureDeficit(object):    
+    def __init__(self, VapourPressureDeficit_variable):
+        self.var = VapourPressureDeficit_variable
+    def initial(self):
+        self.var.vapour_pressure_deficit = np.zeros((self.var.nCell))
+    def compute_vapour_pressure_deficit(self):
+        self.var.vapour_pressure_deficit = np.clip(self.var.es_mean - self.var.ea_mean, 0, None)
+    def dynamic(self):
+        self.compute_vapour_pressure_deficit()
+
+class VapourPressure(object):
+    def __init__(self, VapourPressure_variable):
+        self.saturation_vapour_pressure_module = SaturationVapourPressure(VapourPressure_variable)
+        self.actual_vapour_pressure_module = ActualVapourPressure(VapourPressure_variable)
+        self.vapour_pressure_deficit_module = VapourPressureDeficit(VapourPressure_variable)
+
+    def initial(self):
+        self.saturation_vapour_pressure_module.initial()
+        self.actual_vapour_pressure_module.initial()
+        self.vapour_pressure_deficit_module.initial()
+
+    def dynamic(self):
+        self.saturation_vapour_pressure_module.dynamic()
+        self.actual_vapour_pressure_module.dynamic()
+        self.vapour_pressure_deficit_module.dynamic()

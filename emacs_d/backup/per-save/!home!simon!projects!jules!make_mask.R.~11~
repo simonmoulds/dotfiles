@@ -1,0 +1,20 @@
+## Author : Simon Moulds
+## Date   : 10/04/2019
+
+library(raster)
+library(magrittr)
+library(rgdal)
+
+grid = raster(ncol=720, nrow=360, crs="+proj=longlat +datum=WGS84")
+## land = raster("WFDEI-long-lat-ht.nc")
+## pts = as(grid, "SpatialPoints") %>% as.data.frame
+poopo = readOGR("poopo.kml", "poopo")
+poopo_extent = extent(poopo)
+poopo_grid = crop(grid, poopo_extent, snap='out')
+poopo_raster_poly = rasterize(poopo, poopo_grid) %>% trim
+poopo_lines = as(poopo, "SpatialLines")
+poopo_raster_lines = rasterize(poopo_lines, poopo_grid) %>% trim
+poopo_raster = poopo_raster_poly + poopo_raster_lines
+
+pts = as.data.frame(poopo_raster, xy=TRUE)
+

@@ -1,0 +1,77 @@
+[globalOptions]
+
+# Set the input directory map in an absolute path
+inputDir = /data/PRINCETON_IGP
+
+# Set the output directory in an absolute path
+outputDir = /home/simon/dev/gandak_data_model/data/etref
+
+# Map of clone (must be provided in PCRaster maps)
+# - Spatial resolution and coverage are based on this map:
+cloneMap = igp.clone.map
+
+# The area/landmask of interest:
+landmask = igp.landmask.map
+
+# NetCDF attributes for output files:
+institution = Centre for Water Systems, University of Exeter
+title       = Reference evapotranspiration for Indo-Gangetic Plain
+description = Reference evapotranspiration for Indo-Gangetic Plain
+
+# Start/end time (YYYY-MM-DD)
+startTime = 2000-01-01
+# endTime = 1970-01-02
+endTime = 2002-12-31
+
+# Method (one or more of PenmanMonteith, PriestleyTaylor, Hargreaves; comma-delimited if required)
+method = Hargreaves
+# method = PenmanMonteith,PriestleyTaylor,Hargreaves
+
+[meteoOptions]
+
+# TODO: meteoDataSource = WFDEI, PRINCETON (with method in Configuration to define relevant variables)
+
+compute_daily_min_max_temperature_from_subdaily_data = False
+
+temperatureNC = tas_daily_{year:0>4}-{year:0>4}_igp.nc
+temperatureVarName = tas
+temperatureTimeDimName = time
+
+minDailyTemperatureNC = tmin_daily_{year:0>4}-{year:0>4}_igp.nc
+minDailyTemperatureVarName = tmin
+minDailyTemperatureTimeDimName = time
+
+maxDailyTemperatureNC = tmax_daily_{year:0>4}-{year:0>4}_igp.nc
+maxDailyTemperatureVarName = tmax
+maxDailyTemperatureTimeDimName = time
+
+# subDailyTemperatureNC = None
+# subDailyTemperatureVarName = None
+# subDailyTemperatureTimeDimName = None
+
+downwellingLongwaveRadiationNC = dlwrf_daily_{year:0>4}-{year:0>4}_igp.nc
+downwellingLongwaveRadiationVarName = dlwrf
+downwellingLongwaveRadiationTimeDimName = time
+
+surfaceAtmosphericPressureNC = pres_daily_{year:0>4}-{year:0>4}_igp.nc
+surfaceAtmosphericPressureVarName = pres
+surfaceAtmosphericPressureTimeDimName = time
+
+nearSurfaceSpecificHumidityNC = shum_daily_{year:0>4}-{year:0>4}_igp.nc
+nearSurfaceSpecificHumidityVarName = shum
+nearSurfaceSpecificHumidityTimeDimName = time
+
+downwellingShortwaveRadiationNC = dswrf_daily_{year:0>4}-{year:0>4}_igp.nc
+downwellingShortwaveRadiationVarName = dswrf
+downwellingShortwaveRadiationTimeDimName = time
+
+nearSurfaceWindSpeedNC = wind_daily_{year:0>4}-{year:0>4}_igp.nc
+nearSurfaceWindSpeedVarName = wind
+nearSurfaceWindSpeedTimeDimName = time
+
+[reportingOptions]
+outDailyTotNC = ETref
+# Should we follow the netCDF Climate and Forecast Conventions?
+netcdf_y_orientation_follow_cf_convention = True
+formatNetCDF = NETCDF4
+zlib = True

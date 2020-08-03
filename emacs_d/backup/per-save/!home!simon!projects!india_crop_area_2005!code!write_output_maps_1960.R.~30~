@@ -1,0 +1,124 @@
+## Author : Simon Moulds
+## Date   : August 2017
+
+library(maptools)
+library(rasterVis)
+library(grid)
+library(viridis)
+library(magrittr)
+library(dplyr)
+library(tidyr)
+library(tibble)
+library(latticeExtra)
+library(raster)
+
+load("data/input_data_2005.RData")
+
+my_plot_fun = function(map, title, ...) {
+    v = getValues(map) %>% `[`(!is.na(.))
+    p = levelplot(map,
+                  margin=FALSE,
+                  xlab=NULL,
+                  ylab=NULL,
+                  main=list(title, cex=1, font=1),
+                  par.settings=list(axis.line=list(lwd=1), strip.background=list(col="transparent"), strip.border=list(col="transparent"), axis.components=list(left=list(tck=0.5), right=list(tck=0.5), top=list(tck=0.5), bottom=list(tck=0.5)), background=list(col="transparent"), layout.widths=list(right.padding=1)),
+                  ## par.strip.text=list(cex=0.6),
+                  col.regions=colorRampPalette(RColorBrewer::brewer.pal(9, "PuBuGn"))(101),
+                  ## col.regions=viridis(101, direction=-1),
+                  scales=list(draw=TRUE, cex=0.6),
+                  colorkey=list(space="bottom",
+                                width=1,
+                                at=seq(0,10000,length.out=101)),
+                                labels=list(at=seq(0,9000,1000),
+                                            labels=seq(0,90,10), cex=0.6, tck=0),
+                  panel=function(...) {
+                      grid.rect(gp=gpar(col=NA, fill="white"))
+                      panel.levelplot(...)
+                  })
+    p
+}
+
+## fs = list.files("data/gams_1960", pattern="^gams_output_[0-9]+_20[0-9]{2}")
+fs = list.files("data/gams_1960", pattern="^gams_output_[0-9]+_[0-9]{4}")
+years = sapply(strsplit(fs, "_"), FUN=function(x) x[4]) %>% unique %>% as.numeric
+dists = sapply(strsplit(fs, "_"), FUN=function(x) x[3]) %>% unique %>% as.numeric
+
+## create directory for output maps, if it does not already exist
+if (!dir.exists("data/output_1960")) {
+    dir.create("data/output_1960")
+    dir.create("data/output_1960/seasonal_maps")
+}
+
+read_crop_data = function(dist, year, path, ...) {
+    list(kharif = readRDS(file.path(path, paste0("gams_output_", dist, "_", year, "_kharif.rds"))),
+         rabi = readRDS(file.path(path, paste0("gams_output_", dist, "_", year, "_rabi.rds"))),
+         summer = readRDS(file.path(path, paste0("gams_output_", dist, "_", year, "_summer.rds"))),
+         whole_year = readRDS(file.path(path, paste0("gams_output_", dist, "_", year, "_whole_year.rds"))))
+}
+
+## create India region map
+india_rgn = template
+india_rgn[] = 0
+for (i in 1:length(dists)) {
+    dist_frac_map = raster(file.path("data", "district_frac_1960", paste0("dist_", dists[i], "_frac1_ll.tif")))
+    dist_frac_pts = as(dist_frac_map, "SpatialPoints")
+    india_rgn[dist_frac_pts] = 1
+}
+india_rgn[india_rgn < 1] = NA
+
+## ## get coastlines
+## poly = getRgshhsMap(fn = system.file("share/gshhs_c.b", package= "maptools"), xlim=c(60,105), ylim=c(5,40))
+
+## get crop names
+tmp =
+    read_crop_data(dists[1], years[1], "data/gams_1960") %>%
+    unname %>%
+    do.call(cbind, .)
+
+crops = grep("^(irr|rain).*$", names(tmp), value=TRUE)
+
+dist_frac_pts_list = list()
+for (j in 1:length(dists)) {
+    dist_frac_map = raster(file.path("data", "district_frac_1960", paste0("dist_", dists[j], "_frac1_ll.tif")))
+    dist_frac_pts_list[[j]] = as(dist_frac_map, "SpatialPoints")
+}   
+stop()
+for (i in 1:length(years)) {
+    print(years[i])
+
+    for (k in 1:length(crops)) {
+        ## print(crops[k])
+
+        map = template
+        map[] = 0
+        
+        for (j in 1:length(dists)) {
+
+            ## ## get district frac (data/district_frac)
+            ## dist_frac_map = raster(file.path("data", "district_frac_1960", paste0("dist_", dists[j], "_frac1_ll.tif")))
+            ## dist_frac_pts = as(dist_frac_map, "SpatialPoints")
+            dist_frac_pts = dist_frac_pts_list[[j]]
+            
+            dist_tbl =
+                read_crop_data(dists[j], years[i], "data/gams_1960") %>%
+                unname %>%
+                do.call(cbind, .)
+
+            if (!all(names(dist_tbl) %in% crops)) {
+                stop()
+            }
+
+            vals0 = map[dist_frac_pts]
+            vals1 = dist_tbl[,crops[k],drop=TRUE]
+            vals2 = rowSums(data.frame(vals0, vals1), na.rm=TRUE)
+            map[dist_frac_pts] = vals2
+        }
+        
+        map[is.na(india_rgn)] = NA
+
+        ## write raster image
+        fn = file.path("data","output_1960", "seasonal_maps", paste0("INDIA_", toupper(gsub("-","_",crops[k])), "_", years[i], ".tif"))
+        writeRaster(map, filename=fn, format="GTiff", overwrite=TRUE)
+    }
+}
+

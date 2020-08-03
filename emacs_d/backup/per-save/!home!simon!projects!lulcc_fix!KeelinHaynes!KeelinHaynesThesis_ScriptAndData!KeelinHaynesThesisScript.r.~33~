@@ -1,0 +1,210 @@
+#KeelinHaynes Thesis LULCC Script
+
+#This script requires the following files:
+
+#observed land cover rasterstack
+#explanatory factors rasterstack
+#demand
+
+#All other data is derived from these files
+
+
+#Process:
+## 1. Read in observed land cover rasterstack (2 layers: 2007 and 2017)
+## 2. Read in explanatory factor rasterstack (6 layers) 
+## 3. Partition data in training and testin portions and run GLM to determine suitability for 8 LCLU classes
+## 4. Read in land-cover/land-use demand for years 2017-2027 (csv, convert to matrix; make sure data type is numeric)
+## 5. Set permitted transformations
+## 6. Create neighborhoods based on pixel values
+## 7. Create rules that only have effect within given neighborhoods
+## 8. Load in mask to prevent certain pixels from transitioning
+## 9. Create CLUE-S object
+## 10. Allocate LCLUC demand for 2027 based on 2017 obs layer and other parameters
+## 11. Export predicted 2027 LCLU map
+
+library(rgdal)
+library(raster)
+
+## SM: You uncovered a bug in lulcc::NeighbRasterStack! I've
+## uploaded the patch to Github, so I suggest you use the
+## development version for now:
+## library(lulcc)
+devtools::install_github("simonmoulds/lulcc")
+
+library(magrittr)
+xmin=500000
+ymin=1150000
+crop_ext = raster::extent(xmin, xmin+10000, ymin, ymin+10000)
+
+##1. 
+
+#Where is the land cover data store?
+
+#lulcc package requires the observed land cover maps to be of class "ObsLulcRasterStack"
+#To do this, we first need to create a variable to hold the location of our observed land cover maps
+
+ag_obs_stack <- stack("ag_Stack_obs.tif") %>% crop(crop_ext) %>% stack
+
+ag_olrc <- ObsLulcRasterStack(
+    x=ag_obs_stack,
+    categories=c(1,2,3,4,5,6,7,8),
+    labels=c("Water", "BuiltUp", "Rice", "Crops", "Grassland", "Orchards", "BareLand", "Forest"),
+    t=c(0,10)
+)
+
+#After reading the land cover maps in, let's check to ensure that they are there
+ag_olrc
+
+## 2. 
+#Where is all of our explanatory data stored
+
+#lulcc package requires the explanatory variables to be of class "ExpVarRasterList"
+#To do this, we create a variable that holds the covariates
+ag_evrl <- ExpVarRasterList(
+    x=".", pattern = "ef"
+)
+
+ag_evrl@maps = lapply(ag_evrl@maps, FUN=function(x) crop(x, crop_ext))
+
+#Note that the six layers of ag_evrl are: elev, slope, soil_af, soil_dr, soil_mr, nd soil_nm
+
+
+## 3. 
+
+#Now we are going to explore how our efs explain our obs
+#To do this we are going to use a logistic regression
+
+#To overcome issues of spatial autocorrelation, we are first going to randomly select out a portion of the dataset
+part <- partition(
+    x=ag_olrc[[1]],
+    size=0.1,
+    spatial=TRUE
+)
+
+#This selection will then be used a training data for our logistic regresson
+train.data<- getPredictiveModelInputData(
+    obs=ag_olrc,
+    ef=ag_evrl,
+    cells=part[["train"]],
+    t=0
+)
+
+#This is the formula used for the GLM
+forms <- list(
+  Water~ ag_Stack_ef.1 + ag_Stack_ef.2 + ag_Stack_ef.3 + ag_Stack_ef.4 + ag_Stack_ef.5 + ag_Stack_ef.6,
+  BuiltUp~ ag_Stack_ef.1 + ag_Stack_ef.2 + ag_Stack_ef.3 + ag_Stack_ef.4 + ag_Stack_ef.5 + ag_Stack_ef.6,
+  Rice~ ag_Stack_ef.1 + ag_Stack_ef.2 + ag_Stack_ef.3 + ag_Stack_ef.4 + ag_Stack_ef.5 + ag_Stack_ef.6,
+  Crops~ ag_Stack_ef.1 + ag_Stack_ef.2 + ag_Stack_ef.3 + ag_Stack_ef.4 + ag_Stack_ef.5 + ag_Stack_ef.6,
+  Grassland~ ag_Stack_ef.1 + ag_Stack_ef.2 + ag_Stack_ef.3 + ag_Stack_ef.4 + ag_Stack_ef.5 + ag_Stack_ef.6,
+  Orchards~ ag_Stack_ef.1 + ag_Stack_ef.2 + ag_Stack_ef.3 + ag_Stack_ef.4 + ag_Stack_ef.5 + ag_Stack_ef.6,
+  BareLand~ ag_Stack_ef.1 + ag_Stack_ef.2 + ag_Stack_ef.3 + ag_Stack_ef.4 + ag_Stack_ef.5 + ag_Stack_ef.6,
+  Forest~ ag_Stack_ef.1 + ag_Stack_ef.2 + ag_Stack_ef.3 + ag_Stack_ef.4 + ag_Stack_ef.5 + ag_Stack_ef.6)
+
+#Let's run the logistic regresson
+glm.models <- glmModels(formula=forms, family=binomial, data=train.data, obs=ag_olrc)
+
+
+## 4. 
+
+#Let's read in the total number of pixels for each LCLU class for every year 2017-2027
+
+dmd <- read.csv2("S1_dmd_stripped.csv", dec = ".", header = FALSE, sep=",")
+dmd <-as.matrix(dmd)
+
+
+## 5. 
+
+#Now we can set the permitted land cover transformations
+
+#The first step is to create a matrix that contains a 1 (yes) or 0 (no) for whether each LCLU class can transform into another LCLU class
+lclu.rules <- matrix(data=c(1,0,0,0,0,0,0,0,
+                           0,1,0,0,0,0,0,0,
+                           0,1,1,1,1,1,1,1,
+                           0,1,1,1,1,1,1,1,
+                           0,1,1,1,1,1,1,1,
+                           0,1,1,1,1,1,1,1,
+                           0,1,1,1,1,1,1,1,
+                           0,1,1,1,1,1,1,1), nrow=8, ncol=8, byrow=TRUE)
+#Investigating the matrix, we see that any pixel that is water in 2017 is not allowed to transform 
+# into a different LCLU class
+# Likewise, an built up pixel in 2017 cannot transform into a different LCLU class in 2027
+# All other LCLU classes can transform to any other class
+
+#This is where I am having trouble. From te help page, I get the following function:
+# allow(x, categories, cd, rules, hist = NULL, ...)
+# I only need the rules parameter, as I am not working with time dependent transformations
+# When I try it without the hist or cd, I get an error saying that 'cd' and 'hist' must correspond with categories.
+
+## SM: This function is called automatically from within
+## the allocation function - it doesn't make sense to call
+## it outside of the allocation. Effectively the function
+## takes a land use map for t0 and uses the rules to mask
+## out disallowed transitions for each category. Sorry - the
+## documentation is not particularly clear about this.
+
+## allow <- allow(x=x,
+##                hist=NULL,
+##                categories=ag_olrc@categories,
+##                cd=NULL,
+##                rules=lclu.rules)
+
+#Is this not the proper method to run this function?
+
+## 6. 
+
+#Now we set our neighborhoods. I am also having trouble with this section. I am trying to create neighborhoods
+# around each water and built up pixel to ensure that all pixels that transition from non-water to water or non-built to built up
+# are within these neighborhoods.
+# In other words, I only want new water or new built up to appear next to already established water or built up
+
+#These two lines create a neighborhood around each pixel in layer 2 (2017) 
+#of category 1 (water) or 2 (built up)  
+w <- matrix(data=1, nrow=3, ncol=3)
+nb <- NeighbRasterStack(x=ag_olrc[[2]], weights=w, categories=c(1,2))
+
+## 7. 
+
+#Now we create the rule that these LCLU classes (1 and 2) only occur within
+#these neighborhoods (100% of the time)
+
+nb.allow <- allowNeighb(neighb=nb,
+                        x=ag_olrc[[2]],
+                        categories=ag_olrc@categories,
+                        rules = c(1,1))
+
+#Are steps 6 and 7 done properly? If not, how do I correct them? I added the c(1,2) as you suggested
+# but am still having the same error message
+
+## 8.
+
+#We can load in a mask in the step to stop transformations in pixels under that mask
+#We do not need that this for this province however
+
+
+## 9. 
+
+#Now we can  create a CLUE-S model object
+#This object contains all of the above parameters, plus 'time'. 
+#This is set as the first year (2017 and time step 10 in the ag_olrc object) 
+#and the final year (2027, which would be time step 20)
+#It also includes the 'elas' parameter, which sets how likely each LCLU class is to change
+# to a different LCLU class
+clues.model <- CluesModel(obs = ag_olrc,
+                          ef = ag_evrl, models = glm.models, time = (10:20), demand = dmd, neighb = nb,
+                          elas = c(1, 1, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5),
+                          nb.rules = nb.allow)
+
+
+## 10. 
+
+
+#Now we actually do the allocating of LCLU demand over the time period
+
+allocated.clues.model <- allocate(clues.model)
+
+
+## 11. 
+
+#Now we investigate and export the predicited 2027 raster
+
+#I am havig trouble with this bit as well. How am I able to access the predicted layer?

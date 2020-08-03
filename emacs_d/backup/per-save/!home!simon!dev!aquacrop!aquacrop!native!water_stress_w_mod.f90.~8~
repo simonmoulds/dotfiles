@@ -1,0 +1,59 @@
+module water_stress_w_mod
+  use types
+  implicit none
+  
+contains
+
+  subroutine water_stress_w( &
+       ksw_exp, &
+       ksw_sto, &
+       ksw_sen, &
+       ksw_pol, &
+       ksw_stolin, &
+       dr, &
+       taw, &
+       et_ref, &
+       et_adj, &
+       t_early_sen, &
+       p_up1, &
+       p_up2, &
+       p_up3, &
+       p_up4, &
+       p_lo1, &
+       p_lo2, &
+       p_lo3, &
+       p_lo4, &
+       f_shape_w1, &
+       f_shape_w2, &
+       f_shape_w3, &
+       f_shape_w4, &
+       beta, &
+       n_farm, n_crop, n_cell &
+       )
+
+
+    integer(int32), intent(in) :: n_farm, n_crop, n_cell
+    
+    real(real64), dimension(n_farm, n_crop, n_cell), intent(inout) :: ksw_exp
+    real(real64), dimension(n_farm, n_crop, n_cell), intent(inout) :: ksw_sto
+    real(real64), dimension(n_farm, n_crop, n_cell), intent(inout) :: ksw_sen
+    real(real64), dimension(n_farm, n_crop, n_cell), intent(inout) :: ksw_pol
+    real(real64), dimension(n_farm, n_crop, n_cell), intent(inout) :: ksw_stolin
+    real(real64), dimension(n_farm, n_crop, n_cell), intent(in) :: dr
+    real(real64), dimension(n_farm, n_crop, n_cell), intent(in) :: taw
+    real(real64), dimension(n_farm, n_crop, n_cell), intent(in) :: et_ref
+    integer(int32), dimension(n_farm, n_crop, n_cell), intent(in) :: et_adj
+    real(real64), dimension(n_farm, n_crop, n_cell), intent(in) :: t_early_sen
+    real(real64), dimension(n_farm, n_crop, n_cell), intent(in) :: p_up1
+    real(real64), dimension(n_farm, n_crop, n_cell), intent(in) :: p_up2
+    real(real64), dimension(n_farm, n_crop, n_cell), intent(in) :: p_up3
+    real(real64), dimension(n_farm, n_crop, n_cell), intent(in) :: p_up4
+    real(real64), dimension(n_farm, n_crop, n_cell), intent(in) :: p_lo1
+    real(real64), dimension(n_farm, n_crop, n_cell), intent(in) :: p_lo2
+    real(real64), dimension(n_farm, n_crop, n_cell), intent(in) :: p_lo3
+    real(real64), dimension(n_farm, n_crop, n_cell), intent(in) :: p_lo4
+    real(real64), dimension(n_farm, n_crop, n_cell), intent(in) :: f_shape_w1
+    real(real64), dimension(n_farm, n_crop, n_cell), intent(in) :: f_shape_w2
+    real(real64), dimension(n_farm, n_crop, n_cell), intent(in) :: f_shape_w3
+    real(real64), dimension(n_farm, n_crop, n_cell), intent(in) :: f_shape_w4
+    integer(int32), dimension(n_farm, n_crop, n_cell), intent(in) :: beta

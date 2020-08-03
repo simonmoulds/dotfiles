@@ -1,0 +1,56 @@
+import requests
+import pandas as pd
+import numpy as np
+
+# API Credentials
+API_USER = ".\twiga_hl"
+API_PASSWORD = "321321Demo!"
+
+soilMoisture = getTimeseries('TA00429', 'TAHMO.Connectors.Stations.SoilMoisture', '20180129000000', '20190101000000')
+
+def getTimeseries(station, variable, startDate, endDate, timeserieIndex=0):
+    requestBody = {
+        "Readers": [
+            {
+                "DataSourceCode": "TAHMO.Connectors.Stations",
+                "Settings": {
+                    "LocationCodes": [
+                        'TA00429'
+                    ],
+                    "VariableCodes": [
+                        'TAHMO.Connectors.Stations.SoilMoisture'
+                    ],
+                    "StartDate": '20180129000000',
+                    "EndDate": '20190101000000',
+                    "StructureType": "TimeSeries"
+                }
+            }
+        ]
+    }
+    # response = requests.post(
+    #     'https://tahmotwiga.mybluemix.net/twiga/api/timeSeries/get',
+    #     json=requestBody,
+    #     auth=requests.auth.HTTPBasicAuth(API_USER, API_PASSWORD)
+    # )    
+    response = requests.post(
+        'https://twiga-api.hydronet.com/api/entity/datasources/get',
+        json=requestBody,
+        auth=requests.auth.HTTPBasicAuth(API_USER, API_PASSWORD)
+    )
+    
+    responseJSON = response.json()
+    
+    if 'Data' in responseJSON.keys() and len(responseJSON['Data']) > timeserieIndex and 'Data' in responseJSON['Data'][timeserieIndex].keys():
+        # Get array of all the values within the timeseries.
+        values = list(map(lambda timeserieElement: timeserieElement['Value'], responseJSON['Data'][timeserieIndex]['Data']))
+        
+        # Get array of all the dates in the timeseries in a supported date format ("YYYY-mm-dd HH:ii:ss").
+        dates = list(map(lambda timeserieElement: pd.Timestamp("%s-%s-%s %s:%s:%s" % (timeserieElement['DateTime'][0:4], timeserieElement['DateTime'][4:6], timeserieElement['DateTime'][6:8], timeserieElement['DateTime'][8:10], timeserieElement['DateTime'][10:12], timeserieElement['DateTime'][12:14])), responseJSON['Data'][timeserieIndex]['Data']))
+    else:
+        values = []
+        dates = []
+        
+    return pd.Series(values, index=dates)
+
+soilMoisture = getTimeseries('TA00429', 'TAHMO.Connectors.Stations.SoilMoisture', '20180129000000', '20190101000000')
+relativeHumidity = getTimeseries('TA00429', 'TAHMO.Connectors.Stations.RelativeHumidity', '20181201000000', '20181231000000')

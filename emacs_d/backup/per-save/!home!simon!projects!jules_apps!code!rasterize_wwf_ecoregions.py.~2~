@@ -1,0 +1,35 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import geopandas as gpd
+import rasterio
+from rasterio import features
+
+# raw data: https://www.worldwildlife.org/publications/terrestrial-ecoregions-of-the-world
+os.system('unzip -o ../data/official_teow.zip -d ../data')
+r = rasterio.open('../data/theta_sat_cosby_igp_layer1_0pt25degree.tif')
+bbox = r.bounds
+xmin,ymin,xmax,ymax = bbox[0], bbox[1], bbox[2], bbox[3]
+
+# https://gdal.org/programs/gdal_rasterize.html
+wwf_shp = '../data/official/wwf_terr_ecos.shp'
+os.system('gdal_rasterize -a BIOME -te ' + str(xmin) + ' ' + str(ymin) + ' ' + str(xmax) + ' ' + str(ymax) + ' -tr 0.25 0.25 ../data/official/wwf_terr_ecos.shp ../data/wwf_terr_ecos.tif')
+
+# From Olson et al. (2001) 'Terrestrial Ecoregions
+# of the World: A New Map of Life on Earth'
+
+# 1 - tropical and subtropical moist broadleaf forest
+# 2 - tropical and subtropical dry broadleaf forest
+# 3 - tropical and subtropical coniferous forest
+# 4 - temperate broadleaf and mixed forest
+# 5 - temperate coniferous forest
+# 6 - boreal forests/taiga
+# 7 - tropical and subtropical grasslands, savannas,
+#     shrublands
+# 8 - temperate grasslands, savannas, and shrubland
+# 9 - flooded grasslands and savannas
+# 10 - montane grasslands and shrublands
+# 11 - tundra
+# 12 - mediterranean forests, woodland, and scrub
+# 13 - deserts and xeric shrublands
+# 14 - mangroves

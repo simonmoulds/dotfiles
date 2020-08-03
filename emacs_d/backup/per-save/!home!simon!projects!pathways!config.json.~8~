@@ -1,0 +1,71 @@
+{
+  "out_dir": ".",
+  "temporary_dir": "/tmp",
+  "clean_tmp": true,
+  "clean_intermediate": false,
+  "full_img": true,
+  "tile_size": 300,
+  "horizontal_margin": 20,
+  "vertical_margin": 5,
+  "max_processes": null,
+  "omp_num_threads": 1,
+  "debug": false,
+  "dsm_resolution": 0.5,
+  "dsm_radius": 0,
+  "dsm_sigma": null,
+  "relative_sift_match_thresh": true,
+  "sift_match_thresh": 0.6,
+  "disp_range_extra_margin": 0.2,
+  "register_with_shear": false,
+  "n_gcp_per_axis": 5,
+  "epipolar_thresh": 0.5,
+  "max_pointing_error": 10,
+  "triangulation_mode": "pairwise",
+  "use_global_pointing_for_geometric_triangulation": false,
+  "disp_min": null,
+  "disp_max": null,
+  "alt_min": null,
+  "alt_max": null,
+  "msk_erosion": 0,
+  "fusion_operator": "average_if_close",
+  "fusion_thresh": 3,
+  "rpc_alt_range_scale_factor": 1,
+  "disp_range_method": "sift",
+  "disp_range_exogenous_low_margin": -10,
+  "disp_range_exogenous_high_margin": 100,
+  "exogenous_dem": null,
+  "exogenous_dem_geoid_mode": true,
+  "matching_algorithm": "mgm",
+  "census_ncc_win": 5,
+  "stereo_speckle_filter": 25,
+  "stereo_regularity_multiplier": 1.0,
+  "cargarse_basura": true,
+  "ll_bbx": [
+    "-inf",
+    "inf",
+    "-inf",
+    "inf"
+  ],
+  "images": [
+    {
+      "img": "/home/simon/projects/pathways/corrected_WV02_2010-01-12.10-37-48_5.956.-0.479_C-B-G-Y-R-RE-N-N2_0.31.tif",
+      "rpc": "/tmp/tmpe8j0o7ob.rpc",
+      "clr": null,
+      "cld": null,
+      "roi": null,
+      "wat": null
+    },
+    {
+      "img": "/home/simon/projects/pathways/corrected_WV02_2010-01-12.10-37-49_5.850.-0.479_C-B-G-Y-R-RE-N-N2_0.25.tif",
+      "rpc": "/tmp/tmpzofwdjed.rpc"
+    }
+  ],
+  "skip_existing": false,
+  "roi": {
+    "x": 0,
+    "y": 0,
+    "w": 9216,
+    "h": 7168
+  },
+  "utm_zone": "30N"
+}

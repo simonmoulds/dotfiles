@@ -1,0 +1,2 @@
+what is the best way of linking the various modules - some of which may be supplied from extenal models?
+-> NetCDF? i.e. coupling through i/o (loose model coupling)

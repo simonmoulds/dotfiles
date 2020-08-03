@@ -1,0 +1,44 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#
+# AquaCrop
+#
+import os
+import numpy as np
+import pcraster as pcr
+import virtualOS as vos
+import netCDF4 as nc
+import datetime as datetime
+import calendar as calendar
+
+class IrrigationParameters(object):
+
+    def __init__(self, iniItems, landmask):
+        object.__init__(self)
+
+        self.cloneMap = iniItems.cloneMap
+        self.tmpDir   = iniItems.tmpDir
+        self.inputDir = iniItems.globalOptions['inputDir']
+        self.landmask = landmask
+
+        attr = vos.getMapAttributesALL(self.cloneMap)
+        self.nLat = int(attr['rows'])
+        self.nLon = int(attr['cols'])
+
+        self.cropParameterFileNC = iniItems.cropOptions['cropParameterNC']
+        self.CalendarType = int(iniItems.cropOptions['CalendarType'])
+        self.SwitchGDD = bool(int(iniItems.cropOptions['SwitchGDD']))
+        self.GDDmethod = int(iniItems.cropOptions['GDDmethod'])
+
+    def read_crop_parameters(self):
+        """Function to read crop input parameters"""
+        
+        self.crop_parameter_names = ['CropType','PlantingDate','HarvestDate','Emergence','MaxRooting','Senescence','Maturity','HIstart','Flowering','YldForm','PolHeatStress','PolColdStress','BioTempStress','PlantPop','Determinant','ETadj','LagAer','Tbase','Tupp','Tmax_up','Tmax_lo','Tmin_up','Tmin_lo','GDD_up','GDD_lo','fshape_b','PctZmin','Zmin','Zmax','fshape_r','fshape_ex','SxTopQ','SxBotQ','a_Tr','SeedSize','CCmin','CCx','CDC','CGC','Kcb','fage','WP','WPy','fsink','bsted','bface','HI0','HIini','dHI_pre','a_HI','b_HI','dHI0','exc','MaxFlowPct','p_up1','p_up2','p_up3','p_up4','p_lo1','p_lo2','p_lo3','p_lo4','fshape_w1','fshape_w2','fshape_w3','fshape_w4','Aer','beta','GermThr']
+
+        for var in self.crop_parameter_names:
+            vars(self)[var] = vos.netcdf2PCRobjCloneWithoutTime(
+                self.cropParameterFileNC,
+                var,
+                cloneMapFileName=self.cloneMap)
+
+        self.nCrop = self.CropType.shape[0]

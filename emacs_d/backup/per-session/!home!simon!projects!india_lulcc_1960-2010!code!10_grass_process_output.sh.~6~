@@ -1,0 +1,121 @@
+#!/bin/bash
+
+wd=$HOME/projects/india_lulcc_1960-2010
+
+# =======================================
+# read maps into GRASS
+# =======================================
+
+echo 'export GRASS_MESSAGE_FORMAT=plain
+r.mask -r
+g.region region=india_rgn
+g.region -p
+
+for year in 1985 1995
+do
+    fn=INDIA_LULC_MOD_"${year}".tif
+    out=lu"${year}"_mod
+    r.in.gdal input=maps/"${fn}" output="${out}" --overwrite
+done
+' > mygrassjob_pt1.sh
+
+chmod u+x mygrassjob_pt1.sh
+export GRASS_BATCH_JOB=$wd/mygrassjob_pt1.sh
+grass $HOME/grassdata/lcc/PERMANENT
+unset GRASS_BATCH_JOB
+rm mygrassjob_pt1.sh
+
+# =======================================
+# aggregate maps
+# =======================================
+
+if [ ! -d "data/evaluation_maps" ]
+then
+    mkdir data/evaluation_maps
+fi
+
+echo 'export GRASS_MESSAGE_FORMAT=plain
+r.mask -r
+g.region region=india_rgn
+g.region -p
+
+r.mask raster=IND_adm2_1956_rast
+
+# 1 create map showing valid land cells
+r.mapcalc "land_mask = if(isnull(lu2005),null(),1)" --overwrite
+
+# 2 create binary map for categories for observed map @ t0 and t1 and modelled map @ t1
+for map in lu2005 lu1985 lu1985_mod
+do
+    for category in 1 2 3 4 5 6 7 8 9
+    do 
+	r.mapcalc "tmp = if($map==$category,1,0)" --overwrite
+	r.mapcalc "tmp2 = if(isnull($map),null(),tmp)" --overwrite
+	g.rename raster=tmp2,"$map"_"$category" --overwrite
+	g.remove -f type=raster name=tmp,tmp2
+    done
+done
+r.mask -r
+
+counter=1
+for multiple in 16 32 64 128 256 512 1024 2048 4096 8192 16384 32768 65536
+do
+    g.region region=india_rgn
+    g.region -p
+    eval `g.region -g`
+    nsres2=$(echo "$nsres * $multiple" | bc)
+    ewres2=$(echo "$ewres * $multiple" | bc)
+    rows2=$(echo "$rows / $multiple" | bc -l | python -c "import math; print math.ceil(float(raw_input()))")
+    cols2=$(echo "$cols / $multiple" | bc -l | python -c "import math; print math.ceil(float(raw_input()))")
+    n2=$(echo "$s + $rows2 * $nsres2" | bc)
+    e2=$(echo "$w + $cols2 * $ewres2" | bc)
+    
+    g.region n=$n2 s=$s e=$e2 w=$w nsres=$nsres2 ewres=$ewres2
+    g.region -p
+
+    if [ $counter -eq 1 ]
+    then
+        r.resamp.stats input=land_mask output=weight_"$multiple" method=sum --overwrite
+    else
+        pm=$(echo "$multiple / 2" | bc)
+        r.resamp.stats input=weight_"$pm" output=weight_"$multiple" method=sum --overwrite
+    fi
+
+    r.out.gdal input=weight_"$multiple" output=data/evaluation_maps/weight_$multiple.tif --overwrite
+
+    for category in 1 2 3 4 5 6 7 8 9
+    do 
+        if [ $counter -eq 1 ]
+        then
+	    r.resamp.stats input=lu2005_"$category" output=lu2005_"$category"_"$multiple" method=sum --overwrite
+	    r.resamp.stats input=lu1985_"$category" output=lu1985_"$category"_"$multiple" method=sum --overwrite
+	    r.resamp.stats input=lu1985_mod_"$category" output=lu1985_mod_"$category"_"$multiple" method=sum --overwrite
+        else
+            pm=$(echo "$multiple / 2" | bc)
+	    r.resamp.stats input=lu2005_"$category"_"$pm" output=lu2005_"$category"_"$multiple" method=sum --overwrite
+	    r.resamp.stats input=lu1985_"$category"_"$pm" output=lu1985_"$category"_"$multiple" method=sum --overwrite
+	    r.resamp.stats input=lu1985_mod_"$category"_"$pm" output=lu1985_mod_"$category"_"$multiple" method=sum --overwrite
+        fi
+
+        # r.resamp.stats input=lu2005_"$category" output=lu2005_"$category"_"$multiple" method=sum --overwrite
+        # r.resamp.stats input=lu1985_"$category" output=lu1985_"$category"_"$multiple" method=sum --overwrite
+        # r.resamp.stats input=lu1985_mod_"$category" output=lu1985_mod_"$category"_"$multiple" method=sum --overwrite
+
+        r.out.gdal input=lu2005_"$category"_"$multiple" output=data/evaluation_maps/lu2005_"$category"_"$multiple".tif createopt="COMPRESS=DEFLATE" --overwrite
+        r.out.gdal input=lu1985_"$category"_"$multiple" output=data/evaluation_maps/lu1985_"$category"_"$multiple".tif createopt="COMPRESS=DEFLATE" --overwrite
+        r.out.gdal input=lu1985_mod_"$category"_"$multiple" output=data/evaluation_maps/lu1985_mod_"$category"_"$multiple".tif createopt="COMPRESS=DEFLATE" --overwrite
+        
+    done
+    counter=$((counter+1))
+done
+
+# g.region region=india_rgn
+# r.info lu1985
+
+' > mygrassjob_pt2.sh
+
+chmod u+x mygrassjob_pt2.sh
+export GRASS_BATCH_JOB=$wd/mygrassjob_pt2.sh
+grass $HOME/grassdata/lcc/PERMANENT
+unset GRASS_BATCH_JOB
+rm mygrassjob_pt2.sh

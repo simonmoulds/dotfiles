@@ -1,0 +1,24 @@
+Groundwater
+===========
+
+.. currentmodule:: aquacrop
+
+Configuration
+~~~~~~~~~~~~~
+
+.. code-block:: python
+
+   [GROUNDWATER]
+   water_table = false
+   variable_water_table = false
+   filename
+   
+
+Options
+~~~~~~~
+
+``filename`` : ``str``
+    Path to netCDF file containing the meteorological input variable.
+
+``varname`` : ``str``
+    NetCDF variable name.

@@ -1,0 +1,12 @@
+Directory 'gmia_india/maps' contains maps showing the total area equipped for irrigation and the area equipped for irrigation from surface water and groundwater sources for the year 2005. They are derived from the GMIA v5.0 (http://www.fao.org/nr/water/aquastat/irrigationmap/index.stm) dataset. This is the best globally available dataset but I suspect it over-estimates the area irrigated from surface water because of the number of private tubewells in operation, even in canal command areas. Nevertheless, it is the best we have for now and has been extensively used elsewhere.
+
+Directory 'output/seasonal_maps' contains the irrigated area (in hectares) of each possible crop, season and water source combination for the year 2005. For example, file 'INDIA_IRR_WHEAT_RABI_2005.tif' shows the irrigated area of wheat during the Rabi (winter) growing season. Directory 'output/monthly_maps' contains the monthly irrigated area of each possible crop, season and water source combination. So, file 'INDIA_IRR_WHEAT_RABI_2005_4.tif' shows the irrigated area of Rabi wheat during April (i.e. the number following the year corresponds to the month). For consistency, all months are included even if some are outside of the growing season (e.g. 'INDIA_IRR_WHEAT_RABI_2005_6.tif' doesn't have any values greater than zero, because June is not in the Rabi season).
+
+If you have any queries then please do let me know. I'm fully prepared to go through a number of iterations to get the right product for the analysis! Also please note that this dataset is in active development so it may well change in the coming weeks.
+
+Cheers,
+Simon
+
+11/05/2018
+
+

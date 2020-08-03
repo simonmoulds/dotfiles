@@ -1,0 +1,20 @@
+## Author : Simon Moulds
+## Date   : Nov 2018
+
+library(raster)
+
+rgn = raster("input/Gandak30min.landmask.map")
+
+## startTime = 2000-01-01
+
+## dstools
+## fs = sort(list.files("../../../gandak_data_model/data/output_evap", pattern="^PM", full.names=TRUE))
+## ts = seq.POSIXt(as.POSIXct("1979-01-01", format="%Y-%m-%d"), to=as.POSIXct("2014-12-31", format="%Y-%m-%d"), by="1 day")
+## ix = which(as.character(ts) == "2000-01-01 00:00:00")
+r1 = raster("input/output_evap/HG000000.001")
+r1 = crop(r1, rgn)
+
+## etref
+r2 = raster("output/netcdf/ETref_Hargreaves_dailyTot_output.nc")
+
+plot(stack(r1,r2))

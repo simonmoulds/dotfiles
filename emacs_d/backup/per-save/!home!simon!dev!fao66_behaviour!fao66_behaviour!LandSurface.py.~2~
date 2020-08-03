@@ -1,0 +1,21 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import os
+import numpy as np
+from hydro_model_builder import VirtualOS as vos
+
+import logging
+logger = logging.getLogger(__name__)
+
+class LandSurface(Model):
+
+    def __init__(self):
+        super(LandSurface, self).__init__()
+        self.crop_module = FAO66_behaviour(self)
+        
+    def initial(self):
+        self.crop_module.initial()
+        
+    def dynamic(self):
+        self.crop_module.dynamic()

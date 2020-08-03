@@ -1,0 +1,12 @@
+from setuptools import setup
+
+setup(name='HydroModelBuilder',
+      version=0.1,
+      description='Classes and methods for hydrological model development',
+      url='https://github.com/simonmoulds/HydroModelBuilder',
+      author='Simon Moulds',
+      author_email='sim.moulds@gmail.com',
+      license='GPL',
+      packages=['HydroModelBuilder'],
+      zip_safe=False)
+      

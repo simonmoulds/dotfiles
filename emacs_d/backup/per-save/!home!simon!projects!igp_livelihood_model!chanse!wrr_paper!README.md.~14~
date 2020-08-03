@@ -1,0 +1,47 @@
+This directory contains the code and data required to run the farmer
+livelihood model for Hamirpur, Jalaun, Sitapur and Sultanpur districts
+in northern India. It is divided into two subdirectories:
+
+code/
+=====
+
+code/model.cpp
+--------------
+the model itself, written in Rcpp (C++)
+
+code/model.R
+------------
+R script which calls the model
+
+code/run_scenarios.R
+--------------------
+R script which runs the various scenarios for each district. This is
+the main script which calls all others. It should be run from the root
+directory (i.e. from wrr_paper/) and is the only script which should be
+run by the user. Individual scenarios can be run by commenting out
+those that are not required. 
+
+code/plots.R
+------------
+R script to make plots from the model output
+
+code/config/*
+-------------
+directory containing the config scripts for each district/scenario
+combination. Each district also has a file specifying the model
+parameters (*_params.R), which do not vary between scenarios, and
+two files containing irrigation schedules
+(*_bau|policy_irrigation_schedule.R).
+
+data/
+=====
+
+data/input/*
+------------
+directory containing all input data
+
+data/output/*
+-------------
+directory containing all output data, in RData or txt format
+
+Simon Moulds, January 2018

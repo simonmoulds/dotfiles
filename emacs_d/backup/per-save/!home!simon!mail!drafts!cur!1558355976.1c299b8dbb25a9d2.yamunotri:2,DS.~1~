@@ -1,0 +1,225 @@
+References: <0c844aeb537e4360b3532c1cd6cace86@tudelft.nl> <4DF550BA-1670-4649-8D83-3620D417CD7D@ufz.de> <4820822d42744edc8a467c2588e57900@tudelft.nl> <bc0e2f47c6394789b8ed62201d1d7845@tudelft.nl> <20190520123420.GF31326@imperial.ac.uk>
+User-agent: mu4e 1.0-alpha2; emacs 24.5.1
+From: Simon Moulds <simon.moulds@imperial.ac.uk>
+To: Wouter Buytaert <w.buytaert@imperial.ac.uk>
+Cc: Nick van de Giesen - CITG <N.C.vandeGiesen@tudelft.nl>, Jan Friesen <jan.friesen@ufz.de>, Simon Moulds <simon.moulds@imperial.ac.uk>
+Subject: Re: [TWIGA] D4.1 and D2.2 message to PO
+In-reply-to: <20190520123420.GF31326@imperial.ac.uk>
+
+Dear Nick,
+
+Pleased to connect with you via email.
+
+The focus of my work over the last few weeks has been the prototype index-based crop insurance, using soil moisture rather than met variables (prec, temp). Following the service template (https://drive.google.com/drive/folders/1fIlfBsWeN4P_k-mEr6_OCklEY11Zig9T) I've been working on the soil moisture index algorithm. To do this, I'm currently setting up an implementation of AquaCrop-OS to generate a dataset showing crop phenology (maize, to start with) for multiple points across SSA and for many years (1980s->). Treating the unique (place, growing season) crop phenology time series as "truth", I plan to relate crop development to soil moisture and identify thresholds during the growing season that can be used as the basis of the insurance index. As observations of crop development become available we can refine the index: at the moment I'm focusing on getting something up and running. 
+
+Obviously to develop an operational service we will need to produce estimates of soil moisture for specific sites in near real time. As Wouter mentioned, I've started work on a "front-end" to this service using the RShiny tool. At the moment this just visualises soil moisture using a simple water balance model using historical data. The next task will be to replace this with a crop model, and work on methods to assimilate the observational data which will become available. I had planned to use the AquaCrop-OS model for this, but I'm happy to change at this stage if there are strategic reasons for using WOFOST/PCSE.
+
+Please do let me know if you require any further information.
+
+Thanks,
+Simon
+
+P.s. in WP3 we discussed the potential for me to visit Kenya at the end of June/start of July, to coincide with your visit. Have you been able to finalise dates for this?  
+
+Wouter Buytaert writes:
+
+> Hi Nick,
+>
+> Simon has been making good progress with the WP4 web service, so you
+> are welcome to report on that. I copy Simon so that he can give an
+> update.
+>
+> As for crops: we've got JULES-crop and AQUACROP-OS on our radar, but
+> happy for Simon to have a look at WOFOST and PCSE. From a technical
+> perspective, the latter looks indeed promising to incorporate in a web
+> workflow.
+>
+> Regards,
+> Wouter
+>
+> * Nick van de Giesen - CITG <N.C.vandeGiesen@tudelft.nl> [2019-05-17 14:13:48 +0000]:
+>
+>>Hello Wouter & Jan: It would be nice to have some progress to show for. Have we made a decision with respect to the plant model to use? If we are still in the process of selcting, may I suggest we go with WOFOST:
+>>
+>>
+>>https://www.wur.nl/en/Research-Results/Research-Institutes/Environmental-Research/Facilities-Products/Software-and-models/WOFOST.htm  ?
+>>
+>>
+>>Or its equivalent Python Crop Simulation Environment - PCSE:
+>>
+>>https://github.com/ajwdewit/pcse
+>>
+>>
+>>Best - Nick
+>>
+>>
+>>
+>>--------------------
+>>Prof.dr.ir. Nick van de Giesen
+>>Water Management
+>>Civil Engineering & Geosciences
+>>TU Delft
+>>Stevinweg 1, 2628 CN Delft, Room 4.73
+>>PO Box 5048, 2600 GA Delft
+>>Netherlands
+>>n.c.vandegiesen@tudelft.nl
+>>www.wrm.tudelft.nl
+>>+31 15 2787180
+>>________________________________
+>>From: TWIGA
+>>Sent: Friday, May 17, 2019 2:21:19 PM
+>>To: Nick van de Giesen - CITG
+>>Cc: giovanna.venuti@polimi.it; andrea.montiguarnieri@polimi.it; Wouter Buytaert; TWIGA; Jan Friesen
+>>Subject: RE: [TWIGA] D4.1 and D2.2 message to PO
+>>
+>>
+>>Hi Nick,
+>>
+>>
+>>
+>>In preparation for the call this Wednesday morning with the PO, please see below discussion about D4.1 and how to present the status and impact/planning for the rest of the project.
+>>
+>>
+>>
+>>The explanation for D2.2 is:
+>>
+>>Deliverable 2.2 refers to Task2.2 (from M12 to  M36) within WP2-Atmosphere. The task involves the design and deployment of three experimental networks of low-cost GNSS monitoring units.
+>>
+>>Currently the design of one of the network was performed and the monitoring units have been purchased. They will be delivered to Uganda in few weeks, depending on some bureaucratic issues we are fixing.
+>>
+>>D2.2 consists in a report on these activities and it cannot be completed before the task end. This does not imply any delay in the project.
+>>
+>>
+>>
+>>Kind regards,
+>>
+>>Eva
+>>
+>>
+>>
+>>From: Jan Friesen [mailto:jan.friesen@ufz.de]
+>>Sent: vrijdag 17 mei 2019 14:04
+>>To: TWIGA
+>>Cc: giovanna.venuti@polimi.it; andrea.montiguarnieri@polimi.it; Wouter Buytaert
+>>Subject: Re: [TWIGA] D4.1 and D2.2 message to PO
+>>
+>>
+>>
+>>Dear Eva:
+>>
+>>
+>>
+>>With regard to D4.1 I also cc Wouter as WP leader. The previous explanation to shift D4.1 was as follows:
+>>
+>>D4.1 Prototype app and back-end data processing algorithms to monitor key crop properties based on photographs, with accompanying report (M3312) D, R Obj 6
+>>
+>>The rescheduling of task 4.1 has become necessary as prior to developing monitoring methods it has to be insured that those are in line with the crop model and thus provide usable input or calibration/ validation data. In addition, our first stakeholder meeting is planned for November 2018 in agreement with the rescheduled TWIGA meetings. In view of citizen science data collection this first stakeholder meeting is also necessary before conceptualizing monitoring methods.
+>>
+>>
+>>
+>>In addition, to the previous explanation we can also add that the ICL staff/ PostDoc working on the crop model just recently started. Since the crop monitoring requires a close cooperation with modeling in order to avoid monitoring properties that cannot be implemented into the modeling framework, the deliverable shift makes even more sense now. In communication with the WP4 lead it has therefore been assured that a D4.1 shift does neither impact nor delay the work.
+>>
+>>
+>>
+>>@Wouter: Before arguing in this way towards the EU, however, I would first like to get approval from you as I do not want ICL to be seen as the bottleneck instead of UFZ.
+>>
+>>
+>>
+>>We can also quickly discuss this issue via skype next week (Eva, Wouter, Jan), depending on what Wouter's thoughts are or what additional explanation are actually required by our EU contact.
+>>
+>>
+>>
+>>Cheers,
+>>
+>>Jan
+>>
+>>
+>>
+>>Am 15.05.2019 um 17:07 schrieb TWIGA <TWIGA@tudelft.nl<mailto:TWIGA@tudelft.nl>>:
+>>
+>>
+>>
+>>Dear Jan, Giovanna and Andrea,
+>>
+>>
+>>
+>>I am contacting you to ask for a few lines to answer our PO. In our (now almost final) amendment of the Grant Agreement,  D4.1 and D2.2 needed to be moved (as explained in the attached amendment letter). D4.1 and D2.2 were part of the amendment discussions last year, and communicated then with the PO as well. The PO is asking now for a status update on these deliverables (I guess because the amendment was delayed so long by GIA’s validation). She asks if we can add some more explanation that delaying D4.1 and D2.2 will not impact and delay the work. Below is the PO’s comment:
+>>
+>>
+>>
+>>-      Postponing the completion of deliverables 4.1 and 2.2 to month 33 and 36 respectively: These are key deliverables of the first reporting period. How far is this work advanced, which impact does such delay have on the rest of the work?
+>>
+>>
+>>
+>>D2.2 was mistakenly planned at the beginning of Task 2.2, so on the request of Giovanna and Nick I moved D2.2 to the end of task 2.2. We know that GNSS receivers (D2.2) are only now becoming available. I feel 4.1 has been explained as well, but we still need to respond to the PO’s question. Can you therefore share with me (very briefly in one or two lines) a status update for D4.1 and D2.2, including this reassurance why our change does not affect the project planning negatively?
+>>
+>>
+>>
+>>Here on G-Suite<https://drive.google.com/drive/folders/1AaH4YE9pim9RCCAUclaiqV3S1kkib9DK> (WP8, folder Grant and Consortium Agreement) and attached is the amendment.
+>>
+>>Here on G-Suite<https://drive.google.com/drive/folders/1n_RVL5nS1f1fOWjoVrqng7GuyPqN5_jG> (WP 8 folder Deliverable list) is the deliverable list updated for the amendment.
+>>
+>>
+>>
+>>Thanks and kind regards,
+>>
+>>Eva
+>>
+>>
+>>
+>>
+>>
+>>Eva Spoor
+>>
+>>Project Coordinator
+>>
+>><image001.png>
+>>
+>>ValorisationCentre
+>>
+>>Building 26
+>>
+>>Van der Burgh Tower
+>>Van der Burghweg 1
+>>
+>>2628 CS  Delft
+>>
+>>
+>>
+>>M  +31 (0) 6 28391120
+>>
+>>E   e.v.spoor@tudelft.nl<mailto:e.v.spoor@tudelft.nl>
+>>
+>>W www.tudelft.nl/en/technology-transfer/<http://www.tudelft.nl/en/technology-transfer/>
+>>
+>>
+>>
+>>
+>>
+>><776691 TWIGA_Amendment_2019_FINAL.docx><776691_Amendment request letter.pdf><When and who to review Deliverables - updated amendment 1.xlsx>
+>>
+>>
+>>
+>>---------------------------------------------------------------
+>>Dr. Jan Friesen
+>>Department Catchment Hydrology
+>>
+>>Helmholtz-Zentrum für Umweltforschung GmbH - UFZ
+>>Helmholtz Centre for Environmental Research GmbH - UFZ
+>>Permoserstraße 15, 04318 Leipzig, Germany
+>>Phone +49 341 235 1082
+>>jan.friesen@ufz.de<mailto:jan.friesen@ufz.de>, www.ufz.de<http://www.ufz.de>
+>>http://www.ufz.de/index.php?en=17611
+>>
+>>Sitz der Gesellschaft/Registered Office: Leipzig
+>>Registergericht/Registration Office: Amtsgericht Leipzig
+>>Handelsregister Nr./Trade Register Nr.: B 4703
+>>Vorsitzender des Aufsichtsrats/Chairman of the Supervisory Board: MinDirig Wilfried Kraus
+>>Wissenschaftlicher Geschäftsführer/Scientific Managing Director:
+>>Prof. Dr. Dr. h.c. Georg Teutsch
+>>Administrative Geschäftsführerin/Administrative Managing Director:
+>>Dr. Sabine König
+>>---------------------------------------------------------------
+>>
+>>
+

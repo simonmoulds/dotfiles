@@ -1,0 +1,130 @@
+import numpy as np
+import datetime
+import os
+import gdal
+import netCDF4
+import re
+
+ds = gdal.Open('../data/ksat_topsoil_gapfilled_5m.tif')
+a = ds.ReadAsArray()
+nlat,nlon = np.shape(a)
+xres = 1./12
+yres = 1./12
+
+b = ds.GetGeoTransform() #bbox, interval
+minx = b[0]
+maxx = b[0] + nlon * xres
+maxy = b[3] 
+miny = b[3] + nlat * -yres
+
+lon = np.arange(0,nlon) * xres + (minx + xres/2)
+lat = np.arange(0,nlat) * yres + (miny + yres/2)
+lat = lat[::-1]
+# lat = np.linspace(miny + yres/2, maxy - yres/2, nlat)
+# layer = np.array([0.3,2.])
+# nlayer = len(layer)
+
+# For now, let's create method using rice, wheat, sugarcane
+crop_map_path = '/home/simon/projects/india_crop_area_2005/data/output_2005/monthly_maps'
+crop_nms = ['irr_rice_kharif',
+            'rain_rice_kharif',
+            'irr_rice_rabi',
+            'rain_rice_rabi',
+            'irr_wheat_rabi',
+            'rain_wheat_rabi',
+            'irr_sugarcane_whole_year',
+            'rain_sugarcane_whole_year']
+
+ncrop = len(crop_nms)
+
+# =========
+# crop area
+# =========
+
+# TODO: add time dimension to crop area
+
+map_path = '/home/simon/projects/india_crop_area_2005/data/output_2005/seasonal_maps'
+crop_area = []
+for index,name in enumerate(crop_nms):
+    x = os.path.join(map_path, 'INDIA_' + name.upper() + '_2005.tif')
+    if os.path.isfile(x):
+        # create temporary raster files in current region
+        xx = gdal.Warp('tmp_crop_area.tif', x, outputBounds=(minx,miny,maxx,maxy))
+        # xx = gdal.Warp('tmp_crop_area.tif', x, outputBounds=(83.5,25.5,85.75,28))
+        xarr = xx.ReadAsArray()
+        crop_area.append(xarr)
+        xx = None
+
+# import sys
+# sys.exit(0)
+
+# array with dimensions (crop,lat,lon)
+crop_area = np.stack(crop_area, axis=0)
+
+# create netCDF file containing crop area
+nco = netCDF4.Dataset('../data/Gandak_crop_area.nc','w',clobber=True)
+
+# create dimensions, variables and attributes:
+nco.createDimension('lon',nlon)
+nco.createDimension('lat',nlat)
+nco.createDimension('crop',ncrop)
+
+lono = nco.createVariable('lon',np.float64,('lon'),zlib=True,least_significant_digit=16)
+lono.units = 'degrees_east'
+lono.standard_name = 'longitude'
+lono[:]=lon
+
+lato = nco.createVariable('lat',np.float64,('lat'),zlib=True,least_significant_digit=16)
+lato.units = 'degrees_north'
+lato.standard_name = 'latitude'
+lato[:]=lat
+
+crpo = nco.createVariable('crop',np.int32,('crop'))
+crpo.units = '1'
+crpo.standard_name = 'crop'
+crpo.long_name = 'crop'
+crpo[:]=np.arange(1, ncrop + 1)
+
+# create container variable for CRS: lon/lat WGS84 datum
+crso = nco.createVariable('crs','i4')
+crso.long_name = 'Lon/Lat Coords in WGS84'
+crso.grid_mapping_name='latitude_longitude'
+crso.longitude_of_prime_meridian = 0.0
+crso.semi_major_axis = 6378137.0
+crso.inverse_flattening = 298.257223563
+
+nco.Conventions='CF-1.6'
+
+# crop area
+# #########
+area = nco.createVariable('crop_area', np.float64, ('crop', 'lat', 'lon'), zlib=True,fill_value=np.float64(1e+20))
+area.setncattr('standard_name', 'crop_area')
+area.setncattr('long_name', 'area of individual crops in hectares')
+area.setncattr('units','m2')
+# area.setncattr('units','1e5 m2')
+area.setncattr('_FillValue', np.float64(1e+20))
+area.setncattr('missing_value', np.float64(1e+20))
+crop_area[crop_area > 0] *= 10000.  # ha -> m2
+crop_area[crop_area < 0] = 0
+crop_area = np.float64(crop_area)
+area[:] = crop_area
+
+# cropland area
+# #############
+
+# TODO: for now I'm just using grid cell area
+
+ds = gdal.Open('../data/modelMaskCellArea.tif')
+a = ds.ReadAsArray()
+
+area = nco.createVariable('cropland_area', np.float64, ('lat','lon'), zlib=True,fill_value=np.float64(1e+20))
+area.setncattr('standard_name', 'cropland_area')
+area.setncattr('long_name', 'net cropped area in hectares')
+area.setncattr('units','m2')
+# area.setncattr('units','1e5 m2')
+area.setncattr('_FillValue', np.float64(1e+20))
+area.setncattr('missing_value', np.float64(1e+20))
+area[:] = a
+
+# close netCDF
+nco.close()

@@ -1,0 +1,18 @@
+## Author : Simon Moulds
+## Date   : January 2018
+
+## Quality control for Meghalaya
+
+## Crops not grown: ...
+
+## banana
+## ######
+
+xx[["apy_banana-whole_year"]] = xx[["mapspam_atot_banana"]][6]
+xx[["irr_banana-whole_year"]] = xx[["mapspam_xirr_banana"]][6]
+
+## cassava
+## ######
+
+xx[["apy_cassava-whole_year"]] = xx[["mapspam_atot_cassava"]][6]
+xx[["irr_cassava-whole_year"]] = xx[["mapspam_xirr_cassava"]][6]

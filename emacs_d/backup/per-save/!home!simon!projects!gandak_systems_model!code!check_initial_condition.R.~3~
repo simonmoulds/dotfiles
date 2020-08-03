@@ -1,0 +1,13 @@
+library(raster)
+
+## read mask file
+mask = raster("modelMask.asc")
+pts = as(mask, "SpatialPoints")
+
+## calculate initial gw level
+hini = raster("h_ini.nc", varname="h")
+dem = raster("gw_data.nc", varname="DEM")
+gwlevel = dem - hini
+
+
+plot(gwlevel)

@@ -1,0 +1,167 @@
+library(raster)
+library(magrittr)
+library(tidyr)
+library(dplyr)
+library(rgdal)
+library(ggplot2)
+library(Rcpp)
+library(RcppArmadillo)
+options(stringsAsFactors = FALSE)
+
+source("code/helpers.R")
+nbw = matrix(data=1, nrow=5, ncol=5)
+
+## source("code/prepare_input_data.R")
+sourceCpp("code/allocate.cpp")
+
+## study region characteristics
+input_levels = c("irri","rain_h","rain_l","rain_s")
+growing_seasons = c("annual","kharif","rabi")
+
+subcrops = list(rice = "rice",
+                wheat = "whea",
+                corn = "maiz",
+                oth_cereal = c("barl","sorg","pmil","smil","ocer"),
+                oils = c("soyb","grou","sesa","sunf","rape","ooil"),
+                fibre = c("cott","ofib"),
+                palm = c("cnut","oilp"),
+                sugar = c("sugc","sugb"),
+                root = c("pota","swpo","yams","cass","orts"),
+                misc = c("bean","chic","pige","lent","cowp","opul","trof","temf","bana","plnt","acof","rcof","coco","teas","toba","vege","rest"))
+
+india_rgn = readRDS("data/india_rgn_raster.rds")
+cell_area = readRDS("data/india_rgn_cell_area.rds")
+cell_ix = readRDS("data/india_rgn_cell_ix.rds")
+crop_area_2005 = readRDS("data/iiasa_cropland_area.rds")
+n_cell = length(cell_ix)
+n_input = length(input_levels)
+n_season = length(growing_seasons)
+
+## load required input data (from prepare_input_data.R)
+init_area_mat =
+    readRDS("data/mapspam_crop_area_df.rds") %>%
+    filter(input %in% input_levels) %>%
+    select(-(cell:input)) %>%
+    mutate_all(funs(replace(., is.na(.), 0))) %>%
+    as.matrix
+
+init_area_mat[init_area_mat < 0] = 0
+
+init_total_area_mat =
+    get_total_areaC(init_area_mat, n_season, n_input) %>%
+    `colnames<-`(colnames(init_area_mat))
+
+init_yield_mat =
+    readRDS("data/mapspam_crop_yield_df.rds") %>%
+    filter(input %in% input_levels) %>%
+    select(-(cell:input)) %>%
+    mutate_all(funs(replace(., is.na(.), 0))) %>%
+    as.matrix
+    
+init_nb_mat =
+    readRDS("data/crop_neighb_df.rds") %>%
+    filter(input %in% input_levels) %>%
+    select(-(cell:input)) %>%
+    mutate_all(funs(replace(., is.na(.), 0))) %>%
+    as.matrix
+
+init_suit_mat =
+    readRDS("data/crop_suit_df.rds") %>%
+    filter(input %in% input_levels) %>%
+    select(-(cell:input)) %>%
+    mutate_all(funs(replace(., is.na(.), 0))) %>%
+    as.matrix
+
+init_potyld_mat = 
+    readRDS("data/crop_potyld_df.rds") %>%
+    filter(input %in% input_levels) %>%
+    select(-(cell:input)) %>%
+    mutate_all(funs(replace(., is.na(.), 0))) %>%
+    as.matrix
+
+popn_df = readRDS("data/popn_df.rds")
+
+## total suitability is the maximum of biophysical suitability from
+## GAEZ and neighbourhood suitability
+init_tsuit_mat =
+    pmax(init_nb_mat, init_suit_mat)
+
+dmd = readRDS("data/gcam_reference_demand.rds")
+
+## model parameters
+alloc_order = c("sugc","rice","vege","whea","pota","trof","bana","maiz","cott","pmil","soyb","temf","cnut","sorg","rape","cass","grou","chic","bean","pige","ofib","smil","opul","ooil","sunf","barl","swpo","lent","teas","sesa","rest","toba","rcof","acof","coco","orts","ocer","plnt","cowp","oilp","sugb","yams")
+
+fact = 0.01 ## this value controls how much change is made in each cell
+rand_min = 0
+rand_max = 0.25
+
+## specify output directory
+out_path = "data/output"
+if (!dir.exists(out_path)) {
+    dir.create(out_path)
+}
+
+## start routine
+time = seq(2005, 2100, by=5)
+area_mat = init_area_mat
+total_area_mat = init_total_area_mat
+yield_mat = init_yield_mat
+nb_mat = init_nb_mat
+suit_mat = init_suit_mat
+potyld_mat = init_potyld_mat
+subcrop_nms = colnames(dmd)
+target_intens = 0.25
+target_extens = 1
+
+set.seed(18384)
+
+for (i in 2:length(time)) {
+
+    cat("Allocating crop production in year", time[i], "\n")
+    
+    ## total suitability based on revenue model of You et al. 2014
+    popdens = rep(popn_df[,i], each=(n_season * n_input))
+    tsuit_mat = (suit_mat >= 1) * popdens * potyld_mat
+    for (j in 1:ncol(tsuit_mat)) {
+        x = tsuit_mat[,i]
+        tsuit_mat[,i] = x / max(x)
+    }
+    
+    crop_nms = subcrop_nms ## TEMPORARY
+
+    ## stop()
+    area_mat = allocate(area_mat, suit_mat, yield_mat, dmd[c(i-1,i),], target_intens, target_extens, crop_nms, subcrop_nms, alloc_order, n_cell, n_season, n_input, cell_area, cropland_area, fact, no_chng_count_max=1, tolerance=sqrt(.Machine$double.eps))
+
+    ## write output to file
+    dmd[i,] = colSums(area_mat * yield_mat)    
+    ## for (j in 1:length(alloc_order)) {
+    ##     crop = alloc_order[j]
+    ##     crop_ix = which(subcrop_nms %in% crop)
+        
+    ##     for (k in 1:n_season) {
+            
+    ##         v = area_mat[,crop_ix,drop=TRUE]
+
+    ##         for (m in 1:n_input) {
+    ##             r = raster(india_rgn)  ## template
+    ##             row_ix = seq((k - 1) * n_input + m, by=n_season * n_input, length.out = n_cell)
+    ##             r[cell_ix] = v[row_ix] ## assign values
+
+    ##             nb = get_mapspam_neighb(list(r), w=nbw, fun=mean, na.rm=TRUE, pad=TRUE)[[1]]
+    ##             nb_vals = getValues(nb) %>% `[`(cell_ix)
+    ##             nb_mat[row_ix,crop_ix] = nb_vals ## update nb_mat
+
+    ##             fn = paste0("INDIA_",
+    ##                         toupper(crop), "_",
+    ##                         toupper(growing_seasons[k]), "_",
+    ##                         toupper(input_levels[m]), "_",
+    ##                         time[i], ".tif")
+
+    ##             writeRaster(r, file.path(out_path, fn), format="GTiff", overwrite=TRUE)
+    ##         }
+    ##     }
+    ## }    
+}
+
+write.table(dmd, "data/output/allocated_area.txt", sep=" ", row.names=FALSE, col.names=TRUE)
+

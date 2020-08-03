@@ -1,0 +1,23 @@
+## Author : Simon Moulds
+## Date   : Nov 2018
+
+library(raster)
+library(ncdf4)
+
+# h_ini_filename = get_data_smart(
+#     'gandak_data_model',
+#     '../data/h_ini.nc',
+#     as_string = False)
+# dem_filename = get_data_smart(
+#     'gandak_data_model',
+#     '../data/gw_data.nc',
+#     as_string = False)
+
+# dataset = nc.Dataset(h_ini_filename)
+# h_ini = dataset.variables['h'][:]
+# dataset.close()
+
+# dataset = nc.Dataset(dem_filename)
+# dem = dataset.variables['DEM'][:]
+# dataset.close()
+# gwlevel = np.round(dem - h_ini, decimals=3)

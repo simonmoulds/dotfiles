@@ -1,0 +1,8 @@
+## Author : Simon Moulds
+## Date   : July 2018
+
+## Script to convert input data
+
+wd = "/home/simon/projects/AquaCrop/AquaCropOS_ModelTesting/Chapter7_Tunis_Wheat/Exercise1/Matlab"
+
+## Clock

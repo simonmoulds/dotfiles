@@ -1,0 +1,7 @@
+from pcraster import *
+
+setclone("dem.map")
+
+raindist = spread("rainstat.map")
+
+report(raindist, "raindist.map")

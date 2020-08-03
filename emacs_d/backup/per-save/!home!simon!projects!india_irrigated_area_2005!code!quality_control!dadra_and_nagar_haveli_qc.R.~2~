@@ -1,0 +1,24 @@
+## Author : Simon Moulds
+## Date   : January 2018
+
+## Quality control for Dadra and Nagar Haveli
+
+## Crops not grown: ...
+
+## banana
+## ######
+
+xx[["apy_banana-whole_year"]] = xx[["mapspam_atot_banana"]]
+xx[["irr_banana-whole_year"]] = xx[["mapspam_xirr_banana"]]
+
+## chickpea
+## ########
+
+## all ok
+
+## coconut
+## #######
+
+xx[["apy_coconut-whole_year"]] = xx[["mapspam_atot_coconut"]]
+xx[["irr_coconut-whole_year"]] = xx[["mapspam_xirr_coconut"]]
+

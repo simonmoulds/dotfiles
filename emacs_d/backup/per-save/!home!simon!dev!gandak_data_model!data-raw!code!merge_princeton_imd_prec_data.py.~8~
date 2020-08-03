@@ -1,0 +1,110 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import numpy as np
+import pandas as pd
+import netCDF4
+import calendar
+import datetime
+import os
+
+def get_times(year):
+    dt = datetime.datetime(year,1,1)
+    end = datetime.datetime(year+1,1,1)
+    step = datetime.timedelta(days=1)
+    times = []
+    while dt < end:
+        times.append(dt)
+        dt += step
+    return times
+
+# Make grid file
+xres = 1./12
+yres = 1./12
+nlat,nlon = 36,42
+minx,miny = 83,25
+lon = np.arange(0,nlon) * xres + (minx + xres/2)
+lat = np.arange(0,nlat) * yres + (miny + yres/2)
+lat = lat[::-1]
+
+grid = netCDF4.Dataset('grid.nc','w')
+grid.createDimension('lon',nlon)
+grid.createDimension('lat',nlat)
+lono = grid.createVariable('lon',np.float32,('lon'),zlib=True,least_significant_digit=16)
+lono.units = 'degrees_east'
+lono.standard_name = 'longitude'
+lono.long_name = 'longitude'
+lono[:]=lon
+
+lato = grid.createVariable('lat',np.float32,('lat'),zlib=True,least_significant_digit=16)
+lato.units = 'degrees_north'
+lato.standard_name = 'latitude'
+lato.long_name = 'longitude'
+lato[:]=lat
+
+dummy = grid.createVariable('dummy',np.float32,('lat','lon'))
+dummy.units = '1'
+dummy.standard_name = 'dummy'
+dummy.long_name = 'dummy'
+dummy[:]=1
+
+# # create container variable for CRS: lon/lat
+# # WGS84 datum
+# crso = grid.createVariable('crs','i4')
+# crso.long_name = 'Lon/Lat Coords in WGS84'
+# crso.grid_mapping_name='latitude_longitude'
+# crso.longitude_of_prime_meridian = 0.0
+# crso.semi_major_axis = 6378137.0
+# crso.inverse_flattening = 298.257223563
+grid.Conventions='CF-1.6'
+grid.close()
+
+imd_datadir = '/data/IMD_GRIDDED_RF_DATA_PT25_NC'
+prc_datadir = '/data/PRINCETON_IGP'
+try:
+    os.mkdir(tmpdir)
+except:
+    pass
+years = range(1970, 2013 + 1)
+
+def main():
+    
+    for year in years:
+        print year
+        imd_fn = imd_datadir + '/' + 'IMD_GRIDDED_RF_DATA_PT25_' + str(year) + '.nc'
+        prc_fn = prc_datadir + '/' + 'prcp_daily_' + str(year) + '-' + str(year) + '_igp.nc'
+        os.system('ncks -d lat,25.,28. -d lon,83.,86.5 ' + imd_fn + ' -O imd_tmp.nc')
+        os.system('ncks -d lat,25.,28. -d lon,83.,86.5 ' + prc_fn + ' -O prc_tmp.nc')
+        imd = netCDF4.Dataset('imd_tmp.nc','r+')
+        prc = netCDF4.Dataset('prc_tmp.nc')
+        times = get_times(year)
+        for time in times:
+            imd_index = netCDF4.date2index(time, imd.variables['time'])
+            imd_data = imd.variables['prcp'][imd_index,...]
+            missing = imd_data.mask
+            prc_index = netCDF4.date2index(time, prc.variables['time'])
+            prc_data = prc.variables['prcp'][prc_index,...]
+            # prc_mask = prc_data.mask
+            prc_data = np.flipud(prc_data)  # CHECK
+            imd_data[missing] = prc_data[missing]
+            # imd_data = np.ma.masked_array(imd_data, mask=prc_mask)
+            imd.variables['prcp'][imd_index,...] = imd_data
+        imd.close()
+
+        # For now, this will suffice for downscaling:
+        os.system('cdo gennn,grid.nc imd_tmp.nc weights.nc')
+        os.system('cdo remap,grid.nc,weights.nc imd_tmp.nc imd_tmp_5m.nc')
+
+        # Write merged data to package data directory:
+        merged_fn = '../../data/' + 'IMD_GRIDDED_RF_DATA_PT5_MERGED_' + str(year) + '.nc'
+        os.rename('imd_tmp_5m.nc', merged_fn)
+
+        # Do some tidying up...
+        os.remove('imd_tmp.nc')
+        os.remove('prc_tmp.nc')
+        os.remove('weights.nc')
+
+    os.remove('grid.nc')
+    
+if __name__ == '__main__':
+    main()

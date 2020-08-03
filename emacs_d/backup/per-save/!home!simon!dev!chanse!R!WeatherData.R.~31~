@@ -1,0 +1,48 @@
+#' @include class-WeatherData.R
+NULL
+
+setOldClass("xts")
+
+#' Constructor for WeatherData
+#'
+#' Methods to create a WeatherData object.
+#'
+#' @param x xts. Time series object.
+#' @param prec numeric or xts.
+#' @param etref numeric or xts.
+#' @param start_time POSIXt. Start time of the model simulation.
+#' @param end_time POSIXt. End time of the model simulation.
+#' @param prec_colname character. Name of precipitation column.
+#' @param etref_colname character. Name of reference evapotranspiration column.
+#' @param ... Additional arguments (none).
+#'
+#' @return A WeatherData object.
+#'
+#' @name WeatherData
+#' @rdname WeatherData-methods
+#'
+NULL
+
+setGeneric("WeatherData", function(x, prec, etref, ...)
+    standardGeneric("WeatherData"))
+
+#' @rdname WeatherData-methods
+#' @aliases WeatherData,xts,ANY,ANY-method
+setMethod("WeatherData", signature(x="xts", prec="ANY", etref="ANY"),
+          function(x, prec, etref, start_time, end_time, prec_colname="prec", etref_colname="etref") {
+              flag = FALSE
+              msg = ""
+              if (!prec_colname %in% names(x)) {
+                  flag = TRUE
+                  msg = paste0(msg, "Supplied 'prec_colname' not found in 'x'\n")
+              }
+
+              if (!etref_colname %in% names(x)) {
+                  flag = TRUE
+                  msg = paste0(msg, "Supplied 'etref_colname' not found in 'x'\n")
+              }
+              prec = as.numeric(x[,prec_colname])
+              etref = as.numeric(x[,etref_colname])
+              ts = zoo::index(x)
+              out = new("WeatherData", prec=prec, etref=etref, ts=ts)
+          })

@@ -1,0 +1,109 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import os
+import string
+import numpy as np
+from hydro_model_builder import VirtualOS as vos
+from hydro_model_builder import Messages
+
+import logging
+logger = logging.getLogger(__name__)
+
+class Temperature(object):
+    def __init__(self, Temperature_variable):
+        self.var = Temperature_variable
+
+    def initial(self):
+        self.set_temperature_input_filenames()
+
+    def set_temperature_input_filenames(self):
+        keys = ['temperatureNC',
+                'temperatureVarName',
+                'temperatureTimeDimName']
+        vals = [self.var._configuration.meteoOptions[key] for key in keys]        
+        self.var.tempFileNC = vals[0]
+        self.var.tempVarName = vals[1]
+        self.var.tempTimeDimName = vals[2]
+
+        self.var.compute_tmin_tmax_from_subdaily_data = (
+            bool(self.var._configuration.meteoOptions['compute_daily_min_max_temperature_from_subdaily_data']))
+        
+        if self.var.compute_tmin_tmax_from_subdaily_data:
+            keys = ['subDailyTemperatureNC',
+                    'subDailyTemperatureVarName',
+                    'subDailyTemperatureTimeDimName']            
+            vals = [self.var._configuration.meteoOptions[key] for key in keys]
+            self.var.subDailyTempFileNC = vals[0]
+            self.var.subDailyTempVarName = vals[1]
+            self.var.subDailyTimeDimName = vals[2]
+            
+            self.var.tminFileNC, self.var.tminVarName = None, None
+            self.var.tmaxFileNC, self.var.tmaxVarName = None, None
+        else:
+            self.var.subDailyTempFileNC, self.var.subDailyTempVarName = None, None
+            keys = ['minDailyTemperatureNC',
+                    'maxDailyTemperatureNC',
+                    'minDailyTemperatureVarName',
+                    'maxDailyTemperatureVarName',
+                    'minDailyTemperatureTimeDimName',
+                    'maxDailyTemperatureTimeDimName']            
+                    
+            vals = [self.var._configuration.meteoOptions[key] for key in keys]
+            self.var.tminFileNC, self.var.tmaxFileNC = vals[0], vals[1]
+            self.var.tminVarName, self.var.tmaxVarName = vals[2], vals[3]
+            self.var.tminTimeDimName, self.var.tmaxTimeDimName = vals[4], vals[5]
+
+    def read_temperature_data(self):        
+        day, month, year = (self.var._modelTime.currTime.day,
+                            self.var._modelTime.currTime.month,
+                            self.var._modelTime.currTime.year)
+        
+        self.var.tmean = vos.netcdf2PCRobjClone(
+            self.var.tempFileNC.format(day=day, month=month, year=year),
+            self.var.tempVarName,
+            str(self.var._modelTime.fulldate),
+            useDoy = None,
+            cloneMapFileName = self.var.cloneMap,
+            # cloneMapAttributes = self.var.cloneMapAttributes,
+            LatitudeLongitude = True)[self.var.landmask]
+
+        if self.var.compute_tmin_tmax_from_subdaily_data:
+            self.compute_tmin_tmax_from_subdaily_data(day, month, year)
+        else:
+            self.var.tmin = vos.netcdf2PCRobjClone(
+                self.var.tminFileNC.format(day=day, month=month, year=year),
+                self.var.tminVarName,
+                str(self.var._modelTime.fulldate),
+                useDoy = None,
+                cloneMapFileName = self.var.cloneMap,
+                # cloneMapAttributes = self.var.cloneMapAttributes,
+                LatitudeLongitude = True)[self.var.landmask]
+
+            self.var.tmax = vos.netcdf2PCRobjClone(
+                self.var.tmaxFileNC.format(day=day, month=month, year=year),
+                self.var.tmaxVarName,
+                str(self.var._modelTime.fulldate),
+                useDoy = None,
+                cloneMapFileName = self.var.cloneMap,
+                # cloneMapAttributes = self.var.cloneMapAttributes,
+                LatitudeLongitude = True)[self.var.landmask]
+            
+    def compute_tmin_tmax_from_subdaily_data(self, day, month, year):
+        daily_temp_data = vos.netcdf2NumpyDailyTimeSlice(
+            self.var.subDailyTempFileNC.format(day=day, month=month, year=year),
+            self.var.subDailyTempVarName,
+            str(self.var._modelTime.fulldate),
+            useDoy = None,
+            cloneMapFileName = self.var.cloneMap,  # TODO: change to cloneMapAttributes
+            LatitudeLongitude = True)[...,self.var.landmask]
+        ntime = daily_temp_data.shape[0]
+        # print daily_temp_data[0,:]
+        if not ntime > 1:
+            raise ModelError('')
+        else:
+            self.var.tmin = np.amin(daily_temp_data, axis=0)
+            self.var.tmax = np.amax(daily_temp_data, axis=0)            
+        
+    def dynamic(self):
+        self.read_temperature_data()

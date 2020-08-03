@@ -1,0 +1,197 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import os
+# from pcraster.framework import *
+# import pcraster as pcr
+import string
+import numpy as np
+import hydro_model_builder.Messages
+import hydro_model_builder.VirtualOS as vos
+# from ncConverter import *
+# import ETPFunctions as refPotET
+
+import logging
+logger = logging.getLogger(__name__)
+
+class Meteo(object):
+
+    def __init__(self, Meteo_variable):
+        # self = Meteo_variable
+        self._configuration = Meteo_variable._configuration
+        self._modelTime = Meteo_variable._modelTime
+        self.cloneMapAttributes = Meteo_variable.cloneMapAttributes
+        self.cloneMap = Meteo_variable.cloneMap
+        self.landmask = Meteo_variable.landmask
+
+    def initial(self):
+        self.set_input_filenames()
+        self.set_nc_variable_names()
+        self.set_meteo_conversion_factors()
+        # TODO: find out if we can delete this
+        # # daily time step
+        # self.usingDailyTimeStepForcingData = False
+        # if self._configuration.timeStep == 1.0 and self._configuration.timeStepUnit == "day":
+        #     self.usingDailyTimeStepForcingData = True
+
+    def set_input_filenames(self):
+        self.preFileNC = self._configuration.meteoOptions['precipitationNC']
+        self.minDailyTemperatureNC = self._configuration.meteoOptions['minDailyTemperatureNC']
+        self.maxDailyTemperatureNC = self._configuration.meteoOptions['maxDailyTemperatureNC']
+        self.etpFileNC = self._configuration.meteoOptions['refETPotFileNC']        
+        self.check_input_filenames()
+
+    def check_input_filenames(self):
+        self.check_format_args([
+            self.preFileNC,
+            # self.tmpFileNC,
+            self.minDailyTemperatureNC,
+            self.maxDailyTemperatureNC,
+            self.etpFileNC
+            ])
+        
+    def check_format_args(self, filenames):
+        for filename in filenames:
+            format_args = vos.get_format_args(filename)
+            format_args_ok = vos.check_format_args_ok(format_args, ['day','month','year'])
+            if len(format_args) > 0:
+                if not format_args_ok:
+                    msg = 'Filename ' + filename + ' contains invalid format arguments: only day, month and year are allowable'
+                    raise Messages.AQError(msg)
+                
+    def set_nc_variable_names(self):
+        self.preVarName = self._configuration.meteoOptions['precipitationVariableName']
+        self.tmnVarName = self._configuration.meteoOptions['tminVariableName']
+        self.tmxVarName = self._configuration.meteoOptions['tmaxVariableName']
+        self.refETPotVarName = self._configuration.meteoOptions['refETPotVariableName']
+        self.check_nc_variable_names()
+        
+    def check_nc_variable_names(self):
+        # filenames = [self.preFileNC, self.tmpFileNC, self.tmpFileNC, self.etpFileNC]
+        filenames = [self.preFileNC, self.minDailyTemperatureNC, self.maxDailyTemperatureNC, self.etpFileNC]
+        variable_names = [self.preVarName, self.tmnVarName, self.tmxVarName, self.refETPotVarName]
+        day, month, year = (self._modelTime.startTime.day, self._modelTime.startTime.month, self._modelTime.year)        
+        result = []
+        msg = []
+        for filename,variable in zip(filenames,variable_names):
+            variable_in_nc = vos.checkVariableInNC(filename.format(day=day, month=month, year=year), variable)
+            result.append(variable_in_nc)
+            if not variable_in_nc:
+                msg.append('File ' + str(filename) + ' does not contain variable ' + str(variable) + '\n')
+                
+        if not all(result):
+            msg = '\n'.join(msg)
+            raise Messages.AQError(msg)
+        
+    def set_meteo_conversion_factors(self):
+        self.preConst       = 0.0
+        self.preFactor      = 1.0  # divide this method up?
+        self.tmpConst       = 0.0
+        self.tmpFactor      = 1.0
+        self.refETPotConst  = 0.0
+        self.refETPotFactor = 1.0
+        if 'precipitationConstant' in self._configuration.meteoOptions:
+            self.preConst = np.float64(self._configuration.meteoOptions['precipitationConstant'])
+        if 'precipitationFactor' in self._configuration.meteoOptions:
+            self.preFactor = np.float64(self._configuration.meteoOptions['precipitationFactor'])
+        if 'temperatureConstant' in self._configuration.meteoOptions:
+            self.tmpConst = np.float64(self._configuration.meteoOptions['temperatureConstant'])
+        if 'temperatureFactor' in self._configuration.meteoOptions:
+            self.tmpFactor = np.float64(self._configuration.meteoOptions['temperatureFactor'])
+        if 'ETpotConstant' in self._configuration.meteoOptions:
+            self.refETPotConst = np.float64(self._configuration.meteoOptions['ETpotConstant'])
+        if 'ETpotFactor' in self._configuration.meteoOptions:
+            self.refETPotFactor = np.float64(self._configuration.meteoOptions['ETpotFactor'])
+        
+    def adjust_precipitation_input_data(self):
+        # print self.landmask.shape
+        # print self.precipitation.shape
+        self.precipitation = self.preConst + self.preFactor * self.precipitation[self.landmask]
+        self.precipitation = np.maximum(0.0, self.precipitation)
+        self.precipitation[np.isnan(self.precipitation)] = 0.0
+        self.precipitation = np.floor(self.precipitation * 100000.)/100000.
+
+    def read_precipitation_data(self):
+        method_for_time_index = None
+        self.precipitation = vos.netcdf2PCRobjClone(
+            self.preFileNC.format(
+                day=self._modelTime.currTime.day,
+                month=self._modelTime.currTime.month,
+                year=self._modelTime.currTime.year),
+            self.preVarName,
+            str(self._modelTime.fulldate),
+            useDoy = method_for_time_index,
+            cloneMapAttributes = self.cloneMapAttributes,
+            cloneMapFileName = self.cloneMap,
+            LatitudeLongitude = True)
+        self.adjust_precipitation_input_data()
+
+    def adjust_temperature_data(self):
+        self.tmin = self.tmpConst + self.tmpFactor * self.tmin[self.landmask]
+        self.tmax = self.tmpConst + self.tmpFactor * self.tmax[self.landmask]
+        self.tmin = np.round(self.tmin * 1000.) / 1000.
+        self.tmax = np.round(self.tmax * 1000.) / 1000.
+        
+    def read_temperature_data(self):
+        # TODO: work out if we can remove this
+        # # method for finding time index in the temperature netdf file:
+        # # - the default one
+        # method_for_time_index = None
+        # # - based on the ini/configuration file (if given)
+        # if 'time_index_method_for_temperature_netcdf' in self._configuration.meteoOptions.keys() and\
+        #                                                  self._configuration.meteoOptions['time_index_method_for_temperature_netcdf'] != "None":
+        #     method_for_time_index = self._configuration.meteoOptions['time_index_method_for_temperature_netcdf']
+
+        method_for_time_index = None        
+        self.tmin = vos.netcdf2PCRobjClone(
+            self.minDailyTemperatureNC.format(
+                day=self._modelTime.currTime.day,
+                month=self._modelTime.currTime.month,
+                year=self._modelTime.currTime.year),
+            self.tmnVarName,
+            str(self._modelTime.fulldate),
+            useDoy = method_for_time_index,
+            cloneMapAttributes = self.cloneMapAttributes,
+            cloneMapFileName = self.cloneMap,
+            LatitudeLongitude = True)
+
+        self.tmax = vos.netcdf2PCRobjClone(
+            self.maxDailyTemperatureNC.format(
+                day=self._modelTime.currTime.day,
+                month=self._modelTime.currTime.month,
+                year=self._modelTime.currTime.year),
+            self.tmxVarName,
+            str(self._modelTime.fulldate),
+            useDoy = method_for_time_index,
+            cloneMapAttributes = self.cloneMapAttributes,
+            cloneMapFileName = self.cloneMap,
+            LatitudeLongitude = True)        
+        self.adjust_temperature_data()
+
+    def adjust_reference_ET_data(self):
+        self.referencePotET = self.refETPotConst + self.refETPotFactor * self.referencePotET[self.landmask]
+
+    def read_reference_ET_data(self):
+        # TODO: work out if this is required
+        # if 'time_index_method_for_ref_pot_et_netcdf' in self._configuration.meteoOptions.keys() and self._configuration.meteoOptions['time_index_method_for_ref_pot_et_netcdf'] != "None":
+        #     method_for_time_index = self._configuration.meteoOptions['time_index_method_for_ref_pot_et_netcdf']
+        
+        method_for_time_index = None
+        self.referencePotET = vos.netcdf2PCRobjClone(
+            self.etpFileNC.format(
+                day=self._modelTime.currTime.day,
+                month=self._modelTime.currTime.month,
+                year=self._modelTime.currTime.year),
+            self.refETPotVarName,
+            str(self._modelTime.fulldate), 
+            useDoy = method_for_time_index,
+            cloneMapAttributes = self.cloneMapAttributes,
+            cloneMapFileName=self.cloneMap,
+            LatitudeLongitude = True)
+        self.adjust_reference_ET_data()
+    
+    def dynamic(self):
+        self.read_precipitation_data()
+        self.read_temperature_data()
+        self.read_reference_ET_data()
+

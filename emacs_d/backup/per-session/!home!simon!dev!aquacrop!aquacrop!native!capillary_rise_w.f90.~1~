@@ -1,0 +1,6 @@
+module capillary_rise_w
+  use types
+  use capillary_rise, only: update_cap_rise
+  implicit none
+
+contains

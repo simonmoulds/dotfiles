@@ -1,0 +1,18 @@
+#!/bin/bash
+
+baseurl=http://hydrology.princeton.edu/data/pgf/v3/0.25deg/daily/
+declare -a vars=("dlwrf" "dswrf" "prcp" "pres" "shum" "tas" "tmax" "tmin" "wind")
+for var in "${vars[@]}"
+do
+    for year in {1948..1948}
+    do
+        filename="${var}"_daily_"${year}"-"${year}".nc
+        crop_filename="${var}"_daily_"${year}"-"${year}"_igp.nc
+        url="${baseurl}"/"${filename}"
+        wget "${url}" -O "${filename}"
+        ncks -d lat,6.5,38.5 -d lon,60.,100. "${filename}" -O "${crop_filename}
+    done    
+done
+
+           
+# wget http://hydrology.princeton.edu/data/pgf/v3/0.25deg/daily/dlwrf_daily_1948-1948.nc

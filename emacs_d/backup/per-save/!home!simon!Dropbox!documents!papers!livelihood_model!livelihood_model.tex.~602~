@@ -1,0 +1,506 @@
+\documentclass[12pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{natbib}
+\usepackage{fixltx2e} % subscripts e.g. CO2
+\usepackage{multirow,amssymb,amsmath,booktabs,mathtools,longtable}
+\usepackage{gensymb}
+\usepackage{soul}
+\usepackage{lscape}
+\usepackage{caption}
+\usepackage[labelformat=simple]{subcaption}
+\usepackage{url}
+\usepackage{rotating}
+\usepackage{booktabs}
+\usepackage[flushleft]{threeparttable}
+\usepackage{amsmath}
+
+\usepackage[textsize=small,textwidth=30mm]{todonotes}
+
+\title{A parsimonious empirical model of farmer irrigation decisions in northern India: model development}
+\author{Jimmy O'Keeffe, Simon Moulds}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+% \begin{abstract}
+% This is the paper's abstract \ldots
+% \end{abstract}
+
+\section{Model development}
+
+\subsection{Perceptual model}
+
+Our perceptual model of farming practices and decision making in northern India is informed by more than 200 semi-structured farmer interviews which were carried out by the first author in four districts of Uttar Pradesh, a large and diverse state in northern India. The interviews sought to obtain information on irrigation water use, agricultural practices and constraints as well as socio-economic and environmental factors influencing rural livelihoods. A complete description of the methodology and results of the field campaign are provided in \citet{OKeeffe2016}. The key observations are described below. \\
+
+\noindent \todo[inline]{I have slightly changed the format here so that each italicized sentence is a summary statement of the observation. I also think we should include a bit more information under each heading - perhaps more like 3-4 sentences each?}
+
+\noindent \textit{Conjunctive use of water sources is widespread}\\
+\noindent Irrigation canals provide an irregular but important source of water to some farmers and because of the low cost are used in preference to groundwater when possible. Proximity to a canal is not always an indication of access.\\
+
+\noindent \textit{Irrigation scheduling depends on water availability}\\
+\noindent Farmers typically follow a set irrigation schedule. However, as access to or availability of water can be an issue, farmers may not always irrigate at the optimum time.\\
+
+\noindent \textit{Farmers will continue to irrigate despite increasing prices}\\
+\noindent While the price of irrigation was found to be a major concern for farmers, it did not have a significant influence on irrigation practices.\\
+
+\noindent \textit{Canal recharge benefits all}\\ 
+\noindent Farmers with land located close to a working canal may benefit from canal leakage, with additional aquifer recharge, leading to more stable groundwater levels and lower pumping costs.\\
+
+\noindent \textit{Water application is not measured}\\
+\noindent Farmers do not record the volume of water they apply to crops, instead observing the approximate depth water reaches within their fields (e.g. approximately 10 cm) \citep{OKeeffe2016}.\\
+
+\noindent \textit{Irrigation return flow is an important hydrological process}\\
+\noindent The majority of farmers use flood irrigation, much of which is lost through evaporation or returned to the underlying aquifer.\\
+
+\noindent \textit{Irrigation time increases with decreasing water tables}\\
+\noindent Farmers described increasing irrigation costs with decreasing groundwater levels, particularly during the dry, pre-monsoon season.\\
+
+\noindent \textit{Farmers' solution to lack of water: drill deeper wells}\\
+\noindent The most common solution to declining water tables reported by farmers was to drill deeper wells.\\
+
+\noindent A graphical representation of the perceptual model arising from these observations is shown in Figure~\ref{fig:DecisionFlow}. \\
+
+\subsection{Conceptual model}
+
+The model was conceptualized as three coupled submodels representing hydrology, crop yield and farmer livelihood, which are described in detail in the following sections. Throughout, we use indices $t$ and $T$ to index days and years respectively. Thus, $\Delta t = 1\ \text{day}$ and $\Delta T = 1\ \text{year}$. \\
+
+\subsubsection{Hydrology}
+
+% Changes in groundwater level are instantaneously applied across the entire cell. \\
+
+A single cell model is employed to simulate the response of water resources to changing socioeconomic and environmental conditions. This class of hydrological model is commonly used in the field of water resources economics and there is an extensive body of literature describing their application \citep[see][]{DeFrutosCachorro2014, Gisser1973, Koundouri2004a}. The soil column is represented in terms of the \textit{total available water}, $TAW$, which describes the maximum amount of water that is available to plants at field capacity:
+
+\begin{equation}
+TAW = \big(\theta_{FC} - \theta_{WP}\big)Z_{r}
+\end{equation}
+
+\noindent where $\theta_{FC}$ and $\theta_{WP}$ are respectively the field capacity and wilting point and $Z_{r}$ is the maximum root depth. The proportion of TAW that can easily be extracted from the root zone before the soil moisture deficit impedes plant growth is termed the \textit{readily available water},
+
+\begin{equation}
+RAW = (1-p)TAW
+\end{equation}
+
+\noindent where $p$ is the crop-specific depletion factor. \\
+
+The daily water balance equation expressed in terms of root zone depletion, $D_{r}$, is written
+
+\begin{equation}
+\frac{dD_{r}}{dt}(t,T)\Delta t = ET_{c}(t,T) + R(t,T) - \big(P(t,T) -RO(t,T)\big) - I(t,T)
+\end{equation}
+
+\noindent where $ET_{c}$ is actual crop evapotranspiration, $R$ is recharge, $P$ is precipitation, $RO$ is surface runoff and $I$ is irrigation. Crop evapotranspiration is determined as
+
+\begin{equation}
+ET_{c}(t,T) = K_{s}(t,T)K_{c}(t,T)ET_{0}(t,T)
+\end{equation}
+
+\noindent where $K_{c}$ is a crop coefficient which varies according to the crop growth, $K_{s}$ is a water stress coefficient and $ET_{0}$ is reference evapotranspiration. We use the Hargreaves-Samani equation to estimate $ET_{0}$, expressed
+
+\begin{equation}
+ET_{0}(t,T) = 0.0135 \times 0.17 \times \big(T_{mean}(t,T) + 17.8\big) \times \big(T_{max}(t,T) - T_{min}(t,T)\big)^{0.5}
+\end{equation}
+
+\noindent where $T_{mean}$, $T_{max}$ and $T_{min}$ are daily mean, maximum and minimum temperature, respectively. Crop coefficients are obtained from the FAO \citep{Allen1998}. The water stress coefficient is calculated:
+
+
+\begin{equation}
+K_{s}(t,T) = \frac{TAW-D_{r}(t,T)}{\big(1-p\big)TAW}.
+\end{equation}
+
+\noindent Precipitation data for the four districts are obtained from the Indian Meteorological Department. Spatial and temporal rainfall variability is taken into account by adding noise drawn from a normal distribution with mean and standard deviation based on ? \todo{Not sure what this is based on} A runoff coefficient is used to partition rainfall into runoff and infiltration. Farmers in the surveyed districts typically use flood irrigation and apply water to their crops at set intervals during the growing season. Thus, farmers are assigned an irrigation volume drawn from a random normal distribution with mean and standard deviation based on field data. To account for spatial and temporal heterogeneity in irrigation timing the model randomly selects the day from a normal distribution where the parameters are again based on observations.\\
+
+% \subsubsection{Groundwater}
+
+Recharge from the root zone to the underlying aquifer, $R$, is assumed to occur when the water content of the root zone exceeds field capacity:
+
+\begin{equation}
+  R(t,T) =
+    \begin{cases}
+      -D_{r}(t,T), & \text{if}\ D_{r}(t,T) < 0\\
+      0, & \text{otherwise}.
+    \end{cases}
+\end{equation}
+
+% While groundwater supplies up to 60\% of irrigation water in India, surface water plays an important role in the nation's agricultural sector. 
+\noindent Canals in India are operated by the Irrigation Department, a branch of the federal government, and while the supply is often unreliable it is typically free or very cheap \citep{} \todo{Find reference}. Within the model, farmer access to canal water is predetermined and does not change during the simulation. On the other hand, groundwater abstraction through private tubewells, which considerably outnumber all other types of well, is more expensive to the farmer because of the upfront cost of installing the well in addition to the cost of buying and operating the pump. Outside north-west India, where many farmers have access to heavily subsidised electricity, we found that farmers typically rely on diesel pumps with comparatively expensive running costs \citep{} \todo{Find reference}. Thus, we assume that farmers with access to a canal preferentially use this water source when it is available, otherwise relying on groundwater if they have access to a borehole of sufficient depth. We assume that farmers outside the canal command area only irrigate if they have access to an operational borehole. Lastly, we assume a leaky canal system which contributes recharge to the aquifer \citep{MacDonald2016}. Consistent with the single cell paradigm, the aquifer is represented as a ``bath-tub'' with spatially homogeneous hydrogeological characteristics such as groundwater level, aquifer thickness and specific yield. Drawing together these assumptions, we can express the change in aquifer storage, $H$, as
+
+\begin{equation}
+  \frac{dH}{dt}(t,T)\Delta t =
+  \begin{cases}
+    R(t,T) + (l \times V(t,T)), & \text{canal}\\
+    R(t,T) - I(t,T),            & \text{groundwater}\\
+    R(t,T),                     & \text{otherwise}
+  \end{cases}
+\end{equation}
+
+\noindent where $V$ is the volume of water held in the canal and $l$ is a leakage coefficient. \\
+
+\subsection{Crop yield}
+
+Within the model, crop yield is the principal link between farmer livelihood and agricultural water use. It is calculated using the relationship between crop production and evapotranspiration developed by \citet{Doorenbos1979a}, which can be expressed
+
+\begin{equation}
+\left(1-\frac{Y_{a}(T)}{Y_{x}(T)}\right) = K_{y}\left(1-\frac{\sum\limits_{t=d_{s}}^{d_{h}} ET_{c}(t)}{\sum\limits_{t=d_{s}}^{d_{h}} ET_{x}(t)}\right)
+\end{equation}
+
+\noindent where $Y_{x}$ is maximum yield, $Y_{a}$ is actual yield, $K_{y}$ is the yield response factor, $ET_{x}$ is maximum evapotranspiration, $ET_{c}$ is actual crop evapotranspiration, $d_{s}$ is sowing day and $d_{h}$ is harvesting day. While there are other factors which limit crop production, such as labour and nutrient availability, farmers in the surveyed districts stated that water availability was the largest constraint on production. \todo{Is this correct?}\\
+
+\subsection{Livelihood}
+
+Fundamental to the model is its conceptualization of the feedbacks which exist between farmer livelihood and irrigation behaviour. Farmer livelihood, $L$, is considered in terms of the difference between farm income, $m$, and farm expenditure, $z$, as follows:
+
+\begin{equation}
+L(T) = m(T) - z(T).
+\end{equation}
+
+% \subsubsection{Income}
+
+\noindent Farm income is limited to the amount of money that farmers receive at the market for their crop, expressed
+
+\begin{equation}
+m(T) = \sum\limits_{c=1}^{n_{c}} y(T) q(T) A(T)
+\end{equation}
+
+\noindent where $n_{c}$ is the number of crops grown in an agricultural year and $y$, $q$ and $A$ are yield, price and area of crop $c$. \\% Crop price data is retrieved from national economic statistics and farm area is fixed at one hectare. \\
+
+% \subsubsection{Expenditure}
+
+The model explicitly includes expenditure on irrigation and fertilizer. Other items, such as living expenses, education and loan repayments are implicitly considered through the use of a parameter, $\gamma$, which represents the fraction of income that is saved on an annual basis. % The unit cost of fertilizer is based on national statistics and the application rate is based on field data. 
+We assume that canal irrigation is free, while the cost of groundwater irrigation is a function of the cost of diesel, pump efficiency and depth to groundwater. The volume of diesel $V_{d}$ required to abstract groundwater for irrigation from depth $h$ is estimated from empirical data collected by the University of Nebraska \citep{Martin}, as follows
+
+\begin{equation}
+  V_{d}(t,T) = I(t,T) \left(\frac{(0.1133 \times h(t,T)) + 0.7949}{102.87}\right)\eta
+\end{equation}
+
+\noindent where $\eta$ is the pump efficiency. The total cost of groundwater abstraction, $m_{a}$, can then be calculated:
+
+\begin{equation}
+  m_{a}(T) = \sum\limits_{t=1}^{365} V_{d}(t,T) \times q_{d}(T) \times 0.4
+\end{equation}
+
+\noindent where $q_{d}$ is the unit cost of diesel. \\
+
+At the end of each year, assuming the net farm income (i.e. livelihood) is positive, the farmer is assumed to save a proportion, $\gamma_{s}$, of the difference between income and expenditure, as follows
+
+\begin{equation}
+  S(T) =
+  \begin{cases}
+    S(T-1) + L(T) \times \gamma_{s}, & \text{if}\ L(T) > 0\\
+    0,    & \text{otherwise}\\
+  \end{cases}
+\end{equation}
+  
+\noindent % At the beginning of the simulation each farmer is given an initial amount of savings. 
+During periods of low income farmers use their savings as a buffer to sustain production. During this time irrigation may still take place until a lower limit is reached. In reality, the shortfall in revenue may be compensated by off-farm activities, loans and/or scaling back other outgoings which the model does not explicitly consider. Once the lower limit is reached irrigation no longer takes place and rainfall becomes the only source of water sustaining crop growth. \\
+
+The water use options available to each farmer vary in time and space. Farmers who rely on groundwater for some or all of their water supply will often drill deeper wells in order to safeguard their water supply. We conceptualise this behaviour by dividing farmers into three categories according to the depth of their well. This approach follows \cite{Srinivasan2010}, who categorised households in Chennai, India according to their level of access to municipal water supply. At model initialization all farmers are randomly assigned a category, $C_{w}$, and at the end of the year farmers with sufficient savings change categories by paying for a deeper well, as follows: \\
+
+\begin{equation}
+  C_{w}(T) =
+  \begin{cases}
+    C_{w}(T-1), & \text{if}\ S(T) < m_{w}(T)\ \text{or}\ C_{w}(T-1) = C_{w}^{max}\\
+    C_{w}(T-1) + 1, & \text{otherwise}\\
+  \end{cases}
+\end{equation}
+
+\noindent where $m_{w}$ is the cost of installing a new well, assumed to be the same regardless of the depth of the new well, and $C_{w}^{max}$ is the category corresponding with the maximum well depth. The cost of installing a new well is subtracted from the farmer's savings. \\
+
+% \bibliographystyle{abbrv}
+% \bibliography{../../reference_library.bib}
+
+\begin{thebibliography}{47}
+	\providecommand{\natexlab}[1]{#1}
+	\expandafter\ifx\csname urlstyle\endcsname\relax
+	\providecommand{\doi}[1]{doi:\discretionary{}{}{}#1}\else
+	\providecommand{\doi}{doi:\discretionary{}{}{}\begingroup
+		\urlstyle{rm}\Url}\fi
+	
+	\bibitem[{\textit{Allen et~al.}(1998)\textit{Allen, Pereira, Raes, and
+			Smith}}]{Allen1998}
+	Allen, R.~G., L.~S. Pereira, D.~Raes, and M.~Smith (1998), {Crop
+		evapotranspiration - Guidelines for computing crop water requirements - FAO
+		Irrigation and Drainage Paper 56}, \textit{Tech. rep.}, Food and Agriculture
+	Organization of the United Nations.
+	
+	\bibitem[{\textit{Amarasinghe et~al.}(2009)\textit{Amarasinghe, Mccornick, and
+			Shah}}]{Amarasinghe2009}
+	Amarasinghe, U.~A., P.~Mccornick, and T.~Shah (2009), {Projections of
+		irrigation water demand in India: What do recent trends suggest?},
+	\textit{International Journal of River Basin Management},
+	\textit{7:2,}(January 2013), 157--166, \doi{10.1080/15715124.2009.9635378}.
+	
+	\bibitem[{\textit{Amarasinghe et~al.}(2016)\textit{Amarasinghe, Muthuwatta,
+			Surinaidu, Anand, and Jain}}]{Amarasinghe2016}
+	Amarasinghe, U.~A., L.~Muthuwatta, L.~Surinaidu, S.~Anand, and S.~K. Jain
+	(2016), {Reviving the Ganges Water Machine : potential}, \textit{Hydrology
+		and Earth System Sciences}, \textit{20}, 1085--1101,
+	\doi{10.5194/hess-20-1085-2016}.
+	
+	\bibitem[{\textit{Blair and Buytaert}(2016)}]{Blair2016}
+	Blair, P., and W.~Buytaert (2016), {Socio-hydrological modelling : a review
+		asking “ why , what and how ?”}, \textit{Hydrology and Earth System
+		Sciences}, (20), 443--478, \doi{10.5194/hess-20-443-2016}.
+	
+	\bibitem[{\textit{Briscoe and Malik}(2006)}]{Briscoe2008}
+	Briscoe, J., and R.~Malik (2006), \textit{{India's Water Economy: Bracing for a
+			Turbulent Future}}, 10, 103 pp., Oxford University Press, New Delhi.
+	
+	\bibitem[{\textit{{Central Ground Water
+				Board}}(2014)}]{CentralGroundWaterBoard2014}
+	{Central Ground Water Board} (2014), {Dynamic Ground Water Resources of India},
+	\textit{Tech. Rep. November}, Central Ground Water Board of India, New Delhi.
+	
+	\bibitem[{\textit{{de Frutos Cachorro} et~al.}(2014)\textit{{de Frutos
+				Cachorro}, Erdlenbruch, and Tidball}}]{DeFrutosCachorro2014}
+	{de Frutos Cachorro}, J., K.~Erdlenbruch, and M.~Tidball (2014), {Optimal
+		adaptation strategies to face shocks on groundwater resources},
+	\textit{Journal of Economic Dynamics and Control}, \textit{40}, 134--153,
+	\doi{10.1016/j.jedc.2014.01.005}.
+	
+	\bibitem[{\textit{{Department of
+				Fertilizers}}(2015)}]{DepartmentofFertilizers2015}
+	{Department of Fertilizers}, M. o. C. {\&}.~F. (2015), {Product-wise MRP and
+		Subsidy Rates}.
+	
+	\bibitem[{\textit{Doorenbos and Kassam}(1979)}]{Doorenbos1979a}
+	Doorenbos, J., and A.~Kassam (1979), {Yield response to water: Irrigation and
+		Drainage Paper No. 33}, \textit{Tech. rep.}, FAO Food and Agriculture
+	Organization of the United Nations, Rome.
+	
+	\bibitem[{\textit{Foster et~al.}(2014)\textit{Foster, Butler, and
+			Brozovic´}}]{Foster2014}
+	Foster, T., A.~P. Butler, and N.~Brozovic´ (2014), {Modelling irrigation
+		behavior in groundwater systems}, \textit{Water Resources Research},
+	\textit{50}, 6370--6389, \doi{10.1002/ 2014WR015620}.
+	
+	\bibitem[{\textit{GEWEX}(2012)}]{Gewex2013}
+	GEWEX (2012), {GEWEX Plans for 2013 and Beyond}, \textit{Tech. Rep. November
+		2012}.
+	
+	\bibitem[{\textit{Gisser and Mercado}(1973)}]{Gisser1973}
+	Gisser, M., and A.~Mercado (1973), {Economic Aspects of Ground Water Resources
+		and Replacement Flows in Semiarid Agricultural Areas}, \textit{American
+		Journal of Agricultural Economics}, \textit{55}(3), 461--466.
+	
+	\bibitem[{\textit{Hargreaves and Samani}(1985)}]{Hargreaves1985}
+	Hargreaves, G.~H., and Z.~A. Samani (1985), {Reference Crop Evapotranspiration
+		From Ambient Air Temperature.}, \textit{Paper - American Society of
+		Agricultural Engineers}, pp. 96--99.
+	
+	\bibitem[{\textit{Harou et~al.}(2009)\textit{Harou, Pulido-Velazquez,
+			Rosenberg, Medell{\'{i}}n-Azuara, Lund, and Howitt}}]{Harou2009}
+	Harou, J.~J., M.~Pulido-Velazquez, D.~E. Rosenberg, J.~Medell{\'{i}}n-Azuara,
+	J.~R. Lund, and R.~E. Howitt (2009), {Hydro-economic models: Concepts,
+		design, applications, and future prospects}, \textit{Journal of Hydrology},
+	\textit{375}(3-4), 627--643, \doi{10.1016/j.jhydrol.2009.06.037}.
+	
+	\bibitem[{\textit{Holman et~al.}(2012)\textit{Holman, Allen, Cuthbert, and
+			Goderniaux}}]{Holman2012}
+	Holman, I.~P., D.~M. Allen, M.~O. Cuthbert, and P.~Goderniaux (2012), {Towards
+		best practice for assessing the impacts of climate change on groundwater},
+	\textit{Hydrogeology Journal}, \textit{20}(1), 1--4,
+	\doi{10.1007/s10040-011-0805-3}.
+	
+	\bibitem[{\textit{Huffman et~al.}(2007)\textit{Huffman, Bolvin, Nelkin, Wolff,
+			Adler, Gu, Hong, Bowman, and Stocker}}]{Huffman2007a}
+	Huffman, G.~J., D.~T. Bolvin, E.~J. Nelkin, D.~B. Wolff, R.~F. Adler, G.~Gu,
+	Y.~Hong, K.~P. Bowman, and E.~F. Stocker (2007), {The TRMM Multisatellite
+		Precipitation Analysis (TMPA): Quasi-Global, Multiyear, Combined-Sensor
+		Precipitation Estimates at Fine Scales}, \textit{Journal of
+		Hydrometeorology}, \textit{8}(1), 38--55, \doi{10.1175/JHM560.1}.
+	
+	\bibitem[{\textit{{ICRISAT-ICAR-IRRI Collaborative Research
+				Project}}(2012)}]{ICRISAT-ICAR-IRRICollaborativeResearchProject2012}
+	{ICRISAT-ICAR-IRRI Collaborative Research Project} (2012), {District Level
+		Database Documentation: Village Dynamics in South Asia (VDSA)}, \textit{Tech.
+		rep.}
+	
+	\bibitem[{\textit{Itenfisu et~al.}(2003)\textit{Itenfisu, Elliott, Allen, and
+			Walter}}]{Itenfisu2003}
+	Itenfisu, D., R.~L. Elliott, R.~G. Allen, and I.~a. Walter (2003), {Comparison
+		of Reference Evapotranspiration Calculations as Part of the ASCE
+		Standardization Effort}, \textit{Journal of Irrigation and Drainage
+		Engineering}, \textit{129}(December), 440--448,
+	\doi{10.1061/(ASCE)0733-9437(2003)129:6(440)}.
+	
+	\bibitem[{\textit{Jena et~al.}(2015)\textit{Jena, Azad, and
+			Rajeevan}}]{Jena2015}
+	Jena, P., S.~Azad, and M.~Rajeevan (2015), {Statistical Selection of the
+		Optimum Models in the CMIP5 Dataset for Climate Change Projections of Indian
+		Monsoon Rainfall}, \textit{Climate}, \textit{3}(4), 858--875,
+	\doi{10.3390/cli3040858}.
+	
+	\bibitem[{\textit{Jewitt and Baker}(2007)}]{Jewitt2007}
+	Jewitt, S., and K.~Baker (2007), {The Green Revolution re-assessed: Insider
+		perspectives on agrarian change in Bulandshahr District, Western Uttar
+		Pradesh, India}, \textit{Geoforum}, \textit{38}(1), 73--89,
+	\doi{10.1016/j.geoforum.2006.06.002}.
+	
+	\bibitem[{\textit{Koundouri}(2004)}]{Koundouri2004a}
+	Koundouri, P. (2004), {Potential for groundwater management : Gisser-Sanchez
+		effect reconsidered}, \textit{Water Resources Research}, \textit{40}(6),
+	1--13, \doi{10.1029/2003WR002164}.
+	
+	\bibitem[{\textit{Kuil et~al.}(2016)\textit{Kuil, Carr, Viglione, Prskawetz,
+			and Bloschl}}]{Kuil2016}
+	Kuil, L., G.~Carr, A.~Viglione, A.~Prskawetz, and G.~Bloschl (2016),
+	{Conceptualizing socio-hydrological drought processes: The case of theMaya
+		collapse}, \textit{Water Resources Research}, (52), 1--20,
+	\doi{10.1002/2015WR018298.}
+	
+	\bibitem[{\textit{Macdonald et~al.}(2016)\textit{Macdonald, Bonsor, Ahmed,
+			Burgess, Basharat, Calow, Dixit, Foster, Gopal, Lapworth, Lark, Moench, and
+			Mukherjee}}]{MacDonald2016}
+	Macdonald, A.~M., H.~C. Bonsor, K.~M. Ahmed, W.~G. Burgess, M.~Basharat, R.~C.
+	Calow, A.~Dixit, S.~S.~D. Foster, K.~Gopal, D.~J. Lapworth, R.~M. Lark,
+	M.~Moench, and A.~Mukherjee (2016), {Groundwater quality and depletion in the
+		Indo-Gangetic Basin mapped from in situ observations}, \textit{Nature
+		Geoscience}, \textit{1}(August), 6, \doi{10.1038/NGEO2791}.
+	
+	\bibitem[{\textit{Manjunatha et~al.}(2011)\textit{Manjunatha, Speelman,
+			Chandrakanth, and {Van Huylenbroeck}}}]{Manjunatha2011}
+	Manjunatha, a.~V., S.~Speelman, M.~G. Chandrakanth, and G.~{Van Huylenbroeck}
+	(2011), {Impact of groundwater markets in India on water use efficiency: a
+		data envelopment analysis approach.}, \textit{Journal of environmental
+		management}, \textit{92}(11), 2924--9, \doi{10.1016/j.jenvman.2011.07.001}.
+	
+	\bibitem[{\textit{Martin}(2003)}]{Martin}
+	Martin, D. (2003), {Estimating the Savings from Improving Pumping Plant
+		Performance}, \textit{Tech. rep.}, Extension,Institute of Agriculture and
+	Natural Resources, University of Nebraska, Lincoln, Lincoln.
+	
+	\bibitem[{\textit{McKenney and Rosenberg}(1993)}]{McKenney1993}
+	McKenney, M.~S., and N.~J. Rosenberg (1993), {Sensitivity of some potential
+		evapotranspiration estimation methods to climate change},
+	\textit{Agricultural and Forest Meteorology}, \textit{64}(1-2), 81--110,
+	\doi{10.1016/0168-1923(95)02240-X}.
+	
+	\bibitem[{\textit{Menon et~al.}(2013)\textit{Menon, Levermann, and
+			Schewe}}]{Menon2013}
+	Menon, A., A.~Levermann, and J.~Schewe (2013), {Enhanced future variability
+		during India's rainy season}, \textit{Geophysical Research Letters},
+	\textit{40}(12), 3242--3247, \doi{10.1002/grl.50583}.
+	
+	\bibitem[{\textit{Moors et~al.}(2011)\textit{Moors, Groot, Biemans, van
+			Scheltinga, Siderius, Stoffel, Huggel, Wiltshire, Mathison, Ridley, Jacob,
+			Kumar, Bhadwal, Gosain, and Collins}}]{Moors2011}
+	Moors, E.~J., A.~Groot, H.~Biemans, C.~T. van Scheltinga, C.~Siderius,
+	M.~Stoffel, C.~Huggel, A.~Wiltshire, C.~Mathison, J.~Ridley, D.~Jacob,
+	P.~Kumar, S.~Bhadwal, A.~Gosain, and D.~N. Collins (2011), {Adaptation to
+		changing water resources in the Ganges basin, northern India},
+	\textit{Environmental Science {\&} Policy}, \textit{14}(7), 758--769,
+	\doi{10.1016/j.envsci.2011.03.005}.
+	
+	\bibitem[{\textit{Nazemi and Wheater}(2015)}]{Nazemi2015a}
+	Nazemi, A., and H.~S. Wheater (2015), {On inclusion of water resource
+		management in Earth system models – Part 1: Problem definition and
+		representation of water demand}, \textit{Hydrology and Earth System
+		Sciences}, \textit{19}(1), 33--61, \doi{10.5194/hess-19-33-2015}.
+	
+	\bibitem[{\textit{O'Keeffe et~al.}(2016)\textit{O'Keeffe, Buytaert, Mijic,
+			Brozovic, and Sinha}}]{OKeeffe2016}
+	O'Keeffe, J., W.~Buytaert, A.~Mijic, N.~Brozovic, and R.~Sinha (2016), {The use
+		of semi-structured interviews for the characterisation of farmer irrigation
+		practices}, \textit{Hydrology and Earth System Sciences}, \textit{12}(8),
+	8221--8246, \doi{10.5194/hessd-12-8221-2015}.
+	
+	\bibitem[{\textit{Pande and Savenije}(2016)}]{Pande2016}
+	Pande, S., and H.~H.~G. Savenije (2016), {A sociohydrological model for
+		smallholder farmers in Maharashtra, India}, \textit{Water Resources
+		Research}, \textit{52}(3), 1923--1947, \doi{10.1002/2015WR017841}.
+	
+	\bibitem[{\textit{Prudhomme et~al.}(2010)\textit{Prudhomme, Wilby, Crooks, Kay,
+			and Reynard}}]{Prudhomme2010}
+	Prudhomme, C., R.~L. Wilby, S.~Crooks, A.~L. Kay, and N.~S. Reynard (2010),
+	{Scenario-neutral approach to climate change impact studies: Application to
+		flood risk}, \textit{Journal of Hydrology}, \textit{390}(3-4), 198--209,
+	\doi{10.1016/j.jhydrol.2010.06.043}.
+	
+	\bibitem[{\textit{Revelle and Lakshminarayana}(1975)}]{Revelle1975}
+	Revelle, R., and V.~Lakshminarayana (1975), {The Ganges Water Machine},
+	\textit{Science}, \textit{188}(4188), 611--616.
+	
+	\bibitem[{\textit{Scott and Sharma}(2009)}]{Scott2009}
+	Scott, C.~A., and B.~Sharma (2009), {Energy supply and the expansion of
+		groundwater irrigation in the Indus Ganges Basin}, \textit{International
+		Journal of River Basin Management}, \textit{7}(2), 119--124,
+	\doi{http://dx.doi.org/10.1080/15715124.2009.9635374}.
+	
+	\bibitem[{\textit{Shah}(2016)}]{Shah2016}
+	Shah, M. (2016), {A 21st Century Institutional Architecture for India' s Water
+		Reforms.}, \textit{Tech. Rep. July}, New Delhi.
+	
+	\bibitem[{\textit{Shah et~al.}(2009)\textit{Shah, Gulati, Hemant, Shreedhar,
+			and Jain}}]{Shah2009}
+	Shah, T., A.~Gulati, P.~Hemant, G.~Shreedhar, and R.~C. Jain (2009), {Secret of
+		Gujarat's Agrarian Miracle after 2000}, \textit{xliv}(52), 45--55.
+	
+	\bibitem[{\textit{Shih}(1984)}]{Shih1984}
+	Shih, F.~S. (1984), {Data Requirement for Evapotranspiration Estimation},
+	\textit{Journal of Irrigation and Drainage Engineering}, \textit{110}(3),
+	263--274, \doi{10.1061/(ASCE)0733-9437(1984)110:3(263)}.
+	
+	\bibitem[{\textit{Singh}(2000)}]{Singh2000a}
+	Singh, R. (2000), {Environmental consequences of agricultural development: a
+		case study from the Green Revolution state of Haryana, India},
+	\textit{Agriculture, Ecosystems {\&} Environment}, \textit{82}(1-3), 97--103,
+	\doi{10.1016/S0167-8809(00)00219-X}.
+	
+	\bibitem[{\textit{Sivapalan et~al.}(2012)\textit{Sivapalan, Savenije, and
+			Bl{\"{o}}schl}}]{Sivapalan2012}
+	Sivapalan, M., H.~H.~G. Savenije, and G.~Bl{\"{o}}schl (2012), {Socio-hydrology
+		: A new science of people and water}, \textit{Hydrological Processes},
+	\textit{1276}(January), 1270--1276, \doi{10.1002/hyp.8426}.
+	
+	\bibitem[{\textit{Smith and Steduto}(2012)}]{SmithMartinandSteduto}
+	Smith, M., and P.~Steduto (2012), {Yield response to water: The original FAO
+		water production function}, in \textit{FAO Irrigation and Drainage paper 66:
+		Crop yield response to water}, chap.~2, p.~10, FAO, land and Water Division,
+	Rome.
+	
+	\bibitem[{\textit{Srinivasan et~al.}(2010)\textit{Srinivasan, Gorelick, and
+			Goulder}}]{Srinivasan2010}
+	Srinivasan, V., S.~M. Gorelick, and L.~Goulder (2010), {A hydrologic-economic
+		modeling approach for analysis of urban water supply dynamics in Chennai,
+		India}, \textit{Water Resources Research}, \textit{46}(7), 1--19,
+	\doi{10.1029/2009WR008693}.
+	
+	\bibitem[{\textit{Srivastava et~al.}(2009)\textit{Srivastava, Kumar, and
+			Singh}}]{Srivastava2009}
+	Srivastava, S.~K., R.~Kumar, and R.~P. Singh (2009), {Extent of Groundwater
+		Extraction and Irrigation Efficiency on Farms under Different Water-market
+		Regimes in Central Uttar Pradesh}, \textit{Agricultural Economics Research
+		Review}, \textit{22}(June), 87--97.
+	
+	\bibitem[{\textit{Triami}(2016)}]{Triami2016}
+	Triami (2016), {Historic inflation India – Historic CPI inflation India}.
+	
+	\bibitem[{\textit{van Emmerik et~al.}(2014)\textit{van Emmerik, Li, Sivapalan,
+			Pande, Kandasamy, Savenije, Chanan, and Vigneswaran}}]{VanEmmerik2014}
+	van Emmerik, T. H.~M., Z.~Li, M.~Sivapalan, S.~Pande, J.~Kandasamy, H.~H.~G.
+	Savenije, a.~Chanan, and S.~Vigneswaran (2014), {Socio-hydrologic modeling to
+		understand and mediate the competition for water between agriculture
+		development and environmental health: Murrumbidgee River Basin, Australia},
+	\textit{Hydrology and Earth System Sciences Discussions}, \textit{11}(3),
+	3387--3435, \doi{10.5194/hessd-11-3387-2014}.
+	
+	\bibitem[{\textit{Wayne}(2013)}]{IPCC2014}
+	Wayne, G.~P. (2013), \textit{{The Beginner's Guide to Representative
+			Concentration Pathways}}, 25 pp., Creative Commons.
+	
+	\bibitem[{\textit{{World Climate Research
+				Program}}(2013)}]{WorldClimateResearchProgram}
+	{World Climate Research Program} (2013), {The Coupled Model Intercomparison
+		Project: Phase 5}.
+	
+	\bibitem[{\textit{Yadav}(2003)}]{Yadav2003}
+	Yadav, R.~L. (2003), {Assessing on-farm efficiency and economics of fertilizer
+		N, P and K in rice wheat systems of India}, \textit{Field Crops Research},
+	\textit{81}(1), 39--51, \doi{10.1016/S0378-4290(02)00198-3}.
+	
+\end{thebibliography}
+
+\end{document}

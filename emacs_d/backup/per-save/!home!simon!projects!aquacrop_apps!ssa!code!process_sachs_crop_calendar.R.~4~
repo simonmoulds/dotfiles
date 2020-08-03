@@ -1,0 +1,33 @@
+## Author : Simon Moulds
+## Date   : August 2019
+
+library(ncdf4)
+library(raster)
+
+fn = "../data/sachs_crop_calendar/Maize.crop.calendar.fill.nc"
+
+## nc = nc_open(fn)
+## names(nc$var)
+## nc_close(nc)
+
+plant_date = raster(fn, varname="plant")
+plant_date_start = raster(fn, varname="plant.start")
+plant_date_end = raster(fn, varname="plant.end")
+
+harvest_date = raster(fn, varname="harvest")
+harvest_date_start = raster(fn, varname="harvest.start")
+harvest_date_end = raster(fn, varname="harvest.end")
+
+writeRaster(
+    plant_date,
+    "../data/maize_planting_julian_day_sachs2010.tif",
+    format="GTiff",
+    overwrite=TRUE
+)
+    
+writeRaster(
+    harvest_date,
+    "../data/maize_harvest_julian_day_sachs2010.tif",
+    format="GTiff",
+    overwrite=TRUE
+)

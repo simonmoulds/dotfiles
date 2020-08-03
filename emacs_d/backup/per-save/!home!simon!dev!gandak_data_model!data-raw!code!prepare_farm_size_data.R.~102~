@@ -1,0 +1,151 @@
+## Author : Simon Moulds
+## Date   : June 2018
+
+library(raster)
+library(rgdal)
+library(magrittr)
+library(dplyr)
+library(tidyr)
+library(xts)
+
+options(stringsAsFactors = FALSE)
+
+model_mask = raster("data/modelMask.tif")
+template = raster(xmn=80, xmx=90, ymn=20, ymx=30, res=0.0833333333)
+
+## district boundary data
+## ######################
+
+## devtools::load_all("/home/simon/dev/r_indagridat/indagridat")
+## adm2 = readOGR(dsn=system.file("shapes", package="indagridat"), layer="g1960_2_India", stringsAsFactors=TRUE)
+## adm2$ADM2_CODE %<>% as.numeric
+## adm2_raster = rasterize(x=adm2, y=template, field="ADM2_CODE")
+devtools::load_all("/home/simon/dev/r_indagridat/indagridat")
+adm2_1960 = readOGR(dsn=system.file("shapes", package="indagridat"), layer="g1960_2_India", stringsAsFactors=FALSE)
+adm2_1960$ADM2_CODE %<>% as.numeric
+adm2_1960_raster = rasterize(adm2_1960, template, "ADM2_CODE")
+
+## ICRISAT - farmers land holding size (1970-2010)
+library(readxl)
+bihar_land_holdings = read_excel("data/ICRISAT/Bihar/dt_operational_holdings_a_web.xlsx")
+up_land_holdings = read_excel("data/ICRISAT/UttarPradesh/dt_operational_holdings_a_web.xlsx")
+land_holdings = rbind(bihar_land_holdings, up_land_holdings)
+icrisat_ids = c(901,902,903,904,906,907,911,220,221,222,224)
+land_holdings = land_holdings[land_holdings$DIST %in% icrisat_ids,]
+
+lut = data.frame(DIST=icrisat_ids,
+                 GAUL_ID=c(17618,17613,17598,730,17628,17619,644,17894,17914,72651,17892))
+
+land_holdings =
+    left_join(lut, land_holdings, by="DIST") %>%
+    na_if(-1.00)
+
+## save for use elsewhere
+saveRDS(land_holdings, "data/icrisat_operational_holdings.rds")
+
+## read operational holdings data
+## (saved in prepare_farm_size_data.R)
+land_holdings =
+    readRDS("data/icrisat_operational_holdings.rds") %>%
+    select(-DIST,-STCODE,-STNAME,-DISTNAME) %>%
+    gather(key, value, -GAUL_ID, -YEAR) %>%
+    spread(YEAR, value) %>%
+    gather(YEAR, value, -GAUL_ID, -key) %>%
+    unite(GAUL_ID, GAUL_ID, key, sep="-") %>%
+    spread(GAUL_ID, value) %>%
+    zoo::na.approx() %>%
+    zoo::na.locf() %>%
+    zoo::na.locf(fromLast=TRUE) %>%
+    as.data.frame %>%
+    gather(GAUL_ID, value, -YEAR) %>%
+    separate(GAUL_ID, c("GAUL_ID","key"), "-") %>%
+    mutate_at(vars(GAUL_ID), funs(as.numeric)) %>%
+    spread(key, value) ## %>%
+    ## select(-GAUL_ID) %>%
+    ## group_by(YEAR) %>%
+    ## summarise_all(funs(mean(., na.rm=TRUE))) %>%
+    ## ungroup
+    
+## List of tasks:
+## 1  - downscale operational holdings to grid
+## 1a - match polygons with ICRISAT data
+## 1b - compute total cropland in district (from
+##      iiasa-ifpri cropland map)
+## 1c - compute fraction of cropland occurring in
+##      each grid cell
+## 1c - scale values in land_holdings to match
+##      total cropland (preserve average size in
+##      each class, such that the number in each
+##      category increases)
+## 1d - multiply the number of each holding in
+##      land_holdings by the scale factor computed
+##      in 1c to get the number of farms per
+##      category on a grid cell basis
+## 1e - NOTE: we need a time series of these maps
+##      (but for now we could assume constant)
+
+cropland = raster("data/iiasa-ifpri-cropland-map/Hybrid_10042015v9.img")
+cropland = crop(cropland, extent(template))
+cropland = aggregate(cropland, fact=10, fun=mean)
+cropland = cropland / 100 * area(cropland)
+
+x = land_holdings %>% filter(YEAR %in% 1980)
+
+## First attempt - weight by cropland
+v = getValues(adm2_1960_raster)
+
+farm_area = list(
+    marg=raster(template),
+    small=raster(template),
+    semim=raster(template),
+    medium=raster(template),
+    large=raster(template))
+
+farm_nos = farm_area
+
+cats = c("MARG","SMALL","SEMIM","MEDIUM","LARGE")
+
+for (i in 1:nrow(x)) {
+    gaul_id = x$GAUL_ID[i]
+    cell_ix = which(v == gaul_id)
+    area = cropland[cell_ix]
+    weights = area / sum(area)
+    total_cropland = sum(area) # km2
+    sf = total_cropland / (x[["TOTAL_AR"]][i] * 10)
+    for (j in 1:length(cats)) {
+        area_col = paste0(cats[j], "_AR")
+        no_col = paste0(cats[j], "_NO")
+        size = x[[area_col]][i] / x[[no_col]][i]
+        area = x[[area_col]][i] * sf * weights * 1000
+        nos = area / size
+        farm_area[[j]][cell_ix] = area
+        farm_nos[[j]][cell_ix] = nos
+    }    
+}
+
+## for (i in 1:length(cats)) {
+##     farm_area[[i]] %<>% `*`(template)
+##     farm_nos[[i]] %<>% `*`(template)
+## }
+
+## plot(farm_area[[1]])
+## plot(farm_area[[2]])
+## plot(farm_area[[3]])
+## plot(farm_area[[4]])
+## plot(farm_area[[5]])
+
+## plot(farm_nos[[1]])
+## plot(farm_nos[[2]])
+## plot(farm_nos[[3]])
+## plot(farm_nos[[4]])
+## plot(farm_nos[[5]])
+
+for (i in 1:length(cats)) {
+    area_nm = file.path("../data", paste0(tolower(cats[i]), "_area_1980.tif"))
+    nos_nm = file.path("../data", paste0(tolower(cats[i]), "_no_1980.tif"))
+    size_nm = file.path("../data", paste0(tolower(cats[i], "_farm_size_1980.tif"))
+    writeRaster(farm_area[[i]], area_nm, format="GTiff", overwrite=TRUE)
+    writeRaster(farm_nos[[i]], nos_nm, format="GTiff", overwrite=TRUE)
+}
+
+

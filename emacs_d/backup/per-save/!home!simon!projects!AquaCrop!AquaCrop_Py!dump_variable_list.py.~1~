@@ -1,0 +1,595 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+netcdf_short_name = {}
+netcdf_dimensions = {}
+netcdf_unit       = {}
+# netcdf_monthly_total_unit = {} 
+# netcdf_yearly_total_unit  = {}
+netcdf_long_name  = {}
+description       = {}
+comment           = {}
+latex_symbol      = {}
+
+# Counters
+# ********
+aquacrop_variable_name = 'AgeDays'
+netcdf_short_name[aquacrop_variable_name] = 'canopy_age'
+netcdf_dimensions                         = ('rotation','time','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'd'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+aquacrop_variable_name = 'AgeDays_NS'
+netcdf_short_name[aquacrop_variable_name] = 'canopy_age_no_stress'
+netcdf_dimensions                         = ('rotation','time','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'd'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# AerDays
+aquacrop_variable_name = 'AerDays'
+netcdf_short_name[aquacrop_variable_name] = 'aeration_counter'
+netcdf_dimensions                         = ('rotation','time','depth','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'd'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# IrrCum
+aquacrop_variable_name = 'IrrCum'
+netcdf_short_name[aquacrop_variable_name] = 'cumulative_irrigation'
+netcdf_dimensions                         = ('rotation','time','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'mm'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# IrrNetCum
+aquacrop_variable_name = 'IrrNetCum'
+netcdf_short_name[aquacrop_variable_name] = 'cumulative_net_irrigation'
+netcdf_dimensions                         = ('rotation','time','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'mm'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# DelayedGDDs
+aquacrop_variable_name = 'DelayedGDDs'
+netcdf_short_name[aquacrop_variable_name] = 'delayed_growth_growing_degree_days'
+netcdf_dimensions                         = ('rotation','time','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'd'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+aquacrop_variable_name = 'DelayedCDs'
+netcdf_short_name[aquacrop_variable_name] = 'delayed_growth_calendar_days'
+netcdf_dimensions                         = ('rotation','time','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'd'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+aquacrop_variable_name = 'PctLagPhase'
+netcdf_short_name[aquacrop_variable_name] = 'lag_phase_progression'
+netcdf_dimensions                         = ('rotation','time','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'percent'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+aquacrop_variable_name = 'tEarlySen'
+netcdf_short_name[aquacrop_variable_name] = 'early_senescence_counter'
+netcdf_dimensions                         = ('rotation','time','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'd'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# GDDcum
+aquacrop_variable_name = 'GDDcum'
+netcdf_short_name[aquacrop_variable_name] = 'cumulative_growing_degree_days'
+netcdf_dimensions                         = ('rotation','time','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'd'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+aquacrop_variable_name = 'DaySubmerged'
+netcdf_short_name[aquacrop_variable_name] = 'time_submerged'
+netcdf_dimensions                         = ('rotation','time','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'd'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+aquacrop_variable_name = 'DAP'
+netcdf_short_name[aquacrop_variable_name] = 'days_after_planting'
+netcdf_dimensions                         = ('rotation','time','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'd'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# Epot
+aquacrop_variable_name = 'Epot'
+netcdf_short_name[aquacrop_variable_name] = 'potential_evaporation'
+netcdf_dimensions                         = ('rotation','time','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'mm'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# Tpot
+aquacrop_variable_name = 'Tpot'
+netcdf_short_name[aquacrop_variable_name] = 'potential_transpiration'
+netcdf_dimensions                         = ('rotation','time','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'm3 m-3'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+        
+# States
+# ******
+# WTinSoil
+aquacrop_variable_name = 'th'
+netcdf_short_name[aquacrop_variable_name] = 'water_content'
+netcdf_dimensions                         = ('rotation','time','depth','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'm3 m-3'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# PreAdj
+aquacrop_variable_name = 'th'
+netcdf_short_name[aquacrop_variable_name] = 'water_content'
+netcdf_dimensions                         = ('rotation','time','depth','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'm3 m-3'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# CropMature
+aquacrop_variable_name = 'th'
+netcdf_short_name[aquacrop_variable_name] = 'water_content'
+netcdf_dimensions                         = ('rotation','time','depth','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'm3 m-3'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# CropDead
+aquacrop_variable_name = 'th'
+netcdf_short_name[aquacrop_variable_name] = 'water_content'
+netcdf_dimensions                         = ('rotation','time','depth','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'm3 m-3'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# Germination
+aquacrop_variable_name = 'th'
+netcdf_short_name[aquacrop_variable_name] = 'water_content'
+netcdf_dimensions                         = ('rotation','time','depth','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'm3 m-3'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# PrematSenes
+aquacrop_variable_name = 'th'
+netcdf_short_name[aquacrop_variable_name] = 'water_content'
+netcdf_dimensions                         = ('rotation','time','depth','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'm3 m-3'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# HarvestFlag
+aquacrop_variable_name = 'th'
+netcdf_short_name[aquacrop_variable_name] = 'water_content'
+netcdf_dimensions                         = ('rotation','time','depth','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'm3 m-3'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+
+# Harvest index
+# *************
+# Stage
+aquacrop_variable_name = 'th'
+netcdf_short_name[aquacrop_variable_name] = 'water_content'
+netcdf_dimensions                         = ('rotation','time','depth','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'm3 m-3'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# Fpre
+aquacrop_variable_name = 'th'
+netcdf_short_name[aquacrop_variable_name] = 'water_content'
+netcdf_dimensions                         = ('rotation','time','depth','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'm3 m-3'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# Fpost
+aquacrop_variable_name = 'th'
+netcdf_short_name[aquacrop_variable_name] = 'water_content'
+netcdf_dimensions                         = ('rotation','time','depth','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'm3 m-3'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# fpost_dwn
+aquacrop_variable_name = 'th'
+netcdf_short_name[aquacrop_variable_name] = 'water_content'
+netcdf_dimensions                         = ('rotation','time','depth','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'm3 m-3'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# fpost_upp
+aquacrop_variable_name = 'th'
+netcdf_short_name[aquacrop_variable_name] = 'water_content'
+netcdf_dimensions                         = ('rotation','time','depth','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'm3 m-3'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# HIcor_Asum
+aquacrop_variable_name = 'th'
+netcdf_short_name[aquacrop_variable_name] = 'water_content'
+netcdf_dimensions                         = ('rotation','time','depth','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'm3 m-3'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# HIcor_Bsum
+aquacrop_variable_name = 'th'
+netcdf_short_name[aquacrop_variable_name] = 'water_content'
+netcdf_dimensions                         = ('rotation','time','depth','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'm3 m-3'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# Fpol
+aquacrop_variable_name = 'th'
+netcdf_short_name[aquacrop_variable_name] = 'water_content'
+netcdf_dimensions                         = ('rotation','time','depth','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'm3 m-3'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# sCor1
+aquacrop_variable_name = 'th'
+netcdf_short_name[aquacrop_variable_name] = 'water_content'
+netcdf_dimensions                         = ('rotation','time','depth','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'm3 m-3'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# sCor2
+aquacrop_variable_name = 'th'
+netcdf_short_name[aquacrop_variable_name] = 'water_content'
+netcdf_dimensions                         = ('rotation','time','depth','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'm3 m-3'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+
+# GrowthStage
+aquacrop_variable_name = 'th'
+netcdf_short_name[aquacrop_variable_name] = 'water_content'
+netcdf_dimensions                         = ('rotation','time','depth','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'm3 m-3'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# AerDaysComp
+aquacrop_variable_name = 'th'
+netcdf_short_name[aquacrop_variable_name] = 'water_content'
+netcdf_dimensions                         = ('rotation','time','depth','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'm3 m-3'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# TrRatio
+aquacrop_variable_name = 'th'
+netcdf_short_name[aquacrop_variable_name] = 'water_content'
+netcdf_dimensions                         = ('rotation','time','depth','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'm3 m-3'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# CC
+aquacrop_variable_name = 'th'
+netcdf_short_name[aquacrop_variable_name] = 'water_content'
+netcdf_dimensions                         = ('rotation','time','depth','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'm3 m-3'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# CCadj
+aquacrop_variable_name = 'th'
+netcdf_short_name[aquacrop_variable_name] = 'water_content'
+netcdf_dimensions                         = ('rotation','time','depth','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'm3 m-3'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# CC_NS
+aquacrop_variable_name = 'th'
+netcdf_short_name[aquacrop_variable_name] = 'water_content'
+netcdf_dimensions                         = ('rotation','time','depth','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'm3 m-3'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# CCadj_NS
+aquacrop_variable_name = 'th'
+netcdf_short_name[aquacrop_variable_name] = 'water_content'
+netcdf_dimensions                         = ('rotation','time','depth','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'm3 m-3'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# B
+aquacrop_variable_name = 'th'
+netcdf_short_name[aquacrop_variable_name] = 'water_content'
+netcdf_dimensions                         = ('rotation','time','depth','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'm3 m-3'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# B_NS
+aquacrop_variable_name = 'th'
+netcdf_short_name[aquacrop_variable_name] = 'water_content'
+netcdf_dimensions                         = ('rotation','time','depth','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'm3 m-3'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# HI
+aquacrop_variable_name = 'th'
+netcdf_short_name[aquacrop_variable_name] = 'water_content'
+netcdf_dimensions                         = ('rotation','time','depth','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'm3 m-3'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# HIadj
+aquacrop_variable_name = 'th'
+netcdf_short_name[aquacrop_variable_name] = 'water_content'
+netcdf_dimensions                         = ('rotation','time','depth','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'm3 m-3'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# CCxAct
+aquacrop_variable_name = 'th'
+netcdf_short_name[aquacrop_variable_name] = 'water_content'
+netcdf_dimensions                         = ('rotation','time','depth','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'm3 m-3'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# CCxAct_NS
+aquacrop_variable_name = 'th'
+netcdf_short_name[aquacrop_variable_name] = 'water_content'
+netcdf_dimensions                         = ('rotation','time','depth','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'm3 m-3'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# CCxW
+aquacrop_variable_name = 'th'
+netcdf_short_name[aquacrop_variable_name] = 'water_content'
+netcdf_dimensions                         = ('rotation','time','depth','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'm3 m-3'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# CCxW_NS
+aquacrop_variable_name = 'th'
+netcdf_short_name[aquacrop_variable_name] = 'water_content'
+netcdf_dimensions                         = ('rotation','time','depth','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'm3 m-3'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# CCxEarlySen
+aquacrop_variable_name = 'th'
+netcdf_short_name[aquacrop_variable_name] = 'water_content'
+netcdf_dimensions                         = ('rotation','time','depth','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'm3 m-3'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# CCprev - don't think this is a state var
+aquacrop_variable_name = 'th'
+netcdf_short_name[aquacrop_variable_name] = 'water_content'
+netcdf_dimensions                         = ('rotation','time','depth','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'm3 m-3'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# rcor
+aquacrop_variable_name = 'th'
+netcdf_short_name[aquacrop_variable_name] = 'water_content'
+netcdf_dimensions                         = ('rotation','time','depth','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'm3 m-3'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# Zroot
+aquacrop_variable_name = 'th'
+netcdf_short_name[aquacrop_variable_name] = 'water_content'
+netcdf_dimensions                         = ('rotation','time','depth','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'm3 m-3'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# CC0adj
+aquacrop_variable_name = 'th'
+netcdf_short_name[aquacrop_variable_name] = 'water_content'
+netcdf_dimensions                         = ('rotation','time','depth','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'm3 m-3'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# SurfaceStorage
+aquacrop_variable_name = 'th'
+netcdf_short_name[aquacrop_variable_name] = 'water_content'
+netcdf_dimensions                         = ('rotation','time','depth','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'm3 m-3'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# SurfaceStorageIni
+aquacrop_variable_name = 'th'
+netcdf_short_name[aquacrop_variable_name] = 'water_content'
+netcdf_dimensions                         = ('rotation','time','depth','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'm3 m-3'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# th
+aquacrop_variable_name = 'th'
+netcdf_short_name[aquacrop_variable_name] = 'water_content'
+netcdf_dimensions                         = ('rotation','time','depth','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'm3 m-3'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+
+# Wsurf
+aquacrop_variable_name = 'th'
+netcdf_short_name[aquacrop_variable_name] = 'water_content'
+netcdf_dimensions                         = ('rotation','time','depth','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'm3 m-3'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# EvapZ
+aquacrop_variable_name = 'th'
+netcdf_short_name[aquacrop_variable_name] = 'water_content'
+netcdf_dimensions                         = ('rotation','time','depth','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'm3 m-3'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# Stage2
+aquacrop_variable_name = 'th'
+netcdf_short_name[aquacrop_variable_name] = 'water_content'
+netcdf_dimensions                         = ('rotation','time','depth','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'm3 m-3'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None
+
+# Wstage2
+aquacrop_variable_name = 'th'
+netcdf_short_name[aquacrop_variable_name] = 'water_content'
+netcdf_dimensions                         = ('rotation','time','depth','lat','lon')
+netcdf_unit[aquacrop_variable_name]       = 'm3 m-3'
+netcdf_long_name[aquacrop_variable_name]  = None
+description[aquacrop_variable_name]       = None
+comment[aquacrop_variable_name]           = None
+latex_symbol[aquacrop_variable_name]      = None

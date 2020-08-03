@@ -1,0 +1,44 @@
+[url]
+serverroot = http://wci.earth2observe.eu/thredds/dodsC/
+wrrsetroot = ecmwf/met_forcing_v0/
+
+[selection]
+calculateEvap = True
+#evapMethod = PenmanMonteith
+evapMethod = PenmanMonteith
+#evapMethod = Hargreaves
+#evapMethod = PriestleyTaylor
+
+latmin = 25
+latmax = 28
+lonmin = 83
+lonmax = 86
+startyear = 2000
+endyear= 2000
+startmonth = 1
+endmonth = 1
+startday = 1
+endday = 31
+
+[downscaling]
+highResDEM=/home/simon/dev/etref/examples/WFDEI/DEM-WRR1_Gandak.map
+# radiationcordir=/home/simon/dev/etref/examples/WFDEI/input/output_rad/
+
+# The following only works for wrr2
+# useVarLapseRate = True
+
+resampling  = True
+downscaling = False
+resamplingtype=linear
+
+[output]
+# Gdal output format string
+# See: http://www.gdal.org/formats_list.html
+# examples: AAIGrid, PCRaster, GTiff
+#format=PCRaster
+format=GTiff
+directory=/home/simon/dev/etref/examples/WFDEI/input/output_evap/
+prefix=HG
+# Also downscale and save the intermediate variables (T, Pressure etc)
+saveall=1
+

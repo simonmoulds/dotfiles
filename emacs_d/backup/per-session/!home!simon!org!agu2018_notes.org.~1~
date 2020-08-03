@@ -1,0 +1,42 @@
+* AI in Geosciences
+** Overview of AI in geosciences
+** Is there an "Alexa" for geoscience?
+** 'mint' model integration - [see session 'Integrating models...'
+** LinkedEarth/MINT/EarthCube
+
+* Machine learning and the geosciences (Stephan Sain)
+** JUPITER
+** Narrow AI - Improved observations etc. 
+** Machine learning + physical models
+** Data is an asset; space-time, lack of stationarity, irregularly sampled...
+** Deep learning - variable importance
+** Myth of the "all-powerful" algorithm
+** Uncertainty - physical models, observations, estimation vs. prediction
+** Collaboration
+
+* Physics-guided machine learning: a new paradigm for modeling dynamical systems (Aruj Karpatne)
+** Opportunities: 
+*** Discovering novel patterns and relationships, hypotheses
+*** Advancing geoscience models of dynamical systems
+**** incomplete or approximate representations
+**** recent AI advances (e.g deep learning methods) offer great promise
+**** but black-box models in scientific problems, agnostic about the underlying science, are disappointing
+
+** Why do black-box models fail?
+*** Paucity of labeled data - huge number of samples is critical to success of methods such as deep learning
+*** Ignores wealth of scientific knowledge
+**** learned patterns may not be physically consistent - unfit for scientific advancements, cannot generalize
+
+** Theory-based vs data science models
+*** theory-based models cannot make the best use of available use of data, whereas data science methods exploit data efficiently but do not 
+*** "Theory guided data science: a new paradigm for scientific discovery"
+
+** E.g. Modeling lake temperature
+*** How can we integrate theory in the construction of data science methods
+*** Karpatne et al 2017, Jia et al 2018
+
+* Science fiction prototyping
+** Method for scenario design - Brian David Johnson
+** "A method of scenario design that is based on scientific fact..."
+** Storytelling (i.e. world, plot, characters)
+** #artscience

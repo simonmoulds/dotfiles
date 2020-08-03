@@ -1,0 +1,265 @@
+## Author : Simon Moulds
+## Date   : August 2019
+
+library(magrittr)
+library(ncdf4)
+library(raster)
+library(rasterVis)
+library(grid)
+library(gridExtra)
+library(rworldmap)
+library(ggplot2)
+library(scales)
+
+source("convert-aos-funs.R")
+
+myfun = function(ncfile, varname, crop_ix=1, farm_ix=1, template, ...) {
+    nc = nc_open(ncfile)
+    var = ncvar_get(nc, varname, collapse_degen=FALSE)
+    var_dim_ix = nc$var[[varname]][["dimids"]]
+    var_dims = names(nc$dim)[var_dim_ix + 1]
+    dims = c("lat","lon","time","crop","farm")
+    perm = match(var_dims, dims[dims %in% var_dims])
+    var = aperm(var, perm)
+    var = var[,,,crop_ix,farm_ix]
+    lat = ncvar_get(nc, "lat")
+    lon = ncvar_get(nc, "lon")
+    tm = ncvar_get(nc, "time")
+    lat_descending = (lat[1] == max(lat))
+    lon_ascending = (lon[1] == min(lon))
+    maps = list()
+    for (i in 1:length(tm)) {
+        r = raster(template)
+        r[] = var[,,i]
+        maps[[i]] = r
+    }
+    st = stack(maps)
+    nc_close(nc)
+    st
+}
+
+get_val_at_point = function(ncfile, varname, pts, crop_ix=1, farm_ix=1, ...) {
+    nc = nc_open(ncfile)
+    var = ncvar_get(nc, varname, collapse_degen=FALSE)
+    var_dim_ix = nc$var[[varname]][["dimids"]]
+    var_dims = names(nc$dim)[var_dim_ix + 1]
+    dims = c("lat","lon","time","crop","farm")
+    perm = match(var_dims, dims[dims %in% var_dims])
+    var = aperm(var, perm)
+    var = var[,,,crop_ix,farm_ix]
+    lat = ncvar_get(nc, "lat")
+    lon = ncvar_get(nc, "lon")
+    lat_ix = which.min(abs(lat - pts$y))[1]
+    lon_ix = which.min(abs(lon - pts$x))[1]
+    pt_val = R.utils::extract(var, indices=list("1"=lat_ix, "2"=lon_ix))
+    nc_close(nc)
+    pt_val
+}
+
+pts = SpatialPoints(
+    coords=data.frame(x=-1.875, y=7.875),
+    proj4string=CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
+)
+config_fn = "maize_rainfed_ssa_agmerra.ini"
+in_path = get_config_option(config_fn, "PathIn")
+start_time = get_config_option(config_fn, "startTime")
+end_time = get_config_option(config_fn, "endTime")
+
+datadir="../data"
+template=raster("../data/africa_landmask_0pt25degree.tif")
+ext = extent(template)
+
+## ##############
+## 1 - crop yield
+## ##############
+
+yield = myfun(
+    ncfile=file.path(datadir, "output_maize_rainfed_ssa_agmerra", "netcdf", "Y_cropland_yearMax_output.nc"),
+    varname="crop_yield",
+    template=template
+)    
+
+fs = list.files("../data/mapspam/geotiff_global_harv_area", pattern="SPAM2005V3r2_global_[A-Z]{1}_[A-Z]{2}_MAIZ_[A-Z]{1}.tif$", full.names=TRUE)
+r = raster(fs[5]) %>% crop(ext) %>% raster::aggregate(fact=3, fun=sum)
+maize_grown = r > 0
+yield = yield * maize_grown
+
+## plot years 2005-2009
+st = yield[[6:10]]
+min_val = floor(min(cellStats(st, "min")))
+max_val = ceiling(max(cellStats(st, "max")))
+nlev = 100
+my_breaks = seq(min_val, max_val, length.out=nlev+1)
+
+p = levelplot(st,
+              at=my_breaks,
+              margin=FALSE,
+              xlab=NULL,
+              ylab=NULL,
+              ## xlim=c(-4,2),
+              ## ylim=c(4,12),
+              par.settings=list(axis.line=list(lwd=1), strip.background=list(col="transparent"), strip.border=list(col="transparent")),
+              par.strip.text=list(cex=1),
+              names.attr=as.character(2005:2009),
+              col.regions=rev(terrain.colors(nlev)), #terrain.colors,#colorRampPalette(brewer.pal(n=9, "YlGn"))(1000),
+              layout=c(5,1),
+              scales=list(draw=TRUE, cex=1),
+              colorkey=list(
+                  space="bottom",
+                  width=0.75,
+                  at=seq(min_val,max_val,length.out=nlev),
+                  labels=list(
+                      at=seq(min_val, max_val,by=2),
+                      labels=seq(min_val, max_val,by=2),
+                      cex=1
+                  ),
+                  tck=0.5
+              ))
+p
+
+library(gridExtra)
+data(countriesCoarse)
+p = p + latticeExtra::layer(sp.lines(countriesCoarse, lwd=0.5, fill="transparent"))
+p
+
+pname = "~/Dropbox/ssa_maize_yield_2005_2009.png"
+trellis.device(device="png", width=10, height=3.5, res=320, units="in", file=pname, bg="transparent")
+print(p)
+pushViewport(viewport(0.52,0.04,0.5,0.07))
+grid.text(expression("Maize yield"~(t~ha^-1)), gp=gpar(cex=1))
+dev.off()
+
+## single year (2005)
+p = levelplot(st[[1]],
+              at=my_breaks,
+              margin=FALSE,
+              xlab=NULL,
+              ylab=NULL,
+              ## xlim=c(-4,2),
+              ## ylim=c(4,12),
+              par.settings=list(axis.line=list(lwd=1), strip.background=list(col="transparent"), strip.border=list(col="transparent")),
+              par.strip.text=list(cex=1),
+              names.attr=as.character(2005),
+              ## names.attr=as.character(2005:2009),
+              col.regions=rev(terrain.colors(nlev)), #terrain.colors,#colorRampPalette(brewer.pal(n=9, "YlGn"))(1000),
+              layout=c(1,1),
+              scales=list(draw=TRUE, cex=1),
+              colorkey=list(
+                  space="bottom",
+                  width=0.75,
+                  at=seq(min_val,max_val,length.out=nlev),
+                  labels=list(
+                      at=seq(min_val, max_val,by=2),
+                      labels=seq(min_val, max_val,by=2),
+                      cex=1
+                  ),
+                  tck=0.5
+              ))
+p
+
+library(gridExtra)
+data(countriesCoarse)
+p = p + latticeExtra::layer(sp.lines(countriesCoarse, lwd=0.5, fill="transparent"))
+p
+
+pname = "~/Dropbox/ssa_maize_yield_2005.png"
+trellis.device(device="png", width=5, height=6, res=320, units="in", file=pname, bg="transparent")
+print(p)
+pushViewport(viewport(0.52,0.04,0.5,0.07))
+grid.text(expression("Maize yield"~(t~ha^-1)), gp=gpar(cex=1))
+dev.off()
+
+## ###########################
+## 3 - root zone water content
+## ###########################
+
+ncfile=file.path(datadir, "output_maize_rainfed_ssa_agmerra", "netcdf", "thRZ_Act_cropland_dailyTot_output.nc")
+thrz = get_val_at_point(ncfile, "th_rz", pts)[1,1,]
+tm = get_time_dim_from_nc(ncfile)
+thrz_data = data.frame(time=tm, thrz=thrz)
+## thrz_data = thrz_data[tm >= as.Date("2005-01-01"),]
+## thrz_data$time %<>% as.Date
+thrz_data = thrz_data[tm >= as.Date("2005-03-15") & tm <= as.Date("2005-07-15"),]
+thrz_data$time %<>% as.Date
+
+p2 = ggplot(thrz_data, aes(x=time, y=thrz)) +
+    geom_line(color="blue", lwd=1) +
+    ylim(0,0.5) + 
+    xlab("Date") +
+    scale_x_date(name="Date", date_breaks="1 month", labels=date_format("%Y-%m")) + 
+    ylab(expression("Soil water"~(m^3~m^-3))) + 
+    theme_classic()
+print(p2)
+
+ggsave("~/Dropbox/thrz_2005.png", p2, device=png(), width=3.5, height=2, units="in", dpi="retina")
+
+## #################
+## 4 - precipitation
+## #################
+
+years = seq.POSIXt(as.POSIXlt(start_time), as.POSIXlt(end_time), by="1 day") %>% as.POSIXlt %>% `$`(year) %>% unique %>% sort %>% `+`(1900)
+
+prec_nc = get_config_option(config_fn, "precipitationNC") %>%
+    gsub("^\\$\\{FILE_PATHS:PathIn\\}", in_path, .)
+
+prec_fs = rep(prec_nc, length(years))
+tm = c()
+vals = c()
+for (i in 1:length(years)) {
+    year = years[i]
+    prec_fs = gsub("\\{year:0>4\\}", year, prec_nc)
+    tm = append(tm, get_time_dim_from_nc(prec_fs))
+    vals = append(vals, get_time_varying_var_from_nc(prec_fs[1], "prate", pts))
+}
+
+tm = as.Date(tm)
+prec_data = data.frame(time=tm, prec=vals) %>% left_join(thrz_data)
+
+prec_data = prec_data[tm >= as.Date("2005-03-15") & tm <= as.Date("2005-07-15"),]
+prec_data$time %<>% as.Date
+
+p1 = ggplot(prec_data, aes(x=time, y=prec)) +
+    ## geom_line(color="blue", lwd=1) +
+    geom_bar(color="blue", stat="identity") + 
+    ## ylim(0,0.5) +    
+    scale_x_date(name=NULL, date_breaks="1 year", labels=date_format("%Y-%m"), position="top") +
+    ## scale_x_date(name="Date", date_breaks="1 year", labels=date_format("%Y")) + 
+    ylab(expression("Precipitation"~(mm))) + 
+    scale_y_reverse() +
+    theme_classic()
+print(p1)
+
+## ggsave("~/Dropbox/prec_2005.png", p1, device=png(), width=3.5, height=2, units="in", dpi="retina")
+
+## ################
+## 5 - canopy cover
+## ################
+
+ncfile=file.path(datadir, "output_maize_rainfed_ssa_agmerra", "netcdf", "CC_cropland_dailyTot_output.nc")
+cc = get_val_at_point(ncfile, "canopy_cover", pts)[1,1,]
+tm = get_time_dim_from_nc(ncfile)
+cc_data = data.frame(time=tm, cc=cc)
+cc_data = cc_data[tm >= as.Date("2005-03-15") & tm <= as.Date("2005-07-15"),]
+cc_data$time %<>% as.Date
+
+p3 = ggplot(cc_data, aes(x=time, y=cc)) +
+    geom_line(color="blue", lwd=1) +
+    ## ylim(0,0.5) + 
+    scale_x_date(name=NULL, date_breaks="1 year", labels=date_format("%Y-%m")) + 
+    ylab(expression("Canopy cover"~("%"))) + 
+    theme_classic()
+p3
+
+ggsave("~/Dropbox/canopy_cover_2005.png", p3, device=png(), width=3.5, height=2.5, units="in", dpi="retina")
+
+## library(grid)
+## grid.newpage()
+## grid.draw(rbind(ggplotGrob(p1), ggplotGrob(p3), ggplotGrob(p2), size="last"))
+
+## library(gridExtra)
+## grid.arrange(p1, p3, p2, ncol=1, heights=c(1,2,1))
+
+library(cowplot)
+p4 = plot_grid(p1, p3, p2, ncol=1, align="v", rel_heights=c(0.75,1,1), scale=0.9)
+p4
+ggsave("~/Dropbox/combined_2005.png", p4, device=png(), width=4, height=6, units="in", dpi="retina")

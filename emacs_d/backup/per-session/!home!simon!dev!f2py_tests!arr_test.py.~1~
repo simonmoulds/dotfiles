@@ -1,0 +1,6 @@
+import numpy as np
+import arr_test
+
+nrow = 1000000
+ncol = 10
+arr = np.ones((nrow, ncol))

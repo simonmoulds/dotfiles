@@ -1,0 +1,45 @@
+## Author : Simon Moulds
+## Date   : Apr 2018
+
+## Quality control for Bihar
+
+## Barley
+## ######
+
+xx[["irr_barley"]] %<>% irr_frac_interp(xx[["apy_barley"]], 45:46, 44)
+
+xx[["apy_barley"]] %<>% tot_frac_interp(xx[["irr_barley"]], 50, 49)
+
+if (dist_nm %in% c("Bastar","Hazaribag.Dhanbad","Palamu","Ranchi")) {
+    xx[["apy_barley"]] %<>% tot_frac_interp(xx[["irr_barley"]], 44:61, 41)
+}
+
+## Chickpea
+## ########
+
+if (is.na(xx[["apy_chickpea"]][40])) {
+    xx[["apy_chickpea"]] %<>% tot_frac_interp(xx[["irr_chickpea"]], 40, 39)
+}
+
+## Maize
+## #####
+
+xx[["apy_maize"]] %<>% tot_frac_interp(xx[["irr_maize"]], 60:62, 59)
+
+## Rapeseed
+## ########
+
+xx[["apy_rapeseed"]] %<>% tot_frac_interp(xx[["irr_rapeseed"]], 32, 31)
+
+if (dist_nm %in% c("Bastar")) {
+    xx[["apy_rapeseed"]] %<>% tot_frac_interp(xx[["irr_rapeseed"]], 50, 51)
+    xx[["apy_rapeseed"]] %<>% tot_frac_interp(xx[["irr_rapeseed"]], 54, 53)
+}
+
+if (dist_nm %in% c("Patna")) {
+    xx[["apy_rapeseed"]] %<>% tot_frac_interp(xx[["irr_rapeseed"]], 29, 28)
+    xx[["apy_rapeseed"]] %<>% tot_frac_interp(xx[["irr_rapeseed"]], 32, 31)
+}
+
+if (dist_nm %in% c("Saharsa.Munger")) {
+    xx[["apy_rapeseed"]] %<>% tot_frac_interp(xx[["irr_rapeseed"]], 49, 50)

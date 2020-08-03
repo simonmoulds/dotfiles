@@ -1,0 +1,102 @@
+References: <5d821cc7-7b74-45e5-9a7d-6b4a3e8abe41@ic.ac.uk>
+User-agent: mu4e 1.0; emacs 26.1
+From: Simon Moulds <simon.moulds@imperial.ac.uk>
+To: "Ezzati, Majid" <majid.ezzati@imperial.ac.uk>
+Cc: Jacob Tetteh <tettahdoku@gmail.com>, "Mangiameli, Giulia" <g.mangiameli@imperial.ac.uk>, AGYEI-MENSAH SAMUEL <sagyei-mensah@ug.edu.gh>, "Moulds, Simon C" <simon.moulds@imperial.ac.uk>, "Templeton, Michael" <m.templeton@imperial.ac.uk>, YIDANA SANDOW MARK <smyidana@ug.edu.gh>, George Owusu <gowusu@ug.edu.gh>, Elvis Kyere-Gyeabour <kyeregy@gmail.com>, "Clark, Sierra N" <sierra.clark@imperial.ac.uk>
+Subject: Re: Digital Elevation Model
+In-reply-to: <5d821cc7-7b74-45e5-9a7d-6b4a3e8abe41@ic.ac.uk>
+
+Thanks a lot Jake - that sounds promising, and would probably be sufficient for flood modelling purposes. I assume that the contour map would provide the DTM unaffected by the presence of buildings (which is the problem with using coarse resolution (e.g. 90m SRTM) satellite elevation data.
+
+I'm still exploring the use of high resolution (<1m) satellite data to derive a DEM/DTM. I started looking at the Worldview data but unfortunately I don't think this will be sufficient for the purpose of urban elevation modelling, which requires (tri-)stereo pairs (i.e. the same scene imaged from two or three different angles) to derive elevation (N.B that is not to say the Worldview data cannot be used in other applications). Instead, I'm working on a short proposal to the European Space Agency to access the entire Pleiades archive, which is more suited to this type of application. 
+
+One way of limiting the cost would be to focus on certain areas. For example, Salifu from People's Dialogue suggested focusing on the Sahara community in Adabraka. We could also attempt to tie-in with the large World Bank project, which is focused on the Odaw river basin.
+
+
+
+Ezzati, Majid writes:
+
+> Thanks Jacob.
+>
+> I will have a chat with Simon on his needs. But we should also put on the agenda for the next call a potential visit to the survey department when I am there in a few weeks.  We need some of what they have but should find a way to get
+> around their massive costs
+>
+> Best 
+>
+> Majid 
+>
+>  
+>
+> From: Jacob Tetteh [mailto:tettahdoku@gmail.com]
+> Sent: 17 September 2019 17:19
+> To: Ezzati, Majid <majid.ezzati@imperial.ac.uk>
+> Cc: Mangiameli, Giulia <g.mangiameli@imperial.ac.uk>; AGYEI-MENSAH SAMUEL <sagyei-mensah@ug.edu.gh>; Moulds, Simon C <simon.moulds@imperial.ac.uk>; Templeton, Michael <m.templeton@imperial.ac.uk>; YIDANA SANDOW
+> MARK <smyidana@ug.edu.gh>; gowusu <gowusu@ug.edu.gh>; Elvis Kyere-Gyeabour <kyeregy@gmail.com>; Clark, Sierra N <sierra.clark@imperial.ac.uk>
+> Subject: Re: Digital Elevation Model
+>
+>  
+> Dear Majid,
+>
+>  
+> According to my checks;
+>
+>  
+> Accra as in Accra Metropolitan Assembly (AMA) is about 139.935 km2 while 
+>
+> Accra as in Greater Accra Metropolitan Area (GAMA) is about 1497.122 km2 (maybe, we could have some pluses or minuses)
+>
+>  
+> Regards,
+>
+> Jacob
+>
+>  
+> On Tue, Sep 17, 2019 at 4:43 PM Ezzati, Majid <majid.ezzati@imperial.ac.uk> wrote:
+>
+>  Thanks Jacob.
+>
+>  We should put on the next call's agenda the issue of cost of data from Survey office.  Meanwhile I will catch up with Simon and others about how badly this is needed.  
+>
+>  How many sq km is Accra?
+>
+>  Best
+>
+>  Majid 
+>
+>   
+>   
+>   
+>  From: Jacob Tetteh [mailto:tettahdoku@gmail.com]
+>  Sent: 17 September 2019 12:47
+>  To: Ezzati, Majid; Mangiameli, Giulia
+>  Cc: AGYEI-MENSAH SAMUEL; Moulds, Simon C; Templeton, Michael; YIDANA SANDOW MARK; gowusu; Elvis Kyere-Gyeabour; Clark, Sierra N
+>  Subject: Digital Elevation Model
+>
+>   
+>  Dear Majid and Giulia,
+>
+>   
+>  Elvis and I have sought the information concerning the Digital Elevation Model (Digital Terrain Model) from the Survey Department. These are the details;
+>
+>   
+>  1. 2m Contour Interval for GAMA (NB: It can converted to elevation model)
+>
+>  2. The most current one is dated 2013
+>
+>  3. Each tile cost a GHC100.00 for 2km2 (2km x 1km)
+>
+>   
+>  For Accuracies:
+>
+>  Horizontal Accuracy = 20cm ground sampling distance (GSD)
+>
+>  Vertical Accuracy should be <= 20cm
+>
+>   
+>  Thank you.
+>
+>   
+>  My Regards,
+>
+>  Jacob.
+

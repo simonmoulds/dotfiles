@@ -1,0 +1,17 @@
+#!/bin/bash
+
+wd=$HOME/projects/india_crop_area_2005
+
+echo 'export GRASS_MESSAGE_FORMAT=plain
+g.region e=98E w=68E n=36N s=6N res=0:05:00
+g.region -p
+r.in.gdal input=data/g2008_rgn_India_2001_rast.tif output=india_rgn --overwrite
+r.grow.distance input=india_rgn value=india_rgn_interp --overwrite
+r.out.gdal input=india_rgn_interp output=data/g2008_rgn_India_2001_rast_interp.tif format=GTiff
+' > mygrassjob_pt1.sh
+
+chmod u+x mygrassjob_pt1.sh
+export GRASS_BATCH_JOB=$wd/mygrassjob_pt1.sh
+grass72 /home/simon/grassdata/latlong/PERMANENT
+unset GRASS_BATCH_JOB
+rm tmp mygrassjob_pt1.sh

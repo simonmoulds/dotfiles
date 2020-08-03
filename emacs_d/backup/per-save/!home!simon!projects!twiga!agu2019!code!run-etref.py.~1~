@@ -1,0 +1,17 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+import os
+import glob
+
+run_dir = "../data/etref_ghana"
+
+def main():
+    run_dirs = glob.glob(run_dir + '/' + 'TA*')
+    for dir in run_dirs:
+        for config_file in glob.glob(dir + '/config/*.ini'):
+            cmd = 'python -m aquacrop.run ' + config_file
+            os.system(cmd)
+
+if __name__ == '__main__':
+    main()

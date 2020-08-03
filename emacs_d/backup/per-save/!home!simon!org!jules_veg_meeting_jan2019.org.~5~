@@ -1,0 +1,47 @@
+* 
+** JULES Golden sites
+*** 1: FIFE, tallgrass prairie, Kansas
+*** 2: Mead, crop (e.g. irrigated maize(-soybean), Nebraska
+*** Leaf Simulator
+
+* Kate Halladay (Met)
+** Lemordant et al 2018, Chadwick et al 2017
+** Increased CO2 -> stomatal closure -> reduced transpiration ("Physiological forcing")
+** Halladay & Good (2017):
+*** Western Amazon - dramatic decrease in ET when both vegetation scheme and radiative scheme exposed to CO2 rise
+*** When only the radiative scheme is exposed to CO2 rise, there is an increase in ET
+*** When the vegetation scheme is exposed to CO2 rise there is a more gradual decrease in ET
+** Looking at parameter sensitivity (Tupp, f0, nl0, rootd_ft, psm) - influence on precipitation in fully coupled model run (Sexton et al, in prep)
+
+* Arthur Argles (U of Exe)
+** Robust Ecosystem Demography (RED)-DGVM - N.B., this looks like the future DGVM
+** Large uncertainty in the terrestrial sink
+** GMD 2016 suite, Harper et al 2016(?)...
+
+* Controls on tropical tree cover
+** Are controls and disturbance on tree cover well represented in JULES?
+** What are the controls?
+
+* 
+** Land use and burnt area now treated separately (Burton et al, GMD)
+** 9 PFT setup (Harper et al 2018)
+** Upgrade to 17PFT (13 veg PFTs)
+** Developing crop fragmentation - e.g. resolves bias towards too much burnt area over India
+
+* Land use in JULES
+** HadGEM2-ES Method - LANDCOVER
+** Single call to vegetation competition routines
+** UKESM1 Method
+** Selected using l_trif_crop = .True.
+** Gridbox split into 4 regions (non-veg, natural, crop, pasture)
+** Management - basic representation of harvest and fertilizer
+** Advantage of new scheme is that different science routines can be applied to each PFT
+** Fertilizer flux exactly meets crop nitrogen demand (assume crops never become nitrogen depleted)
+** JULES-crop scheme will be used to represent crops
+** Gross landuse transitions, rather than net land use change (e.g. to more accurately represent the situation where crop land is abandoned in one place, and in another place forest is cut down for additional land use)
+
+* Datasets:
+** Spatio-temporal gridded woody... 1991-2016 (Sami.Rifai@ouce...)
+
+* Matheson
+** Developing a multiple cropping capability in JULES (GMD paper in prep)

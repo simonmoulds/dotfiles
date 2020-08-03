@@ -1,0 +1,9 @@
+## Author : Simon Moulds
+## Date   : June 2018
+
+mat_dir = "/home/simon/projects/AquaCrop/AquaCropOS_v50a"
+py_dir = "/home/simon/projects/AquaCrop/AquaCrop_Py"
+
+r1 = read.table(file.path(mat_dir, "Output", "Sample_CropGrowth.txt"), header=TRUE, sep="\t")
+
+ts = paste(r1$Year, r1$Month, r1$Day, sep="-")

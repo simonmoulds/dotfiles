@@ -1,0 +1,169 @@
+References: <VI1PR06MB158263D8D1C715C2B1E77C92D40F0@VI1PR06MB1582.eurprd06.prod.outlook.com> <87lghysq43.fsf@yamunotri.localdomain> <VI1PR06MB158207D908C164A39B2F039ED40F0@VI1PR06MB1582.eurprd06.prod.outlook.com> <87k1xhss6s.fsf@yamunotri.localdomain> <HE1PR06MB15785947C4F8097B46C40765D40C0@HE1PR06MB1578.eurprd06.prod.outlook.com> <87fu85s7td.fsf@yamunotri.localdomain> <VI1PR06MB1582C15B5DB751F5A6A91731D40C0@VI1PR06MB1582.eurprd06.prod.outlook.com>
+User-agent: mu4e 1.0-alpha2; emacs 24.5.1
+From: Simon Moulds <s.moulds@exeter.ac.uk>
+To: "O'Keeffe, Jimmy M" <jimmy.okeeffe@imperial.ac.uk>
+Subject: Re: model data
+In-reply-to: <VI1PR06MB1582C15B5DB751F5A6A91731D40C0@VI1PR06MB1582.eurprd06.prod.outlook.com>
+
+Jimmy - sorry, would you mind resending sultanpur.zip - for some reason
+FileExchange doesn't accept the ID/passcode combination
+O'Keeffe, Jimmy M writes:
+
+> Hi Simon,
+>
+>
+> I'll go through it in detail later but after a quick scan it looks great. I'll probably need to go through some of the new livelihood equations with you - possibly tomorrow, and I will go through everything with Ana later on.
+>
+>
+> I've also just finished the rest of the text changes so I'll put it all together shortly. The only thing that needs to be sorted after that are the model runs and updates to the results from that.
+>
+>
+> Huge thanks,
+>
+> Jimmy
+>
+>
+>
+>
+>
+> ________________________________
+> From: Simon Moulds <S.Moulds@exeter.ac.uk>
+> Sent: 20 December 2017 16:06:06
+> To: O'Keeffe, Jimmy M
+> Subject: Re: model data
+>
+> Hi Jimmy,
+>
+> Find attached the pdf + tex file for the revised Model development
+> section. I hope the equations make sense - I think it would probably be
+> worth getting someone else (perhaps Ana?) to go through the equations
+> before submission.
+>
+> I've made a couple of comments where I need your input - not too many.
+>
+> Let me know what you think. I'm happy to make any changes.
+>
+> Cheers,
+> Simon
+>
+> O'Keeffe, Jimmy M writes:
+>
+>> Thanks Simon.
+>>
+>>
+>> I suspect it will have an impact on the results - reducing the cost of fuel by nearly a half is pretty significant. I've just gone back over all the over versions of code I have including the one put together by undergrads last year and the 0.4 is in all of them. I guess a quick run will tell us straight away.
+>>
+>>
+>> I aim to also have all the other text sorted today, although I'm expecting some more, hopefully minor, changes once the new results are in.
+>>
+>>
+>> Cheers
+>>
+>> Jimmy
+>>
+>> ________________________________
+>> From: Simon Moulds <S.Moulds@exeter.ac.uk>
+>> Sent: 20 December 2017 08:46:03
+>> To: O'Keeffe, Jimmy M
+>> Subject: Re: model data
+>>
+>> OK, thanks Jimmy - I'll take another look. Let me know if you discover
+>> the significance of the 0.4. If not it's easy to remove (although it may
+>> have an impact on the results).
+>>
+>> Hoping to have a final draft of the revised Model development section by
+>> the end of today.
+>>
+>> Cheers,
+>> Simon
+>>
+>> O'Keeffe, Jimmy M writes:
+>>
+>>> Hi Simon,
+>>>
+>>>
+>>> Sleeping 'till 10 sounds like a great idea. I might give it a go tomorrow.
+>>>
+>>>
+>>> Yes, that report caused me quite a bit of trouble too but it's the best outline on how to calculate pumping costs that I found.
+>>>
+>>>
+>>> I've also attached a more complete version here which might help.
+>>>
+>>>
+>>> As for the coefficients - the 0.1133 and the 0.7949 were based on the linear increase in pumping cost with depth taken from that table in the paper after you convert everything to meters depth and m3 (although it's 3 years since I did that so may need to check it)
+>>>
+>>>
+>>> The efficiency was based on the same document and was just supposed to show that the pump was running at less than 100% efficiency.
+>>>
+>>>
+>>> I'm afraid I can't remember what the 0.4 was for.....sorry. Really should have commented that one. dp is the historical price of diesel and I'm not sure why I would have wanted to * it by 0.4. I might have to go through that tomorrow and let you know. The only think I can think of is that I was using that as a way of testing changes in the price of fuel and forgot to change it back...I hope I wasn't as sloppy as that.
+>>>
+>>>
+>>> Hope all that helps,
+>>>
+>>> Jimmy
+>>>
+>>> ________________________________
+>>> From: Simon Moulds <S.Moulds@exeter.ac.uk>
+>>> Sent: 19 December 2017 15:18:36
+>>> To: O'Keeffe, Jimmy M
+>>> Subject: Re: model data
+>>>
+>>> Hi Jimmy,
+>>>
+>>> Thanks a lot for this - I'll take a look and see how much work it will
+>>> be. Hopefully we'll be able to automate most of it.
+>>>
+>>> I'm struggling to work out the equations to calculate the cost of
+>>> pumping from the Nebraska document you sent. Would you mind taking a
+>>> look?
+>>>
+>>> As a reminder, the code first calculates the amount of fuel per m3,
+>>> written
+>>>
+>>> fuel_m3 = ((0.1133 * gw_depth) + 0.7949) * efficiency / 102.87
+>>>
+>>> and then calculates the cost of irrigation as
+>>>
+>>> pumping_cost = irrigation_volume * fuel_m3 * diesel_price * 0.4
+>>>
+>>> If you could tell me how the various coefficients were calculated that
+>>> would be really helpful. Feel free to give me a call.
+>>>
+>>> Slept until 10am this morning, so feeling quite awake!
+>>>
+>>> Cheers,
+>>> Simon
+>>>
+>>>
+>>> O'Keeffe, Jimmy M writes:
+>>>
+>>>> Hi Simon,
+>>>>
+>>>>
+>>>> Hope you got back OK and are not suffering too much with lack of sleep.
+>>>>
+>>>>
+>>>> I've sent you some files which should contain all the code I used to run the original paper models including all the driving data.
+>>>>
+>>>>
+>>>> Going through them just now I started to remember how much work there was in running them. I realise you will have some clever way of opening files and doing batch runs and that the new version of the model is faster anyway, but if this sounds like too much work for you let me know and we will work something out.
+>>>>
+>>>>
+>>>> Cheers
+>>>>
+>>>> Jimmy
+>>>>
+>>>>
+>>>>
+>>>> ————————————
+>>>> Dr Jimmy O'Keeffe
+>>>> Research Associate
+>>>>
+>>>> Department of Civil and Environmental Engineering
+>>>> Imperial College London
+>>>> London SW7 2AZ
+>>>> @jimmy_okeeffe
+>>>> https://www.imperial.ac.uk/people/jimmy.okeeffe
+

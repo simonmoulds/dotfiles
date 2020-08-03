@@ -1,0 +1,118 @@
+[MODEL_GRID]
+mask = "../data/mask_pt.nc"
+mask_varname = "mask"
+is_1d = true
+xy_dimname = "space"
+
+[PSEUDO_COORDS]
+# list or scalar
+crop = 1
+# farm = 1
+farm = [1,2,3,4,5,6,7]
+
+[CLOCK]
+# interpreted as datetime
+start_time = 2019-01-01T00:00:00
+end_time = 2019-12-31T00:00:00
+
+[INITIAL_WATER_CONTENT]
+type = "percent"
+percent = 50
+interp_method = ""
+
+[NETCDF_ATTRIBUTES]
+institution = "Imperial College London, United Kingdom"
+title = "AquaCrop v5.0 output"
+description = "test version (by Simon Moulds)"
+
+[PRECIPITATION]
+filename = "../data/meteo_pt.nc"
+varname = "prec"
+is_1d = true
+xy_dimname = "space"
+
+[TAVG]
+filename = "../data/meteo_pt.nc"
+varname = "tavg"
+is_1d = true
+xy_dimname = "space"
+
+[TMIN]
+filename = "../data/meteo_pt.nc"
+varname = "tmin"
+is_1d = true
+xy_dimname = "space"
+
+[TMAX]
+filename = "../data/meteo_pt.nc"
+varname = "tmax"
+is_1d = true
+xy_dimname = "space"
+
+[ETREF]
+filename = "../data/meteo_pt.nc"
+varname = "etref"
+is_1d = true
+xy_dimname = "space"
+
+[CARBON_DIOXIDE]
+filename = "../data/co2_annual_mean_mlo_pt.nc"
+varname = "co2"
+is_1d = true
+xy_dimname = "space"
+
+[WATER_TABLE]
+water_table = false
+dynamic = false
+filename = ""
+varname = ""
+is_1d = false
+xy_dimname = "space"
+directory = ""
+coupled = false
+time_lag = 0
+max_wait_time = 0
+wait_interval = 0
+
+[CROP_PARAMETERS]
+filename = "../data/crop_parameters_pt.nc"
+is_1d = true
+xy_dimname = "space"
+crop_id = [2]
+calendar_type = 2
+switch_gdd = true
+gdd_method = 3
+daily_total = ["thRZ_Act", "CC"]
+year_max = ["Y"]
+# PlantingDate = [[121,125,129,133,137]]
+# HarvestDate = [[304,308,312,316,320]]
+
+[IRRIGATION_MANAGEMENT]
+irrigationManagementNC = ""
+irrigationScheduleNC = ""
+
+[FIELD_MANAGEMENT]
+fieldManagementNC = ""
+
+[SOIL_PROFILE]
+dzLayer = [0.1,0.25,0.65,1.3]
+dzComp = [0.1,0.1,0.1,0.15,0.15,0.2,0.2,0.25,0.25,0.25,0.25,0.3]
+
+[SOIL_HYDRAULIC_PARAMETERS]
+calculateSoilHydraulicParametersFromSoilTexture = false
+soilHydraulicParametersNC = "../data/soil_hydraulic_parameters_pt.nc"
+saturatedHydraulicConductivityVarName = "k_sat"
+saturatedVolumetricWaterContentVarName = "th_sat"
+fieldCapacityVolumetricWaterContentVarName = "th_crit"
+wiltingPointVolumetricWaterContentVarName = "th_wilt"
+is_1d = true
+xy_dimname = "space"
+
+[SOIL_PARAMETERS]
+soilParametersNC = ""
+adjustReadilyAvailableWater = true # currently must be false
+adjustCurveNumber = true
+
+[REPORTING]
+formatNetCDF = "NETCDF4"
+zlib = true

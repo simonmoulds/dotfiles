@@ -1,0 +1,154 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import os
+import numpy as np
+import rasterio
+import csv
+import pkgutil
+
+from hydro_model_builder.ncConverter import np2netCDF
+from hydro_model_builder import VirtualOS as vos
+
+import variable_list as variable_list
+from get_data_smart import get_data_smart
+
+class SoilParameters(object):
+    def __init__(self, SoilParameters_variable):
+        self.var = SoilParameters_variable
+        self.var.SoilParameterOutputFile = vos.getFullPath(
+            self.var._configuration.soilParameterOptions['outputFile'],
+            self.var._configuration.globalOptions['outputDir'])
+        self.bbox = vos.get_clone_map_extent(self.var._configuration.cloneMap)
+        
+    def initial(self):
+        arr_zeros = np.zeros((2, self.var.nLat, self.var.nLon))
+        soil_parameters_with_depth = ['th_fc','th_wp','th_s','th_dry','ksat']
+        for param in soil_parameters_with_depth:
+            vars(self.var)[param] = arr_zeros.copy()
+            
+        arr_zeros = np.zeros((self.var.nLat, self.var.nLon))
+        soil_parameters_without_depth = [
+            'CN','CalcSHP','EvapZsurf','EvapZmin','EvapZmax','Kex',
+            'fevap','fWrelExp','fwcc','AdjREW','REW','AdjCN','zCN',
+            'zGerm','zRes','fshape_cr']
+        for param in soil_parameters_without_depth:
+            vars(self.var)[param] = arr_zeros.copy()
+        self.var.soil_parameters = soil_parameters_with_depth + soil_parameters_without_depth
+
+    def read_raster_data(self, filename):
+        vos.gdal_warp(
+            filename,
+            'tmp.tif',
+            self.bbox[0],
+            self.bbox[1],
+            self.bbox[2],
+            self.bbox[3])
+        r = rasterio.open('tmp.tif')
+        arr = r.read(masked=True)[0,...]
+        # mask = np.ma.getmask(arr)
+        # arr[mask] = 0.
+        # crop_area.append(arr)
+        os.remove('tmp.tif')
+        return arr
+
+    def read_field_capacity_data(self):
+        thfc0_filename = get_data_smart(
+            'gandak_data_model',
+            '../data/wcpf2_topsoil_gapfilled_5m.tif',
+            as_string=False)
+        
+        thfc1_filename = get_data_smart(
+            'gandak_data_model',
+            '../data/wcpf2_subsoil_gapfilled_5m.tif',
+            as_string=False)
+        thfc0 = self.read_raster_data(thfc0_filename)
+        thfc1 = self.read_raster_data(thfc1_filename)
+        self.var.th_fc = np.stack([thfc0, thfc1], axis=0)
+
+    def read_wilting_point_data(self):
+        thwp0_filename = get_data_smart(
+            'gandak_data_model',
+            '../data/wcpf4.2_topsoil_gapfilled_5m.tif',
+            as_string=False)
+        
+        thwp1_filename = get_data_smart(
+            'gandak_data_model',
+            '../data/wcpf4.2_subsoil_gapfilled_5m.tif',
+            as_string=False)
+        thwp0 = self.read_raster_data(thwp0_filename)
+        thwp1 = self.read_raster_data(thwp1_filename)
+        self.var.th_wp = np.stack([thwp0, thwp1], axis=0)
+
+    def read_saturated_water_content_data(self):
+        thsat0_filename = get_data_smart(
+            'gandak_data_model',
+            '../data/wcsat_topsoil_gapfilled_5m.tif',
+            as_string=False)
+        
+        thsat1_filename = get_data_smart(
+            'gandak_data_model',
+            '../data/wcsat_subsoil_gapfilled_5m.tif',
+            as_string=False)
+        thsat0 = self.read_raster_data(thsat0_filename)
+        thsat1 = self.read_raster_data(thsat1_filename)
+        self.var.th_s = np.stack([thsat0, thsat1], axis=0)
+
+    def read_residual_water_content_data(self):
+        thres0_filename = get_data_smart(
+            'gandak_data_model',
+            '../data/wcres_topsoil_gapfilled_5m.tif',
+            as_string=False)
+        
+        thres1_filename = get_data_smart(
+            'gandak_data_model',
+            '../data/wcres_subsoil_gapfilled_5m.tif',
+            as_string=False)
+        thres0 = self.read_raster_data(thres0_filename)
+        thres1 = self.read_raster_data(thres1_filename)
+        self.var.th_dry = np.stack([thres0, thres1], axis=0)
+
+    def read_saturated_hydraulic_conductivity_data(self):
+        ksat0_filename = get_data_smart(
+            'gandak_data_model',
+            '../data/ksat_topsoil_gapfilled_5m.tif',
+            as_string=False)
+        
+        ksat1_filename = get_data_smart(
+            'gandak_data_model',
+            '../data/ksat_subsoil_gapfilled_5m.tif',
+            as_string=False)
+        ksat0 = self.read_raster_data(ksat0_filename)
+        ksat1 = self.read_raster_data(ksat1_filename)
+        self.var.ksat = np.stack([ksat0, ksat1], axis=0)
+        
+    def dynamic(self):
+        self.read_field_capacity_data()
+        self.read_wilting_point_data()
+        self.read_saturated_water_content_data()
+        self.read_residual_water_content_data()
+        self.read_saturated_hydraulic_conductivity_data()
+
+        self.var.CN[:] = 50
+        self.var.CalcSHP[:] = 0
+        self.var.EvapZsurf[:] = 0.4
+        self.var.EvapZmin[:] = 0.15
+        self.var.EvapZmax[:] = 0.30
+        self.var.Kex[:] = 1.1
+        self.var.fevap[:] = 4.
+        self.var.fWrelExp[:] = 0.4
+        self.var.fwcc[:] = 50.
+        self.var.AdjREW[:] = 0.
+        self.var.REW[:] = 9.
+        self.var.zCN[:] = 0.3
+        self.var.zGerm[:] = 0.3
+        self.var.zRes[:] = -999
+        self.var.fshape_cr[:] = 16
+        
+        netcdf = np2netCDF(
+            self.var._configuration,
+            self.var.dimensions,
+            variable_list)        
+        netcdf.create_netCDF(self.var.SoilParameterOutputFile, self.var.soil_parameters)
+        for param in self.var.soil_parameters:        
+            netcdf.data2NetCDF(self.var.SoilParameterOutputFile, param, vars(self.var)[param])

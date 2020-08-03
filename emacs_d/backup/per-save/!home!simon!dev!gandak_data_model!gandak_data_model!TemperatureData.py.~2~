@@ -1,0 +1,103 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import os
+import numpy as np
+import datetime
+import scipy.interpolate as interpolate
+import pandas
+import rasterio
+import re
+
+from hydro_model_builder.ncConverter import np2netCDF
+from hydro_model_builder import VirtualOS as vos
+
+import variable_list as variable_list
+
+class TemperatureData(object):
+    def __init__(self, TemperatureData_variable):
+        self.var = TemperatureData_variable
+        self.var.TemperatureInputPath = (
+            self.var._configuration.globalOptions['inputDir'] 
+            + '/' + self.var._configuration.temperatureDataOptions['dataDir'])
+        sd = str(self.var._configuration.temperatureDataOptions['startDate'])
+        ed = str(self.var._configuration.temperatureDataOptions['endDate'])
+        self.var.TemperatureStartDate = datetime.datetime.strptime(sd, '%Y-%m-%d')
+        self.var.TemperatureEndDate = datetime.datetime.strptime(ed, '%Y-%m-%d')
+        self.var.TemperatureDataOutputFile = vos.getFullPath(
+            self.var._configuration.temperatureDataOptions['outputFile'],
+            self.var._configuration.globalOptions['outputDir'])
+        self.bbox = vos.get_clone_map_extent(self.var._configuration.cloneMap)
+        
+    def initial(self):
+        pass
+    
+    def dynamic(self):
+        netcdf = np2netCDF(
+            self.var._configuration,
+            self.var.dimensions,
+            variable_list)        
+        netcdf.create_netCDF(self.var.TemperatureDataOutputFile, ['Tmin','Tmax'])
+
+        # Tmin
+        # ####        
+        pattern = re.compile('TMIN[0-9]{4}\.[0-9]{3}')
+        dt = self.var.TemperatureStartDate
+        step = datetime.timedelta(days=1)
+
+        # Step through data, writing time and data to NetCDF
+        for root, dirs, files in os.walk(self.var.TemperatureInputPath):
+            dirs.sort()
+            files.sort()
+            for f in files:
+                if re.match(pattern,f):
+                    tmn_path = os.path.join(root,f)
+                    print tmn_path
+                    vos.gdal_warp(
+                        tmn_path,
+                        'tmp_tmin_data.tif',
+                        self.bbox[0],
+                        self.bbox[1],
+                        self.bbox[2],
+                        self.bbox[3])
+                    r = rasterio.open('tmp_tmin_data.tif')
+                    arr = r.read(masked=True)[0,...]
+                    arr -= 273.15 # Kelvin -> degC 
+                    # TODO: deal with nodata values properly
+                    # mask = np.ma.getmask(arr)
+                    # arr[mask] = 0.
+                    netcdf.data2NetCDF(self.var.TemperatureDataOutputFile, 'Tmin', arr, dt)
+                    os.remove('tmp_tmin_data.tif')
+                    dt += step
+
+        # Tmax
+        # ####        
+        pattern = re.compile('TMAX[0-9]{4}\.[0-9]{3}')
+        dt = self.var.TemperatureStartDate
+        step = datetime.timedelta(days=1)
+
+        # Step through data, writing time and data to NetCDF
+        for root, dirs, files in os.walk(self.var.TemperatureInputPath):
+            dirs.sort()
+            files.sort()
+            for f in files:
+                if re.match(pattern,f):
+                    tmn_path = os.path.join(root,f)
+                    print tmn_path
+                    vos.gdal_warp(
+                        tmn_path,
+                        'tmp_tmax_data.tif',
+                        self.bbox[0],
+                        self.bbox[1],
+                        self.bbox[2],
+                        self.bbox[3])
+                    r = rasterio.open('tmp_tmax_data.tif')
+                    arr = r.read(masked=True)[0,...]
+                    arr -= 273.15 # Kelvin -> degC 
+                    # TODO: deal with nodata values properly
+                    # mask = np.ma.getmask(arr)
+                    # arr[mask] = 0.
+                    netcdf.data2NetCDF(self.var.TemperatureDataOutputFile, 'Tmax', arr, dt)
+                    os.remove('tmp_tmax_data.tif')
+                    dt += step
+                    

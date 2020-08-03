@@ -1,0 +1,34 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import netCDF4 as nc
+import rasterio
+import numpy as np
+
+# soil properties:
+# ################
+
+# b      : exponent in soil hydraulic characteristics
+# sathh  : 
+# satcon : saturated hydraulic conductivity
+# sm_sat : saturated water content
+# sm_crit: critical water content (field capacity)
+# sm_wilt: wilting point
+# hcap   : dry heat capacity
+# hcon   : dry thermal conductivity
+# albsoil: soil albedo
+
+datadir = '../data'
+res = '0pt25degree'
+region = 'ssa'
+method = 'cosby'
+nlayer = 4
+outdir = '../data'
+
+clone_map = rasterio.open(
+    os.path.join(
+        datadir,
+        'theta_sat_cosby_ssa_layer1_0pt25degree.tif'
+    )    
+)
+

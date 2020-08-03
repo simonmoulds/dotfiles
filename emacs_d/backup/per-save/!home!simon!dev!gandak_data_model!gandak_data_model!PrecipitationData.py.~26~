@@ -1,0 +1,63 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import os
+import numpy as np
+import datetime
+import scipy.interpolate as interpolate
+import pandas
+import rasterio
+import re
+import glob
+
+from hydro_model_builder.ncConverter import np2netCDF
+from hydro_model_builder import VirtualOS as vos
+
+import variable_list as variable_list
+from utils import *
+
+class PrecipitationData(object):
+    def __init__(self, PrecipitationData_variable):
+        self.var = PrecipitationData_variable
+        # self.var.PrecipitationInputPath = (
+        #     self.var._configuration.globalOptions['inputDir'] 
+        #     + '/' + self.var._configuration.precipitationDataOptions['dataDir'])
+        sd = str(self.var._configuration.precipitationDataOptions['startDate'])
+        ed = str(self.var._configuration.precipitationDataOptions['endDate'])
+        self.var.PrecipitationStartDate = datetime.datetime.strptime(sd, '%Y-%m-%d')
+        self.var.PrecipitationEndDate = datetime.datetime.strptime(ed, '%Y-%m-%d')
+        self.var.PrecipitationDataOutputFile = vos.getFullPath(
+            self.var._configuration.precipitationDataOptions['outputFile'],
+            self.var._configuration.globalOptions['outputDir'])
+        self.bbox = vos.get_clone_map_extent(self.var._configuration.cloneMap)
+        
+    def initial(self):
+        pass
+
+    def dynamic(self):
+        self.var.PrecipitationInputPath = get_data_smart(
+            'gandak_data_model',
+            '../data',
+            as_string=False)# /output_prec/Rainfall',
+            # as_string=False)
+        ptn = self.var.PrecipitationInputPath + '/IMD_GRIDDED_RF_DATA_PT5_MERGED_*.nc'
+        prec_fs = glob.glob(ptn)
+        print type(prec_fs)
+        for f in prec_fs:
+            print f
+            os.system('cp ' + f + ' ' + self.var.outputDir)
+            
+        # netcdf = np2netCDF(self.var._configuration, self.var.dimensions, variable_list)
+        # netcdf.create_netCDF(self.var.PrecipitationDataOutputFile, 'precipitation')
+        # pattern = re.compile('EX2[0-9]{5}\.[0-9]{3}')
+        # dt = self.var.PrecipitationStartDate
+        # step = datetime.timedelta(days=1)
+        # for root, dirs, files in os.walk(self.var.PrecipitationInputPath):
+        #     dirs.sort()
+        #     files.sort()
+        #     for f in files:
+        #         if re.match(pattern,f):
+        #             prc_path = os.path.join(root,f)
+        #             arr = read_gdal_raster_image(prc_path, self.bbox, 0)
+        #             netcdf.data2NetCDF(self.var.PrecipitationDataOutputFile, 'precipitation', arr, dt)
+        #             dt += step

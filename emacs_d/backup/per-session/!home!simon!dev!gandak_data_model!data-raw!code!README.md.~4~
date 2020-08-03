@@ -1,0 +1,14 @@
+# process_hihydrosoil.sh
+Processes soil input data, model region and landmask
+
+# get_price_data.R
+Gets price data for crops, fertiliser and diesel
+
+# get_gcwm_data.R
+Gets crop parameters used in the Global Crop Water Model
+
+# process_cropland_map.R
+Processes IIASA-IFPRI cropland map
+
+# compute_canal_access.R
+Computes canal access (currently a binary map with 1=access, 0=no access)

@@ -1,0 +1,39 @@
+From: Simon Moulds <simon.moulds@imperial.ac.uk>
+To: juan carlos sulca jota <sulcaf5@gmail.com>
+Cc: "Buytaert, Wouter" <w.buytaert@imperial.ac.uk>
+Subject: Re: help to copy a folder in my directory
+Fcc: /home/simon/mail/ic/Sent Items/cur/1556556389.8b95f53c62d0d42b.yamunotri:2,S
+Date: Mon, 29 Apr 2019 17:46:29 +0100
+Message-ID: <878svsrc7u.fsf@yamunotri.localdomain>
+References: <CAEn62f4a09gDnp_OnadpxGU81fW4UuHm2zOK9etHzjNK_t3qWw@mail.gmail.com>
+User-agent: mu4e 1.0-alpha2; emacs 24.5.1
+In-reply-to: <CAEn62f4a09gDnp_OnadpxGU81fW4UuHm2zOK9etHzjNK_t3qWw@mail.gmail.com>
+
+Hi Juan,
+
+Thanks for your email. I've copied the directory JULES_Andes to /home/jsulca/MODELS, as requested.
+
+I've done this on cv-hydro1 but I think it should also be accessible on cv-hydro2. 
+
+Let me know if there is any problem. I think Charles may be help you to run the model, if needed.
+
+Cheers,
+Simon
+
+juan carlos sulca jota writes:
+
+> Hi Simon
+>
+> I hope that you has a great weekened.
+>
+> I am writing due to Wouter told me that you could help me with the copy of
+> the folder "JULES_Andes" (/mnt/data/scratch/JULES_Andes) to my directory
+> (home/jsulca/MODELS). It is due to I plan to run the JULES for the central
+> Peruvian Andes.
+>
+> I would grateful if you could do that as soon as possible.
+>
+> Regards
+>
+> Juan Sulca
+

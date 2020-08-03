@@ -1,0 +1,26 @@
+## Author : Simon Moulds
+## Date   : Nov 2018
+
+library(raster)
+
+rgn = raster("input/Gandak30min.landmask.map")
+
+## startTime = 2000-01-01
+
+## dstools
+r1 = raster("input/output_evap/HG000000.001")
+## r1 = crop(r1, rgn)
+
+## etref
+r2 = raster("output/netcdf/ETref_PriestleyTaylor_dailyTot_output.nc", layer=1)
+
+plot(stack(r1,r2))
+
+s2 = stack("input/Tair_WFDEI/Tair_WFDEI_200001.nc")[[1:8]]
+s2 = crop(s2, rgn)
+r2 = stackApply(s2, indices=rep(1,8), fun=max)
+plot(stack(r1,r2))
+
+## dem = raster("DEM-WRR1.tif")
+## dem = crop(dem, rgn)
+## writeRaster(dem, "DEM-WRR1_Gandak.tif", overwrite=TRUE)

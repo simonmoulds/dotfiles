@@ -1,0 +1,67 @@
+* Sushi-Wat
+** Downscaling tools, to deal with uncertainty - historical, extend to RCP
+** Significant decrease in glacier volume/area
+** Develop improved operational practices for water management infrastructure to deal with changing seasonality 
+** Crop water stress index?
+** Compatibility between RCP/SSP
+** Systems modelling (WEAP) in NW India
+** WR systems model - integrate hydrology, water users, water management infrastructure, water policies
+** Considers baseflow - how?
+** Irrigation - crop yield? FAO56, I think
+** Soil moisture method for irrigation (MABIA method?)
+
+* UPSCAPE
+** Changing land use, changing climate
+** Small-scale interventions to manage water locally
+** Rural catchment hydrology - what effect do local interventions have on the basin as a whole?
+** Rural catchment processes: SWAT, DiCaSM (why two?)
+** Hydrology Cascade Model and URBMOD for urban hydrology
+** VIC
+** GWAVA - incorporates water uses (coupled with AMBHAS)
+
+* Breakout groups - notes from CHANSE group
+
+** Focus on MODELLING PROCESSES
+** Summarise modelling challenges
+** Are these challenges shared across other projects
+** What are the top three modelling challenges
+** Options/solutions/opportunities
+
+* Climate change: three main challenges
+** Dealing with emission and model uncertainty
+*** Use simple 'delta' method to analyse wide range of models and scenarios
+*** Use 'best' and 'worst' case scenarios
+*** Downscaling using RCM, but this is very computationally expensive
+
+** Commonality between projects
+*** Sample the same RCPs
+*** Share the subset of GCMs used by each project
+*** SW and CHANSE use RCM
+*** Mid-century [2031-2050], end of century [2081-2100]
+*** Check available downscaled output (IITM, Cordex)
+
+** Climate interactions, e.g. land use, glacier/snowpack
+
+* Socioeconomic scenarios
+** Lots of questions, not too many answers
+** Top 3:
+*** Sensitivity of socioeconomic variables w.r.t. water resources
+*** ...
+
+** Food security is common
+** More contact between those working on these scenarios
+
+* [Ian Holman]
+** All projects based on RCP/SSP framework
+** Valuable to the program to have commonality
+** Common time period (2030-2050; i.e. medium term)
+** Common scenarios (SSP1-RCP4.5, SSP1-RCP8.5 - India progresses along a sustainable pathway, but the rest of the world does not)
+** SSP1 is consistent with several of India's stated objectives (esp. Paris)
+** Socioeconomic context is not at a single scale - transbasin, transnational links
+** Framing of scenarios should have a positive message?
+
+SSP5, SSP3 -> high challenges for mitigation, but reasons are very different:
+SSP5: locked-in to fossil fuels, which means that it becomes very expensive to mitigate -> easier to 'sell', because it is fundamentally positive
+SSP3: stagnating economy, poorly educated society -> very difficult to 'sell' to stakeholders as it is so negative
+
+

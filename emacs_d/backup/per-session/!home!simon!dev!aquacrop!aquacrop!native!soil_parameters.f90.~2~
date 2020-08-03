@@ -1,0 +1,8 @@
+module soil_parameters
+  use types
+  implicit none
+
+  real(real64), parameter :: zero = 0.0d0
+  
+contains
+  

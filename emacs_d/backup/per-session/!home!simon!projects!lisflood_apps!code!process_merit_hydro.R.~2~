@@ -1,0 +1,31 @@
+## Author : Simon Moulds
+## Date   : March 2020
+
+library(raster)
+library(rgdal)
+
+datadir = "/data/MERIT_Hydro/glb_15min"
+fs = list.files(datadir, pattern="*.ctl$", full.names=TRUE)
+for (i in 1:length(fs)) {
+    fn = fs[i]
+    ncfn = gsub("ctl$","nc", fn)
+    tiffn = gsub("ctl$","tif", fn)
+    cmd1 = paste0("cdo -f nc import_binary ", fn, " ", ncfn)
+    cmd2 = paste0("gdal_translate ", ncfn, " ", tiffn)
+    system(cmd1)
+    system(cmd2)
+}
+
+r = raster(file.path(datadir, "rivlen_grid.tif"))
+rv = getValues(r)
+ix = !is.na(rv)
+rv = rv[ix]
+ar = area(r)
+arv = getValues(ar)[ix]
+max(rv)
+
+pts = as(r, "SpatialPointsDataFrame")
+ordr = order(rv, decreasing=TRUE)
+writeOGR(pts[ordr[1:1000],], "pts", layer="pts.shp", driver="ESRI Shapefile")
+
+r = raster(file.path(datadir, "nxtdst.tif"))

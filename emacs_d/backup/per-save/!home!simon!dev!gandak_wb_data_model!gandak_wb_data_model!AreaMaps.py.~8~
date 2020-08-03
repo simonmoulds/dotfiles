@@ -1,0 +1,47 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import os
+import shutil
+import numpy as np
+import rasterio
+
+from ncConverter import np2netCDF
+from hydro_model_builder import VirtualOS as vos
+
+import variable_list as variable_list
+from utils import *
+
+class AreaMaps(object):    
+    def __init__(self, AreaMaps_variable):
+        self.var = AreaMaps_variable
+        self.var.AreaMapsOutputPath = str(
+            self.var._configuration.MASK_OUTLET['areaMapsPathOut'])
+        self.bbox = vos.get_clone_map_extent(self.var._configuration.cloneMap)
+
+    def initial(self):
+        pass
+
+    def dynamic(self):
+        # grid_cell_area_filename = get_data_smart(
+        #     'gandak_wb_data_model',
+        #     '../data/gandak_grid_cell_area.tif',
+        #     as_string = False)
+        grid_cell_area_filename = str(
+            self.var._configuration.MASK_OUTLET['gridCellArea'])
+        self.var.grid_cell_area = read_gdal_raster_image(
+            grid_cell_area_filename,
+            self.bbox,
+            0)
+
+        shutil.copy(
+            str(self.var._configuration.MASK_OUTLET['cloneMap']),
+            self.var.AreaMapsOutputPath)
+        
+        shutil.copy(
+            str(self.var._configuration.MASK_OUTLET['landmask']),
+            self.var.AreaMapsOutputPath)
+        
+        # shutil.copyfile(
+        #     grid_cell_area_filename,
+        #     self.var.AreaMapsOutputPath)

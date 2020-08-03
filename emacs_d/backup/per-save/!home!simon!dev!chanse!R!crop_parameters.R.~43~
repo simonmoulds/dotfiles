@@ -1,0 +1,86 @@
+## Author : Simon Moulds
+## Date   : May 2020
+
+_expand_parameter = function(n, param) {
+    if (length(param) == n) {
+        return(param)
+    } else if (length(param) == 1) {
+        return(rep(param, n))
+    } else {
+        stop()
+    }
+}
+
+initial_condition = function(root_zone_depletion,
+                             groundwater_head) {
+    
+    x = list(
+        root_zone_depletion = root_zone_depletion,
+        groundwater_head = groundwater_head
+    )
+    structure(x, class="initial_condition")
+}
+
+hydrological_parameters = function(n_farm,
+                                   field_capacity,
+                                   wilting_point,
+                                   specific_yield,
+                                   runoff_coefficient,
+                                   evaporation_coefficient,
+                                   canal_volume,
+                                   canal_leakage_rate) {
+    
+    x = list(
+        field_capacity = _expand_parameter(n_farm, field_capacity),
+        wilting_point = _expand_parameter(n_farm, wilting_point),
+        specific_yield = _expand_parameter(n_farm, specific_yield),
+        runoff_coefficient = _expand_parameter(n_farm, runoff_coefficient),
+        evaporation_coefficient = _expand_parameter(n_farm, evaporation_coefficient),
+        canal_volume = _expand_parameter(n_farm, canal_volume),
+        canal_leakage_rate = _expand_parameter(n_farm, canal_leakage_rate)
+    )
+    structure(x, class="hydrological_parameters")
+}
+
+farm_parameters = function(n_farm,
+                           area,
+                           initial_category,
+                           irrigation_efficiency,                           
+                           ...) {
+    x = list(
+        area = _expand_parameter(n_farm, area),
+        initial_category = _expand_parameter(n_farm, initial_category),
+        irrigation_efficiency = _expand_parameter(n_farm, irrigation_efficiency)
+    )
+    structure(x, class="farm_parameters")
+}
+
+crop_parameters = function(n_crop,
+                           L_ini,
+                           L_dev,
+                           L_mid,
+                           L_late,
+                           Kc_ini,
+                           Kc_mid,
+                           Kc_end,
+                           rd) {
+    x = list(
+        L_ini = _expand_parameter(n_crop, L_ini),
+        L_dev = _expand_parameter(n_crop, L_dev),
+        L_mid = _expand_parameter(n_crop, L_mid),
+        L_late = _expand_parameter(n_crop, L_late),
+        Kc_ini = _expand_parameter(n_crop, Kc_ini),
+        Kc_mid = _expand_parameter(n_crop, Kc_mid),
+        Kc_end = _expand_parameter(n_crop, Kc_end),
+        rd = _expand_parameter(n_crop, rd)
+    )
+    structure(x, class="crop_parameters")
+}                           
+
+irrigation_schedule = function(n_crop, schedule, depth) {
+    x = list(
+        schedule = schedule,
+        depth = depth
+    )
+    structure(x, class="irrigation_schedule")
+}

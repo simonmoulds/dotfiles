@@ -1,0 +1,384 @@
+References: <AM0PR0602MB33640563C3158721D773D9D6DA110@AM0PR0602MB3364.eurprd06.prod.outlook.com> <87k1wpvk03.fsf@yamunotri.localdomain> <AM0PR0602MB33645BBC46CEC2E4433F1D09DA110@AM0PR0602MB3364.eurprd06.prod.outlook.com> <87fu7dvgpq.fsf@yamunotri.localdomain> <AM0PR0602MB3364571636D915B989A0DE06DA110@AM0PR0602MB3364.eurprd06.prod.outlook.com> <87efmxvg49.fsf@yamunotri.localdomain> <AM0PR0602MB33649C0AB54539B74EF70C05DA110@AM0PR0602MB3364.eurprd06.prod.outlook.com> <876088vhjw.fsf@yamunotri.localdomain> <107F6F61-EA29-4149-A8A7-10DC80A0DAA6@imperial.ac.uk> <87y3kjqr1l.fsf@yamunotri.localdomain> <CDBED612-6564-43E9-A246-5528C6FE862F@ic.ac.uk> <87mv0wk2xn.fsf@yamunotri.localdomain> <8EFF7477-3E56-468D-B2A8-78B1A0A7B017@ic.ac.uk> <87lgggk2rr.fsf@yamunotri.localdomain> <29C04401-E51F-4770-82F5-CB4CE1347C50@ic.ac.uk> <87607itjrj.fsf@yamunotri.localdomain> <VI1PR0602MB3375916C5376771157B23884DAFB0@VI1PR0602MB3375.eurprd06.prod.outlook.com> <87372mthsc.fsf@yamunotri.localdomain> <AM0PR0602MB 3364F11E8CE2F2B4BFB5B61BDAF90@AM0PR0602MB3364.eurprd06.prod.outlook.com> <87vafa6vyc.fsf@yamunotri.localdomain> <AM0PR0602MB3364D9C2FCDBFBCE8141A5BCDAFD0@AM0PR0602MB3364.eurprd06.prod.outlook.com>
+User-agent: mu4e 1.0-alpha2; emacs 24.5.1
+From: Simon Moulds <s.moulds@exeter.ac.uk>
+To: "Zogheib, Charles" <charles.zogheib12@imperial.ac.uk>
+Cc: Simon Moulds <S.Moulds@exeter.ac.uk>, "Ochoa Tocachi, Boris F" <boris.ochoa13@imperial.ac.uk>
+Subject: Re: Demand paper update
+In-reply-to: <AM0PR0602MB3364D9C2FCDBFBCE8141A5BCDAFD0@AM0PR0602MB3364.eurprd06.prod.outlook.com>
+
+Not necessarily...
+
+MapSPAM uses quite a similar method to the one I outlined below. The
+accuracy largely depends on the level of the inventory data (country
+level being the least accurate, then state, then district etc.).
+
+Perhaps a first step would be to investigate MapSPAM a bit further and
+find out the level of inventory data they use for the countries we are
+studying. In India, for example, the MapSPAM quantities match up quite
+well at the district level, but I'm not sure about South America.
+
+We could also downscale MapSPAM further using the ESA land cover map and
+any other global remote sensing products which include irrigated
+area.
+
+Cheers,
+Simon
+
+P.s. I'm visiting IC next Thursday (15 Feb), so we could talk in more
+detail then, if you like.
+
+Zogheib, Charles writes:
+
+> And you think we would get much better results than MapSPAM?
+>
+> -----Original Message-----
+> From: Simon Moulds [mailto:S.Moulds@exeter.ac.uk] 
+> Sent: Tuesday, February 6, 2018 2:21 PM
+> To: Zogheib, Charles <charles.zogheib12@imperial.ac.uk>
+> Cc: Simon Moulds <S.Moulds@exeter.ac.uk>; Ochoa Tocachi, Boris F <boris.ochoa13@imperial.ac.uk>
+> Subject: Re: Demand paper update
+>
+> Well, probably a couple of weeks for Peru because if I remember correctly I found the data quite quickly. On the other hand I've done something similar for India which took several months because of the data availability/quality. So - if we can get the required inventory data for all the countries we are considering (NB there is no guarantee that this data exists in the public domain, apart from at the national level through AQUASTAT), then it shouldn't take too long to carry out the spatial disaggregation. However, data collection + quality control could take a long time.
+>
+> S
+>
+> Zogheib, Charles writes:
+>
+>> Hi Simon,
+>>
+>> Just to get an idea, how long did you need to do the Peru map? I'm thinking that we are going to have to do it for the paper to make any sense... Getting demand estimates using the routine and MapSPAM just doesn't seem enough.
+>>
+>> Cheers,
+>>
+>> Charles
+>>
+>> -----Original Message-----
+>> From: Simon Moulds [mailto:S.Moulds@exeter.ac.uk]
+>> Sent: Tuesday, February 6, 2018 10:47 AM
+>> To: Zogheib, Charles <charles.zogheib12@imperial.ac.uk>
+>> Cc: Ochoa Tocachi, Boris F <boris.ochoa13@imperial.ac.uk>
+>> Subject: Re: Demand paper update
+>>
+>> Hi Charles,
+>>
+>> That sounds like a sensible approach to allocate domestic demand. I remember that being a boring and time consuming task - hopefully you can reuse to some extent the polygons I developed.
+>>
+>> I agree that a unique irrigation demand dataset would be a great 
+>> addition to the work. It may even be a paper in its own right - 
+>> especially if supplied to a regional hydrological model to estimate 
+>> water demand. I do not have time to do the necessary data collection 
+>> but I would be happy to help coordinate the efforts and develop the 
+>> methodology, if you wish. The most important input is inventory data 
+>> about irrigated area of various crops. I believe that AQUASTAT has 
+>> national-level inventory data, but ideally we would like district (or
+>> equivalent) level or below. We would then run an optimisation routine to spatially allocate the irrigated area to grid cells with irrigation (local maps where possible, defaulting to a global map (e.g. ESA) where necessary).
+>>
+>> There is quite a lot of work here so you must decide whether it is worth it - from the perspective of the paper and your PhD!
+>>
+>> Cheers,
+>> Simon
+>>
+>> Zogheib, Charles writes:
+>>
+>>> Hi Simon,
+>>>
+>>> From the perspective of having the most added-value on the irrigation water demand front, we thought that other than simply running the allocation routine on the MapSPAM, our 'competitive edge’ lies in the amount and quality of data we have for the region. Therefore developing maps like the one you did for Peru could be very helpful. Let me know what you think.
+>>>
+>>> Also, on the domestic demand front, we are 1) masking out large cities just like in the glaciers paper and getting the abstraction points, 2) allocating the population officially listed as dependent on other abstraction points and 3) using connectivity statistics and perhaps a distance “cutoff” number (AQUASTAT, I’m looking into this) to try and account for people not using the formal network. 
+>>>
+>>> Cheers,
+>>>
+>>> Charles
+>>>
+>>>> On 3 Feb 2018, at 10:35, Simon Moulds <S.Moulds@exeter.ac.uk> wrote:
+>>>> 
+>>>> Hi Charles,
+>>>> 
+>>>> If I remember correctly, I got district-level agricultural 
+>>>> statistics and a map of agricultural areas (I think this was from 
+>>>> Carolina - Wouter's wife) and then used GIS to assign statistics to 
+>>>> the agricultural areas.
+>>>> 
+>>>> This is actually not too dissimilar from the MapSPAM methodology, 
+>>>> but I don't know the administrative level (e.g. country, state,
+>>>> district...) of the statistics they use. Obviously the smaller the 
+>>>> administrative unit the better.
+>>>> 
+>>>> We could also look at the most recent remote sensing products to see 
+>>>> how well they detect irrigated agricultural land. There is a new ESA 
+>>>> product which includes irrigated land 
+>>>> (http://maps.elie.ucl.ac.be/CCI/viewer/index.php).
+>>>> 
+>>>> My son has just woken up from his nap so I must go but happy to talk 
+>>>> more about this - let me know your thoughts.
+>>>> 
+>>>> Cheers,
+>>>> Simon
+>>>> 
+>>>> Zogheib, Charles writes:
+>>>> 
+>>>>> Oh I think I know what map he's talking about actually! Yes it's somewhere on the server. I'll have a look. It's also a irrigated km2/pixel. How did you make that? Did you start from MapSPAM? Because it might be more interesting to actually build a similar map for Chile, Bolivia and Ecuador, apart from running the r.watersupply routine which I did. Do you think such maps would be a substantial improvements on MapSPAM?
+>>>>> 
+>>>>> Cheers,
+>>>>> 
+>>>>> Charles
+>>>>> 
+>>>>> -----Original Message-----
+>>>>> From: Simon Moulds [mailto:S.Moulds@exeter.ac.uk]
+>>>>> Sent: Friday, February 2, 2018 4:49 PM
+>>>>> To: Zogheib, Charles <charles.zogheib12@imperial.ac.uk>
+>>>>> Cc: Simon Moulds <S.Moulds@exeter.ac.uk>; Ochoa Tocachi, Boris F 
+>>>>> <boris.ochoa13@imperial.ac.uk>
+>>>>> Subject: Re: Demand paper update
+>>>>> 
+>>>>> Hi Charles,
+>>>>> 
+>>>>> Ah, sorry - I didn't realise you needed all of Chile. I'll send you the map for the entire South America.
+>>>>> 
+>>>>> Yes, Wouter is right but I think I only did that for Peru. Also that was a few laptops ago and I'm not exactly sure where it's ended up. Wouter would presumably have the map itself because he would have used it for the ERL paper. It may also be somewhere on the server - I'll take a look.
+>>>>> 
+>>>>> Cheers,
+>>>>> Simon
+>>>>> 
+>>>>> Zogheib, Charles writes:
+>>>>> 
+>>>>>> Hi Simon,
+>>>>>> 
+>>>>>> I've run the map through the algorithm but it seems that I don't have all of Chile. I guess I can just adjust the bounding box in the R script? Also, Wouter was mentioning today that you had also created some irrigated area maps for the glaciers paper based on multiple sources: census data, disaggregation of national and district level data... I'm not exactly sure what he was mentioning. Because then we could publish that along with a quality control map (e.g. confidence in estimate/pixel or variance in estimate/pixel). Any idea?
+>>>>>> 
+>>>>>> Cheers,
+>>>>>> 
+>>>>>> Charles
+>>>>>> 
+>>>>>> -----Original Message-----
+>>>>>> From: Simon Moulds [mailto:S.Moulds@exeter.ac.uk]
+>>>>>> Sent: Wednesday, January 31, 2018 11:00 AM
+>>>>>> To: Zogheib, Charles <charles.zogheib12@imperial.ac.uk>
+>>>>>> Subject: Re: Demand paper update
+>>>>>> 
+>>>>>> OK, cheers.
+>>>>>> 
+>>>>>> Sorry, I should have said in my first email that you don't actually need to run the script - the map is already in the directory. It's just in case you want to see how it was created.
+>>>>>> 
+>>>>>> S
+>>>>>> 
+>>>>>> Zogheib, Charles writes:
+>>>>>> 
+>>>>>>> Hi Simon,
+>>>>>>> 
+>>>>>>> Thanks a lot. I'll let you know.
+>>>>>>> 
+>>>>>>> Cheers,
+>>>>>>> 
+>>>>>>> Charles
+>>>>>>> 
+>>>>>>> -----Original Message-----
+>>>>>>> From: Simon Moulds [mailto:S.Moulds@exeter.ac.uk]
+>>>>>>> Sent: Wednesday, January 31, 2018 10:17 AM
+>>>>>>> To: Zogheib, Charles <charles.zogheib12@imperial.ac.uk>
+>>>>>>> Subject: Re: Demand paper update
+>>>>>>> 
+>>>>>>> Hi Charles,
+>>>>>>> 
+>>>>>>> I've just sent you a tarball by Exeter Drop Box containing an irrigated area map for the Andes region. The map you need is data/andes_irrigated_area_2005_mapspam.tif. The script to obtain the map is code/process_mapspam_data.R. Run this from the root directory (i.e. andes_irrigated_area/) (NB will only run on Unix systems).
+>>>>>>> 
+>>>>>>> I wouldn't be surprised if we need a few iterations to get it exactly how you require, so don't hesitate to get in touch if anything needs changing.
+>>>>>>> 
+>>>>>>> Cheers,
+>>>>>>> Simon
+>>>>>>> 
+>>>>>>> Zogheib, Charles writes:
+>>>>>>> 
+>>>>>>>> Thanks!
+>>>>>>>> 
+>>>>>>>>> On 29 Jan 2018, at 17:12, Simon Moulds <S.Moulds@exeter.ac.uk> wrote:
+>>>>>>>>> 
+>>>>>>>>> Fine - I'll get it to you in the next couple of days.
+>>>>>>>>> 
+>>>>>>>>> Cheers,
+>>>>>>>>> Simon
+>>>>>>>>> 
+>>>>>>>>> Zogheib, Charles writes:
+>>>>>>>>> 
+>>>>>>>>>> Well let’s start with an annual area. It’s easier to validate since the actual data we have is annual anyway.
+>>>>>>>>>> 
+>>>>>>>>>> Cheers,
+>>>>>>>>>> 
+>>>>>>>>>> Charles
+>>>>>>>>>> 
+>>>>>>>>>>> On 29 Jan 2018, at 17:08, Simon Moulds <S.Moulds@exeter.ac.uk> wrote:
+>>>>>>>>>>> 
+>>>>>>>>>>> Yep, that's great - no problem. That's obviously easier than 
+>>>>>>>>>>> calculating water requirements. Last question - do you need 
+>>>>>>>>>>> an annual area or monthly area. I know we discussed using the
+>>>>>>>>>>> MIRCA2000 crop calendars but I don't think we came to a final decision.
+>>>>>>>>>>> 
+>>>>>>>>>>> Cheers,
+>>>>>>>>>>> Simon
+>>>>>>>>>>> 
+>>>>>>>>>>> Zogheib, Charles writes:
+>>>>>>>>>>> 
+>>>>>>>>>>>> Hi Simon,
+>>>>>>>>>>>> 
+>>>>>>>>>>>> What I need is effectively irrigated km2 per pixel. I will run these maps through the r.watersupply algorithm. Does that make sense?
+>>>>>>>>>>>> 
+>>>>>>>>>>>> Many thanks,
+>>>>>>>>>>>> 
+>>>>>>>>>>>> Charles
+>>>>>>>>>>>> 
+>>>>>>>>>>>>> On 27 Jan 2018, at 15:07, Simon Moulds <S.Moulds@exeter.ac.uk> wrote:
+>>>>>>>>>>>>> 
+>>>>>>>>>>>>> Hi Charles,
+>>>>>>>>>>>>> 
+>>>>>>>>>>>>> Yes, indeed. As discussed below I will soon be able to 
+>>>>>>>>>>>>> provide irrigated area maps for the continent. However, I'm 
+>>>>>>>>>>>>> confused about what you ultimately require - irrigated area or irrigation water demand?
+>>>>>>>>>>>>> Obviously the latter is more work because we would need to 
+>>>>>>>>>>>>> put the data through some sort of hydrological model. Let 
+>>>>>>>>>>>>> me know and we can discuss the options, if necessary.
+>>>>>>>>>>>>> 
+>>>>>>>>>>>>> Cheers,
+>>>>>>>>>>>>> Simon
+>>>>>>>>>>>>> 
+>>>>>>>>>>>>> Zogheib, Charles writes:
+>>>>>>>>>>>>> 
+>>>>>>>>>>>>>> Hi Simon,
+>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>> Were you able to make some progress on this?
+>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>> Many thanks,
+>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>> Charles
+>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>> On 11 Jan 2018, at 10:03, Simon Moulds <S.Moulds@exeter.ac.uk> wrote:
+>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>> Hi Charles,
+>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>> Quick question - have you established a lat/long bounding 
+>>>>>>>>>>>>>>> box for the study area? I guess this will probably 
+>>>>>>>>>>>>>>> correspond with the GRASS region you're using for the allocation routine...
+>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>> Thanks,
+>>>>>>>>>>>>>>> Simon
+>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>> Zogheib, Charles writes:
+>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>>> That's fine then. Thanks a lot.
+>>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>>> Cheers,
+>>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>>> Charles
+>>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>>> -----Original Message-----
+>>>>>>>>>>>>>>>> From: Simon Moulds [mailto:S.Moulds@exeter.ac.uk]
+>>>>>>>>>>>>>>>> Sent: Wednesday, January 10, 2018 4:22 PM
+>>>>>>>>>>>>>>>> To: Zogheib, Charles <charles.zogheib12@imperial.ac.uk>
+>>>>>>>>>>>>>>>> Subject: Re: Demand paper update
+>>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>>> The advantage of MIRCA2000 is that it gives monthly irrigated areas, so you get some idea of the intraannual temporal variability. On the other hand the spatial disaggregation algorithm they use is quite simplistic. I guess my preference would be to use MapSPAM - I think it's a better product overall. We can always use the crop calendars from MIRCA to temporally disaggregate the MapSPAM product.
+>>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>>> I can do it but I may not turn it around before the end of January - how does this fit with your schedule?
+>>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>>> Cheers,
+>>>>>>>>>>>>>>>> Simon
+>>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>>> Zogheib, Charles writes:
+>>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>>>> You're right I'm not sure what I was looking at. Is there one that would work "better" with the allocation algorithm? That's all we need really. That would be great but if you're very busy I could try.
+>>>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>>>> Cheers,
+>>>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>>>> Charles
+>>>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>>>> -----Original Message-----
+>>>>>>>>>>>>>>>>> From: Simon Moulds [mailto:S.Moulds@exeter.ac.uk]
+>>>>>>>>>>>>>>>>> Sent: Wednesday, January 10, 2018 4:09 PM
+>>>>>>>>>>>>>>>>> To: Zogheib, Charles <charles.zogheib12@imperial.ac.uk>
+>>>>>>>>>>>>>>>>> Cc: Simon Moulds <S.Moulds@exeter.ac.uk>; Ochoa 
+>>>>>>>>>>>>>>>>> Tocachi, Boris F <boris.ochoa13@imperial.ac.uk>
+>>>>>>>>>>>>>>>>> Subject: Re: Demand paper update
+>>>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>>>> Perhaps you were looking at an older version - the current MapSPAM version does distinguish irrigated/rainfed (e.g. http://mapspam.info/global-data/#sort/physical_area/irrigated).
+>>>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>>>> In any case I'm happy to process the data and produce irrigated area maps for the study area (I'll just do the whole continent). Why don't I do MapSPAM and MIRCA2000, then you can compare the two sets of maps?
+>>>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>>>> Cheers,
+>>>>>>>>>>>>>>>>> Simon
+>>>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>>>> Zogheib, Charles writes:
+>>>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>>>>> I could do with some help processing the data to be honest. Thanks a lot. The thing with MapSPAM is that it doesn't distinguish irrigated from rainfed areas.
+>>>>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>>>>> With demand estimates my issue would again be the consistency of the analysis. Let's get all the abstraction points first.
+>>>>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>>>>> Charles
+>>>>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>>>>> -----Original Message-----
+>>>>>>>>>>>>>>>>>> From: Simon Moulds [mailto:S.Moulds@exeter.ac.uk]
+>>>>>>>>>>>>>>>>>> Sent: Wednesday, January 10, 2018 2:58 PM
+>>>>>>>>>>>>>>>>>> To: Zogheib, Charles 
+>>>>>>>>>>>>>>>>>> <charles.zogheib12@imperial.ac.uk>
+>>>>>>>>>>>>>>>>>> Cc: simon <S.Moulds@exeter.ac.uk>; Ochoa Tocachi, 
+>>>>>>>>>>>>>>>>>> Boris F <boris.ochoa13@imperial.ac.uk>
+>>>>>>>>>>>>>>>>>> Subject: Re: Demand paper update
+>>>>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>>>>> Hi Charles,
+>>>>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>>>>> Thanks a lot for the update. As far as the irrigated area is concerned, it's a sensible idea to start with MIRCA2000. Let me know if you need a hand processing the data - I have some experience with this. Depending on what you think of the dataset, you could also try the MapSPAM product (http://mapspam.info/data/), although this doesn't include a crop calendar.
+>>>>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>>>>> Do you still intend to estimate the irrigation water demand? Again, let me know if you need a hand with that.
+>>>>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>>>>> Cheers,
+>>>>>>>>>>>>>>>>>> Simon
+>>>>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>>>>> Zogheib, Charles writes:
+>>>>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>>>>>> Hi Simon,
+>>>>>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>>>>>> Happy New Year! I got back to work this week, so I 
+>>>>>>>>>>>>>>>>>>> thought I’d give you an update as to where things 
+>>>>>>>>>>>>>>>>>>> stand with the paper. We were able to get the 
+>>>>>>>>>>>>>>>>>>> allocation algorithm to work and I running it now. As 
+>>>>>>>>>>>>>>>>>>> I mentioned when we talked, the initial aim will be to generate the coordinates of all demand points as such:
+>>>>>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>>>>>> ● Domestic: coordinates and population served ● Hydropower: 
+>>>>>>>>>>>>>>>>>>> coordinates and electricity production ● Agriculture: 
+>>>>>>>>>>>>>>>>>>> coordinates and area irrigated
+>>>>>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>>>>>> For Bolivia, I’ll use the Scientific Data paper 
+>>>>>>>>>>>>>>>>>>> population map for
+>>>>>>>>>>>>>>>>>>> 2015 (100 m) as well as the MIRCA 1000 irrigated area map. 
+>>>>>>>>>>>>>>>>>>> With hydropower, Wouter shared a paper by Finer and 
+>>>>>>>>>>>>>>>>>>> Jenkiss
+>>>>>>>>>>>>>>>>>>> (2015) which contains all current and planned major 
+>>>>>>>>>>>>>>>>>>> hydropower projects in the country. I’ll use that combined with the 2010 National Dam Inventory.
+>>>>>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>>>>>> Cheers,
+>>>>>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>>>>>> Charles
+>>>>>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>>>>>> Charles Zogheib
+>>>>>>>>>>>>>>>>>>> PhD Candidate
+>>>>>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>>>>>> Department of Civil and Environmental Engineering 
+>>>>>>>>>>>>>>>>>>> Imperial College London, Room 411, Skempton Building 
+>>>>>>>>>>>>>>>>>>> London SW7 2AZ
+>>>>>>>>>>>>>>>>>>> Tel: +44 (0)20 75946018
+>>>>>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>>>> 
+>>>>>>>>>>>>> 
+>>>>>>>>>>> 
+>>>>>>>>> 
+>>>> 
+

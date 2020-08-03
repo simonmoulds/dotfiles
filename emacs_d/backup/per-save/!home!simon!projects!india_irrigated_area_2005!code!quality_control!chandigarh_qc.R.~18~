@@ -1,0 +1,93 @@
+## Author : Simon Moulds
+## Date   : January 2018
+
+## Quality control for Chandigarh
+
+## chickpea
+## ########
+
+xx[["apy_chickpea-rabi"]] = xx[["mapspam_atot_chickpea"]][6]
+xx[["irr_chickpea-rabi"]] = xx[["mapspam_xirr_chickpea"]][6]
+
+## lentil
+## ######
+
+xx[["apy_lentil-rabi"]] %<>% locf_interp(3:11)
+xx[["irr_lentil-rabi"]] %<>% locf_interp(3:11)
+
+## maize
+## #####
+
+f = xx[["mapspam_xirr_maize"]][6] / xx[["mapspam_atot_maize"]][6]
+xx[["irr_maize-kharif"]] = xx[["apy_maize-kharif"]] * f
+
+## other pulses
+## ############
+
+xx[["apy_other_pulses-kharif"]] = xx[["mapspam_atot_other_pulses"]][6]
+xx[["irr_other_pulses-kharif"]] = xx[["mapspam_xirr_other_pulses"]][6]
+
+## pigeonpea
+## #########
+
+xx[["apy_pigeonpea-kharif"]] = xx[["mapspam_atot_pigeonpea"]][6]
+xx[["irr_pigeonpea-kharif"]] = xx[["mapspam_xirr_pigeonpea"]][6]
+
+## potato
+## ######
+
+xx[["apy_sweet_potato-whole_year"]] = xx[["mapspam_atot_sweet_potato"]][6]
+xx[["irr_sweet_potato-whole_year"]] = xx[["mapspam_xirr_sweet_potato"]][6]
+
+## rapeseed
+## ########
+
+xx[["apy_rapeseed-rabi"]] %<>% locf_interp(4:11)
+xx[["irr_rapeseed-rabi"]] %<>% locf_interp(4:11)
+
+## rest of crops
+## #############
+
+xx[["apy_rest_of_crops-whole_year"]] = xx[["mapspam_atot_rest_of_crops"]][6]
+xx[["irr_rest_of_crops-whole_year"]] = xx[["mapspam_xirr_rest_of_crops"]][6]
+
+## rice
+## ####
+
+f = xx[["mapspam_xirr_rice"]][6] / xx[["mapspam_atot_rice"]][6]
+xx[["irr_rice-winter"]] = xx[["apy_rice-winter"]] * f
+
+## sesameseed
+## ##########
+
+xx[["apy_sesameseed-kharif"]] = xx[["mapspam_atot_sesameseed"]][6]
+xx[["irr_sesameseed-kharif"]] = xx[["mapspam_xirr_sesameseed"]][6]
+
+## sugarcane
+## #########
+
+xx[["apy_sugarcane-whole_year"]] = xx[["mapspam_atot_sugarcane"]][6]
+xx[["irr_sugarcane-whole_year"]] = xx[["mapspam_xirr_sugarcane"]][6]
+
+## tropical fruit
+## ##############
+
+xx[["apy_tropical_fruit-whole_year"]] = xx[["mapspam_atot_tropical_fruit"]][6]
+xx[["irr_tropical_fruit-whole_year"]] = xx[["mapspam_xirr_tropical_fruit"]][6]
+
+## wheat
+## #####
+
+f = xx[["mapspam_xirr_wheat"]][6] / xx[["mapspam_atot_wheat"]][6]
+xx[["irr_wheat-rabi"]] = xx[["apy_wheat-rabi"]] * f
+
+
+
+
+
+
+
+
+
+
+

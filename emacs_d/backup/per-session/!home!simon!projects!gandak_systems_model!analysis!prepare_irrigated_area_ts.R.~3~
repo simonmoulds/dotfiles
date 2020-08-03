@@ -1,0 +1,117 @@
+## Author : Simon Moulds
+## Date   : June 2018
+
+library(raster)
+library(rgdal)
+library(magrittr)
+library(dplyr)
+library(tidyr)
+library(xts)
+
+options(stringsAsFactors = FALSE)
+
+model_mask = raster("data/modelMask.tif")
+template = raster(xmn=80, xmx=90, ymn=20, ymx=30, res=0.0833333333)
+
+## district boundary data
+## ######################
+
+## devtools::load_all("/home/simon/dev/r_indagridat/indagridat")
+## adm2 = readOGR(dsn=system.file("shapes", package="indagridat"), layer="g1960_2_India", stringsAsFactors=TRUE)
+## adm2$ADM2_CODE %<>% as.numeric
+## adm2_raster = rasterize(x=adm2, y=template, field="ADM2_CODE")
+devtools::load_all("/home/simon/dev/r_indagridat/indagridat")
+adm2_1960 = readOGR(dsn=system.file("shapes", package="indagridat"), layer="g1960_2_India", stringsAsFactors=FALSE)
+adm2_1960$ADM2_CODE %<>% as.numeric
+adm2_1960_raster = rasterize(adm2_1960, template, "ADM2_CODE")
+
+## ICRISAT - farmers land holding size (1970-2010)
+library(readxl)
+bihar_nia = read_excel("data/ICRISAT/Bihar/dt_nca_gca_nia_gia_a_web.xlsx", skip=9)
+up_nia = read_excel("data/ICRISAT/UttarPradesh/dt_nca_gca_nia_gia_a_web.xlsx", skip=9)
+nia = rbind(bihar_nia, up_nia)
+icrisat_ids = c(901,902,903,904,906,907,911,220,221,222,224)
+nia = nia[nia$DIST %in% icrisat_ids,]
+
+lut = data.frame(DIST=icrisat_ids,
+                 GAUL_ID=c(17618,17613,17598,730,17628,17619,644,17894,17914,72651,17892))
+
+nia =
+    left_join(lut, nia, by="DIST") %>%
+    na_if(-1.00)
+
+nnia =
+    nia %>%
+    select(-DIST,-STCODE,-STNAME) %>%
+    ## select(-DIST,-STCODE,-STNAME,-DISTNAME) %>%
+    gather(key, value, -GAUL_ID, -YEAR) %>%
+    spread(YEAR, value) %>%
+    gather(YEAR, value, -GAUL_ID, -key) %>%
+    unite(GAUL_ID, GAUL_ID, key, sep="-") %>%
+    spread(GAUL_ID, value) %>%
+    zoo::na.approx() %>%
+    zoo::na.locf() %>%
+    zoo::na.locf(fromLast=TRUE) %>%
+    as.data.frame %>%
+    gather(GAUL_ID, value, -YEAR) %>%
+    separate(GAUL_ID, c("GAUL_ID","key"), "-") %>%
+    mutate_at(vars(GAUL_ID), funs(as.numeric)) %>%
+    spread(key, value) ## %>%
+    ## select(-GAUL_ID) %>%
+    ## group_by(YEAR) %>%
+    ## summarise_all(funs(mean(., na.rm=TRUE))) %>%
+    ## ungroup
+
+nia_gandak =
+    nia %>%
+    group_by(YEAR) %>%
+    summarise_at(vars(GCA,GIA,NCA,NIA), funs(sum))
+
+## ## save for use elsewhere
+## saveRDS(land_holdings, "data/icrisat_operational_holdings.rds")
+
+## read operational holdings data
+## (saved in prepare_farm_size_data.R)
+land_holdings =
+    readRDS("data/icrisat_operational_holdings.rds") %>%
+    select(-DIST,-STCODE,-STNAME,-DISTNAME) %>%
+    gather(key, value, -GAUL_ID, -YEAR) %>%
+    spread(YEAR, value) %>%
+    gather(YEAR, value, -GAUL_ID, -key) %>%
+    unite(GAUL_ID, GAUL_ID, key, sep="-") %>%
+    spread(GAUL_ID, value) %>%
+    zoo::na.approx() %>%
+    zoo::na.locf() %>%
+    zoo::na.locf(fromLast=TRUE) %>%
+    as.data.frame %>%
+    gather(GAUL_ID, value, -YEAR) %>%
+    separate(GAUL_ID, c("GAUL_ID","key"), "-") %>%
+    mutate_at(vars(GAUL_ID), funs(as.numeric)) %>%
+    spread(key, value) ## %>%
+    ## select(-GAUL_ID) %>%
+    ## group_by(YEAR) %>%
+    ## summarise_all(funs(mean(., na.rm=TRUE))) %>%
+    ## ungroup
+
+x = rep(0,100000)
+for (i in 1:2) {
+    x = x + rlnorm(100000)
+}
+
+plot(density(x))
+
+f.X <- function(x) dlnorm(x)
+f.Y <- function(y) dlnorm(y)
+f.Z <- function(z) integrate(function(x,z) f.Y(z-x)*f.X(x),-Inf,Inf,z)$value
+f.Z <- Vectorize(f.Z)
+
+set.seed(1)
+X <- rlnorm(1000)
+Y <- rlnorm(1000)
+Z <- X + Y
+
+# compare the methods
+hist(Z,freq=F,breaks=50, xlim=c(0,30))
+z <- seq(0,50,0.01)
+lines(z,f.Z(z),lty=2,col="red")
+

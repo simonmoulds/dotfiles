@@ -1,0 +1,18 @@
+#!/bin/bash
+
+declare -a irr_area_columns=(
+    "CANAL_GOVT" "CANAL_PVT" "WELL_WO_EL"
+    "WELL_W_EL"
+    "TW_WO_EL"
+    "TW_W_EL"
+    "TANK_IRR"
+    "RIVER_IRR"
+    "W_FALL"
+    "OTH_IRR"
+)    
+
+for col in "${irr_area_columns[@]}"
+do
+    echo $col
+done
+

@@ -1,0 +1,12 @@
+#!/bin/bash
+
+export GRASS_MESSAGE_FORMAT=plain
+
+datadir=/data/GMTED2010/data
+
+for product in mn15 mi15
+do
+    r.in.gdal -a input=${datadir}/${product}.tif output=${product} --overwrite
+    r.region map=${product} n=84N s=56S e=180E w=180W
+    r.out.gdal input=${product} output=${datadir}/${product}_fixed.tif format=GTiff --overwrite
+done

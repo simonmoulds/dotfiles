@@ -1,0 +1,19 @@
+
+class RootZoneWater(object):
+    def __init__(self, RootZoneWater_variable):
+        self.var = RootZoneWater_variable
+
+    def root_zone_water(self):
+        """Function to calculate actual and total available water in the 
+        root zone at current time step
+        """
+        thRZ, TAW, Dr, Wr = root_zone_water(self.th, self.soil_pars.th_s_comp, self.soil_pars.th_fc_comp, self.soil_pars.th_wp_comp, self.soil_pars.th_dry_comp, self.soil_pars.dz, landcover.Zmin, landcover.Zroot, landcover.Aer)
+        self.thRZ_Act = thRZ['Act']
+        self.thRZ_Sat = thRZ['Sat']
+        self.thRZ_Fc  = thRZ['Fc']
+        self.thRZ_Wp  = thRZ['Wp']
+        self.thRZ_Dry = thRZ['Dry']
+        self.thRZ_Aer = thRZ['Aer']
+        self.TAW = TAW
+        self.Dr = Dr
+        self.Wr = Wr

@@ -1,0 +1,9 @@
+## Author  : Simon Moulds
+## Date    : February 2018
+
+aquacrop = function(config, ...) {
+## AOS_Initialize()
+
+## time loop (do in Rcpp)
+
+## AOS_Finish()

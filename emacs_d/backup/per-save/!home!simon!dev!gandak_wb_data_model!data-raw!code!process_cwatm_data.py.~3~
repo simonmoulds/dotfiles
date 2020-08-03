@@ -1,0 +1,274 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import numpy as np
+import pandas as pd
+import netCDF4
+import calendar
+import datetime
+import os
+
+# set working directory
+wd = '/home/simon/dev/gandak_wb_data_model/data-raw'
+os.chdir(wd)
+
+# extract raw data
+
+if not os.path.isdir('data/cwatm_input'):
+    os.system('mkdir data/cwatm_input')
+    os.system('unzip data/cwatm_input.zip -d data/cwatm_input')
+
+# directory to write output
+outd = '/home/simon/dev/gandak_wb_data_model/data'
+
+# =============
+# root fraction
+# =============
+
+zlayer = np.array([0.3,2.])
+zlayermid = np.array([0.15,1.3])
+nlayer = zlayer.size
+fill_value = np.float32(1e+20)
+
+lc_types = ['forest','grassland','irrPaddy','irrNonPaddy']
+for lc in lc_types:
+    print lc
+    
+    rf1 = netCDF4.Dataset('data/cwatm_input/landcover/' + lc + '/rootFraction1.nc')
+    lat = rf1.variables['lat'][:][::-1]
+    lon = rf1.variables['lon'][:]
+    rf1_data = rf1.variables['rootFraction1'][:]
+    rf1_data = np.flipud(rf1_data)
+    rf1.close()
+
+    rf2 = netCDF4.Dataset('data/cwatm_input/landcover/' + lc + '/rootFraction2.nc')
+    rf2_data = rf2.variables['rootFraction2'][:]
+    rf2_data = np.flipud(rf2_data)
+    rf2.close()
+
+    rf = np.stack([rf1_data, rf2_data])
+    rf[np.isnan(rf)] = fill_value
+
+    nlon = lon.size
+    nlat = lat.size
+    # lat = lat[::-1]
+
+    d = netCDF4.Dataset(outd + '/' + lc + '_rootFraction.nc','w')
+    d.createDimension('lon',nlon)
+    d.createDimension('lat',nlat)
+    d.createDimension('depth',nlayer)
+
+    lono = d.createVariable('lon',np.float32,('lon'),zlib=True,least_significant_digit=16)
+    lono.units = 'degrees_east'
+    lono.standard_name = 'longitude'
+    lono.long_name = 'longitude'
+    lono[:]=lon
+
+    lato = d.createVariable('lat',np.float32,('lat'),zlib=True,least_significant_digit=16)
+    lato.units = 'degrees_north'
+    lato.standard_name = 'latitude'
+    lato.long_name = 'longitude'
+    lato[:]=lat
+
+    dpth = d.createVariable('depth',np.float32,('depth'),zlib=True,least_significant_digit=16)
+    dpth.units = 'meter'
+    dpth.standard_name = 'depth'
+    dpth.long_name = 'depth'
+    dpth[:]=zlayermid
+
+    # create container variable for CRS: lon/lat
+    # WGS84 datum
+    crso = d.createVariable('crs','i4')
+    crso.long_name = 'Lon/Lat Coords in WGS84'
+    crso.grid_mapping_name='latitude_longitude'
+    crso.longitude_of_prime_meridian = 0.0
+    crso.semi_major_axis = 6378137.0
+    crso.inverse_flattening = 298.257223563
+
+    root = d.createVariable('root_fraction',np.float32,('depth','lat','lon'),zlib=True,least_significant_digit=16,fill_value=fill_value)
+    root.units = '1'
+    root.standard_name = 'root_fraction'
+    root.long_name = 'root fraction in each soil layer'
+    root[:] = rf
+
+    d.Conventions='CF-1.6'
+    d.close()
+
+# ==============
+# max root depth
+# ==============
+
+for lc in lc_types:
+    rd = netCDF4.Dataset('data/cwatm_input/landcover/' + lc + '/maxRootDepth.nc')
+    lat = rd.variables['lat'][:][::-1]
+    lon = rd.variables['lon'][:]
+    rd_data = rd.variables['maxRootDepth'][:]
+    rd_data = np.flipud(rd_data)
+    rd.close()
+
+    nlon = lon.size
+    nlat = lat.size
+
+    d = netCDF4.Dataset(outd + '/' + lc + '_maxRootDepth.nc','w')
+    d.createDimension('lon',nlon)
+    d.createDimension('lat',nlat)
+
+    lono = d.createVariable('lon',np.float32,('lon'),zlib=True,least_significant_digit=16)
+    lono.units = 'degrees_east'
+    lono.standard_name = 'longitude'
+    lono.long_name = 'longitude'
+    lono[:]=lon
+
+    lato = d.createVariable('lat',np.float32,('lat'),zlib=True,least_significant_digit=16)
+    lato.units = 'degrees_north'
+    lato.standard_name = 'latitude'
+    lato.long_name = 'longitude'
+    lato[:]=lat
+
+    # create container variable for CRS: lon/lat
+    # WGS84 datum
+    crso = d.createVariable('crs','i4')
+    crso.long_name = 'Lon/Lat Coords in WGS84'
+    crso.grid_mapping_name='latitude_longitude'
+    crso.longitude_of_prime_meridian = 0.0
+    crso.semi_major_axis = 6378137.0
+    crso.inverse_flattening = 298.257223563
+
+    root = d.createVariable('root_fraction',np.float32,('lat','lon'),zlib=True,least_significant_digit=16,fill_value=fill_value)
+    root.units = 'meter'
+    root.standard_name = 'max_root_depth'
+    root.long_name = 'maximum root depth'
+    root[:] = rd_data
+
+    d.Conventions='CF-1.6'
+    d.close()
+
+# ==================
+# intercept capacity
+# ==================
+
+lc_types = ['forest','grassland']
+intercept_fs = ['interceptCapForest10days.nc','interceptCapGrassland10days.nc']
+
+for index,lc in enumerate(lc_types):
+    fs = intercept_fs[index]
+    ic = netCDF4.Dataset('data/cwatm_input/landcover/' + lc + '/' + fs)
+    lat = ic.variables['lat'][:][::-1]
+    lon = ic.variables['lon'][:]
+    times = ic.variables['time']
+    t_units = times.units
+    t_cal = times.calendar
+    t_vals = times[:]
+    ic_data = ic.variables['interceptcap'][:]
+    ic_data = np.flip(ic_data, axis=1)
+    ic.close()
+
+    nlon = lon.size
+    nlat = lat.size
+
+    d = netCDF4.Dataset(outd + '/' + lc + '_interceptCap10days.nc','w')
+    d.createDimension('lon',nlon)
+    d.createDimension('lat',nlat)
+    d.createDimension('time',None)
+
+    lono = d.createVariable('lon',np.float32,('lon'),zlib=True,least_significant_digit=16)
+    lono.units = 'degrees_east'
+    lono.standard_name = 'longitude'
+    lono.long_name = 'longitude'
+    lono[:]=lon
+
+    lato = d.createVariable('lat',np.float32,('lat'),zlib=True,least_significant_digit=16)
+    lato.units = 'degrees_north'
+    lato.standard_name = 'latitude'
+    lato.long_name = 'longitude'
+    lato[:]=lat
+
+    time = d.createVariable('time',np.int32,('time'),zlib=True)
+    time.units = t_units
+    time.calendar = t_cal
+    time.standard_name = 'time'
+    time.long_name = t_units
+    time[:]=times[:]
+
+    # create container variable for CRS: lon/lat
+    # WGS84 datum
+    crso = d.createVariable('crs','i4')
+    crso.long_name = 'Lon/Lat Coords in WGS84'
+    crso.grid_mapping_name='latitude_longitude'
+    crso.longitude_of_prime_meridian = 0.0
+    crso.semi_major_axis = 6378137.0
+    crso.inverse_flattening = 298.257223563
+
+    intc = d.createVariable('interceptcap',np.float32,('time','lat','lon'),zlib=True,least_significant_digit=16,fill_value=fill_value)
+    intc.units = '1'
+    intc.standard_name = 'intercept'
+    intc.long_name = 'interception capacity'
+    intc[:] = ic_data
+
+    d.Conventions='CF-1.6'
+    d.close()
+
+# ================
+# crop coefficient
+# ================
+
+lc_types = ['forest','grassland','irrPaddy','irrNonPaddy']
+kc_fs = ['CropCoefficientForest_10days.nc','CropCoefficientGrassland_10days.nc','CropCoefficientirrPaddy_10days.nc','CropCoefficientirrNonPaddy_10days.nc']
+
+for index,lc in enumerate(lc_types):
+    fs = kc_fs[index]
+    kc = netCDF4.Dataset('data/cwatm_input/landcover/' + lc + '/' + fs)
+    lat = kc.variables['lat'][:][::-1]
+    lon = kc.variables['lon'][:]
+    times = kc.variables['time']
+    t_units = times.units
+    t_cal = times.calendar
+    t_vals = times[:]
+    kc_data = kc.variables['kc'][:]
+    kc_data = np.flip(kc_data, axis=1)
+    kc.close()
+
+    nlon = lon.size
+    nlat = lat.size
+
+    d = netCDF4.Dataset(outd + '/' + lc + '_cropCoefficient10days.nc','w')
+    d.createDimension('lon',nlon)
+    d.createDimension('lat',nlat)
+    d.createDimension('time',None)
+
+    lono = d.createVariable('lon',np.float32,('lon'),zlib=True,least_significant_digit=16)
+    lono.units = 'degrees_east'
+    lono.standard_name = 'longitude'
+    lono.long_name = 'longitude'
+    lono[:]=lon
+
+    lato = d.createVariable('lat',np.float32,('lat'),zlib=True,least_significant_digit=16)
+    lato.units = 'degrees_north'
+    lato.standard_name = 'latitude'
+    lato.long_name = 'longitude'
+    lato[:]=lat
+
+    time = d.createVariable('time',np.int32,('time'),zlib=True)
+    time.units = t_units
+    time.calendar = t_cal
+    time.standard_name = 'time'
+    time.long_name = t_units
+    time[:]=times[:]
+
+    # create container variable for CRS: lon/lat
+    # WGS84 datum
+    crso = d.createVariable('crs','i4')
+    crso.long_name = 'Lon/Lat Coords in WGS84'
+    crso.grid_mapping_name='latitude_longitude'
+    crso.longitude_of_prime_meridian = 0.0
+    crso.semi_major_axis = 6378137.0
+    crso.inverse_flattening = 298.257223563
+
+    intc = d.createVariable('kc',np.float32,('time','lat','lon'),zlib=True,least_significant_digit=16,fill_value=fill_value)
+    intc.units = '1'
+    intc.standard_name = 'kc'
+    intc.long_name = 'crop coefficient'
+    intc[:] = kc_data
+
+    d.Conventions='CF-1.6'
+    d.close()

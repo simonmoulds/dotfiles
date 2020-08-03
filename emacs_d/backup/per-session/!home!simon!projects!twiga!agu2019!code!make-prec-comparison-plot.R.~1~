@@ -1,0 +1,13 @@
+## Author : Simon Moulds
+## Date   : Dec 2019
+
+library(magrittr)
+
+datadir = "../data/pt_met_data/"
+
+x = read.csv(
+    file.path(
+        datadir,
+        "tahmo_era5_stn_TA00339_met_2016-2019.csv"
+    )
+)

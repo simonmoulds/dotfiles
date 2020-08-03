@@ -1,0 +1,12 @@
+## Author : Simon Moulds
+## Date   : January 2020
+
+library(magrittr)
+library(raster)
+
+## ############
+## 1. area maps
+## ############
+
+data/Gandak05min.clone.tif
+data/Gandak05min.landmask.tif

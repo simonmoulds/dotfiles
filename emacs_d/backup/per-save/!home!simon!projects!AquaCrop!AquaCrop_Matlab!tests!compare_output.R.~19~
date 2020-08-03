@@ -1,0 +1,32 @@
+## Author : Simon Moulds
+## Date   : July 2018
+
+library(tidyverse)
+library(magrittr)
+
+aosdir = "/home/simon/projects/AquaCrop/AquaCrop_Matlab/AquaCropOS_v50a"
+
+## Test 1: Ch7, Tunis Wheat, Ex1, 15/10/2001 - 01/10/2002
+aos_v0_fn = file.path(aosdir,
+                      "Output_Ch7_Tunis_Wheat_Ex1",
+                      "Exercise_7_1_LocalSoil_2001_WaterContents_orig.txt")
+aos_v5_fn = file.path(aosdir,
+                      "Output_Ch7_Tunis_Wheat_Ex1",
+                      "Ch7_Tunis_Wheat_Ex1_WaterContents.txt")
+
+soil_profile = read.table(file.path(aosdir,"Input_Ch7_Tunis_Wheat_Ex1", "SoilProfile.txt"), skip=2) %>% setNames(c("Compartment","Thickness","Layer"))
+ncomp = max(soil_profile$Compartment)
+zmid = cumsum(soil_profile$Thickness) - soil_profile$Thickness / 2
+colnms = c("Year","Month","Day","SimDay","Season",paste0("X", as.character(zmid), "m"))
+
+aos_v0 = read.table(aos_v0_fn, header=TRUE, sep="\t", skip=ncomp) %>% setNames(colnms) %>% `[`(,1:(ncomp+5)) %>% unite("Date", Year, Month, Day, sep="-") %>% mutate(Date=as.Date(Date, format="%Y-%m-%d"))
+aos_v5 = read.table(aos_v5_fn, header=TRUE, sep="\t") %>% `[`(,1:(ncomp+5)) %>% unite("Date", Year, Month, Day, sep="-") %>% mutate(Date=as.Date(Date, format="%Y-%m-%d"))
+
+ix = match(aos_v0$Date, aos_v5$Date)
+aos_v5 = aos_v5[ix,]
+
+t = aos_v5[["Date"]]
+plot(t, aos_v5[["X0.05m"]])
+lines(t, aos_v0[["X0.05m"]])
+
+## convert to date, reduce to common rows

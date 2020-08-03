@@ -1,0 +1,101 @@
+## Author : Simon Moulds
+## Date   : May 2020
+
+library(raster)
+library(ncdf4)
+library(rgdal)
+
+basin_titicaca = readOGR("../data/basin_titicaca.shp")
+basin_poopo = readOGR("../data/basin_poopo.shp")
+
+## ## ################################### ##
+## ## 1 - GLEAM
+## ## ################################### ##
+
+## poopo_rast = rasterize(
+##     basin_poopo,
+##     raster(xmn=-71.25, xmx=-66.5, ymn=-18.5, ymx=-14, res=0.25),
+##     field=1
+## )
+
+## basin_rast = poopo_rast
+## tol = 0.1
+## cdo_cmd = paste0(
+##     "cdo sellonlatbox,",
+##     xmin(basin_rast)-tol, ",",
+##     xmax(basin_rast)+tol, ",",
+##     ymin(basin_rast)-tol, ",",
+##     ymax(basin_rast)+tol,
+##     " ../data/E_1980_2018_GLEAM_v3.3a_MO.nc ",
+##     "E_1980_2018_GLEAM_v3.3a_MO_POOPO.nc"
+## )
+## system(cdo_cmd)
+
+## years = 1980:2018
+## months = 1:12
+## annual_maps = vector(mode="list", length=length(years))
+## annual_total = rep(NA, length(years))
+## for (i in 1:length(years)) {
+##     maps = vector(mode="list", length=12)
+##     for (j in 1:length(months)) {
+##         start_ix = (i-1) * 12 + j
+##         nc = nc_open("E_1980_2018_GLEAM_v3.3a_MO_POOPO.nc")
+##         et = ncvar_get(nc, "E", start=c(1,1,start_ix), count=c(-1,-1,1))
+##         nc_close(nc)
+##         r = raster(basin_rast)
+##         r[] = et
+##         r = r * basin_rast 
+##         maps[[j]] = r
+##     }
+##     ann_map = stackApply(stack(maps), indices=rep(1,12), fun=sum)
+##     ann_map[is.na(basin_rast)] = NA
+##     annual_maps[[i]] = ann_map
+##     annual_total[i] = mean(getValues(ann_map), na.rm=TRUE)
+## }
+
+## ################################### ##
+## 2 - MOD16A2
+## ################################### ##
+
+years = 2001:2014
+titicaca_rast = rasterize(
+    basin_titicaca,
+    raster("/data/earthengine/MODIS_NTSG_MOD16A2_105_A2001001.tif")
+)
+titicaca_rast[titicaca_rast != 1] = NA
+
+poopo_rast = rasterize(
+    basin_poopo,
+    raster("/data/earthengine/MODIS_NTSG_MOD16A2_105_A2001001.tif"),
+    field=1
+)
+
+basin_list = list(poopo=poopo_rast, titicaca=titicaca_rast)
+
+annual_maps = vector(mode="list", length=length(years) * length(basin_list))
+annual_total = as.data.frame(matrix(data=NA, nrow=length(years), ncol=length(basin_list)))
+names(annual_total) = names(basin_list)
+for (k in 1:length(basin_list)) {
+    basin_rast = basin_list[[k]]
+    for (i in 1:length(years)) {
+        year = years[i]
+        ptn = paste0("MODIS_NTSG_MOD16A2_105_A", year, "[0-9]{3}_PET.tif")
+        fs = list.files(
+            '/data/earthengine',
+            pattern=ptn,
+            full.names=TRUE
+        )
+        maps = vector(mode="list", length=length(fs))
+        for (j in 1:length(fs)) {        
+            maps[[j]] = raster(fs[j]) * 0.1
+        }
+        ann_map = stackApply(stack(maps), indices=rep(1,length(fs)), fun=sum)
+        ann_map[is.na(basin_rast)] = NA
+        ann_map[ann_map == 0] = NA
+        annual_maps[[i]] = ann_map
+        annual_total[i,k] = mean(getValues(ann_map), na.rm=TRUE)
+    }
+}
+
+## Titicaca annual mean ET = 621mm, sd = 
+## Poopo annual mean ET    = 569mm, sd = 39mm

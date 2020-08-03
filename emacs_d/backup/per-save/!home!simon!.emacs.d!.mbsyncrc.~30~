@@ -1,0 +1,115 @@
+# Adapted from: http://www.macs.hw.ac.uk/~rs46/posts/2014-01-13-mu4e-email-client.html
+
+IMAPAccount work
+Host outlook.office365.com
+User s.moulds@exeter.ac.uk
+Pass S1m0ncm2015
+Port 993
+SSLType IMAPS
+AuthMechs Login
+CertificateFile /etc/ssl/certs/ca-certificates.crt
+
+IMAPStore work-remote
+Account work
+
+MaildirStore work-local
+Path ~/mail/work/
+Inbox ~/mail/work/INBOX
+
+Channel work
+Master :work-remote:
+Slave :work-local:
+Patterns "INBOX" "Drafts" "Sent Items" "Trash"
+Create Both
+Expunge Both
+Sync All
+SyncState *
+
+IMAPAccount ic
+Host outlook.office365.com
+User sm510@ic.ac.uk
+Pass S1m0ncm20!*
+Port 993
+SSLType IMAPS
+AuthMechs Login
+CertificateFile /etc/ssl/certs/ca-certificates.crt
+
+IMAPStore ic-remote
+Account ic
+
+MaildirStore ic-local
+Path ~/mail/ic/
+Inbox ~/mail/ic/INBOX
+
+Channel ic
+Master :ic-remote:
+Slave :ic-local:
+Patterns "INBOX" "Drafts" "Sent Items" "Trash"
+Create Both
+Expunge Both
+Sync All
+SyncState *
+
+IMAPAccount gmail
+Host imap.gmail.com
+User sim.moulds@gmail.com
+Pass S1m0ncm2015
+Port 993
+SSLType IMAPS
+CertificateFile /etc/ssl/certs/ca-certificates.crt
+
+IMAPStore gmail-remote
+Account gmail
+
+MaildirStore gmail-local
+Path ~/mail/gmail/
+Inbox ~/mail/gmail/INBOX
+
+Channel gmail-inbox
+Master :gmail-remote:
+Slave :gmail-local:
+Patterns "INBOX"
+Create Both
+Expunge Both
+SyncState *
+
+Channel gmail-trash
+Master :gmail-remote:"[Gmail]/Trash"
+Slave :gmail-local:"[Gmail].Trash"
+Create Both
+Expunge Both
+SyncState *
+
+Channel gmail-sent
+Master :gmail-remote:"[Gmail]/Sent Mail"
+Slave :gmail-local:"[Gmail].Sent Mail"
+Create Both
+Expunge Both
+SyncState *
+
+Channel gmail-all
+Master :gmail-remote:"[Gmail]/All Mail"
+Slave :gmail-local:"[Gmail].All Mail"
+Create Both
+Expunge Both
+SyncState *
+
+Channel gmail-starred
+Master :gmail-remote:"[Gmail]/Starred"
+Slave :gmail-local:"[Gmail].Starred"
+Create Both
+Expunge Both
+SyncState *
+
+# GROUPS PUT TOGETHER CHANNELS, SO THAT WE CAN INVOKE
+# MBSYNC ON A GROUP TO SYNC ALL CHANNELS
+#
+# FOR INSTANCE: "mbsync gmail" GETS MAIL FROM
+# "gmail-inbox", "gmail-sent", and "gmail-trash"
+#
+Group gmail
+Channel gmail-inbox
+Channel gmail-sent
+Channel gmail-trash
+Channel gmail-all
+Channel gmail-starred

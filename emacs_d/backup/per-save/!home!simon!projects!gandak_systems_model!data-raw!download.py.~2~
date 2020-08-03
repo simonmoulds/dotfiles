@@ -1,0 +1,20 @@
+#!/usr/bin/env python
+from ecmwfapi import ECMWFDataServer
+ 
+server = ECMWFDataServer()
+server.retrieve({
+    "class": "ei",
+    "dataset": "interim_land",
+    "expver": "2",
+    "stream": "oper",
+    "type": "fc",
+    "levtype": "sfc",
+    "param": "45.128/144.128/146.128/147.128/176.128/177.128/182.128/228.128/243.128",
+    "date": "1979-01-01/to/2012-12-31",
+    "time": "00:00:00",
+    "step": "3",
+    "grid": "0.75/0.75",
+    "area":"28/83.75/25.5/85.75",
+    "format":"netcdf",
+    "target": "test.nc"
+})

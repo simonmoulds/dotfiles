@@ -1,0 +1,229 @@
+From: Simon Moulds <simon.moulds@imperial.ac.uk>
+To: "Rickard-Frost, Rhys" <rhys.rickard-frost17@imperial.ac.uk>
+Cc: "Moulds, Simon C" <simon.moulds@imperial.ac.uk>, "Templeton, Michael" <m.templeton@imperial.ac.uk>, "Waluszewski, Dominik" <dominik.waluszewski17@imperial.ac.uk>
+Subject: Re: Accra data meeting
+References: <AM6PR06MB6182C00D75A6374A91D219ADD2F00@AM6PR06MB6182.eurprd06.prod.outlook.com> <871ryqrzgn.fsf@yamunotri.localdomain> <AM6PR06MB472230F9F9C8162F3C905F88B5CB0@AM6PR06MB4722.eurprd06.prod.outlook.com> <DB7PR06MB52570E55691D072A45778AE8ECC70@DB7PR06MB5257.eurprd06.prod.outlook.com>
+User-agent: mu4e 1.0; emacs 26.1
+In-reply-to: <DB7PR06MB52570E55691D072A45778AE8ECC70@DB7PR06MB5257.eurprd06.prod.outlook.com>
+
+Hi Rhys,
+
+Pleased you've been able to access the data. The file I sent is one of 60 files containing data from the questionnaire I sent. If you're ready to look at these, I'll write a script to convert them all.
+
+Cheers,
+Simon
+
+Rickard-Frost, Rhys writes:
+
+> Hi Simon,
+>
+> I've managed to open up the data on Matlab and am now getting a good feel of how everything is set out so thank
+> you for getting that sorted! Is this all the data needed or is there still more to be converted into CSV format?
+>
+> All the best,
+>
+> Rhys Rickard-Frost
+>
+> --------------------------------------------------------------------------------------------------
+> From: Moulds, Simon C <simon.moulds@imperial.ac.uk>
+> Sent: 19 July 2019 13:37:57
+> To: Rickard-Frost, Rhys <rhys.rickard-frost17@imperial.ac.uk>; Templeton, Michael
+> <m.templeton@imperial.ac.uk>
+> Cc: Waluszewski, Dominik <dominik.waluszewski17@imperial.ac.uk>
+> Subject: Re: Accra data meeting 
+>  
+> Hi Rhys,
+>
+> OK, no problem. Apologies for not being clear. 
+>
+> The basic problem is that the data is in SPSS format. This is a proprietary binary (non-text) format of SPSS
+> (https://www.ibm.com/uk-en/analytics/spss-statistics-software), which means it cannot be read using conventional
+> tools (e.g. Excel, Matlab). 
+>
+> So, we need to convert it to a text format like CSV (https://en.wikipedia.org/wiki/Comma-separated_values). This
+> format can be read in Excel, Matlab, etc. The R language is a bit like Matlab but don't worry about it for now - what
+> is relevant is that it can convert the SPSS format to CSV. For now, I've converted the data pertaining to Part A,
+> Section 7 which I mentioned earlier. Open this with Excel, and see if what I said previously makes a bit more
+> sense. 
+>
+> I'm a bit busy today but we can meet next week if you would like - let me know. 
+>
+> Cheers,
+> Simon
+>
+> --------------------------------------------------------------------------------------------------
+> From: Rickard-Frost, Rhys
+> Sent: 18 July 2019 15:37
+> To: Moulds, Simon C; Templeton, Michael
+> Cc: Waluszewski, Dominik
+> Subject: Re: Accra data meeting 
+>  
+> Hi Simon,
+>
+> Sorry about that. Myself and Dominik are just a bit confused at the moment. Neither of us have ever heard of SPSS
+> & CSV formats or even the language R before so are feeling a bit lost with all of this. I'm not sure if it's best if you
+> could explain it to us in person or try and explain it again in really simple terms. Apologies for this but we're just
+> feeling a little confused with all the terminology at the moment. 
+>
+> Many thanks,
+> Rhys Rickard-Frost 
+>
+> Get Outlook for Android
+>
+> --------------------------------------------------------------------------------------------------
+> From: Moulds, Simon C
+> Sent: Wednesday, July 17, 2019 7:35:48 AM
+> To: Templeton, Michael
+> Cc: Rickard-Frost, Rhys; Waluszewski, Dominik
+> Subject: Re: Accra data meeting 
+>  
+> Hi Rhys,
+>
+> Mike forwarded your email - I guess you didn't hit reply all 😉
+>
+> I've done a bit of research online and, as you say, it seems that Matlab doesn't provide any tools for converting
+> between SPSS and CSV formats. So, I will write a script in R which will convert all the data files to CSV. I'll try and do
+> this by the end of today. In the first instance I'll just provide the data but in due course I'll give you the R script +
+> an explanation of how to use it. This is because plain text formats like CSV can easily be edited by mistake, so it's
+> good practice to automate the workflow as far as possible to ensure you're always working from the original data.
+>
+> Thanks,
+> Simon
+>
+> Cheers,
+> Simon
+>
+> --------------------------------------------------------------------------------------------------
+> From: Templeton, Michael
+> Sent: 17 July 2019 07:19
+> To: Moulds, Simon C
+> Subject: FW: Accra data meeting 
+>  
+> FYI below, from Rhys.
+>
+> Sent from my Windows Phone
+> --------------------------------------------------------------------------------------------------
+> From: Rickard-Frost, Rhys
+> Sent: ‎16/‎07/‎2019 16:13
+> To: Templeton, Michael
+> Subject: Re: Accra data meeting
+>
+> Hi all,
+>
+> Thank you for your email, Simon. I've created an account and had a quick look at the questionnaire, we are both
+> most proficient in Matlab so will be using that but I'm a bit unsure of how to open this within Matlab itself and can't
+> find a way to do so yet. Do you have any suggestions on how we would solve this? 
+>
+> Many thanks,
+>
+> Rhys Rickard-Frost
+>
+> --------------------------------------------------------------------------------------------------
+> From: Templeton, Michael
+> Sent: 16 July 2019 15:22:45
+> To: Moulds, Simon C
+> Cc: Rickard-Frost, Rhys; Waluszewski, Dominik
+> Subject: RE: Accra data meeting 
+>  
+> Cheers, Simon. Sounds sensible to me.
+>
+> Rhys / Dominik - not sure how familiar you are with the various data analysis software packages, but I'm thinking
+> you can probably do a good job using your Matlab knowledge from the first two years of our UG course. 
+>
+> Mike
+>
+> -----Original Message-----
+> From: Simon Moulds [mailto:simon.moulds@imperial.ac.uk] 
+> Sent: 16 July 2019 12:28
+> To: Templeton, Michael <m.templeton@imperial.ac.uk>
+> Cc: Moulds, Simon C <simon.moulds@imperial.ac.uk>; Rickard-Frost, Rhys <rhys.rickard-frost17@imperial.ac.uk>;
+> Waluszewski, Dominik <dominik.waluszewski17@imperial.ac.uk>
+> Subject: Re: Accra data meeting
+>
+> Thanks Mike.
+>
+> Rhys, Dominik - rather than me handing you the data it may be better for you to download it from the original
+> source:
+>
+> http://www2.statsghana.gov.gh/nada/index.php/catalog/97/study-description
+>
+> You will need to register for an account; once you have done this, click on the 'Get Microdata' tab and download
+> one or other of the files. Which one you choose will depend on the format you want - the top one is in Stata format
+> and the bottom is SPSS format.
+>
+> Once you've unpacked the data file you will have four subdirectories - aggregates, community, PartAB, and price.
+> The most relevant one is PartAB. Unless you want to work in Stata or SPSS you will need to change the format into
+> one you can use with your favourite data analysis software (e.g. Matlab, R, Python). I use R, which has tools to
+> convert SPSS files to CSV. I imagine Matlab, Python etc. have similar tools. 
+>
+> From the same website you should also download the documentation file from the Documentation tab - 'GLSS 7
+> Questionnaire and Manual'. This is rather misleading because it isn't really documentation but rather the
+> questionnaires which were used to collect the data. Anyway, the parts of the questionnaire relating to the data in
+> the PartAB subdirectory are contained in the files 'GLSS7_MODULE_A_30_09_16_for print.docx' and
+> 'GLSS7_MODULE_B_14_10_16.docx'.
+>
+> The data which is most obviously relevant to water quality/water security is contained in Module A, Section 7, Part D
+> (Utilities and amenities); see page 73 of GLSS7_MODULE_A...docx. The data for this section is in the file
+> PartAB/PartA/g7sec7.sav (if using SPSS format). Once you've converted this e.g. to CSV format, you will see that
+> the column names refer to the questions. So, the answer to Module A, Section 7, Part D, q1a, Drinking, is stored in
+> the column named s7dq1a1; the answer to to Module A, Section 7, Part D, q1a, General use, is stored under
+> column s7dq1a, and so on. It's a bit ambiguous in places but should be mostly tractable. 
+>
+> If Mike agrees, I suggest you work on the above and get a feel for the data. If you have any questions or problems
+> then please let me know. I'm in college all week so can help if needed.
+>
+> Cheers,
+> Simon
+>
+> Templeton, Michael writes:
+>
+>> Hi Simon,
+>>
+>>  
+>>
+>> I met with Rhys and Dominik today and they seem keen to proceed with 
+>> the Accra data analysis. Can you please therefore arrange a meeting 
+>> with them for next week when it is convenient for you, to hand them 
+>> the data and explain the format of it to them? I’ve copied them here.
+>>
+>>  
+>>
+>> (I presume there aren’t any data protection / ownership / ethics 
+>> issues which would prevent you from handing the data to them?)
+>>
+>>  
+>>
+>> Thanks,
+>>
+>>  
+>>
+>> Mike
+>>
+>>  
+>>
+>> ----------------------------------------------------------------------
+>> -
+>>
+>> Dr Michael R Templeton PhD CEng FICE
+>>
+>> Reader in Public Health Engineering
+>>
+>> Director of Undergraduate Studies
+>>
+>> Department of Civil and Environmental Engineering
+>>
+>> Imperial College London
+>>
+>> London, United Kingdom SW7 2AZ
+>>
+>> Tel: +44(0)2075946099
+>>
+>> Email: m.templeton@imperial.ac.uk
+>>
+>> Web: www.imperial.ac.uk/people/m.templeton
+>>
+>> ----------------------------------------------------------------------
+>> -
+>>
+>>  
+

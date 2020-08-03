@@ -1,0 +1,179 @@
+## Author : Simon Moulds
+## Date   : Nov 2018
+
+library(magrittr)
+library(zoo)
+library(xts)
+library(dplyr)
+library(ncdf4)
+library(raster)
+library(rgdal)
+
+wd = "/home/simon/projects/gandak_systems_model"
+setwd(wd)
+
+model_region = raster("land_surface/input/Gandak05min.clone_sub.map")
+
+## Gandak polygons (for plotting)
+## ##############################
+
+gandak_india_poly = readOGR(
+    dsn="analysis/data",
+    layer="gandak_basin_india_ll")
+gandak_poly = readOGR(
+    dsn="analysis/data",
+    layer="gandak_basin_ll")
+gandak_rivers = readOGR(
+    dsn="analysis/data",
+    layer="gandak_rivers_ll")
+
+system("unzip -o data/Gandak_canal+nodes.zip -d data")
+
+gandak_canal_main = readOGR(
+    dsn="analysis/data/Gandak_canal+nodes",
+    layer="main_canal")
+gandak_canal_branch = readOGR(
+    dsn="analysis/data/Gandak_canal+nodes",
+    layer="branch_canal")
+gandak_canal_distr = readOGR(
+    dsn="analysis/data/Gandak_canal+nodes",
+    layer="distributary")
+gandak_canal_subbranch = readOGR(
+    dsn="analysis/data/Gandak_canal+nodes",
+    layer="subbranch canal")
+gandak_canal_subdistr = readOGR(
+    dsn="analysis/data/Gandak_canal+nodes",
+    layer="subdistributary")
+
+## adm2 = readOGR(
+##     dsn=file.path(wd, "pkg", "india_adm2_1990", "data"),
+##     layer="g2010_2_India")
+## adm0 = readOGR(
+##     dsn=file.path(wd, "data"),
+##     layer="India_Country_ll")
+
+## AquaCrop output files
+## #####################
+
+## fs = list.files(file.path("land_surface", "output", "netcdf"), pattern="^.*\\.nc$", full.names=TRUE)
+
+get_nc_var = function(fn) {
+    nc = nc_open(fn)
+    nm = attributes(nc$var)$names[1]
+    var = ncvar_get(nc, nm)
+    nc_close(nc)
+    var
+}
+
+get_nc_var_dims = function(fn, var) {
+    nc = nc_open(fn)
+    ## nm = attributes(nc$var)$names[1]
+    ## var = ncvar_get(nc, nm)
+    dims = sapply(nc$var[[var]]$dim, FUN=function(x) x$name)
+    nc_close(nc)
+    dims
+}
+
+get_maps = function(x, template) {
+    dims = dim(x)
+    nt = dims[5]
+    nfarm = dims[4]
+    ncrop = dims[3]
+    maps = list()
+    for (i in 1:nt) {
+        maps[[i]] = list()
+        for (j in 1:ncrop) {
+            maps[[i]][[j]] = list()
+            for (k in 1:nfarm) {
+                map = raster(template)
+                map[] = t(x[,,j,k,i])
+                maps[[i]][[j]][[k]] = map
+            }
+        }
+    }
+    maps
+}
+
+input_dir = "land_surface/input"
+output_dir = "land_surface/output/netcdf"
+
+## Crop area (input)
+## #########
+
+x = get_nc_var(file.path(input_dir, "Gandak_crop_area.nc"))
+maps = list()
+for (i in 1:4) {
+    croparea = raster(model_region)
+    croparea[] = aperm(x[,nrow(croparea):1,i],2:1)
+    maps[[i]] = croparea
+}
+
+plot(stack(maps))
+
+## Yield
+## #####
+
+x = get_nc_var(file.path(output_dir, "Y_yearMax_output.nc"))
+y = get_nc_var(file.path(input_dir, "Gandak_potential_yield_data.nc"))
+
+farm_idx = 1
+crop_idx = 4
+yield = raster(model_region)
+yield[] = aperm(x[,nrow(yield):1,crop_idx,farm_idx,2], 2:1)
+potyield = raster(model_region)
+potyield[] = aperm(y[,nrow(yield):1,crop_idx], 2:1)
+plot(yield)
+plot(stack(yield, potyield))
+
+## Mean yield
+## ##########
+
+x = get_nc_var(file.path(output_dir, "YieldMean_yearMax_output.nc"))
+y = get_nc_var(file.path(input_dir, "Gandak_potential_yield_data.nc"))
+
+maps = list()
+for (i in 1:2) {
+    crop_idx = 1
+    yield = raster(model_region)
+    yield[] = aperm(x[,nrow(yield):1,crop_idx,i], 2:1)
+    maps[[i]] = yield
+}
+
+potyield = raster(model_region)
+potyield[] = aperm(y[,nrow(yield):1,crop_idx], 2:1)
+plot(yield)
+plot(stack(yield, potyield))
+
+## Mean irrigation
+## ###############
+
+x = get_nc_var(file.path(output_dir, "IrrMean_yearTot_output.nc"))
+
+crop_idx = 1
+irr = raster(model_region)
+irr[] = aperm(x[,nrow(irr):1,crop_idx,1], 2:1)
+## irr[irr > 1e+21] = NA
+plot(irr)
+
+## Mean production
+## ###############
+
+x = get_nc_var(file.path(output_dir, "ProductionMean_yearMax_output.nc"))
+
+crop_idx = 3
+prod = raster(model_region)
+prod[] = aperm(x[,nrow(prod):1,crop_idx,2], 2:1)
+## prod[prod > 1e+21] = NA
+plot(prod)
+
+## Mean recharge vol
+## #################
+
+x = get_nc_var(file.path(output_dir, "RechargeVolMean_yearTot_output.nc"))
+
+## crop_idx = 3
+recharge = raster(model_region)
+recharge[] = aperm(x[,nrow(recharge):1,2], 2:1)
+## prod[prod > 1e+21] = NA
+plot(recharge)
+

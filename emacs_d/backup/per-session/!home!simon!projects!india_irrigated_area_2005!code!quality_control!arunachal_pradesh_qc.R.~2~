@@ -1,0 +1,82 @@
+## Author : Simon Moulds
+## Date   : January 2018
+
+## Quality control for Arunachal Pradesh
+
+## Crops not grown: ...
+
+## maize
+## #####
+
+## all ok
+
+## other cereals
+## #############
+
+## all ok
+
+## rest of crops
+## #############
+
+xx[["apy_rest_of_crops-whole_year"]] %<>% linear_interp(6)
+
+## rice
+## ####
+
+xx[["irr_rice-winter"]] %<>% irr_frac_interp(xx[["apy_rice-winter"]], 1, 2)
+xx[["irr_rice-winter"]] %<>% irr_frac_interp(xx[["apy_rice-winter"]], 3:4, 5)
+
+## sugarcane
+## #########
+
+if (dist_nm %in% c("East Kameng")) {
+    xx[["apy_sugarcane-whole_year"]] = xx[["mapspam_atot_sugarcane"]][6]
+    xx[["irr_sugarcane-whole_year"]] = xx[["mapspam_xirr_sugarcane"]][6]
+}
+
+if (dist_nm %in% c("Papum Pare")) {
+    xx[["apy_sugarcane-whole_year"]] %<>% locf_interp(7, fromLast=TRUE)
+}
+
+if (dist_nm %in% c("Tirap")) {
+    xx[["apy_sugarcane-whole_year"]] %<>% locf_interp(c(4,6,8:11))
+}
+
+if (dist_nm %in% c("Upper Siang")) {
+    xx[["apy_sugarcane-whole_year"]] %<>% locf_interp(1:5, fromLast=TRUE)
+}
+
+## tea
+## ###
+
+xx[["apy_tea-whole_year"]] = xx[["mapspam_atot_tea"]][6]
+xx[["irr_tea-whole_year"]] = xx[["mapspam_xirr_tea"]][6]
+
+## temperate fruit
+## ###############
+
+xx[["apy_temperate_fruit-whole_year"]] = xx[["mapspam_atot_temperate_fruit"]][6]
+xx[["irr_temperate_fruit-whole_year"]] = xx[["mapspam_xirr_temperate_fruit"]][6]
+
+## tobacco
+## #######
+
+xx[["apy_tobacco-kharif"]] = xx[["mapspam_atot_tobacco"]][6]
+xx[["irr_tobacco-kharif"]] = xx[["mapspam_xirr_tobacco"]][6]
+
+## tropical fruit
+## ##############
+
+xx[["apy_tropical_fruit-whole_year"]] = xx[["mapspam_atot_tropical_fruit"]][6]
+xx[["irr_tropical_fruit-whole_year"]] = xx[["mapspam_xirr_tropical_fruit"]][6]
+
+## vegetables
+## ##########
+
+xx[["apy_vegetables-kharif"]] = xx[["mapspam_atot_vegetables"]][6]
+xx[["irr_vegetables-kharif"]] = xx[["mapspam_xirr_vegetables"]][6]
+
+## wheat
+## #####
+
+## all ok

@@ -1,0 +1,79 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from modules.Meteo import *
+from modules.CarbonDioxide import *
+from modules.Groundwater import *
+from modules.CheckGroundwaterTable import *
+
+class AquaCrop_initial(DynamicModel):
+    def __init__(self, configuration, currTimeStep, initialState = None):
+        DynamicModel.__init__(self)
+
+        self._configuration = configuration
+        self._modelTime = currTimeStep
+
+        # clone map, land mask
+        pcr.setclone(configuration.cloneMap)
+        self.cloneMap = configuration.cloneMap
+        self.landmask = vos.readPCRmapClone(configuration.globalOptions['landmask'],
+                                            configuration.cloneMap,
+                                            configuration.tmpDir,
+                                            configuration.globalOptions['inputDir'],
+                                            True)
+
+        # TODO: parameters
+        
+        # initialize the various modules
+        self.meteo_module = Meteo(self)
+        self.carbon_dioxide_module = CarbonDioxide(self)
+        self.groundwater_module = Groundwater(self)
+        self.initial_condition_module = InitialCondition(self)
+        self.check_groundwater_table_module = CheckGroundwaterTable(self)
+        self.pre_irrigation_module = PreIrrigation(self)
+        self.drainage_module = Drainage(self)
+        self.rainfall_partition_module = RainfallPartition(self)
+        self.root_zone_water_module = RootZoneWater(self)
+        self.irrigation_module = Irrigation(self)
+        self.infiltration_module = Infiltration(self)
+        self.capillary_rise_module = CapillaryRise(self)
+        self.germination_module = Germination(self)
+        self.growth_stage_module = GrowthStage(self)
+        self.root_development_module = RootDevelopment(self)
+        self.water_stress_module = WaterStress(self)
+        self.canopy_cover_module = CanopyCover(self)
+        self.soil_evaporation_module = SoilEvaporation(self)
+        self.transpiration_module = Transpiration(self)
+        self.groundwater_inflow_module = GroundwaterInflow(self)
+        self.HI_ref_current_day_module = HIrefCurrentDayModule(self)
+        self.biomass_accumulation_module = BiomassAccumulation(self)
+        self.temperature_stress_module = TemperatureStress(self)
+        self.harvest_index_module = HarvestIndex(self)
+        self.crop_yield_module = CropYield(self)
+
+        # run initial methods to initialize all variables
+        self.meteo_module.initial()
+        self.carbon_dioxide_module.initial()
+        self.groundwater_module.initial()
+        self.initial_condition_module.initial()
+        self.check_groundwater_table_module.initial()
+        self.pre_irrigation_module.initial()
+        self.drainage_module.initial()
+        self.rainfall_partition_module.initial()
+        self.root_zone_water_module.initial()
+        self.irrigation_module.initial()
+        self.infiltration_module.initial()
+        self.capillary_rise_module.initial()
+        self.germination_module.initial()
+        self.growth_stage_module.initial()
+        self.root_development_module.initial()
+        self.water_stress_module.initial()
+        self.canopy_cover_module.initial()
+        self.soil_evaporation_module.initial()
+        self.transpiration_module.initial()
+        self.groundwater_inflow_module.initial()
+        self.HI_ref_current_day_module.initial()
+        self.biomass_accumulation_module.initial()
+        self.temperature_stress_module.initial()
+        self.harvest_index_module.initial()
+        self.crop_yield_module.initial()

@@ -1,0 +1,9 @@
+Two directories:
+
+# code
+
+model.cpp       - the model itself, written in Rcpp (C++)
+model.R         - R script which calls the model
+run_scenarios.R - script which runs all the various scenarios for each district
+plots.R         - R script to make plots from the model output
+

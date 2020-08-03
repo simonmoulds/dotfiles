@@ -1,0 +1,151 @@
+* Ana Mijic (Imperial) - welcome and aims of the meeting
+** Individual pubs
+** Collaborative pubs
+** 1-2 high-level pubs
+** Policy briefs + recommendations
+** Shared state variable (irrigation water use)
+** Can we think about the work differently?
+*** Start with problem (in this case, 1.5deg target) and work backwards (to work out whether it's possible to meet the criteria in a sustainable way)
+
+* Jagdish Krishnaswamy (ATREE) - ecological flows for endangered species and fisheries in the Gandak river
+** Ecological flows - river discharge and depth
+** Barrage operations in the dry season
+** Sand-bar heights and exposure during recession - nesting heights etc
+** Animal responses to changes in river flow
+** Fisheries impacts of flow releases
+
+** Components of ecological flow estimation
+*** Barrage operations and maintenance of sand bars
+*** Nesting and dispersal behaviour of animals
+*** Dry-season recession
+*** River discharge and depth
+
+** River discharge and water level
+*** Stage-discharge equations estimated for sites in three blocks
+*** ...
+
+** Ecological flows in 2017-18
+*** March 2018 - nearly all gates of the barrage were closed (zero-discharge condition - all flow from baseflow and canal return flow)
+*** Extent of habitat that would be submerged or available under different discharge conditions
+*** November 2017 - losing water, but March 2018 - gaining water (role of baseflow + canal return flow)
+*** Spatial distribution of gharials and river dolphins showed a corresponding downstream shift)
+
+** Fisheries: perceptions about dry-season flow releases
+*** Dry season releases from barrage not preferred by river fishers
+*** "Barrage releases triggers upriver fish movement; easy to target as they try to cross the barrage"
+
+** Database on Ganges river dolphins and gharials
+** Potential to upscale to Indus-Ganges-Brahmaputra river system
+** Nov-Dec 2018 will be last field campaign for CHANSE ecology and hydrology data collection
+
+** Future directions
+*** Inter-disciplinary approach wrt to water sharing
+*** Upscaling to Ganges basin
+
+** The Gandak remains a good habitat for the two species under consideration, but we do not fully understand why, and hence it is important to understand the variables which are important (what human activities are incompatible with maintaining the habitat?)
+
+** Opportunity for a policy brief on the need to consider ecological flow requirements in barrage operations
+
+* Johanna Scheidegger (BGS) - land surface-groundwater coupling
+
+** VIC-AMBHAS
+** VIC-SIMGM GW representation (fourth layer in VIC representing unconfined aquifer)
+*** No lateral groundwater flow
+** ...
+
+* Chris Jackson (BGS)
+** Shallow aquifer system (down to about 30m) - deep system is not active
+** ...
+* Subimal Ghosh (IITB)
+** Irrigation module in land surface module
+** Irrigation is not demand driven
+** ~50% of crop area is paddy field
+*** Ponded conditions - energy flux, land-atmosphere coupling
+** Need to include irrigation, and the way that it's being applied
+** Presentations on how to improve land-atmosphere model
+
+* SG Presentation 1
+** IGP may soon face lack of freshwater due to declining groundwater level and weakening monsoon
+** Asoka et al (2017) - groundwater depletion across entire IGP
+** GRACE data is not working particularly well in India
+*** Monsoon rainfall during GRACE-era (1998-2013) is approx stable
+*** Authors consider demand-driven irrigation - incorrect
+** Fishman (?) water application data
+
+* Discussion on collaborative papers (Subimal Ghosh)
+** Paper 1: Coupled VIC-GW-behaviour (land-atmosphere coupling w/ human behaviour)
+*** TODO regionalization of farmer behaviour model
+*** Gaur: US aerial photographs from 1950s - Pradeep to contact Rajiv and CC me
+*** Irrigated area dataset - publish this ASAP
+
+** Paper 2: System dynamics model
+*** TODO addition of ecological component, addition of farmer behaviour component
+*** Rainfall <--/--> groundwater (link broken due to human activities)
+*** Consider impact of forecasts on farmers behaviour
+*** TODO investigate drought duration due to human behaviour?
+
+** Scenarios
+*** climate driven (understanding impact of climate change on the system)
+*** policy driven (what effect do different policies have on resilience) - resilience as an indicator of likelihood of achieving sustainable development?
+*** 
+
+** Regionalizing farmer models
+*** Smallholding (yield maximizers) ----> large farm (profit maximizer)
+*** Does the assumption of yield maximizer hold when:
+**** (1) dealing with cash crops (e.g. sugarcane)?
+**** (2) dealing with large farms (i.e. not smallholdings)?
+
+** Paper 1 timeline:
+*** Dec 2018: individual components (Skype meeting)
+*** Jan-Feb 2019: Jisha (IITB) to BGS, Imperial (Skype meeting in Feb)
+*** Mar 2019: integrate LULCC (Exe)
+*** Apr 2019: stakeholder meeting
+
+** Paper 2 timeline: 
+*** Dec 2018: Fully integrated hydrological model
+*** Feb 2019: ATREE to deliver population model
+*** Mar 2019: Fully integrated simulations
+
+** Other activities:
+*** Submit individual components to EGU/AGU (summer)
+*** Attempt to organise session @ AGU 2019
+
+* Discussion on SWR meeting
+** Three presentations, 10 mins each: 1: overview, 2: modelling, 3: scenarios
+** Overview
+** Modelling
+*** Ecology - ATREE
+*** Focus on integrated modelling
+
+** Scenarios
+*** Introduce integrated modelling again
+*** Historical/future projections
+*** Land use/land cover change
+*** SSPs, downscaling work
+*** What does a good future look like? -> work backwards
+*** Climate scenario
+*** LULC scenario
+*** Human behaviour scenario
+*** Ecological scenario
+
+What is the contribution of Himalayan glaciers to India's water resources?
+
+Introduction
+
+The potential effects of climate change on Himalayan glaciers has received much attention recently, with several studies highlighting the potential effect on regional water resources \citep{}. Himalayan glaciers have scientific and cultural significance which transcend their contribution to water resources. Rather, we aim to quantify the contribution of glacier and snow melt to streamflow in order to ensure that cost-effective adaptation and mitigation measures can be put in place. However, the glacier contribution decreases exponentially as it propagates downstream and interacts with other hydrological processes such as rainfall runoff and baseflow. A landmark study by Kaser et al (2010) quantified the contribution of glacier melt to several basins globally.
+
+Method
+
+We use the SPHY hydrological model, which includes glacier melt. The spatial extent of Himalayan glaciers is obtained from the Randolph Glacier Inventory (v6.0). We use precipitation data at 0.25deg from the Indian Meteorological Department (IMD). 
+
+Fellowship
+
+Interests:
+Water use <-> water supply
+Regional scale - "Regional socio-hydrology"
+Effect of irrigation on hydrometeorological feedbacks
+Incorporating human behaviour in regional hydrological models, bottom-up (agent-based approach)
+Scenario development <-> scenario achievement (i.e. working out what a "good" future looks like, or how a place can achieve SDG)
+Resilient sustainable development, and how to test it (system dynamics - shared state variable)
+Resilience as a property of a system, and sustainable development an objective or aim of the system
+

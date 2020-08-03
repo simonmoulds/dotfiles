@@ -1,0 +1,118 @@
+## Author : Simon Moulds
+## Date   : Apr 2018
+
+## Quality control for Kerala
+
+## Barley
+## ######
+
+## Not grown
+
+## Chickpea
+## ########
+
+## Not grown
+
+## Cotton
+## ######
+
+xx[["irr_cotton"]] = 0
+
+if (dist_nm %in% c("Cannanore.Kozhikode.Palghat.Thrichur")) {
+    xx[["apy_cotton"]] %<>% locf_interp(61:63)
+    xx[["apy_cotton"]] %<>% locf_interp(33:35)
+} else {
+    xx[["apy_cotton"]] = 0
+}
+
+## Finger millet
+## #############
+
+xx[["irr_finger_millet"]] = 0
+
+if (dist_nm %in% c("Cannanore.Kozhikode.Palghat.Thrichur")) {
+    xx[["apy_finger_millet"]] %<>% locf_interp(61:63)
+    xx[["apy_finger_millet"]] %<>% locf_interp(33:35)
+} else {
+    xx[["apy_finger_millet"]] = 0
+}
+
+
+## Groundnut
+## #########
+
+xx[["irr_groundnut"]] = 0
+
+if (dist_nm %in% c("Cannanore.Kozhikode.Palghat.Thrichur")) {
+    xx[["apy_groundnut"]] %<>% locf_interp(61:63)
+    xx[["apy_groundnut"]] %<>% locf_interp(33:35)
+} else {
+    xx[["apy_groundnut"]] = 0
+}
+
+## Maize
+## #####
+
+xx[["apy_maize"]] = 0
+xx[["irr_maize"]] = 0
+
+## Pearl millet
+## ############
+
+xx[["apy_pearl_millet"]] = 0
+xx[["irr_pearl_millet"]] = 0
+
+## Pigeonpea
+## #########
+
+xx[["apy_pigeonpea"]] = 0
+xx[["irr_pigeonpea"]] = 0
+
+## Rapeseed
+## ########
+
+xx[["apy_rapeseed"]] = 0
+xx[["irr_rapeseed"]] = 0
+
+## Rice
+## ####
+
+xx[["apy_rice"]] %<>% tot_frac_interp(rowSums(data.frame(xx[["irr_rice-winter"]], xx[["irr_rice-summer"]], xx[["irr_rice-autumn"]]), na.rm=TRUE), 61, 60)
+
+xx[["irr_rice-summer"]] %<>% irr_frac_interp(xx[["apy_rice"]], 21:31, 32)
+xx[["irr_rice-summer"]] %<>% irr_frac_interp(xx[["apy_rice"]], 33:36, 37)
+xx[["irr_rice-summer"]] %<>% irr_frac_interp(xx[["apy_rice"]], 43:55, 56)
+
+autumn_rice = xx[["irr_rice-autumn"]]
+winter_rice = xx[["irr_rice-winter"]]
+summer_rice = xx[["irr_rice-summer"]]
+xx[["irr_rice-autumn"]][56:63] = winter_rice[56:63]
+xx[["irr_rice-autumn"]] %<>% irr_frac_interp(xx[["apy_rice"]], 21:27, 28)
+xx[["irr_rice-autumn"]][32:43] = winter_rice
+xx[["irr_rice-autumn"]] %<>% irr_frac_interp(xx[["apy_rice"]], 44:50, 50)
+
+## Sesamum
+## #######
+
+xx[["apy_sesamum"]] %<>% locf_interp(61:63)
+xx[["irr_sesamum"]] %<>% locf_interp(61:63)
+xx[["irr_sesamum"]] = 0
+
+## Sorghum
+## #######
+
+xx[["apy_sorghum-kharif"]] = 0
+xx[["irr_sorghum-kharif"]] = 0
+xx[["apy_sorghum-rabi"]] = 0
+xx[["irr_sorghum-rabi"]] = 0
+
+## Sugarcane
+## #########
+
+## TODO
+
+## Wheat
+## #####
+
+xx[["apy_wheat"]] = 0
+xx[["irr_wheat"]] = 0

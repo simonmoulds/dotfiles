@@ -1,0 +1,122 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import os
+import shutil
+import sys
+import math
+import gc
+import numpy as np
+
+import pcraster as pcr
+from hydro_model_builder.Model import Model
+from hydro_model_builder import VirtualOS as vos
+from hydro_model_builder import Messages
+
+from CarbonDioxide import CarbonDioxide
+from CroplandArea import CroplandArea
+from CropArea import CropArea
+from FarmArea import FarmArea
+from CropParameters import CropParameters
+from FarmParameters import FarmParameters
+from IrrigationParameters import IrrigationParameters
+from FieldManagementParameters import FieldManagementParameters
+from PrecipitationData import PrecipitationData
+from TemperatureData import TemperatureData
+from RefETData import RefETData
+from InitialCondition import InitialCondition
+from InitialGroundwaterLevel import InitialGroundwaterLevel
+from PotentialYield import PotentialYield
+from PriceData import PriceData
+from SoilParameters import SoilParameters
+from CanalAccess import CanalAccess
+
+import logging
+logger = logging.getLogger(__name__)
+
+class GandakDataModel(Model):
+
+    def initial(self):
+        self.carbon_dioxide_module = CarbonDioxide(self)
+        self.cropland_area_module = CroplandArea(self)
+        self.crop_area_module = CropArea(self)
+        self.farm_area_module = FarmArea(self)
+        self.crop_parameters_module = CropParameters(self)
+        self.farm_parameters_module = FarmParameters(self)
+        self.irrigation_parameters_module = IrrigationParameters(self)
+        self.field_management_parameters_module = FieldManagementParameters(self)
+        self.precipitation_module = PrecipitationData(self)
+        self.temperature_module = TemperatureData(self)
+        self.reference_evapotranspiration_module = RefETData(self)        
+        self.initial_condition_module = InitialCondition(self)
+        self.initial_groundwater_level_module = InitialGroundwaterLevel(self)
+        self.potential_yield_module = PotentialYield(self)
+        self.price_module = PriceData(self)
+        self.soil_parameters_module = SoilParameters(self)
+        self.canal_access_module = CanalAccess(self)
+        
+        self.carbon_dioxide_module.initial()
+        self.cropland_area_module.initial()
+        self.crop_area_module.initial()
+        self.farm_area_module.initial()
+        self.crop_parameters_module.initial()
+        self.farm_parameters_module.initial()        
+        self.irrigation_parameters_module.initial()
+        self.field_management_parameters_module.initial()
+        self.precipitation_module.initial()
+        self.temperature_module.initial()
+        self.reference_evapotranspiration_module.initial()
+        self.initial_condition_module.initial()
+        self.initial_groundwater_level_module.initial()
+        self.potential_yield_module.initial()
+        self.price_module.initial()
+        self.soil_parameters_module.initial()
+        self.canal_access_module.initial()
+        
+        self.get_model_dimensions()
+        
+    def get_model_dimensions(self):
+        latitudes = np.unique(pcr.pcr2numpy(pcr.ycoordinate(self.cloneMap), vos.MV))[::-1]
+        longitudes = np.unique(pcr.pcr2numpy(pcr.xcoordinate(self.cloneMap), vos.MV))
+        zLayer = np.array([0.3,2.])
+        zLayerBot = np.cumsum(zLayer)
+        zLayerTop = zLayerBot - zLayer
+        zLayerMid = (zLayerTop + zLayerBot) / 2
+        nLayer = zLayer.size
+
+        zComp = np.array([0.1,0.1,0.1,0.15,0.15,0.2,0.2,0.25,0.25,0.25,0.25,0.3])
+        zCompBot = np.cumsum(zComp)
+        zCompTop = zCompBot - zComp
+        zCompMid = (zCompBot + zCompTop) / 2
+        nComp = zComp.size
+        
+        self.dimensions = {
+            'lat' : latitudes,
+            'lon' : longitudes,
+            'time': None,
+            'layer' : zLayerMid,
+            'compartment' : zCompMid,
+            'crop' : np.arange(self.nCrop),
+            'farm' : np.arange(self.nFarm),
+            'category' : np.arange(self.nFarmSizeCategory)
+        }
+        print dimensions
+
+    def dynamic(self):
+        self.carbon_dioxide_module.dynamic()
+        self.cropland_area_module.dynamic()
+        self.crop_area_module.dynamic()
+        self.farm_area_module.dynamic()
+        self.crop_parameters_module.dynamic()
+        self.farm_parameters_module.dynamic()        
+        self.irrigation_parameters_module.dynamic()
+        self.field_management_parameters_module.dynamic()
+        self.precipitation_module.dynamic()
+        self.temperature_module.dynamic()
+        self.reference_evapotranspiration_module.dynamic()
+        self.initial_condition_module.dynamic()
+        self.initial_groundwater_level_module.dynamic()
+        self.potential_yield_module.dynamic()
+        self.price_module.dynamic()
+        self.soil_parameters_module.dynamic()
+        self.canal_access_module.dynamic()

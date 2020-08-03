@@ -1,0 +1,76 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import netCDF4 as nc
+import numpy as np
+import shutil
+import os
+import rasterio
+import pandas as pd
+import scipy.interpolate as interpolate# import scipy 
+import datetime
+
+def run():
+
+    datadir = '../data'
+    os.system("wget ftp://aftp.cmdl.noaa.gov/products/trends/co2/co2_annmean_mlo.txt -O ../data/co2_annmean_mlo.txt")
+    data = pd.read_csv(
+        "../data/co2_annmean_mlo.txt",
+        delimiter="\s+",
+        header=None,
+        skiprows=range(57),
+        names=['year','mean','unc']
+        )
+    
+    years = data['year'].values
+    mean_co2 = data['mean'].values
+    f = interpolate.interp1d(years, mean_co2, kind="linear")
+    newyears = np.arange(years.min(), years.max() + 1)
+    newdata = f(newyears)
+
+    min_lon = -180 + 0.25 / 2
+    max_lon = 180 - 0.25 / 2
+    min_lat = -90 + 0.25 / 2
+    max_lat = 90 - 0.25 / 2
+    nlon = 360 / 0.25
+    nlat = 180 / 0.25
+    lon_vals = np.linspace(min_lon, max_lon, nlon)
+    lat_vals = np.linspace(max_lat, min_lat, nlat)
+    dates = []
+    for i in range(len(newyears)):
+        dates.append(datetime.datetime(newyears[i],1,1))
+    
+    dataset = nc.Dataset(os.path.join('../data', 'co2_annual_mean_mlo_0pt25degree.nc'), 'w')
+    dataset.description = 'mean annual CO2 concentration at Mauna Loa extrapolated to a global 0.25 degree grid'
+    dataset.history = 'created ' + time.ctime(time.time())
+
+    lat = dataset.createDimension('lat', nlat)
+    lon = dataset.createDimension('lon', nlon)
+    time = dataset.createDimension('time', None)
+
+    latitudes = dataset.createVariable('latitude', np.float64, ('lat',))
+    latitudes.units = "degrees_north"
+    latitudes[:] = lat_vals
+
+    longitudes = dataset.createVariable('longitude', np.float64, ('lon',))
+    longitudes.units = "degrees_east"
+    longitudes[:] = lon_vals
+
+    times = dataset.createVariable('time', np.int32, ('time',))
+    times.units = "days since 1901-01-01 00:00:00"
+    times.calendar = "standard"
+    times[:] = nc.date2num(dates, units=times.units, calendar=times.calendar)
+
+    co2 = dataset.createVariable('co2', np.float64, ('time','lat','lon'))
+    co2.setncattr('standard_name', 'co2')
+    co2.setncattr('long_name', 'CO2 concentration by volume')
+    co2.setncattr('units', '1e-6')
+    co2.setncattr('_FillValue', np.float64(1e+20))
+    co2.setncattr('missing_value', np.float64(1e+20))
+    co2[:] = newdata[:,None,None] * np.ones((nlat,nlon))[None,:,:]
+
+    dataset.close()
+    
+if __name__ == "__main__":
+    run()
+    

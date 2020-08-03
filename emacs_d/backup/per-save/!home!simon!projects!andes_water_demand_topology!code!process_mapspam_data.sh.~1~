@@ -1,0 +1,3 @@
+#!/bin/bash
+
+unzip data-raw/dataverse_files.zip -d data

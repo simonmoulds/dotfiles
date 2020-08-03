@@ -1,0 +1,45 @@
+References: <95153072305641@ejpwww11.nature.com.nature.com>
+User-agent: mu4e 1.0-alpha2; emacs 24.5.1
+From: Simon Moulds <s.moulds@exeter.ac.uk>
+To: scientificdata@nature.com
+Cc: s.moulds@exeter.ac.uk, varsha.khodiyar@nature.com
+Subject: Re: Metadata for SDATA-18-00006A
+In-reply-to: <95153072305641@ejpwww11.nature.com.nature.com>
+
+Dear Varsha,
+
+I've just received the proofs for the above manuscript and noticed that in the
+scientificdata@nature.com writes:
+
+> Dear Dr Moulds, 
+>
+> As you may know, Scientific Data provides full structured metadata records to document the provenance, manner of generation, and location in public repositories of the datasets linked to our Data Descriptors. These records follow the ISA (Investigation, Study, Assay) format (www.isa-tools.org), and in accordance with the Scientific Data specification of these guidelines I have generated Investigation, Study, and Assay files to accompany your manuscript (please see the attached ZIP archive for the complete file package).
+>
+> The investigation file provides an overview of the work. The study file describes the samples and subjects assayed in each work (the inputs), and the assay file the manipulations performed on a set of samples to generate one or more related datasets (the outputs). Please note that many of the fields in the investigation file are currently empty, as these will be automatically completed during the publication process.
+>
+> Once the ISA-Tab archive has been unzipped, the study and assay files are best viewed in a spreadsheet program, such as Microsoft Excel.  The investigation file is best viewed by uploading it to http://sd-at.nature.com/. Once uploaded, browse through the file by clicking on the menu items to the right.  
+>
+> Please check whether the selected terms are factually correct for your article. The main items to check in this file are:
+> &#x2022;	Design Descriptors &#x2013; what type of study was this?
+> &#x2022;	Related Publications &#x2013; these should be peer-reviewed and published articles (with a CrossRef DOI) that directly use or analyse the data whose generation is described in the Data Descriptor. If no such articles have published, this tab should be left blank.
+> &#x2022;	Factors &#x2013; What were the independent variables (Factor Name) and have these have been correctly typed (Factor Type)?
+> &#x2022;	Assays - What was measured (Measurement Type) and how was this measured (Technology Type)? 
+> N.B. There is no need to complete the Contacts information.
+>
+> You will see that we are constrained by the specific ontology terms available, and the final selection of terms is also required to be consistent with previously published Data Descriptors.  Term definitions and alternative suggestions can be searched for at https://www.ebi.ac.uk/ols/index.
+>
+> You may also be aware that Data Descriptors are published with a metadata summary table which appears after the article abstract. This table is generated from the machine-accessible metadata files. The table for your article is below.
+>
+> Design Type(s)	data integration objective &#x2022; time series design
+> Measurement Type(s)	land cover
+> Technology Type(s)	computational modeling technique
+> Factor Type(s)	DataTypes &#x2022; temporal_interval
+> Sample Characteristic(s)	India &#x2022; administrative region &#x2022; land &#x2022; anthropogenic terrestrial biome &#x2022; climate &#x2022; population of organisms &#x2022; road
+>
+> If you would like to suggest changes to any of the files or alternative ontology terms for the metadata summary table, please send a list detailing each change to scientificdata@nature.com.
+>
+> Please note that if we have not heard from you within 5 working days, we will assume that you have approved the metadata files, and we will send your article through to production. Any metadata file changes requested after your article is in production could result in publication of your article being delayed. If you require more time to check the metadata files, please let us know within this timeframe.
+>
+> Kind regards,
+> Varsha
+

@@ -1,0 +1,19 @@
+class Drainage(object):
+    
+def drainage(self):
+    """Class to redistribute stored soil water"""
+    def __init__(self, Drainage_variable):
+        self.var = Drainage_variable
+
+    def dynamic(self):
+        th, DeepPerc, FluxOut = drainage(self.var.th,
+                                         self.var.th_s_comp,
+                                         self.var.th_fc_comp,
+                                         self.var.th_fc_adj,
+                                         self.var.ksat_comp,
+                                         self.var.tau_comp,
+                                         self.var.dz,
+                                         self.var.dzsum)
+        self.th  = th
+        self.DeepPerc = DeepPerc
+        self.FluxOut = FluxOut

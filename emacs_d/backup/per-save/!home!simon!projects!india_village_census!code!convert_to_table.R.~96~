@@ -1,0 +1,128 @@
+## Author : Simon Moulds
+## Date   : April 2020
+
+library(rgdal)
+library(raster)
+library(magrittr)
+library(dplyr)
+
+## Get independent/dependent variables
+indep_vars = list.files(
+    "../data/",
+    pattern="^igp_.*_(avg|min|max|sum).tif",
+    full.names=TRUE
+)
+dep_vars = list.files(
+    "../data/",
+    pattern="^modis_max_.*_resamp.tif",
+    full.names=TRUE
+)
+vars = c(
+    dep_vars,
+    indep_vars,
+    file.path("../data/", "igp_cropland_pct.tif")
+)
+
+id_vars = c(
+    "igp_block_code_max",
+    "igp_census_cod_max",
+    "igp_dist_code_max",
+    "igp_district_max",
+    "igp_new_area_sum",
+    "igp_st_code_max",
+    "igp_state_max",
+    "igp_sub_dist_max",
+    "igp_thsil_code_max",
+    "igp_town_vill_max",
+    "igp_uid_max",
+    "igp_v_ct_code_max",
+    "igp_c_code01_max",
+    "igp_sid_max",
+    "igp_did_max",
+    "igp_tid_max",
+    "igp_vill_code_max",
+    "igp_ward_max",
+    "igp_eb_max",
+    "igp_level_max"
+)
+
+## Create tables for two states (Bihar, Haryana)
+options(stringsAsFactors = FALSE)
+adm2_poly = readOGR("~/projects/india_adm/india_adm2_2001/data/g2008_2_India.shp")
+
+states = c("Bihar","Haryana")
+
+extract_data = function(fs, coords) {
+    tbl = as.data.frame(
+        matrix(
+            data=NA,
+            nrow=length(coords),
+            ncol=length(fs)
+        )
+    )
+    nms = rep(NA, length(fs))
+    for (j in 1:length(fs)) {
+        r = raster(fs[j])
+        nms[j] = names(r)
+        vals = r[coords]
+        tbl[,j] = vals
+    }    
+    names(tbl) = nms
+    tbl
+}
+
+for (i in 1:length(states)) {
+
+    ## select state, extract from district-level
+    ## polygons in order to get the spatial extent
+    state = states[i]
+    st_poly = adm2_poly[adm2_poly$ADM1_NAME %in% state,]
+    st_ext = extent(st_poly)
+
+    ## Rasterize state polygon, then extract the coordinates
+    ## of grid cells belonging to the state
+    template = raster(indep_vars[1]) %>% crop(st_ext, snap="out")
+    st_rast = rasterize(st_poly, template, field=1)
+    coords = as(st_rast, "SpatialPoints")
+
+    ## Loop through dependent/independent variables, using
+    ## coordinates extracted above to extract data for the
+    ## particular state
+    dep_tbl = extract_data(dep_vars, coords)
+    indep_tbl = extract_data(indep_vars, coords)
+    vill_id = indep_tbl$igp_uid_max
+    vill_area = indep_tbl$igp_new_area_sum
+    indep_tbl %<>% dplyr::select(-(id_vars))
+    
+    ## assume that rows with all zeros are missing
+    missing_ix = !(rowSums(indep_tbl, na.rm=TRUE) > 0)
+
+    crop_tbl = extract_data(file.path("../data/", "igp_cropland_pct.tif"), coords)
+    
+    tbl = cbind(
+        as.data.frame(coords),
+        dep_tbl,
+        indep_tbl
+    )
+
+    ## Divide NDVI anomaly columns (i.e. dependent variables)
+    ## by 10000 (the raw product from EE is scaled by this
+    ## amount)
+    myfun = function(x) { x / 10000 }
+    tbl %<>% mutate_at(vars(starts_with("modis_")), myfun)
+    
+    ## limit the data to grid cells with more than 50% cropland,
+    ## then write output
+    tbl = tbl[tbl$igp_cropland_pct > 0.5,]
+    
+    write.table(
+        tbl,
+        file=file.path(
+            "../data/",
+            paste0(tolower(state), "_data.txt")
+        ),
+        row.names=FALSE,
+        col.names=TRUE,
+        sep="\t"
+    )
+}

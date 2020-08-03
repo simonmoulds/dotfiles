@@ -1,0 +1,6 @@
+## Author : Simon Moulds
+## Date   : March 2020
+
+library(raster)
+
+hwsd = raster("/data/hwsd/HWSD_RASTER/hwsd.bil")

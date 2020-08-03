@@ -1,0 +1,28 @@
+import numpy as np
+import datetime
+import os
+import gdal
+import netCDF4
+import re
+
+ds = gdal.Open('../data/ksat_topsoil_gapfilled_5m.tif')
+a = ds.ReadAsArray()
+nlat,nlon = np.shape(a)
+xres = 1./12
+yres = 1./12
+
+b = ds.GetGeoTransform() #bbox, interval
+minx = b[0]
+maxx = b[0] + nlon * xres
+maxy = b[3] 
+miny = b[3] + nlat * -yres
+
+lon = np.arange(0,nlon) * xres + (minx + xres/2)
+lat = np.arange(0,nlat) * yres + (miny + yres/2)
+lat = lat[::-1]
+
+zLayer = np.array([0.3,2.])
+zLayerBot = np.cumsum(zLayer)
+zLayerTop = zLayerBot - zLayer
+zLayerMid = (zLayerTop + zLayerBot) / 2
+nLayer = zLayer.size

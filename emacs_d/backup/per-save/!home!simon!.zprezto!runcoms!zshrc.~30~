@@ -1,0 +1,52 @@
+#
+# Executes commands at the start of an interactive session.
+#
+# Authors:
+#   Sorin Ionescu <sorin.ionescu@gmail.com>
+#
+
+# Source Prezto.
+if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
+  source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
+fi
+
+# Customize to your needs...
+if [[ -r /usr/local/lib/python2.7/site-packages/powerline/bindings/zsh/powerline.zsh ]]; then
+  source /usr/local/lib/python2.7/site-packages/powerline/bindings/zsh/powerline.zsh
+fi
+
+# Path
+export PATH=$HOME/local/dropbox:$HOME/local/zlib:$HOME/local/openmpi:$HOME/local/netcdf:$PATH
+
+export PATH=$HOME/local/cylc/bin:$PATH
+export PATH=$HOME/local/rose/bin:$PATH
+export PATH=$HOME/local/fcm/bin:$PATH
+export PATH=$HOME/local:$PATH
+export PATH=$HOME/local/MATLAB/R2019a/bin:$PATH
+export PATH=$HOME/local/eccodes/bin:$PATH
+
+# GCAM
+export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+export CXX=g++
+export BOOST_INCLUDE=${HOME}/projects/gcam/gcam-core-gcam-v5.2/libs/boost-lib
+export BOOST_LIB=${HOME}/projects/gcam/gcam-core-gcam-v5.2/libs/boost-lib/stage/lib
+export XERCES_INCLUDE=${HOME}/projects/gcam/gcam-core-gcam-v5.2/libs/xercesc/include
+export XERCES_LIB=${HOME}/projects/gcam/gcam-core-gcam-v5.2/libs/xercesc/lib
+export JARS_LIB=${HOME}/projects/gcam/gcam-core-gcam-v5.2/libs/jars/*
+export JAVA_INCLUDE=${JAVA_HOME}/include
+export JAVA_LIB=${JAVA_HOME}/lib/server
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/home/simon/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/home/simon/anaconda3/etc/profile.d/conda.sh" ]; then
+        . "/home/simon/anaconda3/etc/profile.d/conda.sh"
+    else
+        export PATH="/home/simon/anaconda3/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<
+

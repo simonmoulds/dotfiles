@@ -1,0 +1,8 @@
+## Author : Simon Moulds
+## Date   : July 2019
+
+library(raster)
+
+agmerra_path = "data-raw/AgMERRA/data.giss.nasa.gov/impacts/agmipcf/agmerra"
+    
+r = raster(

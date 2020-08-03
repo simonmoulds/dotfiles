@@ -1,0 +1,643 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import os
+import math
+import string
+import datetime
+import netCDF4 as nc
+import numpy as np
+import xarray as xr
+import pandas as pd
+from abc import ABC, abstractmethod
+from collections import namedtuple, OrderedDict
+
+from .Messages import ModelError, ModelFileError, ModelWarning
+
+allowed_y_dim_names = ['lat','latitude','y']
+allowed_x_dim_names = ['lon','longitude','x']
+allowed_t_dim_names = ['time','tstep']
+
+FILE_CACHE = dict()
+
+def clear_cache():
+    for item in list(FILE_CACHE.keys()):
+        FILE_CACHE[item].close()
+        FILE_CACHE.pop(item)
+
+def open_nc_dataset(nc_filename):
+    if nc_filename in list(FILE_CACHE.keys()):
+        f = FILE_CACHE[nc_file_name]
+    else:
+        f = nc.Dataset(nc_file_name)
+        f.set_auto_mask(False)
+        FILE_CACHE[nc_file_name] = f
+    return f
+
+def open_nc_mfdataset(nc_filelist, id):
+    if id in list(FILE_CACHE.keys()):
+        f = FILE_CACHE[id]
+    else:
+        f = nc.MFDataset(nc_filelist)
+        f.set_auto_mask(False)
+        FILE_CACHE[id] = f
+    return f
+
+def repair_time_string(timestr):    
+    timestr = timestr.lower()
+    timestr_split = timestr.split()
+    units = timestr_split[0]
+    successful = False
+    if timestr_split[1] == 'since':
+        successful = True
+    elif 'since' in timestr_split:
+        time_units = timestr.split('since')[0]
+        allowable_units = ['second','minute','hour','day']
+        occurrences = [unit in time_units for unit in allowable_units]
+        number_of_occurrences = sum(1 for occurrence in occurrences if occurrence is True)
+        if number_of_occurrences == 1:
+            time_unit = [unit for (unit, index) in zip(allowable_units, occurrences) if index][0]
+            timestr = time_unit + ' since' + timestr.split('since')[1]
+            successful = True
+        else:
+            msg = "ambiguous time units"
+    else:
+        msg = "time string does not contain 'since'"
+    if not successful:
+        raise ValueError(msg)    
+    return timestr
+
+# See https://gis.stackexchange.com/a/166900
+
+# From https://github.com/mapbox/rasterio/blob/master/rasterio/coords.py
+_BoundingBox = namedtuple('BoundingBox', ('left', 'bottom', 'right', 'top'))
+class BoundingBox(_BoundingBox):
+    def _asdict(self):
+        return OrderedDict(zip(self._fields, self))
+
+class Coordinates(object):
+    def __init__(self, x=None, y=None, z=None, time=None):
+        self.x = x
+        self.y = y
+        self.z = z
+        self.time = time
+
+class Dimnames(Coordinates):
+    pass
+
+class Axes(Coordinates):
+    pass
+
+_Resolution = namedtuple('Resolution', ('x', 'y', 'time'))
+class Resolution(_Resolution):
+    pass
+
+def get_dimension_names(self):
+    y_name = [dim for dim in allowed_y_dim_names if dim in dims]
+    x_name = [dim for dim in allowed_x_dim_names if dim in dims]
+    z_name = [dim for dim in allowed_z_dim_names if dim in dims]
+    t_name = [dim for dim in allowed_t_dim_names if dim in dims]
+    dimnames = Dimnames
+    if len(y_name) == 1:
+        dimnames.y = y_name
+    if len(x_name) == 1:
+        dimnames.x = x_name
+    if len(z_name) == 1:
+        dimnames.z = z_name
+    if len(t_name) == 1:
+        dimnames.time = t_name
+    return dimnames
+
+def get_coordinates(dataset, dims):
+    coords = Coordinates()    
+    if len(y_name) == 1:
+        coords.y = dataset.variables[dims.y]
+    if len(x_name) == 1:
+        coords.x = dataset.variables[dims.x]
+    if len(z_name) == 1:
+        coords.z = dataset.variables[dims.z]
+    if len(t_name) == 1:
+        coords.time = dataset.variables[dims.time]
+    return coords
+
+class HmDomain(object):
+    def __init__(self, model_region, model_time, region_varname=None):
+        # try opening netCDF file, otherwise try rasterio
+        try:
+            ds = xr.open_dataset(model_region)
+            rgn = ds.to_array(region_varname)
+            dimnames = get_dimension_names(model_region, region_varname)
+            self.x = rgn.variables[dimnames.x]
+            self.y = rgn.variables[dimnames.y]
+            self.z = rgn.variables[dimnames.z]
+            mask = model_region.variables[region_varname][:] > 0            
+            self.mask = mask > 0
+        except:
+            try:
+                ds = xr.open_rasterio(model_region)
+                self.x = ds.x.values
+                self.y = ds.y.values
+                self.z = None
+                # self.z = ds.z.values
+                mask = ds.values
+            except:
+                msg = 'File containing model region cannot be opened: ' + model_region
+                raise OSError(msg)
+        
+class HmDataset(ABC):
+    def __init__(self, dataset, model_domain, **kwargs):
+        self.dataset = dataset
+        self.domain = model_domain
+        self.dims = Dimnames()
+        self.axes = Axes()
+        self.coordinates = Coordinates()
+        self._values = None
+        
+    @abstractmethod
+    def get_space_dimension_names(self):
+        pass
+    @abstractmethod
+    def get_time_dimension_names(self):
+        pass
+    @abstractmethod
+    def get_space_dimension_axes(self):
+        pass
+    @abstractmethod
+    def get_time_dimension_axes(self):
+        pass    
+    @abstractmethod
+    def get_space_coordinates(self):
+        pass
+    @abstractmethod
+    def get_time_coordinates(self):
+        pass
+    
+class HmSpaceDataset(HmDataset):
+    
+    def __init__(self, dataset, model_domain, **kwargs):
+        super().__init__(
+            dataset,
+            model_domain,
+            **kwargs
+        )
+        self.get_space_dimension_names()
+        self.get_space_dimension_axes()
+        self.get_space_coordinates()
+        self.get_bounds()
+        self.get_spatial_resolution()
+        self.compare_region()
+        self.get_index()
+        
+    def get_space_dimension_names(self):
+        y_name = [dim for dim in allowed_y_dim_names if dim in self.dims]
+        x_name = [dim for dim in allowed_x_dim_names if dim in self.dims]
+        if (len(y_name) == 1) & (len(x_name) == 1):
+            self.dims.y = y_name[0]
+            self.dims.x = x_name[0]
+        else:
+            msg='Dataset dimensions are not understood: x dimension must be one of ' + ', '.join('"{0}"'.format(w) for w in allowed_x_dim_names) + '; y dimension must be one of ' + ', '.join('"{0}"'.format(w) for w in allowed_y_dim_names)
+            raise ValueError(msg)
+        
+        z_name = [dim for dim in allowed_z_dim_names if dim in self.dims]
+        if len(z_name) == 1:
+            self.has_z_dim = True
+            self.dims.z = z_name
+        else:
+            self.has_z_dim = False            
+            
+    def get_space_dimension_axes(self):
+        y_axis = [position for position,value in enumerate(self.dims) if value == self.y_name]
+        x_axis = [position for position,value in enumerate(self.dims) if value == self.x_name]
+        self.axes.y = y_axis
+        self.axes.x = x_axis
+        if self.has_z_dim:
+            z_axis = [position for position,value in enumerate(self.dims) if value == self.dims.z]
+            self.axes.z = z_axis
+    
+    def get_space_coordinates(self):
+        self.coordinates = Coordinates(
+            x = self.dataset.variables[self.dims.x][:],
+            y = self.dataset.variables[self.dims.y][:]
+        )        
+        if has_z_dim:
+            self.coordinates.z = self.dataset.variables[self.dims.z][:]            
+
+    # @abstractmethod
+    def get_spatial_resolution(self):
+        pass
+    # @abstractmethod
+    def get_bounds(self):
+        pass
+    # @abstractmethod
+    def compare_region(self):
+        pass
+    # @abstractmethod
+    def get_index(self):
+        pass
+    
+class Hm1dSpaceDataset(HmSpaceDataset):
+    
+    def get_spatial_resolution(self):
+        pass
+    
+    def get_bounds(self):
+        self.bounds = BoundingBox(
+            left = self.xmin,
+            bottom = self.ymin,
+            right = self.xmax,
+            top = self.ymax
+        )
+    
+    def compare_region(self):
+        identical_y_coordinates = np.array_equal(self.coordinates.y, self.region.coordinates.y)
+        identical_x_coordinates = np.array_equal(self.coordinates.x, self.region.coordinates.x)
+        self.identical_region = identical_y_coordinates & identical_x_coordinates        
+
+    def load(self):
+        if self._values is None:
+            self._values = self.select()
+
+    def select(self):
+        return self.dataset.variables[self.nc_varname][self.index]
+    
+    def get_index(self):
+        index = [slice(None)] * len(self.dims)
+        if not self.identical_region:
+            index[self.x_axis] = self.get_x_slice()
+            index[self.y_axis] = self.get_y_slice()
+        self.index = index
+        
+    def get_x_slice(self):
+        ds = xr.open_dataset(self.nc_filename)
+        x_match = ds[self.x_name].sel({self.x_name : self.region.coordinates.x}).values
+        x = ds[self.x_name]
+        ds.close()
+        # this could be too time consuming - use f2py?
+        self.x_slice = tuple([np.argwhere(xx == x).item() for xx in x_match])        
+
+    def get_y_slice(self):
+        ds = xr.open_dataset(self.nc_filename)
+        y_match = ds[self.y_name].sel({self.y_name : self.region.coordinates.y}).values
+        y = ds[self.y_name]
+        ds.close()
+        # this could be too time consuming - use f2py?
+        self.y_slice = tuple([np.argwhere(yy == y).item() for yy in y_match])
+
+    # @property
+    # def _x_orig(self):
+    #     return self.dataset.variables[self.dims.x][:]
+    # @property
+    # def _y_orig(self):
+    #     return self.dataset.variables[self.dims.y][:]
+    # @property
+    # def x(self):
+    #     return self.coordinates.x
+    # @property
+    # def y(self):
+    #     return self.coordinates.y    
+    @property 
+    def xmin(self):
+        return np.min(self.coordinates.x)
+    @property
+    def xmax(self):
+        return np.max(self.coordinates.x)
+    @property
+    def ymax(self):
+        return np.max(self.coordinates.y)
+    @property
+    def ymin(self):
+        return np.min(self.coordinates.y)    
+    @property
+    def ndim(self):
+        return len(self.dims)
+    @property
+    def values(self):
+        return self._values
+
+class Hm2dSpaceDataset(Hm1dSpaceDataset):
+    def __init__(self, dataset, model_domain, **kwargs):
+        super().__init__(
+            dataset,
+            model_domain,
+            **kwargs
+        )
+        self.check_regular_grid()
+        
+    def get_spatial_resolution(self):
+        self.res = Resolution(
+            x = float(abs(self.coordinates.x[0] - self.coordinates.x[1])),
+            y = float(abs(self.coordinates.y[0] - self.coordinates.y[1]))
+        )
+        
+    def compare_region(self):
+        self.compare_resolution()
+        self.compare_extent()
+        self.identical_region = self.identical_extent & self.identical_resolution
+    
+    def enforce_y_orientation(self):
+        # netcdf_y_orientation_follow_cf_convention = True
+        if len(self.coordinates.y) > 1:
+            netcdf_y_orientation_follow_cf_convention = (self.coordinates.y[0] - self.coordinates.y[1]) > 0
+            if not netcdf_y_orientation_follow_cf_convention:
+                # self.coordinates.y = self.coordinates.y[::-1]
+                self.flipud = True
+            else:
+                self.flipud = False                
+        
+    def check_regular_grid(self):
+        uniform_x = len(set(np.diff(self.coordinates.x))) == 1
+        uniform_y = len(set(np.diff(self.coordinates.y))) == 1
+        uniform_xy = uniform_x & uniform_y
+        if not uniform_xy:
+            msg = "Dataset " + self.nc_filename + " does not have a regular grid"
+            raise ValueError(msg)
+        
+    def compare_resolution(self):
+        self.identical_resolution = True
+        if (self.res['x'] != self.region.xres) | (self.res['y'] != self.region.yres):
+            self.identical_resolution = False
+            
+    def compare_extent(self):
+        self.identical_extent = True
+        if self.bounds.left != self.region.bounds.left:
+            self.identical_extent = False
+        if self.bounds.top != self.region.bounds.top:
+            self.identical_extent = False
+        if self.bounds.right != self.region.bounds.right:
+            self.identical_extent = False
+        if self.bounds.bottom != self.region.bounds.bottom:
+            self.identical_extent = False
+
+    def load(self):
+        if self._values is None:
+            self._values = self.select()
+            
+    def select(self):
+        values = self.dataset.variables[self.nc_varname][self.index]
+        if self.flipud:
+            return np.flip(values, axis=self.axis.y)
+        else:
+            return values
+        
+    def get_index(self):
+        index = [slice(None)] * len(self.dims)
+        if not self.identical_region:
+            index[self.x_axis] = self.get_x_slice()
+            index[self.y_axis] = self.get_y_slice()
+        self.index = index
+        
+    def get_x_slice(self):
+        # longitudes are ascending (i.e. W -> E), hence we *add* half
+        # the input cellsize to the clone map western boundary
+        min_x = min(abs(self.coordinates.x - (self.bounds.left + 0.5 * self.res.x)))
+        x_index_start = int(np.where(abs(self.coordinates.x - (self.region.bounds.left + 0.5 * self.res.x)) == min_x)[0])
+        x_index_end = int(math.ceil(x_index_start + self.region.ncol / (self.res.x / self.region.res.x)))
+        x_step = int((x_index_end - x_index_start) / abs(x_index_end - x_index_start))
+        self.x_slice = self.disaggregate(x_index_start, x_index_stop, x_step, self.res.x, self.region.res.x)
+
+    def get_y_slice(self):
+        if self.flipud:
+            min_y = min(abs(self.coordinates.y - (self.bounds.bottom + 0.5 * self.res.y)))
+            y_index_start = int(np.where(abs(self.coordinates.y - (self.bounds.bottom + 0.5 * self.res.y)) == min_y)[0])
+            y_index_end = int(math.ceil(y_index_start + self.region.ncol / (self.res.y / self.region.res.y)))
+            # y_step = int((y_index_end - y_index_start) / abs(y_index_end - y_index_start))
+        else:
+            # latitudes are descending (i.e. N -> S), hence we *subtract*
+            # half the input cellsize from the clone map northern boundary        
+            min_y = min(abs(self.coordinates.y - (self.bounds.top - 0.5 * self.res.y)))
+            y_index_start = int(np.where(abs(self.coordinates.y - (self.bounds.top - 0.5 * self.res.y)) == min_y)[0])
+            y_index_end = int(math.ceil(y_index_start + self.region.nrow / (self.res.y / self.region.res.y)))
+            # y_step = int((y_index_end - y_index_start) / abs(y_index_end - y_index_start))
+            # self.y_slice = self.disaggregate(y_index_start, y_index_stop, y_step, self.res.y, self.region.res.y)
+        y_step = int((y_index_end - y_index_start) / abs(y_index_end - y_index_start))
+        self.y_slice = self.disaggregate(y_index_start, y_index_stop, y_step, self.res.y, self.region.res.y)
+            
+    def disaggregate(self, start, end, step, res, model_res):
+        if res == model_res:
+            slc = slice(start, end, stop)
+        else:
+            if float(res) % float(model_res) == 0:
+                factor = int(float(res) / float(model_res))
+                slc = np.arange(start, end, step).repeat(factor)
+            else:
+                msg = "Spatial resolution of dataset " + self.nc_filename + " is not a multiple of the model resolution"
+                raise ValueError(msg)
+    @property 
+    def xmin(self):
+        return np.min(self.coordinates.x) - self.res.x * 0.5
+    @property
+    def xmax(self):
+        return np.max(self.coordinates.x) + self.res.x * 0.5
+    @property
+    def ymin(self):
+        return np.min(self.coordinates.y) - self.res.y * 0.5
+    @property
+    def ymax(self):
+        return np.max(self.coordinates.y) + self.res.y * 0.5                
+    @property
+    def xres(self):
+        return self.res.x
+    @property
+    def yres(self):
+        return self.res.y
+    @property
+    def ncol(self):
+        return self.coordinates.x.size
+    @property
+    def nrow(self):
+        return self.coordinates.y.size
+
+class HmTimeDataset(HmDataset):    
+
+    def __init__(self, dataset, model_domain, **kwargs):
+        super(HmTimeDataset, self).__init__(
+            dataset,
+            model_domain,
+            **kwargs
+        )
+        self.model_time = model_time
+        self.get_time_units()
+        self.get_time_calendar()
+        self.get_index()
+            
+    def get_time_dimension_names(self):
+        t_name = [dim for dim in allowed_t_dim_names if dim in self.dims]
+        if len(t_name) == 1:
+            self.has_time_dim = True
+            self.dims.time = t_name
+        else:
+            self.has_time_dim = False
+            
+    def get_time_dimension_axes(self):
+        if self.has_time_dim:
+            t_axis = [position for position,value in enumerate(self.dims) if value == self.t_name]
+            self.axes.time = t_axis
+    
+    def get_time_coordinates(self):
+        if has_time_dim:
+            self.coordinates.time = self.dataset.variables[self.dims.time][:]
+
+    def get_time_units(self):
+        self.time_units = repair_time_string(self.dataset[self.t_name].units)
+
+    def get_time_calendar(self):
+        self.time_calendar = self.dataset[self.t_name].calendar
+
+    def load(self):
+        if self._values is None:
+            # TODO: model_time class does not currently include times attribute
+            self._values = self.select(self.model_time.times)
+
+    def select(self, time):
+        index = [slice(None)] * len(self.dims)
+        time_slice = self.get_time_slice(time)
+        index[self.t_axis] = time_slice
+        if self._values is not None:
+            return self._values[index]
+        else:
+            return self.dataset.variables[self.nc_varname][index]
+
+    def get_index(self):
+        pass
+    
+    def get_time_slice(self, time, before=True):
+        datenum = nc.date2num(time, units=self.time_units, calendar=self.time_calendar)
+        inexact = np.logical_not(np.isin(datenum, self.coordinates.time))
+        time_slice = np.searchsorted(self.coordinates.time, datenum)
+        if inexact.any():
+            if before:
+                time_slice[inexact] = (np.searchsorted(self.coordinates.time, datenum) - 1)[inexact]
+            else:
+                time_slice[inexact] = np.searchsorted(self.coordinates.time, datenum)[inexact]
+        return time_slice
+    
+    @property
+    def values(self):
+        return self._values
+
+class HmSpaceTimeDataset(object):
+    def select(self, time):
+        self.index[self.t_axis] = self.get_time_slice(time)
+        if self._values is not None:
+            return self._values[self.index]
+        else:
+            return self.dataset.variables[self.nc_varname][self.index]
+                
+class Hm1dSpaceTimeDataset(HmSpaceTimeDataset, HmTimeDataset, Hm1dSpaceDataset):
+    pass
+
+class Hm2dSpaceTimeDataset(HmSpaceTimeDataset, HmTimeDataset, Hm2dSpaceDataset):
+    pass
+
+# TODO: see xarray: make separate backend/api.py file for these creator functions
+            
+def get_netcdf_files_covering_time_period(nc_filename, nc_varname, model_time):
+    # assume that no more than one file per day is used - reasonable?
+    datelist = pd.date_range(
+        model_time.start_time.date(),
+        model_time.end_time.date(),
+        freq='D'
+    ).to_pydatetime().tolist()
+    filename_list= []
+    for date in datelist:
+        f = nc_filename.format(day=date.day, month=date.month, year=date.year)
+        filename_list.append(f)
+    # https://stackoverflow.com/a/44628266
+    lookup = set()  # a temporary lookup set
+    filename_list = [x for x in filename_list if x not in lookup and lookup.add(x) is None]
+    return filename_list
+
+def get_format_args(x):
+    """Function to get format arguments from a string. This is
+    useful to work out whether input data files are provided
+    on a monthly or yearly basis
+    """
+    format_args = [tup[1] for tup in string.Formatter().parse(x) if tup[1] is not None]
+    return format_args
+
+def check_format_args_ok(format_args, allowable_args, allow_duplicates=True):
+    """Function to check format arguments meet certain
+    conditions.
+    """
+    format_args_ok = all([arg in allowable_args for arg in format_args])
+    if format_args_ok and not allow_duplicates:
+        format_args_ok = not any_duplicates(format_args)
+    return format_args_ok
+
+def has_format_args(x):
+    format_args = [tup[1] for tup in string.Formatter().parse(x) if tup[1] is not None]
+    return len(format_args) > 0
+
+def open_dataset():
+    if has_format_args(nc_filename):
+        nc_filename_list = get_netcdf_files_covering_time_period()
+        if len(nc_filename_list) > 1:
+            dataset = open_nc_mfdataset(nc_filename_list)
+        else:
+            dataset = open_nc_dataset(nc_filename_list[0])
+    else:
+        dataset = open_nc_dataset(nc_filename)
+    return dataset
+
+def has_time(dims):
+    return np.any([nm in allowed_t_dim_names for nm in dims])
+
+def has_space(dims):
+    has_x = np.any([nm in allowed_x_dim_names for nm in dims])
+    has_y = np.any([nm in allowed_y_dim_names for nm in dims])
+    return has_x & has_y
+
+def open_hmdataset(
+        nc_filename,
+        nc_varname,
+        model_domain,
+        grid_is_1d,
+        grid_dim_name
+):
+    """Open a dataset from a file or file-like object
+
+    Parameters
+    ----------
+    nc_filename : str 
+    nc_varname : str
+    model_time : ModelTime 
+    grid_is_1d : bool, optional
+        If True, the space dimension is interpreted as one-dimensional
+    grid_dim_name : str, optional
+        Only used if grid_is_1d is True
+
+    Returns
+    -------
+    dataset : Subclass of HmDataset
+        The newly created dataset
+
+    Notes
+    -----
+    TODO
+
+    See also
+    --------
+    TODO
+    """
+    dataset = open_dataset(nc_filename, nc_varname, model_time)
+    dims = dataset.variables[nc_varname].dimensions
+    spatial = has_space(dims)
+    temporal = has_space(dims)
+    if spatial & temporal:
+        if grid_is_1d:
+            ds = Hm1dSpaceTimeDataset(dataset)
+        else:
+            ds = Hm2dSpaceTimeDataset(dataset)
+    elif spatial:
+        if grid_is_1d:
+            ds = Hm1dSpaceDataset(dataset)
+        else:
+            ds = Hm2dSpaceDataset(dataset)
+    elif temporal:
+        ds = HmTimeDataset(dataset)
+    return ds
+
+def load_hmdataset(nc_filename, nc_varname, model_time, grid_is_1d, grid_dim_name):
+    ds = open_hmdataset(nc_filename, nc_varname, model_time, grid_is_1d, grid_dim_name)
+    ds.load()
+    return ds

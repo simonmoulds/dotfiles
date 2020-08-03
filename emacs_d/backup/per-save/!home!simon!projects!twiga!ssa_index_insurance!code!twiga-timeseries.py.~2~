@@ -1,0 +1,74 @@
+
+# Requests library is being used for the HTTP POST request with Basic authentication and a JSON body payload.
+import requests
+
+# Pandas and numpy is being used to store the timeseries after the API response has been parsed on converted.
+import pandas as pd
+import numpy as np
+
+# API Credentials
+API_USER = ".\twiga_hl"
+API_PASSWORD = "321321Demo!"
+
+# Function to retrieve a pandas timeseries object for a specific station and variable through the TWIGA/HydroNET API.
+# INPUT:
+#   - station (string): Location identifier in HydroNET which can be retrieved from the location endpoint. E.g. "TA00429"
+#   - variable (string): The variable code for request variable which can be retrieved from the dataSourceVariables endpoint. E.g. "TAHMO.Connectors.Stations.SoilMoisture"
+#   - startDate (string): The HydroNET timestamp notation (YYYYmmddhhmmss). E.g. "20181201000000" for 2018-12-01 00:00:00 UTC.
+#   - endtDate (string): The HydroNET timestamp notation (YYYYmmddhhmmss). E.g. "20181231000000" for 2018-12-31 00:00:00 UTC.
+# OUTPUT:
+#   Pandas timeseries object (docs: https://pandas.pydata.org/pandas-docs/stable/timeseries.html)
+
+def getTimeseries(station, variable, startDate, endDate, timeserieIndex=0):
+    requestBody = {
+        "Readers": [
+            {
+                "DataSourceCode": "TAHMO.Connectors.Stations",
+                "Settings": {
+                    "LocationCodes": [
+                        station
+                    ],
+                    "VariableCodes": [
+                        variable
+                    ],
+                    "StartDate": startDate,
+                    "EndDate": endDate,
+                    "StructureType": "TimeSeries"
+                }
+            }
+        ]
+    }
+    response = requests.post('https://tahmotwiga.mybluemix.net/twiga/api/timeSeries/get',
+                        json=requestBody,
+                        auth=requests.auth.HTTPBasicAuth(
+                          API_USER,
+                          API_PASSWORD))
+    
+    responseJSON = response.json()
+    
+    if 'Data' in responseJSON.keys() and len(responseJSON['Data']) > timeserieIndex and 'Data' in responseJSON['Data'][timeserieIndex].keys():
+        # Get array of all the values within the timeseries.
+        values = list(map(lambda timeserieElement: timeserieElement['Value'], responseJSON['Data'][timeserieIndex]['Data']))
+        
+        # Get array of all the dates in the timeseries in a supported date format ("YYYY-mm-dd HH:ii:ss").
+        dates = list(map(lambda timeserieElement: pd.Timestamp("%s-%s-%s %s:%s:%s" % (timeserieElement['DateTime'][0:4], timeserieElement['DateTime'][4:6], timeserieElement['DateTime'][6:8], timeserieElement['DateTime'][8:10], timeserieElement['DateTime'][10:12], timeserieElement['DateTime'][12:14])), responseJSON['Data'][timeserieIndex]['Data']))
+    else:
+        values = []
+        dates = []
+        
+    return pd.Series(values, index=dates)
+
+soilMoisture = getTimeseries('TA00429', 'TAHMO.Connectors.Stations.SoilMoisture', '20180129000000', '20190101000000')
+relativeHumidity = getTimeseries('TA00429', 'TAHMO.Connectors.Stations.RelativeHumidity', '20181201000000', '20181231000000')
+
+# # Enable inline plotting
+# %matplotlib inline
+
+# # Plot timeseries
+# soilMoisture.plot()
+# relativeHumidity.plot()
+
+# Out[12]:
+
+# <matplotlib.axes._subplots.AxesSubplot at 0x7fd2e2776908>
+

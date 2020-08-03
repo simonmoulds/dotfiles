@@ -1,0 +1,429 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import os
+import netCDF4 as nc
+from . import Messages
+
+allowed_y_dim_names = ['lat','latitude','y']
+allowed_x_dim_names = ['lon','longitude','x']
+allowed_t_dim_names = ['time','tstep']
+
+from collections import namedtuple, OrderedDict
+
+FILE_CACHE = dict()
+
+def clear_cache():
+    for item in list(FILE_CACHE.keys()):
+        FILE_CACHE[item].close()
+        FILE_CACHE.pop(item)
+
+def read_nc_dataset(nc_filename):
+    if nc_filename in list(FILE_CACHE.keys()):
+        f = FILE_CACHE[nc_file_name]
+    else:
+        f = nc.Dataset(nc_file_name)
+        f.set_auto_mask(False)
+        FILE_CACHE[nc_file_name] = f
+    return f
+
+def read_nc_mfdataset(nc_filelist, id):
+    if id in list(FILE_CACHE.keys()):
+        f = FILE_CACHE[id]
+    else:
+        f = nc.MFDataset(nc_filelist)
+        f.set_auto_mask(False)
+        FILE_CACHE[id] = f
+    return f
+
+def repair_time_string(timestr):    
+    timestr = timestr.lower()
+    timestr_split = timestr.split()
+    units = timestr_split[0]
+    successful = False
+    if timestr_split[1] == 'since':
+        successful = True
+    elif 'since' in timestr_split:
+        time_units = timestr.split('since')[0]
+        allowable_units = ['second','minute','hour','day']
+        occurrences = [unit in time_units for unit in allowable_units]
+        number_of_occurrences = sum(1 for occurrence in occurrences if occurrence is True)
+        if number_of_occurrences == 1:
+            time_unit = [unit for (unit, index) in zip(allowable_units, occurrences) if index][0]
+            timestr = time_unit + ' since' + timestr.split('since')[1]
+            successful = True
+        else:
+            msg = "ambiguous time units"
+    else:
+        msg = "time string does not contain 'since'"
+    if not successful:
+        raise ValueError(msg)    
+    return timestr
+
+# See https://gis.stackexchange.com/a/166900
+
+# From https://github.com/mapbox/rasterio/blob/master/rasterio/coords.py
+_BoundingBox = namedtuple('BoundingBox', ('left', 'bottom', 'right', 'top'))
+class BoundingBox(_BoundingBox):
+    def _asdict(self):
+        return OrderedDict(zip(self._fields, self))
+
+class Coordinates(object):
+    def __init__(self, x, y, z=None, time=None):
+        self.x = x
+        self.y = y
+        self.z = z
+        self.time = time
+
+class Dimnames(Coordinates):
+    pass
+
+class Axes(Coordinates):
+    pass
+
+_Resolution = namedtuple('Resolution', ('x', 'y'))
+class Resolution(_Resolution):
+    pass
+
+class HmBasic1dDataset(object):
+    def __init__(self, nc_filename, nc_varname, grid_dim_name):
+        pass
+
+class HmBasic2dDataset(object):
+    def __init__(self, nc_filename, nc_varname):
+        pass
+
+class HmBasicDataSet(object):
+
+    def __init__(self, nc_filename, nc_varname, grid_is_1d=False, grid_dim_name=None):
+        self.nc_filename = nc_filename
+        self.nc_varname = nc_varname
+        self.open_dataset()
+        self.get_dimensions()
+        self.get_dimension_names()
+        self.get_dimension_axes()
+        self.get_coordinates()
+        
+    def open_dataset(self):
+        self.dataset = read_nc_dataset(self.nc_filename)
+
+    def is_regular_grid(self):
+        uniform_x = len(set(np.diff(self.coordinates.x))) == 1
+        uniform_y = len(set(np.diff(self.coordinates.y))) == 1
+        uniform_xy = uniform_x & uniform_y
+        return uniform_xy
+
+    def is_one_dimensional(self):
+        pass
+    
+    # def get_dimensions(self):
+    #     self.dims = [dim_name for dim_name in self.dataset.dimensions.keys()]
+    def get_variable_names(self):
+        self.varnames = [varname for varname in self.dataset.variables.keys()]
+        
+    def get_dimension_names(self):
+        """Standardize dimension variables."""
+        
+        # if self.two_dimensional:
+        y_name = [dim for dim in allowed_y_dim_names if dim in self.dims]
+        x_name = [dim for dim in allowed_x_dim_names if dim in self.dims]
+        if (len(y_name) == 1) & (len(x_name) == 1):
+            self.dims = Dimnames(
+                y = y_name[0],
+                x = x_name[0]
+            )            
+        else:
+            raise ModelError
+        
+        z_name = [dim for dim in allowed_z_dim_names if dim in self.dims]
+        if len(z_name) == 1:
+            self.has_z_dim = True
+            self.dims.z = z_name
+        else:
+            self.has_z_dim = False
+            
+        t_name = [dim for dim in allowed_t_dim_names if dim in self.dims]
+        if len(t_name) == 1:
+            self.has_time_dim = True
+            self.dims.time = t_name
+        else:
+            self.has_time_dim = False
+            
+    def get_dimension_axes(self):
+        y_axis = [position for position,value in enumerate(self.dims) if value == self.y_name]
+        x_axis = [position for position,value in enumerate(self.dims) if value == self.x_name]
+        self.axes = Axes(
+            y = y_axis,
+            x = x_axis
+            )
+        if has_z_dim:
+            z_axis = [position for position,value in enumerate(self.dims) if value == self.dims.z]
+            self.axes.z = z_axis
+
+        if has_time_dim:
+            t_axis = [position for position,value in enumerate(self.dims) if value == self.t_name]
+            self.axes.time = t_axis
+    
+    def get_coordinates(self):
+        self.coordinates = Coordinates(
+            x = self.dataset.variables[self.dims.x][:],
+            y = self.dataset.variables[self.dims.y][:]
+        )        
+        if has_z_dim:
+            self.coordinates.z = self.dataset.variables[self.dims.z][:]
+            
+        if has_time_dim:
+            self.coordinates.time = self.dataset.variables[self.dims.time][:]
+
+class Hm1dSpaceDataArray(HmBasicDataArray):
+
+    def __init__(self, nc_filename, nc_varname, region):
+        super(Hm1dSpaceDataArray, self).__init__(nc_filename, nc_varname)
+        self.region = region
+        self.compare_region()
+        self.get_bounds()
+        self.get_res()
+        self.read()
+    
+    def get_bounds(self):
+        self.bounds = BoundingBox(
+            left = self.xmin,
+            bottom = self.ymin,
+            right = self.xmax,
+            top = self.ymax
+        )
+
+    def get_res(self):
+        pass
+    
+    def get_xyslice(self):
+        ds = xr.open_dataset(self.nc_filename)
+        y_match = ds[self.y_name].sel({self.y_name : self.region.coordinates.y}).values
+        x_match = ds[self.x_name].sel({self.x_name : self.region.coordinates.x}).values
+        y = ds[self.y_name]
+        x = ds[self.x_name]
+        ds.close()
+        # this could be too time consuming - use f2py?
+        self.yslice = tuple([np.argwhere(yy == y).item() for yy in y_match])
+        self.xslice = tuple([np.argwhere(xx == x).item() for xx in x_match])
+        self.xyslice = [slice(None)] * len(self.dims)
+        self.xyslice[self.y_axis] = self.yslice
+        self.xyslice[self.x_axis] = self.xslice
+        
+    def subset(self, values):
+        self.get_xyslice()
+        return values[self.xyslice]
+        
+    def compare_region(self):
+        identical_y_coordinates = np.array_equal(self.coordinates.y, self.region.coordinates.y)
+        identical_x_coordinates = np.array_equal(self.coordinates.x, self.region.coordinates.x)
+        self.identical_region = identical_y_coordinates & identical_x_coordinates
+
+    def resample(self, values):
+        return self.subset(values)
+
+    def read(self):
+        if self.identical_region:
+            self.values = self.dataset[self.nc_varname]
+        else:
+            values = self.dataset[self.nc_varname]
+            values = self.resample(values)
+            self.values = values.copy()
+            
+    @property 
+    def xmin(self):
+        return np.min(self.coordinates.x)
+
+    @property
+    def xmax(self):
+        return np.max(self.coordinates.x)
+
+    @property
+    def ymax(self):
+        return np.max(self.coordinates.y)
+
+    @property
+    def ymin(self):
+        return np.min(self.coordinates.y)
+    
+    @property
+    def values(self):
+        return self.values
+    
+class Hm2dSpaceDataArray(Hm1dSpaceDataArray):
+    # def __init__(self, nc_filename, nc_varname, region):
+    #     super(Hm2dSpaceDataArray, self).__init__(nc_filename, nc_varname)
+        
+    def enforce_y_orientation(self):
+        netcdf_y_orientation_follow_cf_convention = True
+        if len(self.coordinates.y) > 1:
+            netcdf_y_orientation_follow_cf_convention = (self.coordinates.y[0] - self.coordinates.y[1]) > 0            
+            if not netcdf_y_orientation_follow_cf_convention:
+                # WHAT TO DO WITH DATA ARRAY?
+                # data_array = np.flip(data_array, axis=self.y_dim_axis)
+                self.coordinates.y = self.coordinates.y[::-1]
+        
+    def is_regular_grid(self):
+        uniform_x = len(set(np.diff(self.coordinates.x))) == 1
+        uniform_y = len(set(np.diff(self.coordinates.y))) == 1
+        uniform_xy = uniform_x & uniform_y
+        return uniform_xy
+
+    def get_res(self):
+        self.res = Resolution(
+            x = float(abs(self.coordinates.x[0] - self.coordinates.x[1])),
+            y = float(abs(self.coordinates.y[0] - self.coordinates.y[1]))
+        )
+        
+    def compare_resolution(self):
+        self.identical_resolution = True
+        if (self.xres != self.region.xres) | (self.yres != self.region.yres):
+            self.identical_resolution = False
+            
+    def compare_extent(self):
+        self.identical_extent = True
+        if self.bounds.left != self.region.bounds.left:
+            self.identical_extent = False
+        if self.bounds.top != self.region.bounds.top:
+            self.identical_extent = False
+        if self.bounds.right != self.region.bounds.right:
+            self.identical_extent = False
+        if self.bounds.bottom != self.region.bounds.bottom:
+            self.identical_extent = False
+
+    def compare_region(self):
+        self.compare_resolution()
+        self.compare_extent()
+        self.identical_region = self.identical_extent & self.identical_resolution
+    
+    def get_xslice(self):
+        # longitudes are ascending (i.e. W -> E), hence we *add* half
+        # the input cellsize to the clone map western boundary
+        min_x = min(abs(self.coordinates.x - (self.bounds.left + 0.5 * self.xres)))
+        x_index_start = int(np.where(abs(self.coordinates.x - (self.region.bounds.left + 0.5 * self.xres)) == min_x)[0])
+        x_index_end = int(math.ceil(x_index_start + self.region.ncol / (self.xres / self.region.xres)))
+        x_step = int((x_index_end - x_index_start) / abs(x_index_end - x_index_start))
+        self.xslice = slice(x_index_start, x_index_end, x_step)                     
+    
+    def get_yslice(self):
+        # latitudes are descending (i.e. N -> S), hence we *subtract*
+        # half the input cellsize from the clone map northern boundary
+        min_y = min(abs(self.coordinates.y - (self.bounds.top - 0.5 * self.yres)))
+        y_index_start = int(np.where(abs(self.coordinates.y - (self.bounds.top - 0.5 * self.yres)) == min_y)[0])
+        y_index_end = int(math.ceil(y_index_start + self.region.nrow / (self.yres / self.region.yres)))
+        y_step = int((y_index_end - y_index_start) / abs(y_index_end - y_index_start))
+        self.yslice = slice(y_index_start, y_index_end, y_step)
+        
+    def get_xyslice(self):
+        self.get_xslice()
+        self.get_yslice()
+        self.xyslice = [slice(None)] * len(self.dims)
+        self.xyslice[self.y_axis] = self.yslice
+        self.xyslice[self.x_axis] = self.xslice
+        
+    def disaggregate(self, values):
+        x_factor = int(round(float(self.xres) / float(self.region.xres)))
+        y_factor = int(round(float(self.yres) / float(self.region.yres)))
+        values = np.repeat(values, x_factor, self.x_axis)
+        values = np.repeat(values, y_factor, self.y_axis)
+            
+    def resample(self):
+        if not self.identical_extent:
+            self.subset()
+        if not self.identical_resolution:
+            self.disaggregate()
+
+    @property 
+    def xmin(self):
+        return np.min(self.coordinates.x) - self.xres * 0.5
+
+    @property
+    def xmax(self):
+        return np.max(self.coordinates.x) + self.xres * 0.5
+
+    @property
+    def ymin(self):
+        return np.min(self.coordinates.y) - self.xres * 0.5
+
+    @property
+    def ymax(self):
+        return np.max(self.coordinates.y) + self.xres * 0.5
+                
+    @property
+    def xres(self):
+        return self.res.x
+
+    @property
+    def yres(self):
+        return self.res.y
+
+    @property
+    def ncol(self):
+        return self.coordinates.x.size
+
+    @property
+    def nrow(self):
+        return self.coordinates.y.size
+
+    @property
+    def ndim(self):
+        return len(self.dims)
+
+class HmSpaceDataSet(HmBasicDataSet):
+    def __init__(self, nc_filename, nc_varname):
+        super(HmSpaceDataSet, self).__init__(nc_filename, nc_varname)
+        if self.is_2d:
+            self.data = Hm2dSpaceDataArray()
+        else:
+            self.data = Hm1dSpaceDataArray()
+
+class HmSpaceTimeDataSet(HmSpaceDataSet):
+    
+    def __init__(self, nc_filename, nc_varname, region, start_time, end_time):
+        super(HmSpaceTimeDataSet, self).__init__(
+            nc_filename,
+            nc_varname,
+            model_grid
+        )
+        self.start_time = start_time
+        self.end_time = end_time
+
+    def get_netcdf_files_covering_time_period(self):
+        delta = (self.end_time - self.start_time).days + 1
+        datelist = pd.date_range(self.start_time, periods=delta).to_pydatetime().tolist()
+        filename_list= []
+        for date in datelist:
+            f = self.nc_filename.format(day=date.day, month=date.month, year=date.year)
+            filename_list.append(f)
+        # https://stackoverflow.com/a/44628266
+        lookup = set()  # a temporary lookup set
+        filename_list = [x for x in filename_list if x not in lookup and lookup.add(x) is None]
+        return filename_list
+
+    def open_dataset(self):
+        nc_filename_list = self.get_netcdf_files_covering_time_period()
+        self.dataset = read_nc_mfdataset(nc_filename_list)
+            
+    def get_time_units(self):
+        self.time_units = repair_time_string(self.dataset[self.t_name].units)
+
+    def get_time_calendar(self):
+        self.time_calendar = self.dataset[self.t_name].calendar
+    
+    def get_tslice(self, time, before=True):
+        inexact = np.logical_not(np.isin(time, self.coordinates.time))
+        index = np.searchsorted(self.coordinates.time, time)
+        if inexact.any():
+            if before:
+                index[inexact] = (np.searchsorted(self.coordinates.time, time) - 1)[inexact]
+            else:
+                index[inexact] = np.searchsorted(self.coordinates.time, time)[inexact]
+        self.tslice = index
+
+    def get_xyslice(self, time):
+        super(HmSpaceTimeDataArray, self).get_xyslice()
+        self.get_tslice(time)
+        self.xyslice[self.t_axis] = self.tslice
+        
+    def read(self):
+        pass

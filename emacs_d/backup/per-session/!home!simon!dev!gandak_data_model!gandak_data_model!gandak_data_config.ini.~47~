@@ -1,0 +1,221 @@
+[globalOptions]
+
+# Set the input directory map in an absolute path. The input
+# forcing and parameter directories will be relative to this
+# inputDir  = /home/simon/projects/gandak_systems_model_data/data
+inputDir = /home/simon/dev/gandak_data_model/data
+
+# output directory (absolute)
+outputDir = /home/simon/projects/gandak_systems_model/land_surface/input
+
+# Map of clone (must be provided in PCRaster maps)
+cloneMap = Gandak05min.clone.map
+
+# The area/landmask of interest:
+landmask = Gandak05min.landmask.map
+
+# NetCDF attributes for output files:
+institution = Centre for Water Systems, University of Exeter
+title       = AquaCrop v5.0 output
+description = test version (by Simon Moulds) 
+
+# Format: YYYY-MM-DD
+startTime = 1970-06-01
+endTime = 2010-12-31
+
+[carbonDioxideOptions]
+outputFile = Gandak_co2_concentration.nc
+
+[cropAreaOptions]
+# cropTypes = irr_rice_kharif, rain_rice_kharif, irr_rice_rabi, rain_rice_rabi, irr_wheat_rabi, rain_wheat_rabi, irr_sugarcane_whole_year, rain_sugarcane_whole_year
+cropTypes = irr_rice_kharif,irr_rice_rabi,irr_wheat_rabi,irr_sugarcane_whole_year
+cropAreaInputDir = /home/simon/projects/india_crop_area_2005/data/output_2005/seasonal_maps
+outputFile = Gandak_crop_area.nc
+
+[croplandAreaOptions]
+outputFile = Gandak_cropland_area.nc
+
+[cropParameterOptions]
+outputFile = Gandak_crop_parameters.nc
+
+[farmParameterOptions]
+# cropTypes = irr_rice_kharif, rain_rice_kharif, irr_rice_rabi, rain_rice_rabi, irr_wheat_rabi, rain_wheat_rabi, irr_sugarcane_whole_year, rain_sugarcane_whole_year
+# cropAreaInputDir = /home/simon/projects/india_crop_area_2005/data/output_2005/seasonal_maps
+nFarm = 2
+nFarmSizeCategory = 5
+nFarmPerCategory = 5
+outputFile = Gandak_farm_parameters.nc
+
+[irrigationParameterOptions]
+outputFile = Gandak_irrigation_parameters.nc
+
+[fieldManagementParameterOptions]
+outputFile = Gandak_field_management_parameters.nc
+
+[precipitationDataOptions]
+dataDir = output_prec/Rainfall
+startDate = 1979-01-01
+endDate = 2014-01-01
+outputFile = Gandak_precipitation_data.nc
+
+[temperatureDataOptions]
+dataDir = output_evap
+startDate = 1979-01-01
+endDate = 2014-01-01
+outputFile = Gandak_temperature_data.nc
+
+[refETDataOptions]
+dataDir = output_evap
+startDate = 1979-01-01
+endDate = 2014-01-01
+outputFile = Gandak_reference_evapotranspiration_data.nc
+
+[initialConditionOptions]
+outputFile = Gandak_initial_condition_data.nc
+
+[initialGroundwaterLevelOptions]
+outputFile = Gandak_initial_groundwater_level_data.nc
+
+[groundwaterLevelOptions]
+outputFile = Gandak_groundwater_level_data.nc
+
+[potentialYieldOptions]
+outputFile = Gandak_potential_yield_data.nc
+
+[priceOptions]
+cropPriceOutputFile = Gandak_crop_price_data.nc
+fertiliserPriceOutputFile = Gandak_fertiliser_price_data.nc
+dieselPriceOutputFile = Gandak_diesel_price_data.nc
+
+[soilParameterOptions]
+outputFile = Gandak_soil_data.nc
+
+[canalAccessOptions]
+outputFile = Gandak_canal_access.nc
+
+[tubewellOptions]
+outputFile = Gandak_initial_tubewell_ownership.nc
+
+[reportingOptions]
+
+
+
+
+
+
+
+# [meteoOptions]
+# precipitationNC = Gandak_prec_data_1979-2014.nc
+# temperatureNC = Gandak_temp_data_1979-2014.nc
+# refETPotFileNC = Gandak_etref_data_1979-2014.nc
+
+# precipitationVariableName = precipitation
+# tminVariableName = Tmin
+# tmaxVariableName = Tmax
+# refETPotVariableName = referencePotET
+
+# [carbonDioxideOptions]
+
+# carbonDioxideNC = Gandak_co2_concentration.nc
+
+# [groundwaterOptions]
+# WaterTable = 0
+# VariableWaterTable = 0
+# groundwaterNC = gwlevel_{day:d}_{month:d}_{year:d}.nc
+# groundwaterVariableName = level
+# DailyGroundwaterNC = 1
+# timeLag = 1
+# initialGroundwaterLevelNC = Gandak_initial_groundwater_level.nc
+# groundwaterInputDir = /var/data/chanse_model/gwlevel
+
+# [canalOptions]
+# Canal = 0
+# VariableCanalSupply = 0
+# canalNC = canalflow_{day:d}_{month:d}_{year:d}.nc
+# canalVariableName = flow
+# DailyCanalNC = 1
+# timeLag = 1
+# initialCanalSupplyNC = Gandak_initial_canal_supply.nc
+# canalInputDir = /var/data/chanse_model/GandakCanalModel/Output/NetCDF/Flows
+
+# [cropOptions]
+# nCrop = 8
+# cropParameterNC = Gandak_crop_params.nc
+# cropAreaNC = Gandak_crop_area.nc
+# cropAreaVariableName = crop_area_frac
+# croplandAreaNC = Gandak_crop_area.nc
+# croplandAreaVariableName = cropland_area
+# AnnualChangeInCropArea = 0
+
+# CalendarType = 2
+# SwitchGDD = 1
+# GDDmethod = 2
+
+# PotYieldNC = Gandak_potential_crop_yield_gaez.nc
+# PotYieldVariableName = Yx
+# AnnualChangeInPotYield = False
+
+# [farmOptions]
+# nFarm = 10
+# farmAreaNC = Gandak_crop_area.nc
+# farmAreaVariableName = farm_area
+
+# [irrMgmtOptions]
+# irrMgmtParameterNC = Gandak_irri_params.nc
+# irrScheduleNC = None
+
+# [fieldMgmtOptions]
+# fieldMgmtParameterNC = Gandak_mgmt_params.nc
+
+# AnnualChangeInFertiliserAppRate = 0
+# NitrogenApplicationRateNC = None
+# NitrogenApplicationRateVariableName = None
+# PhosphorusApplicationRateNC = None
+# PhosphorusApplicationRateVariableName = None
+# PotassiumApplicationRateNC = None
+# PotassiumApplicationRateVariableName = None
+
+# [priceOptions]
+# cropPriceNC = Gandak_price_data.nc
+# cropPriceVariableName = harvest_price
+# NitrogenPriceNC = Gandak_price_data.nc
+# NitrogenPriceVariableName = nitrogen_price
+# PhosphorusPriceNC = Gandak_price_data.nc
+# PhosphorusPriceVariableName = phosphorus_price
+# PotassiumPriceNC = Gandak_price_data.nc
+# PotassiumPriceVariableName = potassium_price
+# dieselPriceNC = Gandak_price_data.nc
+# dieselPriceVariableName = diesel_price
+
+# [soilOptions]
+# soilAndTopoNC = Gandak_soil_params.nc
+
+# # [reportingOptions]
+# # netcdf_y_orientation_follow_cf_convention = False
+# # formatNetCDF = NETCDF4
+# # zlib = True
+# # outDailyTotNC = zGW
+# # outMonthAvgNC = zGW
+# # outYearMaxNC = Y,Production
+# # outYearAvgNC = zGW
+# # outYearTotNC = Recharge
+
+# # # [couplingOptions]
+# # # netcdf_y_orientation_follow_cf_convention = False
+# # # formatNetCDF = NETCDF4
+# # # zlib = True
+
+# # # recharge = 1
+# # # rechargeVariableName = recharge
+# # # rechargeOutputDir = /var/data/chanse_model/gwrecharge
+# # # rechargeOutputNC = gwrecharge_{day:d}_{month:d}_{year:d}.nc
+
+# # # gwpumping = 1
+# # # gwpumpingVariableName = pumping
+# # # gwpumpingOutputDir = /var/data/chanse_model/gwpumping
+# # # gwpumpingOutputNC = gwpumping_{day:d}_{month:d}_{year:d}.nc
+
+# # # swpumping = 1
+# # # swpumpingVariableName = pumping
+# # # swpumpingOutputDir = /var/data/chanse_model/swpumping
+# # # swpumpingOutputNC = swpumping_{day:d}_{month:d}_{year:d}.nc

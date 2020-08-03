@@ -1,0 +1,38 @@
+## Author : Simon Moulds
+## Date   : July 2019
+
+library(raster)
+library(magrittr)
+
+seasonal_map_path = "../data/output_2005/seasonal_maps"
+kharif_maps =
+    list.files(
+        seasonal_map_path,
+        pattern="INDIA_IRR_(.*)_KHARIF_2005.tif",
+        full.names=TRUE
+    ) %>% stack
+kharif_irrigated_area = stackApply(kharif_maps, indices=rep(1, nlayers(kharif_maps)), fun=sum)
+
+rabi_maps =
+    list.files(
+        seasonal_map_path,
+        pattern="INDIA_IRR_(.*)_RABI_2005.tif",
+        full.names=TRUE
+    ) %>% stack
+rabi_irrigated_area = stackApply(rabi_maps, indices=rep(1, nlayers(rabi_maps)), fun=sum)
+
+summer_maps =
+    list.files(
+        seasonal_map_path,
+        pattern="INDIA_IRR_(.*)_SUMMER_2005.tif",
+        full.names=TRUE
+    ) %>% stack
+summer_irrigated_area = stackApply(summer_maps, indices=rep(1, nlayers(summer_maps)), fun=sum)
+
+whole_year_maps =
+    list.files(
+        seasonal_map_path,
+        pattern="INDIA_IRR_(.*)_WHOLE_YEAR_2005.tif",
+        full.names=TRUE
+    ) %>% stack
+whole_year_irrigated_area = stackApply(whole_year_maps, indices=rep(1, nlayers(whole_year_maps)), fun=sum)

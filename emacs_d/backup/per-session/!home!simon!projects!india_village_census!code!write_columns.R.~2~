@@ -1,0 +1,16 @@
+## Author : Simon Moulds
+## Date   : February 2020
+
+library(rgdal)
+v=readOGR("/data/india_village_level_geospatial_socio_econ_data/india-village-census-2001-UP_ll.gpkg")
+cols = names(v)
+fn = "columns.txt"
+if (file.exists(fn)) {
+    unlink(fn)
+}
+fileConn<-file(fn)
+for (nm in cols) {
+    write(nm, fn, append=TRUE)
+}
+close(fileConn)
+

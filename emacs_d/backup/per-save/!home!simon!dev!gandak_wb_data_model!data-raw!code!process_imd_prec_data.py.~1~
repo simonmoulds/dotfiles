@@ -1,0 +1,212 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import numpy as np
+import pandas as pd
+import netCDF4
+import calendar
+import datetime
+import os
+
+def get_times(year):
+    dt = datetime.datetime(year,1,1)
+    end = datetime.datetime(year+1,1,1)
+    step = datetime.timedelta(days=1)
+    times = []
+    while dt < end:
+        times.append(dt)
+        dt += step
+    return times
+
+wd = '/home/simon/dev/gandak_data_model/data-raw'
+datadir = '/data'
+zipfile = 'GRIDDED RF DATA 0.25 X 0.25 (1901-2015)'
+
+# # UNCOMMENT AS REQUIRED:
+# unzip_cmd1 = 'unzip -o ' + '"' + wd + '/' + 'data/' + zipfile + '.zip' + '"' + ' -d ' + datadir
+# unzip_cmd2 = 'unzip -o ' + '"' + datadir + '/' + zipfile + '/' + 'ASCII_DATA_PT25/RF(1901-2015)0.25 TEXT FILES.zip' '"' + ' -d ' + '"' + datadir + '/' + zipfile + '/' + 'ASCII_DATA_PT25' + '"'
+# os.system(unzip_cmd1)
+# os.system(unzip_cmd2)
+
+# directory to store netCDF files
+nc_path = '/data/IMD_GRIDDED_RF_DATA_PT25_NC'
+try:
+    os.mkdir(nc_path)
+except:
+    pass
+
+# netCDF spatial dimensions
+nlon = 135
+nlat = 129
+
+# NB The metadata for the IMD data defines the extent of the data as 38.5N,
+# 66.5E, 6.5S, 100E, but does not say whether these values refer to the grid
+# center or top-left. I've done a few tests and this configuration, which
+# assumes the metadata refers to the top-left of the grid cell, seems to
+# result in the best agreement with a map of India's border.
+lon = [66.625 + (0.25 * i) for i in range(nlon)]
+lat = [6.375 + (0.25 * i) for i in range(nlat)][::-1]
+
+# NB 2014, 2015 do not follow same naming
+# convention, for some reason
+startyear = 1901
+endyear = 2013
+years = range(startyear, endyear + 1)
+
+def main():
+    
+    for year in years:
+
+        # CREATE NETCDF
+        nc_filename = (
+            nc_path + '/'
+            + 'IMD_GRIDDED_RF_DATA_PT25_'
+            + str(year) + '.nc')
+        print nc_filename
+
+        nco = netCDF4.Dataset(
+            nc_filename, 'w', clobber=True)
+
+        # create dimensions, variables and attributes:
+        nco.createDimension('lon',nlon)
+        nco.createDimension('lat',nlat)
+        nco.createDimension('time',None)
+
+        times = get_times(year)
+        timeo = nco.createVariable('time','f4',('time'))
+        timeo.units = 'days since 1901-01-01 00:00:00'
+        timeo.calendar = 'standard'
+        timeo.standard_name = 'time'
+        timeo[:] = netCDF4.date2num(
+            times,
+            units=timeo.units,
+            calendar=timeo.calendar)
+
+        lono = nco.createVariable(
+            'lon',
+            np.float64,
+            ('lon'),
+            zlib=True,
+            least_significant_digit=3)
+        lono.units = 'degrees_east'
+        lono.standard_name = 'longitude'
+        lono[:]=lon
+
+        lato = nco.createVariable(
+            'lat',
+            np.float64,
+            ('lat'),
+            zlib=True,
+            least_significant_digit=3)
+        lato.units = 'degrees_north'
+        lato.standard_name = 'latitude'
+        lato[:]=lat
+
+        # # create container variable for CRS: lon/lat
+        # # WGS84 datum
+        # crso = nco.createVariable('crs','i4')
+        # crso.long_name = 'Lon/Lat Coords in WGS84'
+        # crso.grid_mapping_name='latitude_longitude'
+        # crso.longitude_of_prime_meridian = 0.0
+        # crso.semi_major_axis = 6378137.0
+        # crso.inverse_flattening = 298.257223563
+
+        prco = nco.createVariable(
+            'prcp',
+            np.float64,
+            ('time', 'lat', 'lon'),
+            zlib=False,
+            fill_value=np.float64(-999.0))
+        prco.setncattr('standard_name', 'precipitation_flux')
+        prco.setncattr('long_name', 'Precipitation')
+        prco.setncattr('units','kg m-2 s-1')
+        prco.setncattr('_FillValue', np.float64(-999.0))
+        nco.Conventions='CF-1.6'
+
+        fn = '/data' + '/' + zipfile + '/' + 'ASCII_DATA_PT25' + '/' + 'IND' + str(year) + '_rfP25.TXT'
+        ndays=365
+        if calendar.isleap(year): ndays+=1        
+        for day in range(ndays):
+            skiprows = (day - 1) * (nlat + 1)
+            df = pd.read_table(
+                fn,
+                nrows=nlat,
+                skiprows=skiprows,
+                sep='\s+',
+                index_col=0)
+            arr = df.values
+            # print np.min(arr)
+            missing = (arr == -99.9)
+            arr[np.logical_not(missing)] /= 86400
+            arr[missing] = -999.0
+            # print np.min(arr)
+            prco[day,:,:] = np.flipud(arr)
+
+        # CLOSE NETCDF
+        nco.close()
+
+if __name__ == '__main__':
+    main()
+    
+# nc_filename = nc_path + '/' + 'IMD_GRIDDED_RF_DATA_PT25_' + str(year) + '.nc'
+
+# nco = netCDF4.Dataset(nc_filename, 'w', clobber=True)
+
+# # create dimensions, variables and attributes:
+# nco.createDimension('lon',nlon)
+# nco.createDimension('lat',nlat)
+# nco.createDimension('time',None)
+
+# times = get_times(year)
+# timeo = nco.createVariable('time','f4',('time'))
+# timeo.units = 'days since 1901-01-01 00:00:00'
+# timeo.calendar = 'standard'
+# timeo.standard_name = 'time'
+# timeo[:] = netCDF4.date2num(times, units=timeo.units, calendar=timeo.calendar)
+
+# lono = nco.createVariable('lon', np.float64, ('lon'), zlib=True, least_significant_digit=3)
+# lono.units = 'degrees_east'
+# lono.standard_name = 'longitude'
+# lono[:]=lon
+
+# lato = nco.createVariable('lat',np.float64,('lat'),zlib=True,least_significant_digit=3)
+# lato.units = 'degrees_north'
+# lato.standard_name = 'latitude'
+# lato[:]=lat
+
+# # create container variable for CRS: lon/lat WGS84
+# # datum
+# crso = nco.createVariable('crs','i4')
+# crso.long_name = 'Lon/Lat Coords in WGS84'
+# crso.grid_mapping_name='latitude_longitude'
+# crso.longitude_of_prime_meridian = 0.0
+# crso.semi_major_axis = 6378137.0
+# crso.inverse_flattening = 298.257223563
+
+# prco = nco.createVariable('precipitation', np.float64, ('time', 'lat', 'lon'), zlib=False,fill_value=np.float64(1e+20))
+# prco.setncattr('standard_name', 'precipitation')
+# prco.setncattr('long_name', 'precipitation')
+# prco.setncattr('units','1e3 m.day-1')  # =mm
+# prco.setncattr('_FillValue', np.float64(1e+20))
+# prco.setncattr('missing_value', np.float64(1e+20))
+
+# nco.Conventions='CF-1.6'
+
+# itime=0
+
+# #step through data, writing time and data to NetCDF
+# for root, dirs, files in os.walk('../data/output_prec/Rainfall'):
+#     dirs.sort()
+#     files.sort()
+#     for f in files:
+#         if re.match(pattern,f):
+#             prc_path = os.path.join(root,f)
+#             print(prc_path)
+#             prc=gdal.Open(prc_path)
+#             a=prc.ReadAsArray()
+#             prco[itime,:,:]=a
+#             itime=itime+1
+
+# # close netCDF
+# nco.close()
+    

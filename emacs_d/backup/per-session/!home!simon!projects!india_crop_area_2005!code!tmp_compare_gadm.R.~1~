@@ -1,0 +1,4 @@
+
+library(rgdal)
+
+g2008 = readOGR(dsn="/home/simon/projects/india_adm2_2001/data", layer="g2008_2_India")

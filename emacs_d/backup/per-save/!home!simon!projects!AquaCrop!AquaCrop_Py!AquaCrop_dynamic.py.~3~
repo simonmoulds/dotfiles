@@ -1,0 +1,51 @@
+class AquaCrop_dynamic(DynamicModel):
+
+    def dynamic(self):
+
+        logger.info("Reading forcings for time %s", self._modelTime)
+        self.meteo_module.dynamic()
+        self.carbon_dioxide_module.dynamic()
+        self.groundwater_module.dynamic()
+
+        # TODO: how do we handle these?
+        # # Update parameters for current time step
+        # self.landcover.update(self.meteo, self.CO2, self._modelTime)
+        # self.soilwater.update(self.landcover, self._modelTime)
+
+        self.check_groundwater_table_module.dynamic()
+        self.pre_irrigation_module.dynamic()
+        self.drainage_module.dynamic()
+        self.rainfall_partition_module.dynamic()
+
+        self.root_zone_water_module.dynamic()
+        self.irrigation_module.dynamic()
+
+        self.infiltration_module.dynamic()
+        self.capillary_rise_module.dynamic()
+
+        self.germination_module.dynamic()
+        self.growth_stage_module.dynamic()
+        self.root_development_module.dynamic()
+        self.root_zone_water_module.dynamic()
+        self.water_stress_module.dynamic()
+        self.canopy_cover_module.dynamic()
+
+        self.soil_evaporation_module.dynamic()
+        self.root_zone_water_module.dynamic()
+
+        self.water_stress_module.dynamic(beta=True)
+
+        self.transpiration_module.dynamic()
+        self.inflow_module.dynamic()
+
+        self.HI_ref_current_day_module.dynamic()
+        self.biomass_accumulation_module.dynamic()
+
+        self.root_zone_water_module.dynamic()
+        self.water_stress_module.dynamic(beta=True)
+        self.temperature_stress_module.dynamic()
+        self.harvest_index_module.dynamic()
+        self.crop_yield_module.dynamic()
+
+        self.root_zone_water_module.dynamic()
+        self.add_pre_irrigation_module.dynamic()

@@ -1,0 +1,57 @@
+library(raster)
+
+r1 = raster("../data/tmin_daily_2010-2010_gandak.nc")
+r2 = raster("/data/PRINCETON_IGP/tmin_daily_2010-2010_igp.nc")
+r2 = crop(r2, extent(r1))
+
+## r1 = raster::aggregate(r1, fact=3, fun=mean)
+## vals1 = getValues(r1)
+## r1 = raster(r2)
+## r1[] = vals1
+
+plot(stack(r1,r2))
+
+## ET
+
+tas = raster("/data/PRINCETON_IGP/tas_daily_2000-2000_igp.nc")
+tmin = raster("/data/PRINCETON_IGP/tmin_daily_2000-2000_igp.nc")
+tmax = raster("/data/PRINCETON_IGP/tmax_daily_2000-2000_igp.nc")
+plot(stack(tas,tmin,tmax))
+
+r = raster("../data/etref/netcdf/ETref_Hargreaves_dailyTot_output.nc")
+plot(r)
+
+## Village census data
+r1 = raster("up_canal_govt_sum.tif")
+r2 = raster("br_canal_govt_sum.tif")
+r = raster(xmn=77, xmx=89, ymn=22, ymx=30.5, res=0.008333333)
+r[] = 0
+r3 = r
+r4 = r
+r3[r1] = r3[r1] + r1[r1]
+r4[r2] = r4[r2] + r2[r2]
+r = stackApply(stack(r3,r4), indices=c(1,1), fun=max)
+
+template = raster(xmn=83, ymn=25, xmx=86.5, ymx=28, ncols=42, nrows=36)
+
+r = crop(r, extent(template))
+plot(r)
+area = area(r) * 1000 * 1000 / 10000
+
+pts = as(r, "SpatialPoints")
+idx = getValues(r) > getValues(area)
+pts = pts[idx]
+pts = SpatialPointsDataFrame(pts, data=data.frame(id=seq(1, length(pts))))
+
+r[idx] = NA
+plot(r)
+points(pts)
+
+writeRaster(r, "up_br_canal_govt_sum.tif", format="GTiff", overwrite=TRUE)
+writeOGR(pts, dsn=".", layer="points.shp", driver="ESRI Shapefile", overwrite=TRUE)
+
+r = raster("tw_wo_el.tif")
+r = raster("land_fores.tif")
+r = raster("tot_irr.tif")
+r = raster("un_irr.tif")
+plot(r)

@@ -1,0 +1,157 @@
+## Author : Simon Moulds
+## Date   : Apr 2018
+
+## Quality control for Himachal Pradesh
+
+## Barley
+## ######
+
+xx[["irr_barley"]] %<>% locf_interp(61:63)
+xx[["apy_barley"]] %<>% tot_frac_interp(xx[["irr_barley"]], 61:63, 60)
+
+if (dist_nm %in% c("Kinnaur")) {
+    xx[["irr_barley"]] %<>% irr_frac_interp(xx[["apy_barley"]], 32, 31)
+}
+
+if (dist_nm %in% c("Lahul & Spiti")) {
+    xx[["apy_barley"]] %<>% tot_frac_interp(xx[["irr_barley"]], 30, 29)
+    xx[["apy_barley"]] %<>% tot_frac_interp(xx[["irr_barley"]], 36:40, 35)
+}
+
+## Chickpea
+## ########
+
+xx[["irr_chickpea"]] %<>% locf_interp(61:63)
+xx[["apy_chickpea"]] %<>% tot_frac_interp(xx[["irr_chickpea"]], 61:63, 60)
+xx[["apy_chickpea"]] %<>% linear_interp(55)
+xx[["irr_chickpea"]] %<>% irr_frac_interp(xx[["apy_chickpea"]], 44:50, 43)
+
+## Cotton
+## ######
+
+xx[["irr_cotton"]] %<>% locf_interp(61:63)
+xx[["apy_cotton"]] %<>% tot_frac_interp(xx[["irr_cotton"]], 61:63, 60)
+
+if (dist_nm %in% c("Chamba","Mandi")) {
+    xx[["apy_cotton"]] = 0
+    xx[["irr_cotton"]] = 0
+}
+
+if (dist_nm %in% c("Hosiarpur.Kangra")) {
+    xx[["apy_cotton"]] %<>% tot_frac_interp(xx[["irr_cotton"]], 54:57, 53)
+}
+
+if (dist_nm %in% c("Mahasu.Simla.Sirmaur")) {
+    xx[["apy_cotton"]] %<>% tot_frac_interp(xx[["irr_cotton"]], 55:57, 54)
+}
+
+## Finger millet
+## #############
+
+if (dist_nm %in% c("Bilaspur")) {
+    xx[["apy_finger_millet"]] = 0
+    xx[["irr_finger_millet"]] = 0
+}
+
+if (dist_nm %in% c("Chamba","Hosiarpur.Kangra")) {
+    xx[["apy_finger_millet"]] %<>% locf_interp(43:53)
+    xx[["apy_finger_millet"]] %<>% locf_interp(55)
+}
+
+if (dist_nm %in% c("Kinnaur","Mahasu.Simla.Sirmaur","Mandi")) {
+    xx[["apy_finger_millet"]] %<>% irr_frac_interp(xx[["irr_finger_millet"]], 30, 29)
+    xx[["apy_finger_millet"]] %<>% locf_interp(44:50)
+    xx[["irr_finger_millet"]] %<>% locf_interp(44:50)
+    xx[["apy_finger_millet"]] %<>% locf_interp(60:63)
+    xx[["irr_finger_millet"]] %<>% locf_interp(60:63)
+}
+
+## Groundnut
+## #########
+
+if (dist_nm %in% c("Mahasu.Simla.Sirmaur")) {
+    xx[["irr_groundnut"]] %<>% locf_interp(61:63)
+    xx[["apy_groundnut"]] %<>% tot_frac_interp(xx[["irr_groundnut"]], 61:63, 60)
+    xx[["apy_groundnut"]] %<>% tot_frac_interp(xx[["irr_groundnut"]], 55, 54)
+} else {
+    xx[["irr_groundnut"]] = 0
+    xx[["apy_groundnut"]] = 0
+}
+
+## Linseed
+## #######
+
+## TODO
+
+## Maize
+## #####
+
+xx[["irr_maize"]] %<>% locf_interp(61:63)
+xx[["apy_maize"]] %<>% tot_frac_interp(xx[["irr_maize"]], 60:63, 59)
+
+## Pearl millet
+## ############
+
+xx[["apy_pearl_millet"]] = 0
+xx[["irr_pearl_millet"]] = 0
+
+## Pigeonpea
+## #########
+
+xx[["apy_pigeonpea"]] = 0
+xx[["irr_pigeonpea"]] = 0
+
+## Rapeseed
+## ########
+
+xx[["irr_rapeseed"]] %<>% locf_interp(61:63)
+xx[["apy_rapeseed"]] %<>% tot_frac_interp(xx[["irr_rapeseed"]], 60:63, 59)
+xx[["apy_rapeseed"]] %<>% tot_frac_interp(xx[["irr_rapeseed"]], 55, 54)
+
+## Rice
+## ####
+
+xx[["irr_rice-summer"]][c(21:27,51)] = xx[["irr_rice-autumn"]][c(21:27,51)]
+xx[["irr_rice-winter"]] = xx[["irr_rice-summer"]]
+xx[["irr_rice-summer"]] = 0
+xx[["irr_rice-autumn"]] = 0
+xx[["irr_rice-winter"]] %<>% irr_frac_interp(xx[["apy_rice"]], 44:50, 43)
+xx[["irr_rice-winter"]] %<>% locf_interp(61:63)
+xx[["apy_rice"]] %<>% tot_frac_interp(xx[["irr_rice-winter"]], 60:63, 59)
+if (dist_nm %in% c("Kinnaur","Lahul & Spiti")) {
+    xx[["apy_rice"]] = 0
+    xx[["irr_rice-winter"]] = 0
+    xx[["irr_rice-autumn"]] = 0
+    xx[["irr_rice-summer"]] = 0
+}
+
+## Sesamum
+## #######
+
+xx[["irr_sesamum"]] %<>% locf_interp(60:63)
+xx[["apy_sesamum"]] %<>% tot_frac_interp(xx[["irr_sesamum"]], 60:63, 59)
+xx[["apy_sesamum"]] %<>% locf_interp(21, fromLast=TRUE)
+if (dist_nm %in% c("Chamba")) {
+    xx[["apy_sesamum"]] %<>% locf_interp(60:63)
+}
+
+## Sorghum
+## #######
+
+xx[["apy_sorghum-kharif"]] = 0
+xx[["irr_sorghum-kharif"]] = 0
+xx[["apy_sorghum-rabi"]] = 0
+xx[["irr_sorghum-rabi"]] = 0
+
+## Sugarcane
+## #########
+
+xx[["irr_sugarcane-whole_year"]] %<>% locf_interp(60:63)
+xx[["apy_sugarcane-whole_year"]] %<>% tot_frac_interp(xx[["irr_sugarcane-whole_year"]], 60:63, 59)
+xx[["apy_sugarcane-whole_year"]] %<>% tot_frac_interp(xx[["irr_sugarcane-whole_year"]], 55, 54)
+
+if (dist_nm %in% c("Chamba","Kinnaur","Lahul & Spiti")) {
+    xx[["apy_sugarcane-whole_year"]] = 0
+    xx[["irr_sugarcane-whole_year"]] = 0
+}
+

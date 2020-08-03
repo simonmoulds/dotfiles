@@ -1,0 +1,17 @@
+module gdd
+  use types
+  implicit none
+
+contains
+
+  subroutine update_gdd( &
+       gdd, &
+       gdd_cum, &
+       t_max, &
+       t_min, &
+       t_base, &
+       t_upp &
+       )
+
+    real(real64), intent(inout) :: gdd
+    

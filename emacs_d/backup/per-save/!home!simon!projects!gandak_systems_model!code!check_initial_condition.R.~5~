@@ -1,0 +1,22 @@
+library(raster)
+
+## read mask file
+mask = raster("modelMask.asc")
+pts = as(mask, "SpatialPoints")
+
+## calculate initial gw level
+hini = raster("h_ini.nc", varname="h")
+dem = raster("gw_data.nc", varname="DEM")
+gwlevel = dem - hini
+
+## this suggests the initial head at the river boundary cells
+## is also set to 10
+plot(gwlevel)
+points(pts)
+
+## read a simulated gw level file
+gwlevel = raster("gwlevel_1_1_2000.nc",varname="level")
+
+## in the simulated maps the gw level correctly equals zero
+plot(gwlevel)
+points(pts)

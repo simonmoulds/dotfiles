@@ -1,0 +1,606 @@
+module soil_evaporation
+  use types
+  implicit none
+
+  real(real64), parameter :: zero = 0.0d0
+  integer(int32), parameter :: one = 1
+  integer(int32), parameter :: two = 2
+  integer(int32), parameter :: four = 4
+
+  ! TODO: compare against some best practice guidelines, e.g.
+  ! https://www.fortran90.org/src/best-practices.html
+  
+contains
+
+
+  
+  ! Get array showing which compartments lie in the soil evaporative zone.
+  !
+  ! Input:
+  !    evap_z     : depth of evaporative zone
+  !    dz         : compartment thicknesses
+  !    dz_sum     : accumulated compartment thicknesses
+  !    n_farm, n_crop, n_comp, n_cell : array dimensions
+  !
+  ! Output:
+  !    comp_idx   : array showing which compartments lie in the evaporative zone
+  !
+  ! -------------------------------------------------------------------
+  function get_comp_idx(evap_z, dz, dz_sum, n_farm, n_crop, n_comp, n_cell) result (comp_idx)
+    
+    integer, intent(in) :: n_farm, n_crop, n_comp, n_cell
+    real(real64), dimension(n_comp), intent(in) :: dz, dz_sum
+    real(real64), dimension(n_farm,n_crop,n_cell), intent(in) :: evap_z
+    real(real64) :: z_top
+    integer :: i
+    integer, dimension(n_farm, n_crop, n_comp, n_cell) :: comp_idx
+    
+    comp_idx = 0
+    do i = 1, n_comp
+       z_top = dz_sum(i) - dz(i)
+       where ( z_top < evap_z ) comp_idx(:,:,i,:) = 1
+    end do
+    
+  end function get_comp_idx
+
+
+  
+  ! Get the index of the deepest compartment in evaporation layer.
+  !
+  ! Input:
+  !    evap_z : depth of soil evaporation layer (m)
+  !    dz_sum : accumulated compartment depths (m)
+  ! 
+  ! Output:
+  !    n_comp_max : index of deepest compartment
+  ! 
+  ! -------------------------------------------------------------------
+  function get_max_comp_idx(evap_z, dz, dz_sum, n_farm, n_crop, n_comp, n_cell) result (max_comp_idx)
+
+    integer, intent(in) :: n_farm, n_crop, n_comp, n_cell
+    real(real64), dimension(n_comp), intent(in) :: dz, dz_sum
+    real(real64), dimension(n_farm,n_crop,n_cell), intent(in) :: evap_z
+    integer :: i
+    integer, dimension(n_farm, n_crop, n_cell) :: max_comp_idx
+
+    max_comp_idx = 1
+    do i = 1, n_comp
+       where (dz_sum(i) < evap_z ) max_comp_idx = max_comp_idx + 1
+    end do
+    
+  end function get_max_comp_idx
+
+
+
+  ! Compute potential soil evaporation rate
+  !
+  ! Input:
+  !    TODO
+  !
+  ! Output:
+  !    es_pot : potential soil evaporation rate (mm d-1)
+  ! 
+  ! -------------------------------------------------------------------
+  function pot_soil_evap(et_ref, cc, cc_adj, ccx_act, &
+       growing_season, senescence, premat_senes, t_adj, kex, ccxw, fwcc, &
+       n_farm, n_crop, n_cell) result (es_pot)
+
+    integer, intent(in) :: n_farm, n_crop, n_cell
+    real(real64), dimension(n_farm, n_crop, n_cell), intent(in) :: et_ref, cc, cc_adj, ccx_act, kex, ccxw, fwcc
+    integer, dimension(n_farm, n_crop, n_cell), intent(in) :: t_adj, growing_season, senescence, premat_senes
+    real(real64), dimension(n_farm, n_crop, n_cell) :: es_pot, es_pot_min, es_pot_max, mult, ccx_act_adj
+
+    es_pot = 0
+    es_pot_min = 0
+    es_pot_max = 0
+    mult = 0
+    ccx_act_adj = 0
+    
+    where ( growing_season == one )
+       es_pot_max = kex * et_ref * (1 - ccxw * (fwcc / 100))
+       es_pot = kex * (1 - cc_adj) * et_ref
+       
+       where (t_adj > senescence .and. ccx_act > zero)
+          
+          where (cc > (ccx_act / 2))
+
+             where (cc > ccx_act)
+                mult = 0
+             elsewhere
+                mult = (ccx_act - cc) / (ccx_act / 2)
+             end where
+
+          elsewhere
+             mult = 1
+          end where
+          
+          es_pot = es_pot * (1 - ccx_act * (fwcc / 100) * mult)
+          ccx_act_adj = (1.72 * ccx_act) + (ccx_act ** 2) - 0.3 * (ccx_act ** 3)
+          es_pot_min = kex * (1 - ccx_act_adj) * et_ref
+
+          where (es_pot_min < 0)
+             es_pot_min = 0
+          end where
+          
+          where (es_pot < es_pot_min)
+             es_pot = es_pot_min
+          end where
+          
+          where (es_pot > es_pot_max)
+             es_pot = es_pot_max
+          end where          
+          
+       elsewhere
+          es_pot_max = es_pot_max
+          es_pot = es_pot
+       end where
+
+       where (premat_senes == one .and. es_pot > es_pot_max) es_pot = es_pot_max
+       
+    elsewhere
+       es_pot = kex * et_ref
+       
+    end where
+    
+  end function pot_soil_evap
+
+  ! for testing:
+  ! ------------
+  ! function apply_max(arr, mx, nx, ny) result(arr_max)    
+  !   integer, intent(in) :: nx, ny
+  !   real(8), dimension(nx, ny), intent(in) :: arr
+  !   real(8), intent(in) :: mx
+  !   real(8), dimension(nx, ny) :: arr_max    
+  !   arr_max = min(arr, mx)    
+  ! end function apply_max
+  
+  
+  ! Compute water contents in soil evaporation layer.
+  !
+  ! Input:
+  !    th, th_sat, th_fc, th_wilt th_dry : volumetric water contents (m3 m-3)
+  !    evap_z : depth of soil evaporation layer (m)
+  !    dz     : thickness of each soil compartment (m)
+  !    dz_sum : accumulated compartment depth (m)
+  !    n_comp : number of compartments
+  !
+  ! Output:
+  !    w_evap_act, w_evap_sat, w_evap_fc, w_evap_wp : depth of water in soil evaporation layer (mm)
+  !
+  ! -------------------------------------------------------------------
+  subroutine get_evap_lyr_wc(th, th_sat, th_fc, th_wilt, th_dry, &
+       w_evap_act, w_evap_sat, w_evap_fc, w_evap_wp, w_evap_dry, &
+       evap_z, dz, dz_sum, n_farm, n_crop, n_comp, n_cell)
+    
+    integer, intent(in) :: n_farm, n_crop, n_comp, n_cell
+    real(real64), dimension(n_farm, n_crop, n_comp, n_cell), intent(in) :: th, th_sat, th_fc, th_wilt, th_dry
+    real(real64), dimension(n_farm, n_crop, n_cell), intent(in) :: evap_z
+    real(real64), dimension(n_comp), intent(in) :: dz, dz_sum
+    integer :: i, glob_max_comp_idx
+    real(real64), dimension(n_farm, n_crop, n_cell), intent(out) :: w_evap_act, w_evap_sat, w_evap_fc, w_evap_wp, w_evap_dry
+    integer, dimension(n_farm, n_crop, n_cell) :: max_comp_idx
+    real(real64), dimension(n_farm, n_crop, n_cell) :: factor
+
+    ! initialize water content to zero
+    w_evap_act = 0
+    w_evap_sat = 0
+    w_evap_fc = 0
+    w_evap_wp = 0
+    w_evap_dry = 0
+
+    ! get the index of the deepest compartment in the soil evaporation layer
+    max_comp_idx = get_max_comp_idx(evap_z, dz, dz_sum, n_farm, n_crop, n_comp, n_cell)
+    glob_max_comp_idx = maxval(max_comp_idx)
+    
+    ! loop through compartments, calculating the depth of water in each
+    do i = 1, glob_max_comp_idx
+       factor = 1 - (dz_sum(i) - evap_z) / dz(i)
+       where (factor > 1) factor = 1
+       where (factor < 0) factor = 0       
+       w_evap_act = w_evap_act + factor * 1000 * th(:,:,i,:) * dz(i)
+       w_evap_sat = w_evap_sat + factor * 1000 * th_sat(:,:,i,:) * dz(i)
+       w_evap_fc = w_evap_fc + factor * 1000 * th_fc(:,:,i,:) * dz(i)
+       w_evap_wp = w_evap_wp + factor * 1000 * th_wilt(:,:,i,:) * dz(i)
+       w_evap_dry = w_evap_dry + factor * 1000 * th_dry(:,:,i,:) * dz(i)
+    end do
+    
+  end subroutine get_evap_lyr_wc
+
+  ! Compute potential soil evaporation rate, adjusted for mulches
+  !
+  ! Input
+  !    es_pot : potential soil evaporation rate
+  !    ...
+  !
+  ! Output
+  !    es_pot_mulch : potential soil evaporation rate, adjusted for mulches (mm d-1)
+  !
+  ! -------------------------------------------------------------------
+  function pot_soil_evap_w_mul(es_pot, growing_season, surface_storage, &
+       mulches, f_mulch, mulch_pct_gs, mulch_pct_os, n_farm, n_crop, &
+       n_cell) result (es_pot_mul)
+
+    integer, intent(in) :: n_farm, n_crop, n_cell
+    integer, dimension(n_farm, n_crop, n_cell), intent(in) :: mulches, growing_season
+    real(real64), dimension(n_farm, n_crop, n_cell), intent(in) :: es_pot, surface_storage, f_mulch, mulch_pct_gs, mulch_pct_os
+    real(real64), dimension(n_farm, n_crop, n_cell) :: es_pot_mul
+
+    where (surface_storage < 0.000001)
+       where (mulches == zero)
+          es_pot_mul = es_pot
+       elsewhere
+          where (growing_season == one)
+             es_pot_mul = es_pot * (1 - f_mulch * (mulch_pct_gs / 100))
+          elsewhere
+             es_pot_mul = es_pot * (1 - f_mulch * (mulch_pct_os / 100))
+          end where
+       end where
+    elsewhere
+       es_pot_mul = es_pot
+    end where
+        
+  end function pot_soil_evap_w_mul
+
+  ! Compute potential soil evaporation rate, adjusted for irrigation
+  !
+  ! Input
+  !    es_pot          : potential soil evaporation rate (mm d-1)
+  !    prec            : precipitation rate (mm d-1)
+  !    irr             : irrigation rate (mm d-1)
+  !    irr_method      : irrigation method (1-4)
+  !    surface_storage : depth of water in surface storage (i.e. because of bunds) (mm)
+  !    wet_surf        : TODO
+  !
+  ! Output
+  !    es_pot_irr : potential soil evaporation rate, adjusted for irrigation (mm d-1)
+  !
+  ! -------------------------------------------------------------------
+  function pot_soil_evap_w_irr(es_pot, prec, irr, irr_method, &
+       surface_storage, wet_surf, n_farm, n_crop, n_cell) result (es_pot_irr)
+
+    integer, intent(in) :: n_farm, n_crop, n_cell
+    integer, dimension(n_farm, n_crop, n_cell), intent(in) :: irr_method
+    real(real64), dimension(n_farm, n_crop, n_cell), intent(in) :: es_pot, prec, irr, surface_storage, wet_surf
+    real(real64), dimension(n_farm, n_crop, n_cell) :: es_pot_irr
+
+    where (irr > 0 .and. .not. irr_method == four)
+       where (prec > 1 .or. surface_storage > zero)
+          es_pot_irr = es_pot
+       elsewhere
+          es_pot_irr = es_pot * (wet_surf / 100)
+       end where
+
+    elsewhere
+       es_pot_irr = es_pot
+    end where
+        
+  end function pot_soil_evap_w_irr
+
+
+  
+  ! Compute evaporation from surface storage
+  !
+  ! Input:
+  !    es_pot          : potential soil evaporation (mm d-1)
+  !    es_act          : actual soil evaporation
+  !    rew             : readily evaporable(?) water (mm)
+  !    surface_storage :
+  !    w_surf          : 
+  !    w_stage_two     : 
+  !    evap_z          :
+  !
+  ! Output:
+  !    es_act, surface_storage, w_surf, w_stage_two, evap_z : updated
+  !    
+  subroutine surf_evap(es_pot, es_act, surface_storage, rew, &
+       w_surf, w_stage_two, evap_z, evap_z_min, n_farm, n_crop, n_cell)
+
+    integer, intent(in) :: n_farm, n_crop, n_cell
+    real(real64), dimension(n_farm, n_crop, n_cell), intent(in) :: es_pot, rew, evap_z_min
+    real(real64), dimension(n_farm, n_crop, n_cell), intent(inout) :: es_act, surface_storage, w_surf, w_stage_two, evap_z
+
+    where (surface_storage > 0)
+       where (surface_storage > es_pot)
+          es_act = es_pot          
+          surface_storage = surface_storage - es_act
+          
+       elsewhere
+          es_act = surface_storage
+          surface_storage = 0
+          w_surf = rew
+          w_stage_two = 0
+          evap_z = evap_z_min
+       end where
+       
+    end where
+    
+  end subroutine surf_evap
+
+
+
+  ! Extract water from the soil layer to meet soil evaporation demand.
+  !
+  ! Input:
+  !    to_extract
+  !    to_extract_stage
+  !    es_act
+  !    th
+  !    th_dry
+  !    dz, dz_sum
+  !    evap_z
+  !    evap_z_min
+  !    n_farm, n_crop, n_comp, n_cell
+  !
+  ! Output:
+  !    to_extract, to_extract_stage, es_act, th
+  !
+  ! -------------------------------------------------------------------  
+  subroutine extract_water(to_extract, to_extract_stage, es_act, th, th_dry, &
+       dz, dz_sum, evap_z, evap_z_min, n_farm, n_crop, n_comp, n_cell)
+
+    integer, intent(in) :: n_farm, n_crop, n_comp, n_cell
+    real(real64), dimension(n_farm, n_crop, n_comp, n_cell), intent(in) :: th_dry
+    real(real64), dimension(n_farm, n_crop, n_cell), intent(in) :: evap_z, evap_z_min
+    real(real64), dimension(n_comp), intent(in) :: dz, dz_sum
+
+    real(real64), dimension(n_farm, n_crop, n_cell), intent(inout) :: to_extract, to_extract_stage, es_act
+    real(real64), dimension(n_farm, n_crop, n_comp, n_cell), intent(inout) :: th
+    
+    real(real64), dimension(n_farm, n_crop, n_cell) :: factor, w_dry, w, av_w
+    integer, dimension(n_farm, n_crop, n_cell) :: max_comp_idx
+    integer :: comp, glob_max_comp_idx
+    
+    ! get the index of the deepest compartment in the soil evaporation layer                                
+    max_comp_idx = get_max_comp_idx(evap_z, dz, dz_sum, n_farm, n_crop, n_comp, n_cell)
+    glob_max_comp_idx = maxval(max_comp_idx)
+    comp = 0
+    do while ( any(to_extract_stage > 0) .and. comp < glob_max_comp_idx)
+       comp = comp + 1
+
+       where (dz_sum(comp) > evap_z_min)
+          factor = 1 - (dz_sum(comp) - evap_z) / dz(comp)
+          where (factor > 1) factor = 1
+          where (factor < 0) factor = 0
+          w_dry = 1000 * th_dry(:,:,comp,:) * dz(comp)
+          w = 1000 * th(:,:,comp,:) * dz(comp)
+          av_w = (w - w_dry) * factor
+          where (av_w < 0) av_w = 0
+
+          where (av_w > to_extract_stage)
+             es_act = es_act + to_extract_stage
+             w = w - to_extract_stage                
+             to_extract = to_extract - to_extract_stage
+             to_extract_stage = 0
+          elsewhere
+             es_act = es_act + av_w
+             to_extract_stage = to_extract_stage - av_w
+             to_extract = to_extract - av_w
+             w = w - av_w
+          end where             
+          th(:,:,comp,:) = w / (1000 * dz(comp))
+       end where
+    end do       
+    
+  end subroutine extract_water
+
+
+
+  ! Compute soil evaporation.
+  !
+  ! Input:
+  !    TODO
+  ! 
+  ! Output:
+  !    TODO
+  !
+  ! -------------------------------------------------------------------
+  subroutine soil_evap( &
+       prec, &
+       et_ref, es_act, e_pot, &
+       irr, irr_method, &
+       infl, &
+       th, th_sat, th_fc, th_wilt, th_dry, &
+       surface_storage, &
+       wet_surf, w_surf, w_stage_two, &
+       cc, cc_adj, ccx_act, &
+       evap_z, evap_z_min, evap_z_max, &
+       rew, kex, ccxw, fwcc, f_evap, f_wrel_exp, &
+       dz, dz_sum, &
+       mulches, f_mulch, mulch_pct_gs, mulch_pct_os, &
+       growing_season, senescence, premat_senes, &
+       calendar_type, dap, delayed_cds, delayed_gdds, &
+       time_step, evap_time_steps, &
+       n_farm, n_crop, n_comp, n_cell)
+
+    integer(int32), intent(in) :: n_farm, n_crop, n_comp, n_cell
+    integer(int32), intent(in) :: calendar_type
+    integer(int32), intent(in) :: time_step
+    integer(int32), intent(in) :: evap_time_steps
+    
+    real(real64), dimension(n_farm, n_crop, n_comp, n_cell), intent(in) :: th_sat
+    real(real64), dimension(n_farm, n_crop, n_comp, n_cell), intent(in) :: th_fc
+    real(real64), dimension(n_farm, n_crop, n_comp, n_cell), intent(in) :: th_wilt
+    real(real64), dimension(n_farm, n_crop, n_comp, n_cell), intent(in) :: th_dry
+    real(real64), dimension(n_farm, n_crop, n_cell), intent(in) :: prec, et_ref
+    real(real64), dimension(n_farm, n_crop, n_cell), intent(in) :: infl
+    real(real64), dimension(n_farm, n_crop, n_cell), intent(in) :: irr, wet_surf
+    real(real64), dimension(n_farm, n_crop, n_cell), intent(in) :: rew
+    real(real64), dimension(n_farm, n_crop, n_cell), intent(in) :: evap_z_min, evap_z_max    
+    real(real64), dimension(n_farm, n_crop, n_cell), intent(in) :: cc, cc_adj, ccx_act
+    real(real64), dimension(n_farm, n_crop, n_cell), intent(in) :: kex, ccxw, fwcc, f_evap, f_wrel_exp
+    real(real64), dimension(n_farm, n_crop, n_cell), intent(in) :: f_mulch, mulch_pct_gs, mulch_pct_os
+    real(real64), dimension(n_comp), intent(in) :: dz, dz_sum
+    
+    integer(int32), dimension(n_farm, n_crop, n_cell), intent(in) :: irr_method
+    integer(int32), dimension(n_farm, n_crop, n_cell), intent(in) :: dap, delayed_cds, delayed_gdds
+    integer(int32), dimension(n_farm, n_crop, n_cell), intent(in) :: mulches
+    integer(int32), dimension(n_farm, n_crop, n_cell), intent(in) :: growing_season
+    integer(int32), dimension(n_farm, n_crop, n_cell), intent(in) :: senescence, premat_senes
+    
+    real(real64), dimension(n_farm, n_crop, n_comp, n_cell), intent(inout) :: th
+    real(real64), dimension(n_farm, n_crop, n_cell), intent(inout) :: es_act, e_pot
+    real(real64), dimension(n_farm, n_crop, n_cell), intent(inout) :: surface_storage, w_surf, w_stage_two, evap_z
+    
+    real(real64), dimension(n_farm, n_crop, n_cell) :: w_evap_act, w_evap_sat, w_evap_fc, w_evap_wp, w_evap_dry
+    real(real64), dimension(n_farm, n_crop, n_cell) :: w_upper, w_lower, w_rel, w_check
+    real(real64), dimension(n_farm, n_crop, n_cell) :: es_pot, es_pot_mul, es_pot_irr
+    real(real64), dimension(n_farm, n_crop, n_cell) :: to_extract, to_extract_stage_one, to_extract_stage_two
+    real(real64), dimension(n_farm, n_crop, n_cell) :: edt
+    real(real64), dimension(n_farm, n_crop, n_cell) :: kr
+    
+    logical, dimension(n_farm, n_crop, n_cell) :: mask
+
+    integer(int32), dimension(n_farm, n_crop, n_cell) :: t_adj
+    integer(int32) :: i
+    
+    ! prepare soil evaporation stage two
+    if ( time_step == one ) then
+       w_surf = 0
+       evap_z = evap_z_min
+       
+       call get_evap_lyr_wc(th, th_sat, th_fc, th_wilt, th_dry, &
+            w_evap_act, w_evap_sat, w_evap_fc, w_evap_wp, w_evap_dry, &
+            evap_z, dz, dz_sum, n_farm, n_crop, n_comp, n_cell)
+
+       w_stage_two = (w_evap_act - (w_evap_fc - rew)) / (w_evap_sat - (w_evap_fc - rew))
+
+       if ( any( w_stage_two < zero) ) then
+          where (w_stage_two < zero)
+             w_stage_two = zero
+          end where
+       end if       
+       
+    end if
+
+    ! prepare soil evaporation stage one if rainfall has occurred, or
+    ! when irrigation is triggered and not in net irrigation mode.
+    mask = ( (prec > zero) .or. ( (irr > zero) .and. (.not. irr_method == four))) .and. ( infl > zero )
+    if ( any( mask ) ) then
+       where ( mask )
+          w_surf = infl
+          w_surf = min(w_surf, rew)
+          w_stage_two = 0
+          evap_z = evap_z_min
+       end where
+    end if
+    
+    ! calculate potential soil evaporation rate    
+    if (calendar_type == one) then
+       t_adj = dap - delayed_cds       
+    else if (calendar_type == two) then
+       t_adj = dap - delayed_gdds       
+    end if
+    
+    es_pot = pot_soil_evap(et_ref, cc, cc_adj, ccx_act, &
+       growing_season, senescence, premat_senes, t_adj, kex, ccxw, fwcc, &
+       n_farm, n_crop, n_cell)
+    
+    ! adjust potential soil evaporation for mulch
+    es_pot_mul = pot_soil_evap_w_mul(es_pot, growing_season, &
+         surface_storage, mulches, f_mulch, mulch_pct_gs, mulch_pct_os, &
+         n_farm, n_crop, n_cell)
+
+    ! adjust potential soil evaporation for irrigation
+    es_pot_irr = pot_soil_evap_w_irr(es_pot, prec, irr, irr_method, &
+       surface_storage, wet_surf, n_farm, n_crop, n_cell)
+
+    ! adjusted potential soil evaporation is the minimum value
+    ! (effects of mulch and irrigation do not combine)
+    es_pot = min(es_pot_mul, es_pot_irr)
+
+    ! surface evaporation
+    call surf_evap(es_pot, es_act, surface_storage, rew, &
+       w_surf, w_stage_two, evap_z, evap_z_min, n_farm, n_crop, n_cell)
+
+    ! stage one evaporation
+    to_extract = es_pot - es_act
+    to_extract_stage_one = min(to_extract, w_surf)
+    mask = (to_extract_stage_one > zero)
+    
+    if ( any( mask )) then
+
+       call extract_water(to_extract, to_extract_stage_one, es_act, th, th_dry, &
+          dz, dz_sum, evap_z, evap_z_min, n_farm, n_crop, n_comp, n_cell)
+       
+       ! update surface evaporation layer water balance
+       where ( mask )
+          w_surf = w_surf - es_act
+          where ( w_surf < zero .or. to_extract_stage_one > 0.0001 )
+             w_surf = 0
+          end where
+       end where
+
+       ! prepare stage two evaporation
+       if ( any( w_surf < 0.0001 )) then
+          call get_evap_lyr_wc(th, th_sat, th_fc, th_wilt, th_dry, &
+               w_evap_act, w_evap_sat, w_evap_fc, w_evap_wp, w_evap_dry, &
+               evap_z, dz, dz_sum, n_farm, n_crop, n_comp, n_cell)
+          
+          where ( w_surf < 0.0001 )
+             w_stage_two = (w_evap_act - (w_evap_fc - rew)) / (w_evap_sat - (w_evap_fc - rew))                
+             where ( w_stage_two < zero )
+                w_stage_two = zero
+             end where                
+          end where
+          
+       end if             
+    end if
+
+    ! stage two evaporation
+    mask = (to_extract > zero)
+    if ( any( mask )) then
+       
+       edt = to_extract / evap_time_steps
+       
+       do i = 1, evap_time_steps
+          call get_evap_lyr_wc(th, th_sat, th_fc, th_wilt, th_dry, &
+               w_evap_act, w_evap_sat, w_evap_fc, w_evap_wp, w_evap_dry, &
+               evap_z, dz, dz_sum, n_farm, n_crop, n_comp, n_cell)
+          
+          w_upper = w_stage_two * (w_evap_sat - (w_evap_fc - rew)) + (w_evap_fc - rew)
+          w_lower = w_evap_dry
+          w_rel = (w_evap_act - w_lower) / (w_upper - w_lower)
+          
+          mask = evap_z_max > evap_z_min
+          if ( any( mask )) then
+             w_check = f_wrel_exp * ((evap_z_max - evap_z) / (evap_z_max - evap_z_min))
+             mask = (w_rel < w_check) .and. (evap_z < evap_z_max)
+             
+             do while ( any( mask ))
+
+                where ( mask )
+                   evap_z = evap_z + 0.001
+                end where
+                
+                call get_evap_lyr_wc(th, th_sat, th_fc, th_wilt, th_dry, &
+                     w_evap_act, w_evap_sat, w_evap_fc, w_evap_wp, w_evap_dry, &
+                     evap_z, dz, dz_sum, n_farm, n_crop, n_comp, n_cell)
+
+                w_upper = w_stage_two * (w_evap_sat - (w_evap_fc - rew)) + (w_evap_fc - rew)
+                w_lower = w_evap_dry
+                w_rel = (w_evap_act - w_lower) / (w_upper - w_lower)
+                w_check = f_wrel_exp * ((evap_z_max - evap_z) / (evap_z_max - evap_z_min))
+                
+                mask = (w_rel < w_check) .and. (evap_z < evap_z_max)
+
+             end do
+          end if
+          
+          ! get stage 2 evaporation reduction coefficient
+          kr = ( exp(f_evap * w_rel) - 1 ) / ( exp(f_evap) - 1 )
+          where (kr > 1)
+             kr = 1
+          end where
+          
+          to_extract_stage_two = kr * edt
+          
+          call extract_water(to_extract, to_extract_stage_two, es_act, th, th_dry, &
+             dz, dz_sum, evap_z, evap_z_min, n_farm, n_crop, n_comp, n_cell)
+          
+       end do
+    end if
+    
+  end subroutine soil_evap
+  
+end module soil_evaporation
+

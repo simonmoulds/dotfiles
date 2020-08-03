@@ -1,0 +1,13 @@
+library(rgdal)
+library(sf)
+library(rworldmap)
+
+data(countriesCoarse)
+
+x = read.csv('../data-raw/TAHMO/tahmo_stn_metadata.csv')
+
+pts = st_as_sf(x, crs=CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"), coords=c("X","Y"))
+plot(pt$geom)
+lines(countriesCoarse)
+
+st_write(pts, '../data/tahmo_stn_locations.shp')

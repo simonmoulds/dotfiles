@@ -1,0 +1,6 @@
+module biomass_accumulation
+  use types
+  implicit none
+
+contains
+  

@@ -1,0 +1,12 @@
+#!/bin/bash
+
+if [ ! -d $HOME/grassdata/latlong/hwsd ]
+then
+    grass -e -c $HOME/grassdata/latlong/hwsd
+fi
+
+wd=$HOME/projects/process_hwsd/code
+chmod u+x grass_make_hwsd_maps.sh
+export GRASS_BATCH_JOB=$wd/grass_make_hwsd_maps.sh
+grass76 /home/sm510/grassdata/latlong/hwsd
+unset GRASS_BATCH_JOB

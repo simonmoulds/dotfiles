@@ -1,0 +1,6 @@
+#!/bin/bash
+
+echo '%% Enter Location of Input files %%
+/home/simon/projects/AquaCrop/AquaCropOS_v50a/Input
+%% Enter Location of Output files %%
+/home/simon/projects/AquaCrop/AquaCropOS_v50a/Output' > FileLocations.txt

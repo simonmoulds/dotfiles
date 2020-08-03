@@ -1,0 +1,144 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+import os
+import shutil
+import numpy as np
+import datetime
+import time
+import glob
+import configparser
+import collections
+
+datadir = "../data"
+out_dir = "../data/etref"
+if not os.path.exists(out_dir):    
+    os.makedirs(out_dir)
+
+starttime = datetime.datetime(1980, 1, 1)
+endtime = datetime.datetime(2010, 12, 31)
+
+def main():
+    
+    for country in ['ghana','kenya']:
+        
+        run_input_dir = os.path.join(out_dir, country, "input")
+        run_output_dir = os.path.join(out_dir, country, "output")
+        run_config_dir = os.path.join(out_dir, country, "config")
+        if os.path.exists(run_input_dir):
+            shutil.rmtree(run_input_dir)
+        if os.path.exists(run_config_dir):
+            shutil.rmtree(run_config_dir)
+        os.makedirs(run_config_dir)
+        os.makedirs(run_input_dir)
+        if not os.path.exists(run_output_dir):
+            os.makedirs(run_output_dir)
+    
+        config = configparser.ConfigParser()
+        config.optionxform = str
+        config['FILE_PATHS'] = collections.OrderedDict([
+            ('PathIn', os.path.abspath(run_input_dir)),
+            ('PathOut', os.path.abspath(run_output_dir))
+        ])
+
+        config['MODEL_GRID'] = collections.OrderedDict([
+            ('cloneMap', '${FILE_PATHS:PathIn}/../../' + country + '_aquacrop_clone_0pt25degree.tif'),
+            ('landmask', '${FILE_PATHS:PathIn}/../../' + country + '_aquacrop_landmask_0pt25degree.tif')
+        ])
+
+        config['CLOCK'] = collections.OrderedDict([
+            ('startTime', str(starttime.year) + '-' + str(starttime.month) + '-' + str(starttime.day)),
+            ('endTime', str(endtime.year) + '-' + str(endtime.month) + '-' + str(endtime.day)),
+        ])
+
+        config['NETCDF_ATTRIBUTES'] = collections.OrderedDict([
+            ('institution', 'Imperial College London, UK'),
+            ('title', 'AquaCrop v5.0 output'),
+            ('description', 'test version (by Simon Moulds)'),
+            ('netcdf_y_orientation_follow_cf_convention', 'True'),
+            ('formatNetCDF', 'NETCDF4'),
+            ('zlib', 'True')
+        ])            
+
+        config['ET_METHOD'] = collections.OrderedDict([
+            ('method', 'PenmanMonteith')
+        ])
+
+        config['WEATHER'] = collections.OrderedDict([
+            ('compute_daily_min_max_temperature_from_subdaily_data', str(False)),
+            ('compute_daily_mean_temperature_from_subdaily_data', str(False)),
+            ('meanDailyTemperatureNC', '${FILE_PATHS:PathIn}/../../AgMERRA/AgMERRA_{year:0>4}_tavg.nc4'),
+            ('meanDailyTemperatureVarName', 'tavg'),
+            ('meanDailyTemperatureTimeDimName', 'time'),
+            ('meanDailyTemperatureOffset', str(-273.15)),
+            ('meanDailyTemperatureFactor', str(1)),        
+            ('minDailyTemperatureNC', '${FILE_PATHS:PathIn}/../../AgMERRA/AgMERRA_{year:0>4}_tmin.nc4'),
+            ('minDailyTemperatureVarName', 'tmin'),
+            ('minDailyTemperatureTimeDimName', 'time'),
+            ('minDailyTemperatureOffset', str(-273.15)),
+            ('minDailyTemperatureFactor', str(1)),
+            ('maxDailyTemperatureNC', '${FILE_PATHS:PathIn}/../../AgMERRA/AgMERRA_{year:0>4}_tmax.nc4'),
+            ('maxDailyTemperatureVarName', 'tmax'),
+            ('maxDailyTemperatureTimeDimName', 'time'),
+            ('maxDailyTemperatureOffset', str(-273.15)),
+            ('maxDailyTemperatureFactor', str(1)),        
+            ('subDailyTemperatureNC', str(None)),
+            ('subDailyTemperatureVarName', str(None)),
+            ('subDailyTemperatureTimeDimName', str(None)),
+            ('subDailyTemperatureOffset', str(0)),
+            ('subDailyTemperatureFactor', str(1)),        
+            ('downwellingLongwaveRadiationNC', str(None)),
+            ('downwellingLongwaveRadiationVarName', str(None)),
+            ('downwellingLongwaveRadiationTimeDimName', str(None)),
+            ('downwellingLongwaveRadiationOffset', str(0)),
+            ('downwellingLongwaveRadiationFactor', str(1)),        
+            ('surfaceAtmosphericPressureNC', '${FILE_PATHS:PathIn}/../../WFDEI/PSurf_daily_WFDEI/PSurf_daily_WFDEI_{year:0>4}{month:0>2}.nc'),
+            ('surfaceAtmosphericPressureVarName', 'PSurf'),
+            ('surfaceAtmosphericPressureTimeDimName', 'timestp'),
+            ('surfaceAtmosphericPressureOffset', str(0)),
+            ('surfaceAtmosphericPressureFactor', str(1)),        
+            ('specificHumidityNC', str(None)),
+            ('specificHumidityVarName', str(None)),
+            ('specificHumidityTimeDimName', str(None)),
+            ('specificHumidityOffset', str(0)),
+            ('specificHumidityFactor', str(1)),        
+            ('maxRelativeHumidityNC', '${FILE_PATHS:PathIn}/../../AgMERRA/AgMERRA_{year:0>4}_rhstmax.nc4'),
+            ('maxRelativeHumidityVarName', 'rhstmax'),
+            ('maxRelativeHumidityTimeDimName', 'time'),
+            ('maxRelativeHumidityOffset', str(0)),
+            ('maxRelativeHumidityFactor', str(1)),
+            ('minRelativeHumidityNC', str(None)),
+            ('minRelativeHumidityVarName', str(None)),
+            ('minRelativeHumidityTimeDimName', str(None)),
+            ('minRelativeHumidityOffset', str(0)),
+            ('minRelativeHumidityFactor', str(1)),
+            ('meanRelativeHumidityNC', str(None)),
+            ('meanRelativeHumidityVarName', str(None)),
+            ('meanRelativeHumidityTimeDimName', str(None)),
+            ('meanRelativeHumidityOffset', str(0)),
+            ('meanRelativeHumidityFactor', str(1)),
+            ('downwellingShortwaveRadiationNC', '${FILE_PATHS:PathIn}/../../AgMERRA/AgMERRA_{year:0>4}_srad.nc4'),
+            ('downwellingShortwaveRadiationVarName', 'srad'),
+            ('downwellingShortwaveRadiationTimeDimName', 'time'),
+            ('downwellingShortwaveRadiationOffset', str(0)),
+            ('downwellingShortwaveRadiationFactor', str(1)),
+            ('windSpeedNC', '${FILE_PATHS:PathIn}/../../AgMERRA/AgMERRA_{year:0>4}_wndspd.nc4'),
+            ('windSpeedVarName', 'wndspd'),
+            ('windSpeedTimeDimName', 'time'),
+            ('windSpeedOffset', str(0)),
+            ('windSpeedFactor', str(1))
+        ])
+
+        config['REPORTING'] = collections.OrderedDict([
+            ('outDailyTotal', 'ETref'),
+            ('formatNetCDF', 'NETCDF4'),
+            ('zlib', 'True')
+        ])
+
+        config_fn = os.path.join(run_config_dir, 'etref_kenya_agmerra_config.ini')
+        with open(config_fn, 'w') as f:
+            config.write(f)
+
+if __name__ == '__main__':
+    main()
+

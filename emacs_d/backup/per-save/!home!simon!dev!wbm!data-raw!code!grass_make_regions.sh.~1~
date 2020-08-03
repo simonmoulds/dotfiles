@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# convert model mask file to geotiff w/ proper georeferencing
+# N.B. original ascii map provided by Johanna Scheidegger (BGS)
+
+g.region \
+    e=83 w=86.5 n=28 s=25 \
+    res=0:05 \
+    save=gandak_0.083333Deg \
+    --overwrite
