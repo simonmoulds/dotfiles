@@ -2,6 +2,8 @@
 
 ;; ----- ido-last-directory-list -----
 (
+ ("/home/simon/dotfiles/emacs_d/" . "backup/")
+ ("/home/simon/dotfiles/" . "emacs_d/")
  ("/home/simon/projects/igp_livelihood_model/chanse/ee_s1/code/" . "config/")
  ("/home/simon/projects/igp_livelihood_model/chanse/ee_s1/data/" . "input/")
  ("/home/simon/projects/igp_livelihood_model/chanse/ee_s1/" . "code/")
@@ -128,6 +130,8 @@
 
 ;; ----- ido-work-directory-list -----
 (
+ "/home/simon/dotfiles/"
+ "/home/simon/dotfiles/emacs_d/backup/"
  "/home/simon/projects/flood_ineq_model/code/"
  "/home/simon/dev/aquacrop/aquacrop/native/"
  "/home/simon/dev/aquacrop/aquacrop/io/"
@@ -176,26 +180,30 @@
  "/home/simon/projects/twiga/workshop_nov2019/"
  "/home/simon/dev/aquacrop/test/make_tests/"
  "/home/simon/projects/twiga/"
- "/home/simon/dev/aquacrop/test/release/"
- "/home/simon/dev/aquacrop/test/make_tests/AquaCropOS_v50a/Input/Example Crop Files/"
 )
 
 ;; ----- ido-work-file-list -----
 (
+ "tmux_conf"
+ "installer.sh"
+ ".gitignore"
+ "zpreztorc"
+ "zshenv"
  "model_funs.R"
  "aquacrop_w.f90"
  "crop_parameters_w.f90"
  "CropParameters.py"
  "InitialCondition.py"
- "crop_parameters.f90"
- "LandCover.py"
- "reporting.py"
- "SoilHydraulicParameters.py"
- "LandCoverParameters.py"
 )
 
 ;; ----- ido-dir-file-cache -----
 (
+ ("/home/simon/dotfiles/" (24360 6194 308654 53000) "zshenv" "../" "emacs_d/" "gitconfig" "./" "profile" ".git/" "README.md" "tmux/" "zshrc" "zprofile" ".gitmodules" "zlogout" "zlogin" ".gitignore" "zpreztorc" "tmux_conf" "prezto/" "bashrc" "installer.sh")
+
+ ("/home/simon/dotfiles/emacs_d/backup/" (24359 60882 481590 62000) "../" "./" "per-session/" "per-save/")
+
+ ("/home/simon/dotfiles/emacs_d/" (24360 3286 255168 297000) "../" "session.10a917f03871d66718156414565626115400000009120118" "session.105729d36adf4eb278156639528982524300000012900068" "games/" "settings/" "./" "ac-comphist.dat" "init.el" ".mbsyncrc" "network-security.data" "elpa/" "session.108e0a57bd3c35c195156499779930355100000009580064" "eshell/" "%backup%~" "snippets/" "ido.last" "backups/" "auto-save-list/" "backup/")
+
  ("/home/simon/projects/flood_ineq_model/code/" (24318 1944 992111 293000) "model_wrr.R" "wealth_redistr_exp.R" "model_ineq_v2.R" "../" "model_ineq_v1.R" "model_funs.R" "test.pdf" "./" "model_ineq_v1_backup.R" ".Rhistory" "model_jhyd.R")
 
  ("/home/simon/dev/aquacrop/aquacrop/native/" (24297 55011 123084 826000) "inflow_w.f90" "crop_yield.f90" "infiltration.f90" "../" "temperature_stress.f90" "soil_parameters.f90" "canopy_cover.f90" "growth_stage_w.f90" "soil_parameters_w.f90" "germination.f90" "irrigation.f90" "soil_evaporation.f90" "types.f90" "check_gw_table.f90" "root_dev.f90" "inflow.f90" "drainage.f90" "./" "biomass_accumulation_w.f90" "water_stress_w.f90" "crop_parameters_w.f90" "soil_hydraulic_parameters.f90" "growth_stage.f90" "soil_evaporation_w.f90" "gdd.f90" "water_stress.f90" "capillary_rise.f90" "root_zone_water.f90" "irrigation_w.f90" "biomass_accumulation.f90" "gdd_w.f90" "check_gw_table_w.f90" "transpiration.f90" "aquacrop_w.f90" "aquacrop.f90" "root_dev_w.f90" "soil_hydraulic_parameters_w.f90" "harvest_index_w.f90" "transpiration_w.f90" "infiltration_w.f90" "rainfall_partition_w.f90" "harvest_index.f90" "germination_w.f90" "rainfall_partition.f90" "drainage_w.f90" "pre_irr_w.f90" "capillary_rise_w.f90" "canopy_cover_w.f90" "pre_irr.f90" "crop_yield_w.f90" "crop_parameters.f90" "root_zone_water_w.f90")
@@ -389,12 +397,6 @@
  ("/home/simon/projects/gandak_systems_model/" (23983 61598 375481 801000) "../" "analysis/" "run-wb-model.sh" "data/" "./" ".git/" "wbm.prof" "README.md" "groundwater/" ".Rhistory" "land_surface/" "surfacewater_routing/")
 
  ("/home/simon/dev/wbm_farmer/wbm_farmer/" (23984 34387 611916 412000) "../" "FarmParameters.py" "IrrigationSupply.py" "./" "CropYield.py" "variable_list.py" "WaterBalanceModel.py" "LandCoverParameters.py" "FertiliserApplication.py" "Groundwater.py" "Investment.py" "CropParameters.py" "LandCover.py" "GridCellMean.py" "variable_list_crop.py" "LandSurface.py" "PriceData.py" "Income.py" "WBMConfiguration.py" "Accounting.py" "CanalSupply.py" "__pycache__/" "run.py")
-
- ("/home/simon/dev/wbm_data_model/wbm_data_model/not-used/" (23983 60652 207520 601000) "../" "FarmParameters.py" "./" "SoilParameters.py" "CanalAccess.py" "PriceData.py" "PotentialYield.py")
-
- ("/home/simon/projects/twiga/ssa_index_insurance/code/" (23982 3125 59909 616000) "../" "./" "twiga-timeseries.ipynb")
-
- ("/home/simon/projects/twiga/ssa_index_insurance/" (23958 19808 20486 949000) "../" "code/" "data/" "./")
 )
 
 ;; ----- ido-unc-hosts-cache -----
