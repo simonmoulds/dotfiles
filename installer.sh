@@ -19,14 +19,16 @@ ln -s ${BASEDIR}/emacs_d/ ~/.emacs.d
 # N.B. the zprezto directory is a fork of the original repo
 # (https://github.com/sorin-ionescu/prezto.git). To download the
 # forked repo including all submodules, then link to upstream, do
-# the following:
+# the following (https://stackoverflow.com/a/4438292):
 
-# git clone https://github.com/simonmoulds/prezto.git "${ZDOTDIR:-$HOME}"/dotfiles/prezto
+# git submodule add https://github.com/simonmoulds/prezto.git "${ZDOTDIR:-$HOME}"/dotfiles/prezto
 # cd "${ZDOTDIR:-$HOME}"/dotfiles/prezto/
 # git submodule update --init --recursive
 # git remote add upstream https://github.com/sorin-ionescu/prezto.git
 # git remote -v
 # git fetch upstream
+
+# NB to remove submodules, see the following gist: https://gist.github.com/simonmoulds/3d6d07f0703bfe5a9ccc6744668b9187
 
 # this is a bit convoluted but it preserves the original
 # file structure of the prezto repository
