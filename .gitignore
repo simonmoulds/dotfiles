@@ -1,4 +1,2 @@
-emacs_d/backup/per-save/
-emacs_d/backup/per-session/
-emacs_d/backups/*
-emacs_d/session.*/
+emacs_d/session.*
+emacs_d/network-security.data
