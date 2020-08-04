@@ -130,6 +130,8 @@
 
 ;; ----- ido-work-directory-list -----
 (
+ "/home/simon/dotfiles/tmux/"
+ "/home/simon/.tmux/"
  "/home/simon/dotfiles/"
  "/home/simon/dotfiles/emacs_d/backup/"
  "/home/simon/projects/flood_ineq_model/code/"
@@ -178,12 +180,12 @@
  "/home/simon/projects/gcam/gcam-core-gcam-v5.2/exe/"
  "/home/simon/dev/r_indagridat/indagridat/data-raw/code/utils/"
  "/home/simon/projects/twiga/workshop_nov2019/"
- "/home/simon/dev/aquacrop/test/make_tests/"
- "/home/simon/projects/twiga/"
 )
 
 ;; ----- ido-work-file-list -----
 (
+ ".tmux.conf"
+ ".tmux.conf.local"
  "tmux_conf"
  "installer.sh"
  ".gitignore"
@@ -192,12 +194,16 @@
  "model_funs.R"
  "aquacrop_w.f90"
  "crop_parameters_w.f90"
- "CropParameters.py"
- "InitialCondition.py"
 )
 
 ;; ----- ido-dir-file-cache -----
 (
+ ("/home/simon/dotfiles/tmux/" (24360 20321 980811 800000) "./" "../" ".tmux.conf.local" ".git" "LICENSE.MIT" ".tmux.conf" ".gitattributes" "README.md" "LICENSE.WTFPLv2")
+
+ ("/home/simon/.tmux/" (24360 17065 200811 800000) "./" "../" ".tmux.conf.local" ".git/" "LICENSE.MIT" ".tmux.conf" ".gitattributes" "README.md" "LICENSE.WTFPLv2")
+
+ ("/home/simon/" (24360 17112 260811 800000) "./" ".zhistory" "../" ".zcompdump.zwc" ".zlogin" ".zcompdump" ".emacs.d/" ".tmux.conf.local" ".bashrc" "tmux-client-7665.log" ".zpreztorc" ".zprofile" ".zshrc" ".bash_logout" ".profile" ".config/" ".motd_shown" ".zprezto/" ".zshenv" ".zlogout" ".tmux.conf" "dotfiles/" ".tmux/" ".bash_history" ".cache/" ".gitconfig" ".sudo_as_admin_successful" ".landscape/")
+
  ("/home/simon/dotfiles/" (24360 6194 308654 53000) "zshenv" "../" "emacs_d/" "gitconfig" "./" "profile" ".git/" "README.md" "tmux/" "zshrc" "zprofile" ".gitmodules" "zlogout" "zlogin" ".gitignore" "zpreztorc" "tmux_conf" "prezto/" "bashrc" "installer.sh")
 
  ("/home/simon/dotfiles/emacs_d/backup/" (24359 60882 481590 62000) "../" "./" "per-session/" "per-save/")
@@ -233,8 +239,6 @@
  ("/home/simon/projects/igp_livelihood_model/chanse/" (24269 5374 384191 329000) "../" "code/" "farmer_livelihood_model/" "wrr_paper.zip" "data/" "./" ".git/" "README.md" "ee_s1/" "espl_s1/" "alex_msc_paper/" "Rplots.pdf" ".gitignore" "wrr_paper/" ".Rhistory")
 
  ("/home/simon/projects/igp_livelihood_model/" (23857 49716 281481 547000) "../" "./" "plots/" "plots.zip" "__MACOSX/" "chanse/")
-
- ("/home/simon/" (24283 48982 773962 394000) "Templates/" ".virtualenvs/" ".gitconfig" ".npm/" ".mozilla/" "Dropbox/" "sm_cv.pdf" ".cache/" "qrparm.soil_HWSD_cont_cosbyNew.nc" ".jssc/" "grassdata/" ".rstudio-desktop/" ".bashrc" ".jupyter/" ".bash_logout" ".zcompdump.zwc" "R/" ".ssh/" ".authinfo" ".octave_hist" "mirca_monthly_comparison_rice.pdf" "JULES_LCCS2PFT_LUT.csv" "Arduino/" "ghana_nasadem.tif" ".dropbox-dist/" ".tmux/" ".local/" ".dropbox/" ".ICEauthority" "dotfiles/" ".cdsapirc" ".matlab/" "Zotero/" "SWdown_WFDEI_land_200306.nc" ".profile" "tmp/" "test.gms" "virtualenvs/" ".cesm_proj" "mirca_monthly_comparison_wheat.pdf" "surface-data.128x064.clm2_soicol.nc" ".tmux.conf" ".hplip/" "Pictures/" ".zcompdump" ".gnome/" ".~lock.JULES_LCCS2PFT_LUT.csv#" "flwdir_15min.tif" ".particle/" "Music/" ".~lock.Default_LCCS2PFT_LUT.csv#" "rfm_flow_direction.tif" "upixel_15min.tif" ".snap/" ".simile/" ".zprofile" "packages/" ".lesshst" ".gissjava/" ".basex" ".zhistory" ".java/" ".gnupg/" "local/" ".python_history" "faostat_comparison.pdf" ".pki/" ".install4j" "octave/" ".vscode/" ".pylint.d/" ".emacs.d/" ".zotero/" "zotero/" ".gdal/" "Boostnote/" ".zlogout" ".oracle_jre_usage/" ".R/" ".zshenv" "Desktop/" "models/" ".grass7/" ".conda/" ".arduino15/" "DRT/" ".cortex-debug" ".wget-hsts" "dev/" "rfm_flow_direction.tif.aux.xml" ".config/" ".ipython/" ".mu/" ".astropy/" "Default_LCCS2PFT_LUT.csv" ".sane/" ".zprezto/" ".zoom/" "Public/" ".subversion/" ".zshrc" ".zpreztorc" "org/" "projects/" "jules-vn5.4.zip" "anaconda3/" ".bash_history" "Videos/" "Simile/" ".metomi/" "var/" ".gconf/" ".octave_packages" "Documents/" "core" ".zcompcache/" ".zlogin" "find" "mail/" ".qgis2/" "era5-download.py" "Downloads/" "../" "./")
 
  ("/home/simon/projects/" (24272 55363 140688 148000) "lulcc_fix/" "ramirez/" "india_lulcc_1960-2010_v1.7z" "../" "jules_apps/" "gandak_systems_model/" "Drina/" "accra_flood_analysis/" "accra_flood_ineq_analysis/" "lisflood_data/" "./" "GAMS/" "AquaCrop_IGP/" "india_lulcc_1960-2010_wd/" "sensors/" "india_irrigated_area_2001/" "india_crop_area_2005/" "poopo/" "India_RS_MSc_project/" "india_lulcc_1960-2010.7z" "chanse_apps/" "ganges_water_machine/" "consultancy/" "fortran/" ".gitignore" "gandak_systems_model_data/" "jules_hsikai/" "flood_ineq_model/" "india_village_census/" "TestCatchment1/" "india_adm/" "hsikai/" "igp_livelihood_model/" "india_lulcc_1960-2010/" "jules/" ".Rhistory" "lisflood_apps/" "aquacrop_apps/" "process_hwsd/")
 
@@ -393,10 +397,6 @@
  ("/home/simon/projects/aquacrop_apps/ssa/data/aquacrop_os/" (23991 60661 865953 369000) "../" "Output/" "new/" "./" "Input/")
 
  ("/home/simon/projects/aquacrop_apps/" (23911 46238 934483 851000) "../" "./" "ssa/" "requirements.txt" "igp/")
-
- ("/home/simon/projects/gandak_systems_model/" (23983 61598 375481 801000) "../" "analysis/" "run-wb-model.sh" "data/" "./" ".git/" "wbm.prof" "README.md" "groundwater/" ".Rhistory" "land_surface/" "surfacewater_routing/")
-
- ("/home/simon/dev/wbm_farmer/wbm_farmer/" (23984 34387 611916 412000) "../" "FarmParameters.py" "IrrigationSupply.py" "./" "CropYield.py" "variable_list.py" "WaterBalanceModel.py" "LandCoverParameters.py" "FertiliserApplication.py" "Groundwater.py" "Investment.py" "CropParameters.py" "LandCover.py" "GridCellMean.py" "variable_list_crop.py" "LandSurface.py" "PriceData.py" "Income.py" "WBMConfiguration.py" "Accounting.py" "CanalSupply.py" "__pycache__/" "run.py")
 )
 
 ;; ----- ido-unc-hosts-cache -----
