@@ -1,3 +1,5 @@
 tmux/plugins/tmux-*/
 emacs_d/session.*
 emacs_d/network-security.data
+emacs_d/ido.last
+emacs_d/ac-comphist.dat
