@@ -43,29 +43,79 @@ if [ -d "$HOME/.emacs.d/bin" ] ;
   then PATH="$HOME/.emacs.d/bin:$PATH"
 fi
 
-if [ -z "$GRASSBIN" ] ; then
-  export GRASSBIN="/Applications/GRASS-8.2.app/Contents/Resources/bin/grass"
-fi
+export PATH="$HOME/local:$PATH"
 
-if [ -z "$PYTHONPATH" ] ; then 
-  export PYTHONPATH="/Applications/GRASS-8.2.app/Contents/Resources/etc/python:/Applications/GRASS-8.2.app/Contents/Resources/etc/python"
-fi
+# for esa user tools
+export PATH=$HOME/local/esa-cci-user-tools/bin:$PATH
 
-if [ -d "/opt/homebrew/bin" ] ; then
-  PATH=/opt/homebrew/bin:$PATH 
-fi
+export PATH=$HOME:$PATH
 
-if [ -d "$HOME/mars/bin" ] ; then
-  PATH=/Users/simonmoulds/mars/bin/:$PATH
-fi 
+# ######################################################### #
+# JULES
+# ######################################################### #
 
-if [ -d "$HOME/Library/TeX/texbin" ] ; then
-  PATH=/Library/TeX/texbin:$PATH
-fi
+# for Cylc
+export PATH=$HOME/local/cylc/bin:$PATH
 
-if [ -d "$HOME/anaconda3/bin" ] ; then 
-  PATH=$HOME/anaconda3/bin:$PATH
-fi
+# for Rose
+export PATH=$HOME/local/rose/bin:$PATH
+export LD_LIBRARY_PATH=/lib/x86_64-linux-gnu:/usr/local/lib:$HOME/local/lib:$LD_LIBRARY_PATH
+
+# for FCM
+export PATH=$HOME/local/fcm/bin:$HOME/local:$PATH
+
+# export PATH=$HOME/local/svn/bin:$PATH
+
+# cache mosrs password
+export GPG_TTY=$(tty)
+export GPG_AGENT_INFO=`gpgconf --list-dirs agent-socket | tr -d '\n' && echo -n ::`
+[[ "$-" != *i* ]] && return # Stop here if not running interactively
+# . mosrs-setup-gpg-agent
+
+# ######################################################### #
+# NetCDF
+# ######################################################### #
+
+# zlib
+export PATH=/opt/zlib/:$PATH
+
+# openmpi
+export PATH=/opt/openmpi/bin:$PATH
+export LD_LIBRARY_PATH=/opt/openmpi/lib:$LD_LIBRARY_PATH
+
+# netcdf
+# export PATH=/opt/netcdf_par/bin:$PATH
+# export LD_LIBRARY_PATH=/opt/netcdf_par/lib:$LD_LIBRARY_PATH
+
+# ######################################################### #
+# GDAL
+# ######################################################### #
+
+export GDAL_DATA=$(gdal-config --datadir)
+
+# if [ -z "$GRASSBIN" ] ; then
+#   export GRASSBIN="/Applications/GRASS-8.2.app/Contents/Resources/bin/grass"
+# fi
+#
+# if [ -z "$PYTHONPATH" ] ; then 
+#   export PYTHONPATH="/Applications/GRASS-8.2.app/Contents/Resources/etc/python:/Applications/GRASS-8.2.app/Contents/Resources/etc/python"
+# fi
+
+# if [ -d "/opt/homebrew/bin" ] ; then
+#   PATH=/opt/homebrew/bin:$PATH 
+# fi
+#
+# if [ -d "$HOME/mars/bin" ] ; then
+#   PATH=/Users/simonmoulds/mars/bin/:$PATH
+# fi 
+#
+# if [ -d "$HOME/Library/TeX/texbin" ] ; then
+#   PATH=/Library/TeX/texbin:$PATH
+# fi
+
+# if [ -d "$HOME/anaconda3/bin" ] ; then 
+#   PATH=$HOME/anaconda3/bin:$PATH
+# fi
   
 #   PATH=/opt/local/bin:$PATH
 #   PATH=/usr/local/bin:$PATH 
@@ -280,9 +330,9 @@ alias pscpu='ps auxf | sort -nr -k 3'
 # alias tozsh="sudo chsh $USER -s /bin/zsh && echo 'Now log out.'"
 # alias tofish="sudo chsh $USER -s /bin/fish && echo 'Now log out.'"
 
-# bare git repo alias for dotfiles
-alias config="/usr/bin/git --git-dir=$HOME/dotfiles --work-tree=$HOME"
-
+# # bare git repo alias for dotfiles
+# alias config="/usr/bin/git --git-dir=$HOME/dotfiles --work-tree=$HOME"
+#
 # # termbin
 # alias tb="nc termbin.com 9999"
 
@@ -311,20 +361,24 @@ alias rr='curl -s -L https://raw.githubusercontent.com/keroserene/rickrollrc/mas
 ### SETTING THE STARSHIP PROMPT ###
 eval "$(starship init zsh)"
 
-
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/Users/simonmoulds/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+__conda_setup="$('/mnt/homes/sm510/mambaforge/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
 if [ $? -eq 0 ]; then
     eval "$__conda_setup"
 else
-    if [ -f "/Users/simonmoulds/anaconda3/etc/profile.d/conda.sh" ]; then
-        . "/Users/simonmoulds/anaconda3/etc/profile.d/conda.sh"
+    if [ -f "/mnt/homes/sm510/mambaforge/etc/profile.d/conda.sh" ]; then
+        . "/mnt/homes/sm510/mambaforge/etc/profile.d/conda.sh"
     else
-        export PATH="/Users/simonmoulds/anaconda3/bin:$PATH"
+        export PATH="/mnt/homes/sm510/mambaforge/bin:$PATH"
     fi
 fi
 unset __conda_setup
+
+if [ -f "/mnt/homes/sm510/mambaforge/etc/profile.d/mamba.sh" ]; then
+    . "/mnt/homes/sm510/mambaforge/etc/profile.d/mamba.sh"
+fi
 # <<< conda initialize <<<
 
-alias dotfiles='/usr/bin/git --git-dir=/Users/simonmoulds/.dotfiles/ --work-tree=/Users/simonmoulds'
+
+alias dotfiles='/usr/bin/git --git-dir=/home/sm510/.dotfiles/ --work-tree=/home/sm510'
