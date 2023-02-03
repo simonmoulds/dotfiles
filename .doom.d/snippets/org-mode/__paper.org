@@ -1,0 +1,18 @@
+#+TITLE: Title goes here
+#+OPTIONS: toc:nil author:nil
+#+LaTeX_CLASS: article
+#+LaTeX_CLASS_OPTIONS: [a4paper]
+#+LaTeX_HEADER: \author{author name}
+#+LaTeX_HEADER: \usepackage[backend=biber, style=apa]{biblatex}
+
+@@latex:\abstract{This is the abstract}@@
+
+* Introduction
+And now just type away!
+
+** This is a sub-heading!
+Remember our lists?
+- Here is a list entry
+- Here is another one
+
+@@latex:\printbibliography@@
