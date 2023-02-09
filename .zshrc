@@ -359,7 +359,7 @@ alias rr='curl -s -L https://raw.githubusercontent.com/keroserene/rickrollrc/mas
 # fi
 
 ### SETTING THE STARSHIP PROMPT ###
-# eval "$(starship init zsh)"
+eval "$(starship init zsh)"
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
