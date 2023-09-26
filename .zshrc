@@ -56,7 +56,7 @@ if [ -d "/opt/homebrew/bin" ] ; then
 fi
 
 if [ -d "$HOME/mars/bin" ] ; then
-  PATH=/Users/simonmoulds/mars/bin/:$PATH
+  PATH=$HOME/mars/bin/:$PATH
 fi 
 
 if [ -d "$HOME/Library/TeX/texbin" ] ; then
@@ -281,7 +281,7 @@ alias pscpu='ps auxf | sort -nr -k 3'
 # alias tofish="sudo chsh $USER -s /bin/fish && echo 'Now log out.'"
 
 # bare git repo alias for dotfiles
-alias config="/usr/bin/git --git-dir=$HOME/dotfiles --work-tree=$HOME"
+alias config="/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME"
 
 # # termbin
 # alias tb="nc termbin.com 9999"
@@ -314,17 +314,21 @@ eval "$(starship init zsh)"
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/Users/simonmoulds/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+__conda_setup="$('/Users/smoulds/mambaforge/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
 if [ $? -eq 0 ]; then
     eval "$__conda_setup"
 else
-    if [ -f "/Users/simonmoulds/anaconda3/etc/profile.d/conda.sh" ]; then
-        . "/Users/simonmoulds/anaconda3/etc/profile.d/conda.sh"
+    if [ -f "/Users/smoulds/mambaforge/etc/profile.d/conda.sh" ]; then
+        . "/Users/smoulds/mambaforge/etc/profile.d/conda.sh"
     else
-        export PATH="/Users/simonmoulds/anaconda3/bin:$PATH"
+        export PATH="/Users/smoulds/mambaforge/bin:$PATH"
     fi
 fi
 unset __conda_setup
+
+if [ -f "/Users/smoulds/mambaforge/etc/profile.d/mamba.sh" ]; then
+    . "/Users/smoulds/mambaforge/etc/profile.d/mamba.sh"
+fi
 # <<< conda initialize <<<
 
-alias dotfiles='/usr/bin/git --git-dir=/Users/simonmoulds/.dotfiles/ --work-tree=/Users/simonmoulds'
+export JAVA_HOME=$(/usr/libexec/java_home)
