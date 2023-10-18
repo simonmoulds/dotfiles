@@ -39,32 +39,20 @@ if [ -d "$HOME/.local/bin" ] ;
   then PATH="$HOME/.local/bin:$PATH"
 fi
 
+if [ -d "$HOME/.local/usr/bin" ] ;
+  then PATH="$HOME/.local/usr/bin:$PATH"
+fi
+
 if [ -d "$HOME/.emacs.d/bin" ] ;
   then PATH="$HOME/.emacs.d/bin:$PATH"
 fi
 
-if [ -z "$GRASSBIN" ] ; then
-  export GRASSBIN="/Applications/GRASS-8.2.app/Contents/Resources/bin/grass"
-fi
-
-if [ -z "$PYTHONPATH" ] ; then 
-  export PYTHONPATH="/Applications/GRASS-8.2.app/Contents/Resources/etc/python:/Applications/GRASS-8.2.app/Contents/Resources/etc/python"
-fi
-
-if [ -d "/opt/homebrew/bin" ] ; then
-  PATH=/opt/homebrew/bin:$PATH 
-fi
-
-if [ -d "$HOME/mars/bin" ] ; then
-  PATH=$HOME/mars/bin/:$PATH
+if [ -d "$HOME/mars/bin" ] ; 
+  then PATH=$HOME/mars/bin/:$PATH
 fi 
 
-if [ -d "$HOME/Library/TeX/texbin" ] ; then
-  PATH=/Library/TeX/texbin:$PATH
-fi
-
-if [ -d "$HOME/anaconda3/bin" ] ; then 
-  PATH=$HOME/anaconda3/bin:$PATH
+if [ -d "$HOME/anaconda3/bin" ] ; 
+  then PATH=$HOME/anaconda3/bin:$PATH
 fi
   
 #   PATH=/opt/local/bin:$PATH
@@ -312,23 +300,3 @@ alias rr='curl -s -L https://raw.githubusercontent.com/keroserene/rickrollrc/mas
 eval "$(starship init zsh)"
 
 
-# >>> conda initialize >>>
-# !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/Users/smoulds/mambaforge/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-else
-    if [ -f "/Users/smoulds/mambaforge/etc/profile.d/conda.sh" ]; then
-        . "/Users/smoulds/mambaforge/etc/profile.d/conda.sh"
-    else
-        export PATH="/Users/smoulds/mambaforge/bin:$PATH"
-    fi
-fi
-unset __conda_setup
-
-if [ -f "/Users/smoulds/mambaforge/etc/profile.d/mamba.sh" ]; then
-    . "/Users/smoulds/mambaforge/etc/profile.d/mamba.sh"
-fi
-# <<< conda initialize <<<
-
-export JAVA_HOME=$(/usr/libexec/java_home)
