@@ -32,29 +32,43 @@ export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 
 ### PATH
 if [ -d "$HOME/.bin" ] ;
-  then PATH="$HOME/.bin:$PATH"
+then 
+	PATH="$HOME/.bin:$PATH"
 fi
 
 if [ -d "$HOME/.local/bin" ] ;
-  then PATH="$HOME/.local/bin:$PATH"
+then 
+	PATH="$HOME/.local/bin:$PATH"
 fi
 
 if [ -d "$HOME/.local/usr/bin" ] ;
-  then PATH="$HOME/.local/usr/bin:$PATH"
+then 
+	PATH="$HOME/.local/usr/bin:$PATH"
 fi
 
 if [ -d "$HOME/.emacs.d/bin" ] ;
-  then PATH="$HOME/.emacs.d/bin:$PATH"
+then 
+	PATH="$HOME/.emacs.d/bin:$PATH"
 fi
 
 if [ -d "$HOME/mars/bin" ] ; 
-  then PATH=$HOME/mars/bin/:$PATH
+then 
+	PATH=$HOME/mars/bin/:$PATH
 fi 
 
 if [ -d "$HOME/anaconda3/bin" ] ; 
-  then PATH=$HOME/anaconda3/bin:$PATH
+then 
+	PATH=$HOME/anaconda3/bin:$PATH
 fi
-  
+
+if [ -d "$HOME/.local/cuda-11.7" ] ; 
+then 
+	PATH=$HOME/.local/cuda-11.7/bin:$PATH
+	LD_LIBRARY_PATH=$HOME/.local/cuda-11.7/lib64:$LD_LIBRARY_PATH
+fi
+
+export DATA=/exports/geos.ed.ac.uk/moulds_hydro
+
 #   PATH=/opt/local/bin:$PATH
 #   PATH=/usr/local/bin:$PATH 
 #   PATH=/usr/bin:$PATH
@@ -299,4 +313,18 @@ alias rr='curl -s -L https://raw.githubusercontent.com/keroserene/rickrollrc/mas
 ### SETTING THE STARSHIP PROMPT ###
 eval "$(starship init zsh)"
 
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/opt/conda/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/opt/conda/etc/profile.d/conda.sh" ]; then
+        . "/opt/conda/etc/profile.d/conda.sh"
+    else
+        export PATH="/opt/conda/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<
 
